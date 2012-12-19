@@ -1,0 +1,5 @@
+<?if( isset($section) ) {?>
+<script id="search-template" type="text/x-jquery-tmpl">
+<?include "$confroot/$scripts/search-$section-temp.js"?>
+</script>
+<?}?>

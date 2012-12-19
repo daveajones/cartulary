@@ -76,6 +76,10 @@ function create_user($email = NULL, $silent = NULL, $inside = NULL, $active = NU
     send_newuser_email($email, $password);
   }
 
+  //Create an initial prefs entry
+  init_user_prefs($newuid);
+
+
   //Log it
   loggit(1, "Created the new user: [$email|$newuid|$password|$username|$name]");
 

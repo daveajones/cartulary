@@ -88,13 +88,13 @@ if( strlen($url) > 760 ) {
 $url = trim($url);
 
 //Is the feed even valid?
-$content = @file_get_contents($url);
+$content = fetchUrl($url);
 if( isset($_REQUEST['dig']) ) {
   //Can we get an alternate link from the html at this url?
   $feedloc = getAlternateLinkUrl($content);
   if( !empty($feedloc) ) {
     $url = absolutizeUrl($feedloc, $url);
-    $content = @file_get_contents($url);
+    $content = fetchUrl($url);
     loggit(3, "Built url: [$url] from the bookmarklet.");
   } else {
     die('This site does not publish a feed. :-(');
@@ -108,14 +108,14 @@ if( $content == FALSE && $urltarget != "local" ) {
     $url = 'http://'.$url;
   }
   loggit(3, "Bad feed check for url: [$oldurl]. Trying again as: [$url].");
-  $content = @file_get_contents($url);
+  $content = fetchUrl($url);
 }
 if( $content == FALSE && $urltarget != "local" ) {
   //This feed wasn't good, so let's append a default to the end and try again
   $oldurl = $url;
   $url = rtrim($url, '/')."/".$default_social_outline_file_name;
   loggit(3, "Bad feed check for url: [$oldurl]. Trying again as: [$url].");
-  $content = @file_get_contents($url);
+  $content = fetchUrl($url);
 }
 if( $content == FALSE ) {
   //Log it

@@ -510,6 +510,7 @@ function fetchUrl($url, $timeout = 5)
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
 	curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
         curl_setopt($ch,CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch,CURLOPT_ENCODING, "");
 	$data = curl_exec($ch);
         $response = curl_getinfo($ch);
 	curl_close($ch);

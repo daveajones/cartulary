@@ -40,10 +40,13 @@ River.generate = (function () {
         if( initialized == false ) {
  		_populate(jsonRiverData);
 		console.log("DEBUG: Populated river locally.");
+
+                <?if($g_platform != "mobile"){?>
                 // check river data every 5 minutes
                 setInterval(function () {
-        		_init(url, callback, initialized);
+                        _init(url, callback, initialized);
                 }, 300000);
+                <?}?>
 
 		initialized = true;
 	     	return true;

@@ -3,6 +3,9 @@
 ##:   Of course, you can skip anything that's already on your system.  Like, the apt-get's.
 
 
+[before starting, cd into the git project folder.  probably called "cartulary-master"]
+
+
 ##: Install Apache and PHP5
 > sudo apt-get update
 > sudo apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-tidy ccze
@@ -11,10 +14,8 @@
 
 ##: Install MySql
 > sudo apt-get install -y mysql-server php5-mysql
-> sudo mysql_install_db
 > sudo mysql_secure_installation
 [Yes, <enter root password>, Yes, Yes, Yes, Yes]
-> sudo /etc/init.d/apache2 restart
 
 
 ##: Build Database
@@ -23,10 +24,12 @@
 >> create user cartulary identified by '<make a good password>';
 >> grant usage on *.* to cartulary@localhost identified by '<the same good password>';
 >> grant all privileges on cartulary.* to cartulary@localhost;
-> mysql -ucartulary -p cartulary < cartulary.sql
+>> exit
+> mysql -ucartulary -p cartulary < opt/cartulary/templates/cartulary.sql
 
 
 ##: Configure PHP
+> sudo /etc/init.d/apache2 restart
 [add the following to the end of /etc/php5/apache and /etc/php5/cli]
  [cartulary]
  cartulary_conf="/opt/cartulary"

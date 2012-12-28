@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 10, 2012 at 10:49 PM
+-- Generation Time: Dec 28, 2012 at 06:16 PM
 -- Server version: 5.5.24
 -- PHP Version: 5.3.10-1ubuntu3.4
 
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `adminlog` (
   `sourceurl` varchar(1024) NOT NULL COMMENT 'The url of the source feed',
   `sourcetitle` varchar(255) NOT NULL COMMENT 'The title of the source feed',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='The main article vault.' AUTO_INCREMENT=38 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='The main article vault.' AUTO_INCREMENT=58 ;
 
 -- --------------------------------------------------------
 
@@ -321,7 +321,7 @@ CREATE TABLE IF NOT EXISTS `rivers` (
   `mriver` mediumblob NOT NULL COMMENT 'Mobile version of the river array.',
   PRIMARY KEY (`userid`),
   KEY `id` (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Holds pre-built river arrays for each user.' AUTO_INCREMENT=144425 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Holds pre-built river arrays for each user.' AUTO_INCREMENT=162369 ;
 
 -- --------------------------------------------------------
 
@@ -441,6 +441,17 @@ CREATE TABLE IF NOT EXISTS `strings` (
   `message` varchar(255) NOT NULL COMMENT 'The text of the message.',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='A list of commonly used character strings.';
+
+
+INSERT INTO `strings` (`type`, `id`, `message`) VALUES
+(2, 0, 'You can''t have a blank password or username.'),
+(2, 1, 'No article id given in the request.  Cartulize failure?'),
+(2, 2, 'That user and password isn''t valid.'),
+(2, 4, 'Could not create the session.'),
+(2, 6, 'That user and password isn''t valid.'),
+(2, 8, 'Too many bad login attempts.  You must wait 5 minutes to login again.'),
+(2, 13, 'You are not allowed to view that article.'),
+(2, 30, 'The username or password wasn''t a sane length.');
 
 -- --------------------------------------------------------
 

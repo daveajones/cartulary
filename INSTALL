@@ -1,6 +1,8 @@
 ##: Server Setup on Ubuntu 12.04
 ##:   Commands to be issued are preceded with a ">".  Comments on things you need to do are wrapped with []'s.
 ##:   Of course, you can skip anything that's already on your system.  Like, the apt-get's.
+##:   These instructions assume some basic familiarity with what's going on.  You could easily convert it to a 
+##:   shell script and run it in one go if you feel so inclined. :-)
 
 
 [before starting, cd into the git project folder.  probably called "cartulary-master"]
@@ -9,13 +11,13 @@
 ##: 1. Install Apache and PHP5
 > sudo apt-get update
 > sudo apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-tidy ccze
-[add .index.php. to /etc/apache2/mods-enabled/dir.conf]
 
 
 ##: 2. Install MySql
 > sudo apt-get install -y mysql-server php5-mysql
+[you should set a root password during this step and write it down]
 > sudo mysql_secure_installation
-[Yes, <enter root password>, Yes, Yes, Yes, Yes]
+[No, Yes, Yes, Yes, Yes]
 
 
 ##: 3. Build Database
@@ -25,11 +27,10 @@
 >> grant usage on *.* to cartulary@localhost identified by '<the same good password>';
 >> grant all privileges on cartulary.* to cartulary@localhost;
 >> exit
-> mysql -ucartulary -p cartulary < opt/cartulary/templates/cartulary.sql
+> mysql -ucartulary -p cartulary < templates/cartulary.sql
 
 
 ##: 4. Configure PHP
-> sudo /etc/init.d/apache2 restart
 [add the following to the end of /etc/php5/apache2/php.ini and /etc/php5/cli/php.ini]
  [cartulary]
  cartulary_conf="/opt/cartulary"
@@ -60,6 +61,10 @@
 ##: 9. Install Crontab
 > sudo php /opt/cartulary/bin/syscheck.php
 [this step creates the cron job entries to start the aggregator and support scripts]
+
+
+##: 10. Set permissions
+> sudo chown www-data /opt/cartulary/logs/*
 
 
 ##: All done!

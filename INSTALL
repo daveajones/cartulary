@@ -37,7 +37,7 @@
 
 
 ##: Install Cartulary Files
-> sudo mv -R [/path/to/git/source/cartulary] /opt
+> sudo mv [/path/to/git/source/cartulary-master] /opt/cartulary
 
 
 ##: Create Cartulary Config File

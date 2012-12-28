@@ -1,6 +1,0 @@
-<div class="row page-header" id="divPageTitle" style="border-bottom:solid #333 1px;">
-        <a class="aPreauthLogout" href="<?echo $logoutpage?>">Logout</a>
-        <h1><?echo $system_name?></h1>
-</div>
-<div class="pageContentWrapper <?echo $section?>">
-

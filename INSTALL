@@ -33,11 +33,16 @@
 [add the following to the end of /etc/php5/apache2/php.ini and /etc/php5/cli/php.ini]
  [cartulary]
  cartulary_conf="/opt/cartulary"
-> sudo /etc/init.d/apache2 restart
 
 
 ##: Install Cartulary Files
 > sudo mv [/path/to/git/source/cartulary-master] /opt/cartulary
+
+
+##: Configure Apache
+> sudo cp /opt/cartulary/templates/apache.conf /etc/apache2/sites-available/cartulary
+> sudo ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cartulary
+> sudo /etc/init.d/apache2 restart
 
 
 ##: Create Cartulary Config File

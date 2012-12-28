@@ -1,0 +1,972 @@
+/* ---------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------- */
+@media all { /* ----------- Start Media: All ---------------------------- */
+/* ---------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------- */
+
+
+/* --------------------------------------------------- */
+/* ----- Fonts and other imports ----- */
+@import url(http://fonts.googleapis.com/css?family=Orienta);
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Body and other major elements ----- */
+/* body {  background:#4d4d4d url(../images/bg-body.jpg) repeat top left;  } */
+
+body > .container {
+  width:90%;
+  margin-left:auto;
+  margin-right:auto;
+}
+a {  color:#059;  }
+.pageContentWrapper .statline {  text-align:right;  }
+.pageContentWrapper .statline > ul, .pageContentWrapper .statline > ul > li {
+  list-style:none;
+  display:inline;
+  margin:0 5px 3px;
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Widgets ----- */
+.ui-datepicker {
+  background: white;
+  font-size:150%;
+  line-height:150%;
+  border:solid black 1px;
+}
+.ui-datepicker-trigger {
+  margin-top:-3px;
+  margin-left:2px;
+}
+.ui-datepicker-next {  float: right;  }
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Navbar ----- */
+#divMainMenu .navbar {  margin-top:10px;  }
+#divSearchMenu .navbar {  margin-top:5px;  }
+.btnCloseSearchResults {  float:right;  }
+.popSearchResults {
+  height:400px;
+  width:600px;
+}
+.popSearchResults .popover-content {
+  overflow:auto;
+  height:335px;
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Header ----- */
+#divProfileHeader {  float:right;  }
+#divProfileHeader img.avatarheader {  max-height: 64px;  }
+#divPageTitle {
+  color: #222;
+  font-size: 130%;
+  text-shadow:0 1px 0 #777;
+  border:none;
+}
+.lblLoginLabel {
+  color: #222;
+  text-shadow:0 1px 0 #777;  
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- River ----- */
+.pageContentWrapper.River #stream-sidebar-left {  display:none;  }
+.pageContentWrapper.River #stream-sidebar-right {  display:none;  }
+.pageContentWrapper.River #stream {  max-width:600px; padding:1px;  }
+.pageContentWrapper.River #stream .notice {  color:white;  }
+.pageContentWrapper.River #stream-header {  display:none;  }
+.pageContentWrapper.River #stream .section {
+  font-family:'Orienta', sans-serif;
+  position: relative;
+  background-color:#fff;
+  margin:0 0 20px;
+  padding:0 0 0 0;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.River #stream .section > .article.fulltext {
+  white-space: pre-line;
+}
+.pageContentWrapper.River #stream .section > .article {
+  padding:20px 20px 8px;
+  word-wrap:break-word;
+  word-break:hyphenate;
+}
+.pageContentWrapper.River #stream .section > .article + .article {
+  padding:0 20px 8px;
+  word-wrap:break-word;
+  word-break:hyphenate;
+}
+.pageContentWrapper.River #stream .section .article h3 {
+  font-size:120%;
+  margin-bottom:10px;
+}
+.pageContentWrapper.River #stream .section .article .description {
+  font-size:110%;
+}
+.pageContentWrapper.River #stream .section .article .bodypic {
+  display:block;
+  margin:20px auto 10px;
+  max-width:500px;
+}
+.pageContentWrapper.River #stream .section .encpicture {
+  display:block;
+  margin:20px auto 10px;
+  max-width: 500px;
+}
+.pageContentWrapper.River #stream .section .riverminitar { 
+  float:right;
+  max-height:64px;
+  max-width:64px;
+  margin:8px;
+}
+.pageContentWrapper.River #stream .section .article .bodyvid {
+  display:block;
+  margin:10px auto 10px;
+  width:500px;
+  height:300px;
+}
+.pageContentWrapper.River #stream .section .article .encvideo {
+  display:block;
+  margin:10px auto 10px;
+  width:500px;
+  height:300px;
+}
+.pageContentWrapper.River #stream .section > .header {
+  padding:10px 10px 5px;
+  background-color:#ddd;
+  border-bottom:solid #bbb 1px;  
+}
+.pageContentWrapper.River #stream .section > .header .header-tools {  display:none;  }
+.pageContentWrapper.River #stream .section .sticky:nth-of-type(2) {
+  background-image: linear-gradient(bottom, #FFFFFF 70%, #fca 100%);
+  background-image: -o-linear-gradient(bottom, #FFFFFF 70%, #fca 100%);
+  background-image: -moz-linear-gradient(bottom, #FFFFFF 70%, #fca 100%);
+  background-image: -webkit-linear-gradient(bottom, #FFFFFF 70%, #fca 100%);
+  background-image: -ms-linear-gradient(bottom, #FFFFFF 70%, #fca 100%);
+}
+.pageContentWrapper.River #stream .section > .article .aUnSticky {  float:right;  }
+.pageContentWrapper.River #stream .section > .article .header {  font-size:150%;  }
+.pageContentWrapper.River #stream .section > .article .footer {  margin:20px 0 0;  }
+.pageContentWrapper.River #stream .section > .article .footer .actions img {
+  float:right;
+  padding:5px;
+}
+.pageContentWrapper.River #stream .section > .article .footer .actions button {
+  float:right;
+  padding:5px;
+}
+.pageContentWrapper.River #stream .section > .article .footer .time {  float:left; }
+.pageContentWrapper.River #stream .section > .article .footclear {  clear:both;  }
+.pageContentWrapper.River #header h2 {  display:none;  }
+.pageContentWrapper.River #stream-header {  margin-bottom:10px;  }
+.pageContentWrapper.River #stream-updated {
+  float:none;
+  margin:0 0 10px;
+}
+.pageContentWrapper.River #stream-view {
+  float:none;
+  margin:0 0 10px;
+}
+.pageContentWrapper.River #footer p {  font-size:0.6875em;  }
+.pageContentWrapper.River #stream .section .header h2 {  float:none; margin-top:0;  }
+.pageContentWrapper.River #stream .section .header .time {  float:none; padding:0; margin-top:0;  }
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Show Article ----- */
+.pageContentWrapper.Articles #divPageArticle {
+  position: relative;
+  *padding-top: 19px;
+  width:600px;
+  margin-left:auto;
+  margin-right:auto;
+  background-color: #FBF0D9;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Articles #divPageArticle #article {
+  font-family: Georgia, sans-serif;
+  font-size: 130%;
+  line-height: 150%;
+  background-color: #FBF0D9;
+  color: #5F4B32;
+  padding: 15px;
+  padding-top: 10px;
+}
+.pageContentWrapper.Articles #divPageArticle #article #headline {
+  font-size:80%;
+  margin-bottom:20px;
+}
+.pageContentWrapper.Articles #divPageArticle #article #content img {  max-width:500px;  }
+.pageContentWrapper.Articles #divPageArticle #article #content iframe {  max-width:500px;  }
+.pageContentWrapper.Articles #divPageArticle #article #content object {  max-width:500px;  }
+.pageContentWrapper.Articles #divPageArticle #article #content embed {  max-width:500px;  }
+.pageContentWrapper.Articles #divPageArticle #article #content .bodyvid {
+  display:block;
+  max-width:500px;
+  width:500px;
+  height:280px;
+  margin:10px auto 10px;
+}
+.pageContentWrapper.Articles #divPageArticle #article .footer {  border-top:solid #ddd 1px;  }
+.pageContentWrapper.Articles #divPageArticle #article .footer .divToolBox {
+  text-align:center;
+  margin:10px auto 10px;
+}
+.pageContentWrapper.Articles #divPageArticle #article .footer .divToolBox .opml {  display:none;  }
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Microblog ----- */
+.pageContentWrapper.Microblog #divBlogPost {
+  position: relative;
+  padding:40px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Microblog #divBlogPost #divPostIt {  float:right;  }
+.pageContentWrapper.Microblog #divBlogPost #divPostSubmit #chkTweet {  display:none;  }
+.pageContentWrapper.Microblog #divBlogPost #divPostText #txtContent {
+  font-size:150%;
+  line-height:130%;
+  margin-top:10px;
+  width:99%;
+  height:130px;
+}
+.pageContentWrapper.Microblog #divBlogPost #divTitle input {  width:70%;  }
+.pageContentWrapper.Microblog #divBlogPost #divLink input {  width:70%;  }
+.pageContentWrapper.Microblog #divBlogPost #divEnclosures {  display:none;  }
+.pageContentWrapper.Microblog #divBlogPost #divUpload {  display:none;  }
+.pageContentWrapper.Microblog #divBlogPost #divEnclosures #queue {
+    background-color: #444;
+    border: 1px dashed #666;
+    color: white;
+    border-radius: 5px;
+    min-height: 50px;
+    overflow: auto;
+    padding: 3px;
+    min-width: 350px;
+    max-width: 866px;
+}
+.pageContentWrapper.Microblog #divPostList {
+  position: relative;
+  margin-top:10px;
+  padding:20px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Microblog #divPostList ul {  list-style:none;  }
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Articles ----- */
+.pageContentWrapper.Articles #date-line {
+  position: relative;
+  text-align:right;
+  padding:10px 10px 0;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Articles #date-line .divDateSelect {  float:right;  }
+.pageContentWrapper.Articles #date-line .txtDatePicker {
+  width:80px;
+  margin:5px 2px 5px;
+}
+.pageContentWrapper.Articles #date-line #btnSubmitDates {
+  float:left;
+  min-width:50px;
+  min-height:50px;
+}
+.pageContentWrapper.Articles #divArticles {
+  position:relative;
+  clear:both;
+  margin-top:10px;
+  padding:20px;
+  *padding-top:19px;
+  background-color:#fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Articles #divArticles ul {  list-style:none;  }
+.pageContentWrapper.Articles #divArticles ul li {  margin:5px auto 15px;;  }
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Subscribe ----- */
+.Subscribe-searchpop .popSearchResults .popover-content ul li {
+  clear:both;  
+}
+.Subscribe-searchpop .popSearchResults .popover-content ul li:hover {
+  background-color:#ddd;
+}
+.Subscribe-searchpop .popSearchResults .popover-content ul li:hover a {
+  text-decoration:none;
+  font-weight:bold;
+  font-size:130%;
+  line-height:120%;
+}
+.Subscribe-searchpop .popSearchResults .popover-content ul li span.feed-properties {
+  display:inline-block;
+  float:right;
+}
+.pageContentWrapper.Subscribe #divSubscribe {
+  position: relative;
+  padding:20px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Subscribe #divSubscribe #txtSubscribeUrl {
+  width:97%;
+  background:#fff;
+}
+.pageContentWrapper.Subscribe #divSubscribePeople {
+  position: relative;
+  padding:20px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Subscribe #divSubscriptions {
+  position: relative;
+  padding:20px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+.pageContentWrapper.Subscribe #divSubscribePeople a {  color:#722;  }
+.pageContentWrapper.Subscribe #divSubscribePeople .person {
+  color:white;
+  float:left;
+  display:inline-block;
+  background:#555;
+  text-shadow:0 1px 0 #333;
+  margin:8px;
+  border:solid #555 2px;
+}
+.pageContentWrapper.Subscribe #divSubscribePeople .personcaption-block {
+  display:block;
+}
+.pageContentWrapper.Subscribe #divSubscribePeople .personcaption-inline {
+  display:inline;
+}
+.pageContentWrapper.Subscribe #divSubscribePeople .smallPerson {
+  width:96px;
+}
+.pageContentWrapper.Subscribe #divSubscribePeople .smallPerson .personimg {
+  width:96px;
+  height:96px;
+}
+.pageContentWrapper.Subscribe #divSubscribePeople .bigPerson {
+  width:95%;
+  max-width:222px
+}
+.pageContentWrapper.Subscribe #divSubscribePeople .bigPerson .personimg {
+  width:48px;
+  height:48px;
+}
+.pageContentWrapper.Subscribe #divSubscribePeople .bigPerson .feed-title {
+  display:inline-block;
+  width:70%;
+}
+.pageContentWrapper.Subscribe #divSubscribePeople .person .persondrop {
+  display:none;
+  float:right;
+  padding:5px;
+}
+
+.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li img.icon-warning {  display:inline;  }
+.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li a.aFeedRaw {  display:inline;  }
+.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li span.feed-properties {
+  display:inline-block;
+  float:right;
+}
+.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li {
+  clear:both;
+  margin:3px 0 0;
+}
+.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li a {
+  display:inline-block;
+  width:70%;
+}
+.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li:hover {
+  background-color:#ddd;
+}
+.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li:hover a {
+  text-decoration:none;
+  font-weight:bold;
+  font-size:130%;
+  line-height:120%;
+}
+.pageContentWrapper.Subscribe a.nooverflow {
+  vertical-align:middle;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  word-wrap:nowrap;
+}
+
+.pageContentWrapper.Subscribe .liManagedList {
+  background:#777;
+  border:solid black 1px;
+  margin:3px;
+  color:black;
+  font-size:110%;
+  min-height:30px;
+}
+.pageContentWrapper.Subscribe #divSubscriptions .liManagedList a { color:white; }
+.pageContentWrapper.Subscribe #divSubscriptions .liManagedList .ulListFeeds {
+  font-size:80%;
+}
+.pageContentWrapper.Subscribe #divSubscriptions .listdrop {
+  display:none;
+  float:right;
+  padding:5px;
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Feed Finder ----- */
+.pageContentWrapper.Subscribe #divFeedFinder {
+  position: relative;
+  padding:20px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Admin:User ----- */
+.pageContentWrapper.Admin-user #divAdmin #divUserCreate {
+  position: relative;
+  padding:20px 20px 0px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Admin-user #divAdmin #divUserCreate .divCreateEmail input {
+  width:96%;
+}
+.pageContentWrapper.Admin-user #divAdmin #divUserCreate .divCreateSubmit {
+  margin:10px;
+  text-align:right;
+}
+.pageContentWrapper.Admin-user #divAdmin #divUserManage {
+  position: relative;
+  margin-bottom:10px;
+  padding:20px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Admin-user #divAdmin #divUserManage .cellFocus {  background:#def;  }
+.pageContentWrapper.Admin-user #divAdmin #divUserManage .trEditUser {  display:none;  background:#def;  }
+.pageContentWrapper.Admin-user #divAdmin #divUserManage .trEditUser .btn-primary {  float:right;  }
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Admin:Feeds ----- */
+.pageContentWrapper.Admin-feed #divAdmin #divFeedAdmin {
+  position: relative;
+  padding:10px 10px 0px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Wizard ----- */
+.pageContentWrapper.Wizard {  margin-top:10px; }
+.pageContentWrapper.Wizard #divNewUser1 {
+  position: relative;
+  padding:20px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Wizard #divNewUser2 {
+  position: relative;
+  padding:20px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Error ----- */
+.pageContentWrapper.Error {  margin-top:10px; }
+.pageContentWrapper.Error #divErrorPage {
+  position: relative;
+  padding:20px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Prefs ----- */
+.pageContentWrapper.Prefs #divPrefs #divBookmarklets {
+  position: relative;
+  padding:20px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Prefs #divPrefs #divSetpw {
+  position: relative;
+  padding:20px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Prefs #divPrefs #divSetpw ul {  list-style: none;  }
+.pageContentWrapper.Prefs #divPrefs #divSetpw input.urlinput {  width: 95%;  }
+.pageContentWrapper.Prefs #divPrefs #divSetpw #btnPwdSubmit {  float:none;  }
+.pageContentWrapper.Prefs #divPrefs #divSetpw .buttonline {  text-align: right;  }
+.pageContentWrapper.Prefs #divPrefs .divPrefPane {
+  position: relative;
+  padding:20px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Prefs #divPrefs #divPref input.urlinput {  width:95%;  }
+/* --------------------------------------------------- */
+
+
+/* --------------------------------------------------------- */
+} /* ---------------- End Media: All ----------------------- */
+/* --------------------------------------------------------- */
+
+
+
+
+/* ----------------------------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------------------------- */
+@media (min-width:980px) { /* ---------- Start Media: 1000 -------------------------------------- */
+/* ----------------------------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------------------------- */
+
+
+/* --------------------------------------------------- */
+/* ----- Navbar ----- */
+#divMainMenu .navbar {  margin:0;  }
+#divMainMenu .navbar-inner {  padding:0;  }
+#divMainMenu .navbar .brand {  display:none;  }
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- River ----- */
+.pageContentWrapper.River #stream-sidebar-left {
+  float:left;
+  display:block;
+  position:relative;
+  width:240px;
+}
+.pageContentWrapper.River #stream-sidebar-left #divMe {
+  position: relative;
+  padding:10px 10px 0px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.River #stream {
+  display:block;
+  float:left;
+  margin:0 0 0 20px;
+}
+.pageContentWrapper.River #stream-sidebar-left #divMe #divSaySomething {
+  margin-top:15px;
+  border-bottom:solid #ddd 1px;
+}
+.pageContentWrapper.River #stream-sidebar-left #divMe #divSaySomething #txtSaySomething.smallSaySomething {
+  height:100px;
+}
+.pageContentWrapper.River #stream-sidebar-left #divMe #divSaySomething #txtSaySomething.bigSaySomething {
+  height:300px;
+}
+.pageContentWrapper.River #stream-sidebar-left #divMe .quickTweet { float:right; text-align:right; }
+
+.pageContentWrapper.River #stream-sidebar-left #divMe #divMicroblogWidget div p {
+  display:none;
+}
+.pageContentWrapper.River #stream-sidebar-left #divMe #divMicroblogWidget ul {
+  margin:0;
+  padding:0;
+  list-style-type:none;
+  width:200px;
+}
+.pageContentWrapper.River #stream-sidebar-left #divMe #divMicroblogWidget li {
+  border-left:solid #ddd 3px;
+  padding-left:3px;
+  margin-bottom:8px;
+  word-wrap:break-word;
+}
+.pageContentWrapper.River #stream-sidebar-left #divMe #divMicroblogWidget li.tweeted {
+  background:url('/images/glyph/glyphicons_391_twitter_16x16.png') no-repeat left top;
+  background-position: 0.2em 0.3em;
+  padding-left:22px;
+  min-height:24px;
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Articles ----- */
+.pageContentWrapper.Articles #date-line {
+  display:inline-block;
+  float:right;
+  width:17%;
+  text-align:right;
+  padding:10px 10px 0;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Articles #date-line #btnSubmitDates {
+  clear:both; 
+  float:right;
+  margin-top:10px;
+}
+.pageContentWrapper.Articles #divArticles {
+  display:inline-block;
+  width:76%;
+  margin-top:0;
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Subscribe ----- */
+.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li a {
+  display:inline-block;
+  width:80%;
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Admin:Feeds ----- */
+.pageContentWrapper.Admin-feed #divAdmin #divFeedAdmin {
+  position: relative;
+  padding:20px 20px 0px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+/* --------------------------------------------------- */
+
+
+/* ---------------------------------------------------------- */
+} /* ---------------- End Media: 1000 ----------------------- */
+/* ---------------------------------------------------------- */
+
+
+
+
+/* ----------------------------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------------------------- */
+@media (min-width:1100px) { /* ---------- Start Media: 11000 ------------------------------------- */
+/* ----------------------------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------------------------- */
+
+
+/* --------------------------------------------------- */
+/* ----- Body and other major elements ----- */
+.pageContentWrapper {  margin-top:20px;  }
+body > .container {
+  width:1000px;
+  margin-left:auto;
+  margin-right:auto;
+}/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- River ----- */
+.pageContentWrapper.River #stream-sidebar-right {
+  display:block;
+  float:left;
+  text-align:right;
+  margin:0 0 0 17px;
+  max-width:100px;
+  padding:10px 10px 0px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.River #stream-sidebar-right #divMyFeeds {
+  display:none;
+}
+.pageContentWrapper.River #stream-sidebar-right #divBuddies .minitar {
+  float:left;;
+  margin:5px;
+  max-width:64px;
+}
+
+
+/* ---------------------------------------------------------- */
+} /* ---------------- End Media: 1100 ----------------------- */
+/* ---------------------------------------------------------- */
+
+
+
+/* ----------------------------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------------------------- */
+@media (min-width:1200px) { /* ---------- Start Media: 1280 -------------------------------------- */
+/* ----------------------------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------------------------- */
+
+
+/* --------------------------------------------------- */
+/* ----- Body and other major elements ----- */
+body > .container {
+  width:1100px;
+  margin-left:auto;
+  margin-right:auto;
+}
+/* --------------------------------------------------- */
+
+
+/* --------------------------------------------------- */
+/* ----- River ----- */
+.pageContentWrapper.River #stream {
+  margin:0 20px 0 23px;
+  float:left;
+}
+.pageContentWrapper.River #stream-sidebar-right {
+  display:block;
+  float:left;
+  text-align:left;
+  margin:0 0 0 0;
+  max-width:220px;
+  padding:10px 10px 0px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.River #stream-sidebar-right #divMyFeeds {
+  display:block;
+}
+.pageContentWrapper.River #stream-sidebar-right #divMyFeeds #ulMyStuff li.pubfeed {
+  list-style:none;
+  margin-top:5px;
+  margin-left:-19px;
+}
+.pageContentWrapper.River #stream-sidebar-right #divMyFeeds #divAddPubFeed #frmAddPubFeed #txtPubFeedUrl {
+  max-width:150px;
+}
+.pageContentWrapper.River #stream-sidebar-right #divBuddies .minitar {
+  display:inline;
+  margin:5px;
+  max-width:64px;
+}
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Prefs ----- */
+.pageContentWrapper.Prefs #divPrefs #divBookmarklets {
+  float:left;
+  position: relative;
+  padding:20px;
+  margin:0 10px;
+  width:20%;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Prefs #divPrefs #divSetpw {
+  clear:both;
+  float:left;
+  position: relative;
+  padding:20px;
+  margin:10px 10px; 
+  width:20%;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+
+
+/* --------------------------------------------------- */
+/* ----- Admin:User ----- */
+.pageContentWrapper.Admin-user #divAdmin #divUserCreate {
+  float:right;
+  width:30%;
+  position: relative;
+  padding:20px 20px 0px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Admin-user #divAdmin #divUserCreate .divCreateEmail input {
+  width:96%;
+}
+.pageContentWrapper.Admin-user #divAdmin #divUserCreate .divCreateSubmit {
+  margin:10px;
+  text-align:right;
+}
+.pageContentWrapper.Admin-user #divAdmin #divUserManage {
+  position: relative;
+  width:60%;
+  margin-bottom:10px;
+  padding:20px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Admin-user #divAdmin #divUserManage .trEditUser {  display:none;  }
+/* --------------------------------------------------- */
+
+
+/* ---------------------------------------------------------- */
+} /* ---------------- End Media: 1280 ---- ------------------ */
+/* ---------------------------------------------------------- */

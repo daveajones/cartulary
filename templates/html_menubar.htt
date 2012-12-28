@@ -1,0 +1,88 @@
+<?
+  $myuid = get_user_id_from_sid(get_session_id());
+  $myprefs = get_user_prefs($myuid);
+  $myuname = get_user_name_from_uid($myuid);
+?>
+
+<!-- Menu bar -->
+<div id="divMainMenu" class="row">
+<div class="navbar navbar-inverse">
+	<div class="navbar-inner">
+		<a class="brand" href="<?echo $startpage?>"><?echo $system_name?></a>
+		<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</a>
+		<div class="nav-collapse">
+			<ul class="nav">
+			<li <?if($section == "River"){echo "class='active'";}?>><a href="<?echo $newsriverpage?>">Home</a></li>
+			<!-- <li <?if($section == "River"){echo "class='active'";}?>><a href="<?echo $newsriverpage.'-beta'?>">[Beta]</a></li> -->
+			<li <?if($section == "Microblog"){echo "class='active'";}?>><a href="<?echo $microblogpage?>">Microblog</a></li>
+  			<li <?if($section == "Articles"){echo "class='active'";}?>><a href="<?echo $articlespage?>">Articles</a></li>
+			<li <?if($section == "Subscribe"){echo "class='active'";}?>><a href="<?echo $subscribepage?>">Subscribe</a></li>
+
+	                <li>
+                          <form class="navbar-search" id="navsearch" name="navsearch" method="POST" action="<?echo $searchcgi?>">
+			    <input id="navsearchs" type="hidden" name="s" value="<?echo $section?>" />
+	                    <input id="navsearchq" type="text" class="search-query span3" name="q" placeholder="Search" /> <img id="navSpinner" src="/images/spinner.gif" alt="" />
+	                  </form>
+		          <div id="divNavSearchResults"></div>
+                        </li>
+
+			<? if( $platform == "mobile" || $platform == "tablet" ) {?>
+                        <li <?if($section == "Prefs"){echo "class='active'";}?>><a href="<?echo $prefspage?>">Prefs</a></li>
+                        <li><a href="<?echo $logoutpage?>">Logout</a></li>
+			<?}?>
+		        <?if(is_admin($myuid)){?>
+                        <li <?if($section == "Admin-user"){echo "class='active'";}?>><a href="<?echo $adminpage?>.user">User Admin</a></li>
+                        <li <?if($section == "Admin-feed"){echo "class='active'";}?>><a href="<?echo $adminpage?>.feed">Feed Admin</a></li>
+                        <?}?>
+			</ul>           
+			<a class="sysname pull-right" href="<?echo $startpage?>"><?echo $system_name?> v<?echo $version?></a>
+		</div>
+	</div>
+</div>
+</div>
+
+<?if($platform == "testing") {?>
+<!--  Search bar -->
+<div id="divSearchMenu" class="row">
+<div class="navbar">
+	<div class="navbar-inner">
+		<ul class="nav">
+        	<li><form class="nav navbar-search" id="navsearch" name="navsearch" method="POST" action="<?echo $searchcgi?>">
+			<input id="navsearchs" type="hidden" name="s" value="<?echo $section?>" />
+	                <input id="navsearchq" type="text" class="search-query span3" name="q" placeholder="Search" />
+			<input type="submit" name="searchSubmit" style="display:none;" />
+			<img id="navSpinner" src="/images/spinner.gif" alt="" />
+	        </form></li>
+		</ul>
+		<div class="nav-collapse">
+		        <div id="divNavSearchResults"></div>
+		</div>
+	</div>
+</div>
+</div>
+<?}?>
+
+
+
+<!-- Profile Header -->
+<? if( $platform != "mobile" && $platform != "tablet" ) {
+  if( !empty($myprefs['avatarurl']) ) {
+    $avatarurl = $myprefs['avatarurl'];
+  } else {
+    $avatarurl = $default_avatar_url;
+  }
+  ?>
+  <div id="divProfileHeader">
+    <ul style="float:left;margin-right:8px;list-style:none;">
+      <li <?if($section == "Prefs"){echo "class='active'";}?>><a href="<?echo $prefspage?>"><img class="icon-prefs" title="Prefs" alt="Prefs" src="/images/blank.gif" /></a></li>
+      <li class="last"><a href="<?echo $logoutpage?>"><img class="icon-logout" title="Logout" alt="Logout" src="/images/blank.gif" /></a></li>
+    </ul>
+
+    <a href="<?echo $prefspage?>"><img class="avatarheader" src="<?echo $avatarurl?>" alt="" /></a>
+  </div>
+<?}?>
+<div class="pageContentWrapper <?echo $section?>">

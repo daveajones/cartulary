@@ -1,0 +1,213 @@
+body { 
+  background: #ddd;
+  font-size: 130%; 
+  line-height: 130%; 
+}
+#loginForm input.txtinput {
+  font-size: 200%;
+  line-height: 200%; 
+  height: 130%;
+  width: 50%;
+}
+#loginForm input.btn {
+  font-size: 200%;
+  line-height: 200%; 
+  height: 130%;
+}
+#divPageTitle {
+  color: #222;
+  font-size: 130%;
+  text-shadow:0 1px 0 #777;
+}
+#divPageTitle a {
+  color: #007;
+  text-shadow:0 1px 0 #777;
+}
+#divArticle {
+  width:920px;
+  margin-left: auto;
+  martin-right: auto;
+}
+#article {
+  font-family: Georgia, sans-serif;
+  font-size: 130%;
+  line-height: 170%;
+  background-color: #FBF0D9;
+  color: #5F4B32;
+  padding: 25px;
+  padding-top: 10px;
+  border: solid #333 2px;
+}
+#article a {
+  text-decoration: underline;
+  color: #900;
+}
+#article #headline h1 {
+  line-height: 150%;
+}
+#article #content h1 {
+  line-height: 150%;
+}
+#article #content h2 {
+  line-height: 150%;
+}
+#article #content h3 {
+  line-height: 150%;
+}
+#article #content img {
+  display: block;
+  max-width: 100%;
+}
+#article p {
+  font-family: Georgia, sans-serif;
+  font-size: 100%;
+  line-height: 140%;
+  word-wrap: break-word;
+  margin-top: 2%; 
+}
+#article dd {
+  margin-bottom: 10px;
+}
+#article pre {
+  white-space: pre-wrap;
+}
+#article #url {
+  font-size: 80%;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: solid #333 2px;
+}
+#divArticleList {
+  width: 920px;
+}
+#tblArticleList {
+  width: 100%;
+  background-color: #ddd;
+  -moz-box-shadow: 0 0 3px 3px #333;
+  -webkit-box-shadow: 0 0 3px 3px #333;
+  box-shadow: 0 0 3px 3px #333;
+}
+#tblArticleList tbody tr td a {
+  color:#900;
+}
+#divPrefs h2 {
+  color: #222;
+  text-shadow:0 1px 0 #777;
+}
+#divPrefs p {
+  margin-left: 20px;
+  font-size: 120%;
+  color:#000;
+}
+#divPrefSubmit {
+  margin-top: 20px;
+}
+#btnPrefSubmit {
+  margin-right: 20px;
+  width: 70px;
+}
+#divToolBox {
+  padding:3px;
+  display:inline;
+  background-color:#111;
+  border-top:solid #333 2px;
+  border-left:solid #333 2px;
+  border-right:solid #333 2px;
+}
+#divToolBox a {
+  text-decoration:none;
+  color:#444;
+  text-shadow:0 1px 0 #777;
+}
+.page-header {
+  border:0;
+}
+#divBlogPost #txtContent {
+  width:100%;
+  height: 70px;
+  background:#ddd;
+  font-size:120%;
+}
+#divBlogPost fieldset {
+  text-align:left;
+}
+#divBlogPost #spnCharCount {
+  color: #222;
+  font-size: 170%;
+  font-weight: bold;
+  text-shadow:0 1px 0 #777;  
+  padding-left: 22px;
+}
+#divBlogPost #btnSubmit {
+  margin-bottom: 12px;
+  font-size: 130%;
+}
+#divBlogPost #message {
+  float:left;
+  font-size:130%
+}
+#divPostList {
+  width: 920px;
+}
+#tblPostList {
+  width: 100%;
+  background-color: #ddd;
+  -moz-box-shadow: 0 0 3px 3px #333;
+  -webkit-box-shadow: 0 0 3px 3px #333;
+  box-shadow: 0 0 3px 3px #333;
+}
+#tblPostList tbody tr td a {
+  color:#900;
+}
+#tblPostList thead tr th {
+  border-bottom: dashed black 1px;
+}
+#divFeedAdd #txtFeedUrl {
+  width:100%;
+  background:#ddd;
+}
+#divFeedList {
+  width: 920px;
+}
+#tblFeedList {
+  width: 100%;
+  background-color: #ddd;
+  -moz-box-shadow: 0 0 3px 3px #333;
+  -webkit-box-shadow: 0 0 3px 3px #333;
+  box-shadow: 0 0 3px 3px #333;
+}
+#tblFeedList tbody tr td a {
+  color:#900;
+}
+#tblFeedList thead tr th {
+  border-bottom: dashed black 1px;
+}
+#divRiverInner {
+  width: 100%;
+  margin-left:auto;
+  margin-right:auto;
+}
+#tblRiver tbody tr td a {
+  color:#900;
+  font-size: 150%;
+  line-height: 150%;
+}
+#tblRiver tbody tr td a.feedtitle {
+  color:#009;
+}
+#tblRiver tbody tr td.feedrow {
+  padding-left:15px;
+}
+#tblRiver tbody tr td.itemrow {
+  padding-left:30px;
+}
+#tblRiver tbody tr td.pubdate {
+  font-size:100%;
+  line-height:100%;
+}
+#tblRiver thead tr th {
+  border-bottom: dashed black 1px;
+}
+.showall {
+  float:right;
+}

@@ -1,6 +1,6 @@
-Server Setup on Ubuntu 12.04
--Commands to be issued are preceded with a ">".  Comments on things you need to do are wrapped with []'s.
--Of course, you can skip anything that's already on your system.  Like, the apt-get's.
+##: Server Setup on Ubuntu 12.04
+##:   Commands to be issued are preceded with a ">".  Comments on things you need to do are wrapped with []'s.
+##:   Of course, you can skip anything that's already on your system.  Like, the apt-get's.
 
 
 ##: Install Apache and PHP5

@@ -6,19 +6,19 @@
 [before starting, cd into the git project folder.  probably called "cartulary-master"]
 
 
-##: Install Apache and PHP5
+##: 1. Install Apache and PHP5
 > sudo apt-get update
 > sudo apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-tidy ccze
 [add .index.php. to /etc/apache2/mods-enabled/dir.conf]
 
 
-##: Install MySql
+##: 2. Install MySql
 > sudo apt-get install -y mysql-server php5-mysql
 > sudo mysql_secure_installation
 [Yes, <enter root password>, Yes, Yes, Yes, Yes]
 
 
-##: Build Database
+##: 3. Build Database
 > mysql -u root -p
 >> create database cartulary;
 >> create user cartulary identified by '<make a good password>';
@@ -28,31 +28,38 @@
 > mysql -ucartulary -p cartulary < opt/cartulary/templates/cartulary.sql
 
 
-##: Configure PHP
+##: 4. Configure PHP
 > sudo /etc/init.d/apache2 restart
 [add the following to the end of /etc/php5/apache2/php.ini and /etc/php5/cli/php.ini]
  [cartulary]
  cartulary_conf="/opt/cartulary"
 
 
-##: Install Cartulary Files
+##: 5. Install Cartulary Files
 > sudo mv [/path/to/git/source/cartulary-master] /opt/cartulary
 
 
-##: Configure Apache
+##: 6. Configure Apache
 > sudo cp /opt/cartulary/templates/apache.conf /etc/apache2/sites-available/cartulary
 > sudo ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cartulary
 > sudo /etc/init.d/apache2 restart
 
 
-##: Create Cartulary Config File
+##: 7. Create Cartulary Config File
 > sudo php /opt/cartulary/bin/confcheck.php
+[you're going to answer with 'cartulary' as the username and the password you made in step 3 above as the password]
+[your fully qualified hostname will be how the outside world gets to your site.]
+[if you mess up, just go edit /opt/cartulary/conf/cartulary.conf by hand to correct]
 
 
-##: Install Cartulary Admin User
+##: 8. Install Cartulary Admin User
 > sudo php /opt/cartulary/bin/usercheck.php
-[make note of this password for later]
+[this step is going to give you a username and password. write it down!]
 
 
-##: Install Crontab
+##: 9. Install Crontab
 > sudo php /opt/cartulary/bin/syscheck.php
+[this step creates the cron job entries to start the aggregator and support scripts]
+
+
+##: All done!

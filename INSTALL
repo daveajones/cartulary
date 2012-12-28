@@ -30,7 +30,7 @@
 
 ##: Configure PHP
 > sudo /etc/init.d/apache2 restart
-[add the following to the end of /etc/php5/apache and /etc/php5/cli]
+[add the following to the end of /etc/php5/apache2/php.ini and /etc/php5/cli/php.ini]
  [cartulary]
  cartulary_conf="/opt/cartulary"
 > sudo /etc/init.d/apache2 restart

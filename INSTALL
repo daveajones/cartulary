@@ -1,0 +1,50 @@
+Server Setup on Ubuntu 12.04
+-Commands to be issued are preceded with a ">".  Comments on things you need to do are wrapped with []'s.
+-Of course, you can skip anything that's already on your system.  Like, the apt-get's.
+
+
+##: Install Apache and PHP5
+> sudo apt-get update
+> sudo apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-tidy ccze
+[add .index.php. to /etc/apache2/mods-enabled/dir.conf]
+
+
+##: Install MySql
+> sudo apt-get install -y mysql-server php5-mysql
+> sudo mysql_install_db
+> sudo mysql_secure_installation
+[Yes, <enter root password>, Yes, Yes, Yes, Yes]
+> sudo /etc/init.d/apache2 restart
+
+
+##: Build Database
+> mysql -u root -p
+>> create database cartulary;
+>> create user cartulary identified by '<make a good password>';
+>> grant usage on *.* to cartulary@localhost identified by '<the same good password>';
+>> grant all privileges on cartulary.* to cartulary@localhost;
+> mysql -ucartulary -p cartulary < cartulary.sql
+
+
+##: Configure PHP
+[add the following to the end of /etc/php5/apache and /etc/php5/cli]
+ [cartulary]
+ cartulary_conf="/opt/cartulary"
+> sudo /etc/init.d/apache2 restart
+
+
+##: Install Cartulary Files
+> sudo mv -R [/path/to/git/source/cartulary] /opt
+
+
+##: Create Cartulary Config File
+> sudo php /opt/cartulary/bin/confcheck.php
+
+
+##: Install Cartulary Admin User
+> sudo php /opt/cartulary/bin/usercheck.php
+[make note of this password for later]
+
+
+##: Install Crontab
+> sudo php /opt/cartulary/bin/syscheck.php

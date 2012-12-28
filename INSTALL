@@ -63,3 +63,21 @@
 
 
 ##: All done!
+
+At this point the system is functional.  A couple of very strong recommendations though:
+- Edit your /opt/cartulary/conf/cartulary.conf and put in your Amazon S3 credentials.
+  The values are as follows:
+    
+    s3_sys_bucket - This is the name of a bucket that you create where users that
+                    don't have an s3 account will be given some space to store their
+                    static files.
+
+    s3_sys_cname -  This is a DNS cname that points to the user bucket.
+
+    s3_sys_backup - This is the name of a bucket that you create that will hold backups
+                    of your mysql database.  This is very important.  Daily backups
+                    of your database will begin when you fill in this value.  I suggest
+                    setting up your backup bucket to keep 4 days of backups and then archive
+                    older backups to glacier.
+
+- Set your proper timezone in the "my_time_zone" value.

@@ -1052,19 +1052,21 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
   }
 
   //The feed string
-  $html = '<html><head>';
+  $html = '<!DOCTYPE html>'."\n";
+  $html .= '<html><head>';
 
   $html .= "\n
       <title>$title</title>
+      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0\">
       <link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"$css\" />
       </head><body><div class=\"container\"><div class=\"row page-header\" id=\"divPageTitle\">";
 
+  if( !empty($prefs['avatarurl']) ) {
+    $html .= "      <img class=\"avatarheader\" alt=\"\" src=\"".$prefs['avatarurl']."\" />\n";
+  }
+
   $html .= "\n
       <h1>$title <small>(<a href=\"".$prefs['homepagelink']."\">Homepage</a>)</small>";
-
-  if( !empty($prefs['avatarurl']) ) {
-    $html .= "      <img class=\"avatarheader\" src=\"".$prefs['avatarurl']."\" />\n";
-  }
 
 
   $html .= "</h1>
@@ -1072,7 +1074,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
       by: $system_name, v$version
       for: ".get_email_from_uid($uid)." ($username)</p>";
 
-  $html .= "</div>\n<div class=\"row hero-unit\" id=\"divPostList\">";
+  $html .= "</div>\n<div class=\"pageContentWrapper Archive\">\n<div class=\"row\" id=\"divArchive\">\n";
 
   foreach( $posts as $post ) {
 	if ($post['url'] == "") {
@@ -1106,7 +1108,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
           if( is_array($enclosures) && count($enclosures) > 0 ) {
             foreach($enclosures as $enclosure) {
               if( strripos($enclosure['url'], ".jpg") !== FALSE || strripos($enclosure['url'], ".gif") !== FALSE || strripos($enclosure['url'], ".png") !== FALSE ) {
-                $html .= '        <p class="enclosureview"><img class="enclosureimg" src="'.htmlspecialchars($enclosure['url']).'" /></p>'."\n";
+                $html .= '        <p class="enclosureview"><img class="enclosureimg" alt="" src="'.htmlspecialchars($enclosure['url']).'" /></p>'."\n";
               }
             }
           }
@@ -1127,7 +1129,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
       $html .= "      </div></div>\n";
   }
 
-  $html .= "\n    </div></div></body>\n  </html>";
+  $html .= "\n    </div></div></div></body>\n  </html>";
 
   //If this user has S3 storage enabled, then do it
   if( (s3_is_enabled($uid) || sys_s3_is_enabled()) && !$nos3 ) {

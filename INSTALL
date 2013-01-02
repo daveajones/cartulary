@@ -1,8 +1,7 @@
 ##: Server Setup on Ubuntu 12.04
-##:   Commands to be issued are preceded with a ">".  Comments on things you need to do are wrapped with []'s.
-##:   Of course, you can skip anything that's already on your system.  Like, the apt-get's.
-##:   These instructions assume some basic familiarity with what's going on.  You could easily convert it to a 
-##:   shell script and run it in one go if you feel so inclined. :-)
+##:
+##:   This install script can be run as-is, but it'd be better to walk through it first and adjust it
+##:   to your liking.  It's best run from one level above the git folder.
 
 
 [before starting, cd into the git project folder.  probably called "cartulary-master"]

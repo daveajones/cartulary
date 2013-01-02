@@ -1,29 +1,32 @@
+#!/bin/bash
+
 ##: Server Setup on Ubuntu 12.04
 ##:
-##:   This install script can be run as-is, but it'd be better to walk through it first and adjust it
-##:   to your liking.  It's best run from one level above the git folder.
+##:   This install script can be run as-is on a virgin system. If you're installing on an existing box
+##:   it'd be better to walk through it first and adjust things
+##:   
+##:   Before starting, download and unzip the git source to the directory you're in.  Then run this
+##:   file like "./cartulary-master/INSTALL"
 
-
-[before starting, cd into the git project folder.  probably called "cartulary-master"]
 
 
 ##: 1. Install Apache and PHP5
-> sudo apt-get update
-> sudo apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-tidy ccze
+sudo apt-get update
+sudo apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-tidy ccze
 
 
 ##: 2. Install MySql
-> sudo apt-get install -y mysql-server php5-mysql
-[you should set a root password during this step and write it down]
-> sudo mysql_secure_installation
-[No, Yes, Yes, Yes, Yes]
+sudo apt-get install -y mysql-server php5-mysql
+#[you should set a root password during this step and write it down]
+sudo mysql_secure_installation
+#[No, Yes, Yes, Yes, Yes]
 
 
 ##: 3. Build Database
-> mysql -u root -p
+mysql -u root -p
 >> create database cartulary;
->> create user cartulary identified by '<make a good password>';
->> grant usage on *.* to cartulary@localhost identified by '<the same good password>';
+>> create user cartulary identified by 'cartulary';
+>> grant usage on *.* to cartulary@localhost identified by 'cartulary';
 >> grant all privileges on cartulary.* to cartulary@localhost;
 >> exit
 > mysql -ucartulary -p cartulary < templates/cartulary.sql

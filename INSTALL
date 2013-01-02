@@ -4,87 +4,84 @@
 ##:
 ##:   This install script can be run as-is on a virgin system. If you're installing on an existing box
 ##:   it'd be better to walk through it first and adjust things
-##:   
+##:
 ##:   Before starting, download and unzip the git source to the directory you're in.  Then run this
-##:   file like "./cartulary-master/INSTALL"
+##:   file like "sudo cartulary-master/INSTALL"
 
 
 
 ##: 1. Install Apache and PHP5
-sudo apt-get update
-sudo apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-tidy ccze
+apt-get update
+apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-tidy ccze
 
 
 ##: 2. Install MySql
-sudo apt-get install -y mysql-server php5-mysql
+apt-get install -y mysql-server php5-mysql
 #[you should set a root password during this step and write it down]
-sudo mysql_secure_installation
+mysql_secure_installation
 #[No, Yes, Yes, Yes, Yes]
 
 
 ##: 3. Build Database
-mysql -u root -p
->> create database cartulary;
->> create user cartulary identified by 'cartulary';
->> grant usage on *.* to cartulary@localhost identified by 'cartulary';
->> grant all privileges on cartulary.* to cartulary@localhost;
->> exit
-> mysql -ucartulary -p cartulary < templates/cartulary.sql
+mysql -u root -p < cartulary-master/templates/newdb.sql
+mysql -ucartulary -p cartulary < cartulary-master/templates/cartulary.sql
 
 
 ##: 4. Configure PHP
-[add the following to the end of /etc/php5/apache2/php.ini and /etc/php5/cli/php.ini]
- [cartulary]
- cartulary_conf="/opt/cartulary"
+echo  >> /etc/php5/apache2/php.ini
+echo '[cartulary]' >> /etc/php5/apache2/php.ini
+echo 'cartulary_conf="/opt/cartulary"' >> /etc/php5/apache2/php.ini
+echo  >> /etc/php5/cli/php.ini
+echo '[cartulary]' >> /etc/php5/cli/php.ini
+echo 'cartulary_conf="/opt/cartulary"' >> /etc/php5/cli/php.ini
 
 
 ##: 5. Install Cartulary Files
-> sudo mv [/path/to/git/source/cartulary-master] /opt/cartulary
+mv cartulary-master /opt/cartulary
 
 
 ##: 6. Configure Apache
-> sudo cp /opt/cartulary/templates/apache.conf /etc/apache2/sites-available/cartulary
-> sudo ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cartulary
-> sudo /etc/init.d/apache2 restart
+cp /opt/cartulary/templates/apache.conf /etc/apache2/sites-available/cartulary
+ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cartulary
+/etc/init.d/apache2 restart
 
 
 ##: 7. Create Cartulary Config File
-> sudo php /opt/cartulary/bin/confcheck.php
-[you're going to answer with 'cartulary' as the username and the password you made in step 3 above as the password]
-[your fully qualified hostname will be how the outside world gets to your site.]
-[if you mess up, just go edit /opt/cartulary/conf/cartulary.conf by hand to correct]
+echo 'You are going to answer with "cartulary" as the username and the password.'
+echo 'Your fully qualified hostname will be how the outside world gets to your site.'
+echo 'If you mess up, just go edit /opt/cartulary/conf/cartulary.conf by hand to correct.'
+php /opt/cartulary/bin/confcheck.php
 
 
 ##: 8. Install Cartulary Admin User
-> sudo php /opt/cartulary/bin/usercheck.php
-[this step is going to give you a username and password. write it down!]
+echo 'This step is going to give you a username and password. Write it down!'
+php /opt/cartulary/bin/usercheck.php
 
 
 ##: 9. Install Crontab
-> sudo php /opt/cartulary/bin/syscheck.php
-[this step creates the cron job entries to start the aggregator and support scripts]
+php /opt/cartulary/bin/syscheck.php
 
 
 ##: 10. Set permissions
-> sudo chown www-data /opt/cartulary/logs/*
+chown www-data /opt/cartulary/logs/*
 
 
 ##: All done!
 
-At this point the system is functional.  A couple of very strong recommendations though:
-- Edit your /opt/cartulary/conf/cartulary.conf and put in your Amazon S3 credentials.
-  The values are as follows:
-    
-    s3_sys_bucket - This is the name of a bucket that you create where users that
-                    don't have an s3 account will be given some space to store their
-                    static files.
-
-    s3_sys_cname -  This is a DNS cname that points to the user bucket.
-
-    s3_sys_backup - This is the name of a bucket that you create that will hold backups
-                    of your mysql database.  This is very important.  Daily backups
-                    of your database will begin when you fill in this value.  I suggest
-                    setting up your backup bucket to keep 4 days of backups and then archive
-                    older backups to glacier.
-
-- Set your proper timezone in the "my_time_zone" value.
+##: At this point the system is functional.  A couple of very strong recommendations though:
+##: - Edit your /opt/cartulary/conf/cartulary.conf and put in your Amazon S3 credentials.
+##:   The values are as follows:
+##:
+##:     s3_sys_bucket - This is the name of a bucket that you create where users that
+##:                     don't have an s3 account will be given some space to store their
+##:                     static files.
+##:
+##:     s3_sys_cname -  This is a DNS cname that points to the user bucket.
+##:
+##:     s3_sys_backup - This is the name of a bucket that you create that will hold backups
+##:                     of your mysql database.  This is very important.  Daily backups
+##:                     of your database will begin when you fill in this value.  I suggest
+##:                     setting up your backup bucket to keep 4 days of backups and then archive
+##:                     older backups to glacier.
+##:
+##: - Set your proper timezone in the "my_time_zone" value.

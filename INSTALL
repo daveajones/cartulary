@@ -23,8 +23,9 @@ mysql_secure_installation
 
 
 ##: 3. Build Database
+echo 'Type your mysql root password here.'
 mysql -u root -p < cartulary-master/templates/newdb.sql
-mysql -ucartulary -p cartulary < cartulary-master/templates/cartulary.sql
+mysql -ucartulary -pcartulary cartulary < cartulary-master/templates/cartulary.sql
 
 
 ##: 4. Configure PHP

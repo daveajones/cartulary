@@ -11,24 +11,31 @@
 
 
 ##: 1. Install Apache and PHP5
-apt-get update
+clear
+echo 'Installing Apache, PHP and some modules.'
+apt-get update 2>install-e
 apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-tidy ccze
 
 
 ##: 2. Install MySql
+clear
+echo 'Give MySQL a root password and write it down.'
 apt-get install -y mysql-server php5-mysql
 #[you should set a root password during this step and write it down]
-mysql_secure_installation
+#mysql_secure_installation
 #[No, Yes, Yes, Yes, Yes]
 
 
 ##: 3. Build Database
-echo 'Type your mysql root password here.'
+clear
+echo 'Type your MySQL root password here when asked.'
 mysql -u root -p < cartulary-master/templates/newdb.sql
 mysql -ucartulary -pcartulary cartulary < cartulary-master/templates/cartulary.sql
 
 
 ##: 4. Configure PHP
+echo
+echo 'Configuring PHP to know where our app is.'
 echo  >> /etc/php5/apache2/php.ini
 echo '[cartulary]' >> /etc/php5/apache2/php.ini
 echo 'cartulary_conf="/opt/cartulary"' >> /etc/php5/apache2/php.ini
@@ -38,16 +45,21 @@ echo 'cartulary_conf="/opt/cartulary"' >> /etc/php5/cli/php.ini
 
 
 ##: 5. Install Cartulary Files
+echo
+echo 'Installing application file structure.'
 mv cartulary-master /opt/cartulary
 
 
 ##: 6. Configure Apache
+echo
+echo 'Configuring Apache.'
 cp /opt/cartulary/templates/apache.conf /etc/apache2/sites-available/cartulary
 ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cartulary
 /etc/init.d/apache2 restart
 
 
 ##: 7. Create Cartulary Config File
+clear
 echo 'You are going to answer with "cartulary" as the username and the password.'
 echo 'Your fully qualified hostname will be how the outside world gets to your site.'
 echo 'If you mess up, just go edit /opt/cartulary/conf/cartulary.conf by hand to correct.'
@@ -55,15 +67,20 @@ php /opt/cartulary/bin/confcheck.php
 
 
 ##: 8. Install Cartulary Admin User
-echo 'This step is going to give you a username and password. Write it down!'
+clear
+echo 'This step is going to give you a username and password. Write it down!!'
 php /opt/cartulary/bin/usercheck.php
 
 
 ##: 9. Install Crontab
+echo
+echo 'Configuring cron jobs. You can ignore "system is unhealthy" warnings here.'
 php /opt/cartulary/bin/syscheck.php
 
 
 ##: 10. Set permissions
+echo
+echo 'Setting permissions.'
 chown www-data /opt/cartulary/logs/*
 
 

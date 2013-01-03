@@ -6,7 +6,7 @@
 BAKDATE=`date +'%Y%m%d%s'`
 
 ##: Go to the temp folder
-cd $TEMP
+cd /tmp
 
 ##: Grab the current repo and extract it
 wget https://github.com/daveajones/cartulary/archive/master.zip

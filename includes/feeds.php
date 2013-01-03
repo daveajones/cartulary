@@ -4025,7 +4025,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 
   //Let's be smart about this and not re-publish a river that hasn't changed
   $pubriver = get_river_info($uid);
-  if( $pubriver['firstid'] == $firstid && $force == FALSE ) {
+  if( $pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) ) {
     //loggit(3, "User: [$uid]'s river has not changed. No need to publish.");
     return($jsonriver);
   }

@@ -24,18 +24,39 @@
     $template = fread($fh, filesize($cftemp));
 
     //Replace the tags
-    echo "What is your mysql username? ";
+    echo "What is your mysql username? [required]";
     $response = get_user_response();
     $template = str_replace('dbusernamegoeshere', $response, $template);
 
-    echo "What is your mysql password? ";
+    echo "What is your mysql password? [required]";
     $response = get_user_response();
     $template = str_replace('dbpasswordgoeshere', $response, $template);
 
-    echo "What is the fully qualified hostname of your server? ";
+    echo "What is the fully qualified hostname of your server? [required]";
     $response = get_user_response();
     $template = str_replace('domain.goes.here', $response, $template);
     $template = str_replace('fqdn.goes.here', $response, $template);
+
+    echo "What is your Amazon S3 key? [can be blank]";
+    $response = get_user_response();
+    $template = str_replace('s3keyvalue', $response, $template);
+
+    echo "What is your Amazon S3 secret? [can be blank]";
+    $response = get_user_response();
+    $template = str_replace('s3secretvalue', $response, $template);
+
+    echo "What S3 bucket do you want user info stored in? [can be blank]";
+    $response = get_user_response();
+    $template = str_replace('s3userbucketvalue', $response, $template);
+
+    echo "Do you have a dns CNAME pointed to this bucket? If so, what is it?  [can be blank]";
+    $response = get_user_response();
+    $template = str_replace('s3cnamevalue', $response, $template);
+
+    echo "What S3 bucket do you want backups stored in? [can be blank]";
+    $response = get_user_response();
+    $template = str_replace('s3backupbucketvalue', $response, $template);
+
 
     //Close the template
     fclose($fh);

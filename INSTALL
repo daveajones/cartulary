@@ -93,8 +93,9 @@ chown www-data /opt/cartulary/logs/*
 
 ##: 11. Do an initial feed scan
 echo
-echo 'Doing an initial feed scan.'
+echo 'Doing an initial feed scan and river build.'
 php /opt/cartulary/bin/feedscan.php
+php /opt/cartulary/bin/buildrivers.php
 
 ##: All done!
 

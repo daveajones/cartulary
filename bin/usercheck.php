@@ -25,7 +25,7 @@
     }
 
     //Make sure that admin users are subscribed to the admin log feed
-    $fid = add_feed($system_url.$adminlogfeed, NULL, FALSE);
+    $fid = add_feed('http://localhost'.$adminlogfeed, NULL, TRUE, NULL);
     $users = get_admin_users();
     foreach($users as $user) {
       loggit(1, "Linking admin user: [".$user['name']."] to admin log feed: [".$system_url.$adminlogfeed."]");

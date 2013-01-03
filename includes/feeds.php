@@ -3877,6 +3877,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
   $mrcount = 0;
   $firstid = NULL;
   $lastfeedid = "";
+  $pubdate = time();
   while($sql->fetch()){
     $feed = get_feed_info($feedid);
 

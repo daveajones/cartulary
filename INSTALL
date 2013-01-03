@@ -91,6 +91,11 @@ echo 'Setting permissions.'
 chown www-data /opt/cartulary/logs/*
 
 
+##: 11. Do an initial feed scan
+echo
+echo 'Doing an initial feed scan.'
+php /opt/cartulary/bin/feedscan.php
+
 ##: All done!
 
 echo 'At this point the system is functional.  It would be a good idea to peruse through'

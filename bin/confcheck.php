@@ -3,6 +3,7 @@
   include get_cfg_var("cartulary_conf").'/includes/env.php';
   include "$confroot/$includes/util.php";
   include "$confroot/$includes/auth.php";
+  include "$confroot/$includes/admin.php";
   include "$confroot/$includes/feeds.php";
   include "$confroot/$includes/opml.php";
   include "$confroot/$includes/posts.php";
@@ -25,7 +26,7 @@
     $l_s3backup = "";
 
     //If there is already a config file, let's hang on to it
-    if( file_exists($cfname) ) {
+    if( file_exists($cfname) !isset($cartularynewinstall) ) {
       //Pull in the existing values
       $l_dbusername = $dbuser;
       $l_dbpassword = $dbpass;
@@ -93,6 +94,10 @@
     $fh = fopen($cfname, "w+");
     fwrite( $fh, $template );
     fclose($fh);
+
+    //Log it
+    add_admin_log_item("The server had no configuration file. A fresh one was created.", "Cartulary.conf generated.");
+
 
   //Remove the lock file
   cronHelper::unlock();

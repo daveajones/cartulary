@@ -65,7 +65,13 @@ ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cart
 /etc/init.d/apache2 restart
 
 
-##: 7. Create Cartulary Config File
+##: 7. Set permissions
+echo
+echo 'Setting permissions.'
+chown www-data /opt/cartulary/logs/*
+
+
+##: 8. Create Cartulary Config File
 clear
 echo 'You are going to answer with "cartulary" as the username and the password.'
 echo 'Your fully qualified hostname will be how the outside world gets to your site.'
@@ -73,22 +79,17 @@ echo 'If you mess up, just go edit /opt/cartulary/conf/cartulary.conf by hand to
 php /opt/cartulary/bin/confcheck.php
 
 
-##: 8. Install Cartulary Admin User
+##: 9. Install Cartulary Admin User
 clear
 echo 'This step is going to give you a username and password. Write it down!!'
 php /opt/cartulary/bin/usercheck.php
 
 
-##: 9. Install Crontab
+##: 10. Install Crontab
 echo
 echo 'Configuring cron jobs. You can ignore "system is unhealthy" warnings here.'
 php /opt/cartulary/bin/syscheck.php
-
-
-##: 10. Set permissions
-echo
-echo 'Setting permissions.'
-chown www-data /opt/cartulary/logs/*
+/etc/init.d/cron restart
 
 
 ##: 11. Do an initial feed scan

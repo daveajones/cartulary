@@ -3875,14 +3875,14 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
   $ticount = 0;
   $drcount = 0;
   $mrcount = 0;
-  $firstid = NULL;
+  $firstid = "";
   $lastfeedid = "";
   $pubdate = time();
   while($sql->fetch()){
     $feed = get_feed_info($feedid);
 
     //Save the time stamp of the first item to use as a pubdate
-    if( $firstid == NULL && $sticky != 1 && $hidden != 1 ) {
+    if( $firstid == "" && $sticky != 1 && $hidden != 1 ) {
       $pubdate = $timeadded;
       $firstid = $id;
     }

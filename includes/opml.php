@@ -879,7 +879,7 @@ function get_outlines($uid = NULL, $max = NULL, $otype = NULL, $ididx = NULL)
   if($sql->num_rows() < 1) {
     $sql->close()
       or print(mysql_error());
-    loggit(2,"This user has not subscribed to any outlines: [$uid]");
+    loggit(1,"This user has not subscribed to any outlines: [$uid]");
     return(FALSE);
   }
 

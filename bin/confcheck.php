@@ -26,16 +26,18 @@
     $l_s3backup = "";
 
     //If there is already a config file, let's hang on to it
-    if( file_exists($cfname) !isset($cartularynewinstall) ) {
-      //Pull in the existing values
-      $l_dbusername = $dbuser;
-      $l_dbpassword = $dbpass;
-      $l_fqdn = $system_fqdn;
-      $l_s3key = $s3_sys_key;
-      $l_s3secret = $s3_sys_secret;
-      $l_s3bucket = $s3_sys_bucket;
-      $l_s3cname = $s3_sys_cname;
-      $l_s3backup = $s3_sys_backup;
+    if( file_exists($cfname) ) {
+      if( !isset($cartularynewinstall) ) {
+        //Pull in the existing values
+        $l_dbusername = $dbuser;
+        $l_dbpassword = $dbpass;
+        $l_fqdn = $system_fqdn;
+        $l_s3key = $s3_sys_key;
+        $l_s3secret = $s3_sys_secret;
+        $l_s3bucket = $s3_sys_bucket;
+        $l_s3cname = $s3_sys_cname;
+        $l_s3backup = $s3_sys_backup;
+      }
 
       rename( $cfname, $cfname.'.old.'.time() );
     }

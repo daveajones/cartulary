@@ -174,7 +174,7 @@ function get_admin_log_items($max = NULL)
     $sqltxt .= " LIMIT $max";
   }
 
-  loggit(3, "[$sqltxt]");
+  //loggit(3, "[$sqltxt]");
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->store_result() or print(mysql_error());

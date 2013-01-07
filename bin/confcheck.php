@@ -46,37 +46,43 @@
     //Replace the tags
     echo "What is your mysql username? [$l_dbusername]: ";
     $response = get_user_response();
-    if( empty($response) ) {  $response = 'cartulary';  }
+    if( empty($response) ) {  $response = $l_dbusername;  }
     $template = str_replace('dbusernamegoeshere', $response, $template);
 
     echo "What is your mysql password? [$l_dbpassword]: ";
     $response = get_user_response();
-    if( empty($response) ) {  $response = 'cartulary';  }
+    if( empty($response) ) {  $response = $l_dbpassword;  }
     $template = str_replace('dbpasswordgoeshere', $response, $template);
 
     echo "What is the fully qualified hostname of your server? [$l_fqdn]: ";
     $response = get_user_response();
+    if( empty($response) ) {  $response = $l_fqdn;  }
     $template = str_replace('domain.goes.here', $response, $template);
     $template = str_replace('fqdn.goes.here', $response, $template);
 
     echo "What is your Amazon S3 key? [$l_s3key]: ";
     $response = get_user_response();
+    if( empty($response) ) {  $response = $l_s3key;  }
     $template = str_replace('s3keyvalue', $response, $template);
 
     echo "What is your Amazon S3 secret? [$l_s3secret]: ";
     $response = get_user_response();
+    if( empty($response) ) {  $response = $l_s3secret;  }
     $template = str_replace('s3secretvalue', $response, $template);
 
     echo "What S3 bucket do you want user info stored in? [$l_s3bucket]: ";
     $response = get_user_response();
+    if( empty($response) ) {  $response = $l_s3bucket;  }
     $template = str_replace('s3userbucketvalue', $response, $template);
 
     echo "Do you have a dns CNAME pointed to this bucket? If so, what is it?  [$l_s3cname]: ";
     $response = get_user_response();
+    if( empty($response) ) {  $response = $l_s3cname;  }
     $template = str_replace('s3cnamevalue', $response, $template);
 
     echo "What S3 bucket do you want backups stored in? [$l_s3backup]: ";
     $response = get_user_response();
+    if( empty($response) ) {  $response = $l_s3backup;  }
     $template = str_replace('s3backupbucketvalue', $response, $template);
 
 

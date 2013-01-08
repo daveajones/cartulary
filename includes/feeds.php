@@ -3558,14 +3558,16 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 
   //Set the items properties per user
   $fusers = get_feed_subscribers($fid);
-  foreach( $fusers as $fuser ) {
-    if( feed_is_sticky($fid, $fuser) && $old != TRUE ) {
-      set_feed_item_properties($id, $fuser, array( 'sticky' => TRUE ));
+  if( $fusers != FALSE ) {
+    foreach( $fusers as $fuser ) {
+      if( feed_is_sticky($fid, $fuser) && $old != TRUE ) {
+        set_feed_item_properties($id, $fuser, array( 'sticky' => TRUE ));
+      }
+      if( feed_is_hidden($fid, $fuser) ) {
+        set_feed_item_properties($id, $fuser, array( 'hidden' => TRUE ));
+      }
+      mark_river_as_updated($fuser);
     }
-    if( feed_is_hidden($fid, $fuser) ) {
-      set_feed_item_properties($id, $fuser, array( 'hidden' => TRUE ));
-    }
-    mark_river_as_updated($fuser);
   }
 
   //Log and return

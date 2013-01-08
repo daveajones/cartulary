@@ -10,6 +10,7 @@
 
 
 ##: 0. Warning.
+clear
 echo 'This install script assumes it is being run on a virgin install of Ubuntu server 12.04 LTS.'
 echo 'Running this file as-is on a production system is going to most likely wreck some stuff.'
 echo 'If that is the case, you should stop NOW and do the install by hand.'
@@ -82,6 +83,7 @@ php /opt/cartulary/bin/confcheck.php
 ##: 9. Install Cartulary Admin User
 clear
 echo 'This step is going to give you a username and password. Write it down!!'
+echo
 php /opt/cartulary/bin/usercheck.php
 
 

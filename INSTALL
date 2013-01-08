@@ -37,8 +37,8 @@ apt-get install -y mysql-server php5-mysql
 ##: 3. Build Database
 clear
 echo 'Type your MySQL root password here when asked.'
-mysql -u root -p < cartulary-master/templates/newdb.sql
-mysql -ucartulary -pcartulary cartulary < cartulary-master/templates/cartulary.sql
+mysql -u root -p < cartulary-master/templates/newdb.sql >>/tmp/cartinstall.log 2>&1
+mysql -ucartulary -pcartulary cartulary < cartulary-master/templates/cartulary.sql >>/tmp/cartinstall.log 2>&1
 
 
 ##: 4. Configure PHP
@@ -55,43 +55,41 @@ echo 'cartulary_conf="/opt/cartulary"' >> /etc/php5/cli/php.ini
 ##: 5. Install Cartulary Files
 echo
 echo 'Installing application file structure.'
-mv cartulary-master /opt/cartulary
+mv cartulary-master /opt/cartulary >>/tmp/cartinstall.log 2>&1
 
 
 ##: 6. Configure Apache
 echo
 echo 'Configuring Apache.'
-cp /opt/cartulary/templates/apache.conf /etc/apache2/sites-available/cartulary
-ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cartulary
-/etc/init.d/apache2 restart
+cp /opt/cartulary/templates/apache.conf /etc/apache2/sites-available/cartulary >>/tmp/cartinstall.log 2>&1
+ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cartulary >>/tmp/cartinstall.log 2>&1
+/etc/init.d/apache2 restart >>/tmp/cartinstall.log 2>&1
 
 
 ##: 7. Set permissions
 echo
 echo 'Setting permissions.'
-chown www-data /opt/cartulary/logs/*
+chown www-data /opt/cartulary/logs/* >>/tmp/cartinstall.log 2>&1
 
 
 ##: 8. Create Cartulary Config File
-clear
 echo 'You are going to answer with "cartulary" as the username and the password.'
-echo 'Your fully qualified hostname will be how the outside world gets to your site.'
-echo 'If you mess up, just go edit /opt/cartulary/conf/cartulary.conf by hand to correct.'
-php /opt/cartulary/bin/confcheck.php
+echo 'Your fully qualified domain name(fqdn) will be how the outside world gets to your site. Like my.server.com.'
+echo 'If you mess up, just go edit /opt/cartulary/conf/cartulary.conf by hand to correct after the install finishes.'
+php /opt/cartulary/bin/confcheck.php 2>>/tmp/cartinstall.log
 
 
 ##: 9. Install Cartulary Admin User
-clear
 echo 'This step is going to give you a username and password. Write it down!!'
 echo
-php /opt/cartulary/bin/usercheck.php
+php /opt/cartulary/bin/usercheck.php 2>>/tmp/cartinstall.log
 
 
 ##: 10. Install Crontab
 echo
-echo 'Configuring cron jobs. You can ignore "system is unhealthy" warnings here.'
-php /opt/cartulary/bin/syscheck.php
-/etc/init.d/cron restart
+echo 'Installing cron jobs.'
+php /opt/cartulary/bin/syscheck.php >>/tmp/cartinstall.log 2>&1
+/etc/init.d/cron restart >>/tmp/cartinstall.log 2>&1
 
 
 ##: 11. Do an initial feed scan
@@ -101,7 +99,10 @@ php /opt/cartulary/bin/feedscan.php
 php /opt/cartulary/bin/buildrivers.php
 
 ##: All done!
-
-echo 'At this point the system is functional.  It would be a good idea to peruse through'
-echo 'the cartulary.conf file and make any tweaks you want at this point, like setting the'
-echo 'timezone and setting up a more secure password for the cartulary MySQL user.  Enjoy!'
+echo
+echo 'At this point the system is functional.  You can reach it in your browser at the FQDN'
+echo 'you gave above, using the username/password you were given above.'
+echo 'It would be a good idea to peruse through the cartulary.conf file and make any tweaks'
+echo 'you want at this point before using the system in earnest, like setting the'
+echo 'timezone and setting up a more secure password for the cartulary MySQL user.'
+echo 'A log of the installation is at /tmp/cartinstall.log  Enjoy!'

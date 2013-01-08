@@ -36,14 +36,28 @@ apt-get install -y mysql-server php5-mysql
 
 ##: 3. Build Database
 clear
-echo 'Type your MySQL root password here when asked.'
+echo '#####################################################'
+echo '##---------------------------------------------------'
+echo '##                                                   '
+echo '##  Type your MySQL root password here when asked.   '
+echo '##                                                   '
+echo '##---------------------------------------------------'
+echo '#####################################################'
+echo
 mysql -u root -p < cartulary-master/templates/newdb.sql >>/tmp/cartinstall.log 2>&1
 mysql -ucartulary -pcartulary cartulary < cartulary-master/templates/cartulary.sql >>/tmp/cartinstall.log 2>&1
 
 
 ##: 4. Configure PHP
 echo
-echo 'Configuring PHP to know where our app is.'
+echo '#####################################################'
+echo '##---------------------------------------------------'
+echo '##                                                   '
+echo '##  Configuring PHP to know where our app is.        '
+echo '##                                                   '
+echo '##---------------------------------------------------'
+echo '#####################################################'
+echo
 echo  >> /etc/php5/apache2/php.ini
 echo '[cartulary]' >> /etc/php5/apache2/php.ini
 echo 'cartulary_conf="/opt/cartulary"' >> /etc/php5/apache2/php.ini
@@ -54,13 +68,27 @@ echo 'cartulary_conf="/opt/cartulary"' >> /etc/php5/cli/php.ini
 
 ##: 5. Install Cartulary Files
 echo
-echo 'Installing application file structure.'
+echo '#####################################################'
+echo '##---------------------------------------------------'
+echo '##                                                   '
+echo '##  Installing application file structure.           '
+echo '##                                                   '
+echo '##---------------------------------------------------'
+echo '#####################################################'
+echo
 mv cartulary-master /opt/cartulary >>/tmp/cartinstall.log 2>&1
 
 
 ##: 6. Configure Apache
 echo
-echo 'Configuring Apache.'
+echo '#####################################################'
+echo '##---------------------------------------------------'
+echo '##                                                   '
+echo '##  Configuring Apache.                              '
+echo '##                                                   '
+echo '##---------------------------------------------------'
+echo '#####################################################'
+echo
 cp /opt/cartulary/templates/apache.conf /etc/apache2/sites-available/cartulary >>/tmp/cartinstall.log 2>&1
 ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cartulary >>/tmp/cartinstall.log 2>&1
 /etc/init.d/apache2 restart >>/tmp/cartinstall.log 2>&1
@@ -68,33 +96,81 @@ ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cart
 
 ##: 7. Set permissions
 echo
-echo 'Setting permissions.'
+echo '#####################################################'
+echo '##---------------------------------------------------'
+echo '##                                                   '
+echo '##  Setting File Permissions.                        '
+echo '##                                                   '
+echo '##---------------------------------------------------'
+echo '#####################################################'
+echo
 chown www-data /opt/cartulary/logs/* >>/tmp/cartinstall.log 2>&1
 
 
 ##: 8. Create Cartulary Config File
-echo 'You are going to answer with "cartulary" as the username and the password.'
-echo 'Your fully qualified domain name(fqdn) will be how the outside world gets to your site. Like my.server.com.'
-echo 'If you mess up, just go edit /opt/cartulary/conf/cartulary.conf by hand to correct after the install finishes.'
+echo
+echo '#####################################################'
+echo '##---------------------------------------------------'
+echo '##                                                   '
+echo '##  Create cartulary.conf file.                      '
+echo '##                                                   '
+echo '##  - You are going to answer with "cartulary" as    '
+echo '##    the username and the password.                 '
+echo '##                                                   '
+echo '##  - Your fully qualified domain name(fqdn) will be '
+echo '##    how the outside world gets to your site.       '
+echo '##    Example:  my.server.com.                       '
+echo '##                                                   '
+echo '##  - If you mess up, just go edit:                  '
+echo '##    /opt/cartulary/conf/cartulary.conf by hand to  '
+echo '##    correct after the install finishes.            '
+echo '##                                                   '
+echo '##---------------------------------------------------'
+echo '#####################################################'
+echo
 php /opt/cartulary/bin/confcheck.php 2>>/tmp/cartinstall.log
 
 
 ##: 9. Install Cartulary Admin User
-echo 'This step is going to give you a username and password. Write it down!!'
+echo
+echo '#####################################################'
+echo '##---------------------------------------------------'
+echo '##                                                   '
+echo '##  Create Admin user account.                       '
+echo '##                                                   '
+echo '##  - This step will give you a username and         '
+echo '##    password.  Write it down!!!                    '
+echo '##                                                   '
+echo '##---------------------------------------------------'
+echo '#####################################################'
 echo
 php /opt/cartulary/bin/usercheck.php 2>>/tmp/cartinstall.log
 
 
 ##: 10. Install Crontab
 echo
-echo 'Installing cron jobs.'
+echo '#####################################################'
+echo '##---------------------------------------------------'
+echo '##                                                   '
+echo '##  Installing CRON jobs.                            '
+echo '##                                                   '
+echo '##---------------------------------------------------'
+echo '#####################################################'
+echo
 php /opt/cartulary/bin/syscheck.php >>/tmp/cartinstall.log 2>&1
 /etc/init.d/cron restart >>/tmp/cartinstall.log 2>&1
 
 
 ##: 11. Do an initial feed scan
 echo
-echo 'Doing an initial feed scan and river build.'
+echo '#####################################################'
+echo '##---------------------------------------------------'
+echo '##                                                   '
+echo '##  Do initial feed scan and river build.            '
+echo '##                                                   '
+echo '##---------------------------------------------------'
+echo '#####################################################'
+echo
 php /opt/cartulary/bin/feedscan.php
 php /opt/cartulary/bin/buildrivers.php
 

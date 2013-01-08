@@ -954,17 +954,17 @@ class cronHelper {
 			// Is running?
 			self::$pid = file_get_contents($lock_file);
 			if(self::isrunning()) {
-				error_log("==".self::$pid."== Already in progress...");
+				loggit(2, "==".self::$pid."== Already in progress...");
 				return FALSE;
 			}
 			else {
-				error_log("==".self::$pid."== Previous job died abruptly...");
+				loggit(2, "==".self::$pid."== Previous job died abruptly...");
 			}
 		}
 
 		self::$pid = getmypid();
 		file_put_contents($lock_file, self::$pid);
-		error_log("==".self::$pid."== Lock acquired, processing the job...");
+		loggit(1, "==".self::$pid."== Lock acquired, processing the job...");
 		return self::$pid;
 	}
 
@@ -979,7 +979,7 @@ class cronHelper {
 		if(file_exists($lock_file))
 			unlink($lock_file);
 
-		error_log("==".self::$pid."== Releasing lock...");
+		loggit(1, "==".self::$pid."== Releasing lock...");
 		return TRUE;
 	}
 

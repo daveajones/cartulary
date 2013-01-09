@@ -1364,7 +1364,7 @@ function get_all_outlines($max = NULL)
   if($sql->num_rows() < 1) {
     $sql->close()
       or print(mysql_error());
-    loggit(2,"There are no outlines in the system.");
+    loggit(1,"There are no outlines in the system.");
     return(FALSE);
   }
 

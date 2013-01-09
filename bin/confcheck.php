@@ -88,6 +88,10 @@
     if( empty($response) ) {  $response = $l_s3backup;  }
     $template = str_replace('s3backupbucketvalue', $response, $template);
 
+    //Eliminate the newinstall flag if it's set and bring in the default feed list
+    if( !isset($cartularynewinstall) ) {
+      $template = str_replace('cartularynewinstall=1', "", $template);
+    }
 
     //Close the template
     fclose($fh);

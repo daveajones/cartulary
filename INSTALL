@@ -166,11 +166,12 @@ echo
 echo '#####################################################'
 echo '##---------------------------------------------------'
 echo '##                                                   '
-echo '##  Do initial feed scan and river build.            '
+echo '##  Do initial feed/outline scan and river build.    '
 echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
+php /opt/cartulary/bin/outlinescan.php
 php /opt/cartulary/bin/feedscan.php
 php /opt/cartulary/bin/buildrivers.php
 

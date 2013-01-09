@@ -53,6 +53,7 @@
 $(document).ready( function() {
                 $('#frmPrefs').ajaxForm({
                         dataType:       'json',
+			timeout:	60000,
                         success:        function(data) {
                                 $('#divPref .control-group').removeClass('error');
                                 if(data.status == "false") {

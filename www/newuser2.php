@@ -16,10 +16,10 @@ $(document).ready( function() {
         //The feed subscription form
         $('#frmSubscribe').ajaxForm({
                 dataType:       'json',
-                timeout:        20000,
+                timeout:        60000,
                 beforeSubmit:   function() {
                         $('#frmSubscribe .imgSpinner').show();
-                        $('#frmSubscribe .btnSubmit').attr("disabled", true);
+                        $('.btnSubmit').attr("disabled", true);
                 },
                 success:        function(data) {
                         if(data.status == "false") {
@@ -29,16 +29,16 @@ $(document).ready( function() {
                                 window.location.href = '<?echo $startpage?>';
                         }
                         $('#frmSubscribe .imgSpinner').hide();
-                        $('#frmSubscribe .btnSubmit').attr("disabled", false);
+                        $('.btnSubmit').attr("disabled", false);
                 }
         });
         //The skip form
         $('#frmSkip').ajaxForm({
                 dataType:       'json',
-                timeout:        20000,
+                timeout:        60000,
                 beforeSubmit:   function() {
-                        $('#frmSubscribe .imgSpinner').show();
-                        $('#frmSubscribe .btnSubmit').attr("disabled", true);
+                        $('#frmSkip .imgSpinner').show();
+                        $('.btnSubmit').attr("disabled", true);
                 },
                 success:        function(data) {
                         if(data.status == "false") {
@@ -48,7 +48,7 @@ $(document).ready( function() {
                                 window.location.href = '<?echo $startpage?>';
                         }
                         $('#frmSubscribe .imgSpinner').hide();
-                        $('#frmSubscribe .btnSubmit').attr("disabled", false);
+                        $('.btnSubmit').attr("disabled", false);
                 }
         });
         //Bind events to the file import button
@@ -101,7 +101,10 @@ $(document).ready( function() {
 
         <form id="frmSkip" name="skip" action="/cgi/auth/setup2" method="POST">
                 <input name="url" type="hidden" value="<?echo $system_url.$default_subscription_list_url?>" />
-        	<div id="divSkip" class="pull-right"><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Skip</button></div>
+        	<div id="divSkip" class="pull-right">
+                <span class="message"></span>
+                <img class="imgSpinner" src="/images/spinner.gif" />
+                <button id="btnPrefSubmit" class="btn btn-primary btnSubmit" type="submit">Skip</button></div>
         </form>
 
 </div>

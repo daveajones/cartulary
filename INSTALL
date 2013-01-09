@@ -108,6 +108,7 @@ chown www-data /opt/cartulary/logs/* >>/tmp/cartinstall.log 2>&1
 
 
 ##: 8. Create Cartulary Config File
+clear
 echo
 echo '#####################################################'
 echo '##---------------------------------------------------'

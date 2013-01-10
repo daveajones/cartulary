@@ -106,7 +106,7 @@
                     <div class="time">${River.methods.prettyDate(item.pubDate)}{{if item.sourceurl}}<span class="source"> via: <a href="${item.sourceurl}">${item.sourcetitle}</a> | <a class="aSubscribe" data-sourceurl="${encodeURIComponent(item.sourceurl)}" href="#">Subscribe</a></span>{{/if}}</div>
                     <div class="actions">
                         <?if($prefs['riverheadlinecart'] != 1) {?>
-                          <div class="cartform"><a class="cartlink" href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}" rel="external nofollow"><img class="icon-folder" src="/images/blank.gif" alt="" /></a></div>
+                          <div class="cartform"><a class="cartlink" href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}" rel="external nofollow"><img class="icon-book-small" src="/images/blank.gif" alt="" /></a></div>
                         <?}?>
                         <?if(!empty($prefs['linkblog'])) {?>
 			  <div><a href="<?echo $prefs['linkblog']?>/?description=${encodeURIComponent(item.title)}&link=${encodeURIComponent(item.link)}" rel="external nofollow" target="_blank">RT</a></div>
@@ -122,6 +122,9 @@
                             <input type="hidden" name="extenclosure[${e}][type]" value="${enclosure.type}" />
                             <input type="hidden" name="extenclosure[${e}][length]" value="${enclosure.length}" />
                           {{/each}}
+                          {{if Hidepics == false && River.methods.getImages(item.body) != false}}
+                      	    <input type="hidden" name="extenclosure[][url]" value="${River.methods.getImages(item.body)}" />
+			  {{/if}}
 			  <input type="hidden" name="source[url]" value="${feedUrl}" />
 			  <input type="hidden" name="source[title]" value="${feedTitle}" />
 			  </form>

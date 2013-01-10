@@ -879,7 +879,7 @@ function get_outlines($uid = NULL, $max = NULL, $otype = NULL, $ididx = NULL)
   if($sql->num_rows() < 1) {
     $sql->close()
       or print(mysql_error());
-    loggit(1,"This user has not subscribed to any outlines: [$uid]");
+    loggit(2,"This user has not subscribed to any outlines: [$uid]");
     return(FALSE);
   }
 
@@ -1575,9 +1575,11 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
     $opml .= "
               <outline text=\"$catitle\" description=\"$catitle\" type=\"rss\" xmlUrl=\"$carturl\" sopml:disposition=\"pub\" sopml:contains=\"text html\" sopml:lastupdate=\"\"/>";
   }
-  foreach( $pubfeeds as $pubfeed ) {
+  if( $pubfeeds != FALSE ) {
+    foreach( $pubfeeds as $pubfeed ) {
       $opml .= "
               <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($pubfeed['title']))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($pubfeed['url'])."\" sopml:disposition=\"pub\" sopml:contains=\"text html image audio video\" sopml:lastupdate=\"\" sopml:attention=\"\" />";
+    }
   }
   $opml .= "
           </outline>";

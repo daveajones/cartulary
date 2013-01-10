@@ -1419,6 +1419,12 @@ function format_json($json)
 function get_device_type()
 {
   $device = "";
+
+  //Be nice to the error logs
+  if ( !isset($_SERVER['HTTP_USER_AGENT']) ) {
+    return($device);
+  }
+
   if ( strstr($_SERVER['HTTP_USER_AGENT'], "iPad")) {
     $device = "ipad";
   } else if ( strstr($_SERVER['HTTP_USER_AGENT'], "iPhone")) {
@@ -1437,6 +1443,12 @@ function get_device_type()
 function get_platform_type()
 {
   $platform = "";
+
+  //Be nice to the error logs
+  if ( !isset($_SERVER['HTTP_USER_AGENT']) ) {
+    return($platform);
+  }
+
   if ( strstr($_SERVER['HTTP_USER_AGENT'], "iPad")) {
     $platform = "tablet";
   } else if ( strstr($_SERVER['HTTP_USER_AGENT'], "iPhone")) {

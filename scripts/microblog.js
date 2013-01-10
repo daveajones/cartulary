@@ -129,7 +129,11 @@ $(document).ready( function() {
                                 $('#imgSpinner').hide();
                                 $('#btnSubmit').attr("disabled", false);
 				$('#spnCharCount').text( <?echo $default_blog_post_max_chars?> - $('#txtContent').val().length );
-                        }
+                        },
+			error:		function(x, t, m) {
+				showMessage( "Error: " + m + "(" + t + ")", false, 60 );
+		                loadPostList('#divPostList', '#microblog-template');
+			}
                 });
 
 		//Set up some paste handling to catch pasted links

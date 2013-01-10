@@ -80,7 +80,9 @@ $(document).ready( function() {
                 $(this).switchClass('smallSaySomething', 'bigSaySomething', 300);
         });
         $('#txtSaySomething').blur(function() {
-                $(this).switchClass('bigSaySomething', 'smallSaySomething', 300);
+		if( isEmpty($('#txtSaySomething').val()) ) {
+	                $(this).switchClass('bigSaySomething', 'smallSaySomething', 300);
+		}
         });
         $('#imgTwitter').bind('click', function() {
                 $('#chkTwitter').prop("checked", !$('#chkTwitter').prop("checked"));

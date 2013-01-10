@@ -18,7 +18,8 @@
         function resetQuickBlogBox () {
                 $('#chkTwitter').attr('checked', false);
                 $('#imgTwitter').removeClass('icon-twitter').addClass('icon-notwitter');
-                $('#txtContent').val('');
+                $('#txtSaySomething').val('');
+                $('#txtSaySomething').switchClass('bigSaySomething', 'smallSaySomething', 300);
         }
 
         // River stuff

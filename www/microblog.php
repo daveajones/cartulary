@@ -60,9 +60,6 @@
 <title><?echo $tree_location?></title>
 <?include "$confroot/$templates/$template_html_styles"?>
 <?include "$confroot/$templates/$template_html_scripts"?>
-<script>
-<?include "$confroot/$scripts/microblog.js"?>
-</script>
 </head>
 <?include "$confroot/$templates/$template_html_posthead"?>
 <body ondragenter="javascript:showEnclosures();">
@@ -167,27 +164,12 @@
   </div>
 </div>
 
-<div class="row" id="divPostList">
-	<?
-        $posts = get_blog_posts($uid, $max);
-        if ($posts > 0) {
-        ?><ul id="ulPostList"><?
-        foreach( $posts as $post ) {
-		?>
-                <li id="li<?echo $post['id']?>" data-title="<?echo truncate_text((!empty($post['title']) ? $post['title'] : $post['content']), 40).'...'?>">
-                        <a class="aDeletePost" href='<?echo $deletepostcgi."?"."id=".$post['id'];?>'><img class="icon-remove" src="/images/blank.gif" alt="" /></a>
-                        <?if($post['url'] != "") {?><a href="<?echo $post['url']?>"><?}?>
-			<?echo (!empty($post['title']) ? $post['title'] : $post['content']);?>
-                        <?if($post['url'] != "") {?></a><?}?>
-                </li>
-		<?
-        }
-        ?></ul><?
-        } else {
-                ?><p>No posts yet. Why don't you say something?</p><?
-        }
-	?>
-</div>
+<script id="microblog-template" type="text/x-jquery-tmpl">
+<?include "$confroot/$scripts/microblog-temp.js"?>
+</script>
+
+<div class="row" id="divPostList"></div>
+
 
 <?//--- Include the footer bar html fragments -----------?>
 <?include "$confroot/$templates/$template_html_footerbar"?>
@@ -210,6 +192,9 @@ $(function() {
     })
 });
 <?}?>
+</script>
+<script>
+<?include "$confroot/$scripts/microblog.js"?>
 </script>
 </body>
 

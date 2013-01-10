@@ -1,32 +1,44 @@
-function loadPostList() {
-	//FOr now just redirect
-	window.location = "<?echo $microblogpage?>";
+function loadPostList(elDiv, elTemplate) {
+      $(elDiv).empty();
+      $(elDiv).append('<center><p>Loading post list...</p><img src="/images/spinner.gif" alt="" /></center>');
+      $.getJSON("/cgi/out/list.posts.json", function(data) {
+          if(data.status == "true") {
+              $(elDiv).empty();
+              $(elTemplate).tmpl(data.data).appendTo(elDiv);
+              bindDeletePost('.aDeletePost');
+              //bindResetUser('.aResetUser');
+              //bindEditUser('.aEditUser');
+              //ajaxFormEditUser('.frmEditUser');
+          } else {
+              $(elDiv).append("<p>Error retrieving JSON data: [" + data.description + "]</p>");
+          }
+      });
 
-	//Clear the table
-	$('#divPostList ul').empty();
+      return(true);
+}
 
-	//Get fresh data and populate the table if successful
-        $.ajax({
-	        url: "<?echo $postlistcgi?>",
-                type: "GET",
-                async: false,
-                dataType:       'json',
-                success:        function(data) {
-                        if(data.status == "false") {
-                                showMessage( data.description, data.status, 5 );
-			} else if(data.status == "noposts") {
-                	        $('#divPostList').append('<p>You have not posted anything yet. Say something!</p>');
-                        } else {
-                                for( var i=0 ; i < data.posts.length && i <= <?echo $max?>; i++ ) {
-					if(data.posts[i]['url'] != "") {
-	                	          $('#divPostList ul:last').append('<li><a class="aDeletePost" href="<?echo $deletepostcgi?>?id=' + data.posts[i]['id'] + '"><i class="icon-remove"></i></a><a href="' + data.posts[i]["url"] + '">' + data.posts[i]["content"] + '</a></li>');
-                                        } else {
-	                	          $('#divPostList ul:last').append('<li><a class="aDeletePost" href="<?echo $deletepostcgi?>?id=' + data.posts[i]['id'] + '"><i class="icon-remove"></i></a>' + data.posts[i]["content"] + '</li>');
-					}
-				}
-                        }
-                }
-	});
+function bindDeletePost(elDeleteLink) {
+    $(elDeleteLink).click(function() {
+        var postId = $(this).attr("data-id");
+        var postTitle = $(this).parent().parent().attr("data-title");
+        if( confirm("Do you really want to delete '" + postTitle + "'?") == false ) return false;
+        $('#divPostList ul li#' + postId).css({"text-decoration":"line-through"});
+        $.getJSON("/cgi/in/delete.post?postId="+postId, function(data) {
+            showMessage( data.description, data.status, 7 );
+            if(data.status == "true") {
+                loadPostList('#divPostList', '#microblog-template');
+            }
+        });
+    });
+
+    return(true);
+}
+
+function getShortTitle(contentString) {
+    cleanContent = contentString.replace(/\W/g, '');
+    shortContent = cleanContent.substring(0, 20);
+
+    return(shortContent);
 }
 
 function showEnclosures() {
@@ -111,7 +123,7 @@ $(document).ready( function() {
 				        <?if($prefs['mbreturnhome'] == 1) {?>
 					window.location = '<?echo $startpage?>';
                                         <?} else {?>
-					loadPostList();
+			                loadPostList('#divPostList', '#microblog-template');
 					<?}?>
                                 }
                                 $('#imgSpinner').hide();
@@ -176,7 +188,9 @@ $(document).ready( function() {
 		});
 
 		$('#spnCharCount').text( $('#txtContent').val().length );
-		//loadPostList();
+
+	        //Populate the user management section
+	        loadPostList('#divPostList', '#microblog-template');
 
 		//If there's already a link, don't enable link extraction
 		if( $('#txtLink').val() != '') {

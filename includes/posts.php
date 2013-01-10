@@ -322,6 +322,8 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
 
   if($max != NULL) {
     $sqltxt .= " LIMIT $max";
+  } else {
+    $sqltxt .= " LIMIT $default_max_list";
   }
 
   loggit(1, "[$sqltxt]");

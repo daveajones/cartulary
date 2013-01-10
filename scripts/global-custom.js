@@ -96,3 +96,12 @@ function closeMessage() {
          return(false);
 }
 
+//Empty and blank string checks
+//via: http://stackoverflow.com/questions/154059/what-is-the-best-way-to-check-for-an-empty-string-in-javascript
+function isEmpty(str) {
+    return (!str || 0 === str.length);
+}
+function isBlank(str) {
+    return (!str || /^\s*$/.test(str));
+}
+

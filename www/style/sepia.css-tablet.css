@@ -207,6 +207,13 @@ body {
           border-radius: 4px;
 }
 .pageContentWrapper.Microblog #divPostList ul {  list-style:none;  }
+.pageContentWrapper.Microblog #divPostList li {  padding:10px 7px 10px;  }
+.pageContentWrapper.Microblog #divPostList li:hover {  background-color:#ddd;  }
+.pageContentWrapper.Microblog #divPostList li .spnPostControls {  float:right; }
+.pageContentWrapper.Microblog #divPostList li .spnPostTitle {
+  font-weight:bold;
+  font-size:120%;
+}
 /* --------------------------------------------------- */
 
 

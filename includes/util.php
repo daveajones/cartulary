@@ -505,7 +505,7 @@ function fetchUrl($url, $timeout = 5)
 
 	$ch = curl_init();
 	$userAgent = 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; .NET CLR 1.1.4322)';
-	curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
+	curl_setopt($ch,CURLOPT_USERAGENT, $userAgent);
 	curl_setopt($ch,CURLOPT_URL,$url);
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
 	curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
@@ -530,7 +530,7 @@ function safe_feof($fp, &$start = NULL) {
  return feof($fp);
 }
 
-function httpRequest($host, $port, $method, $path, $params) {
+function httpRequest($host, $port, $method, $path, $params, $timeout = 30) {
   // Params are a map from names to values
   $paramStr = "";
   foreach ($params as $name => $val) {
@@ -549,7 +549,8 @@ function httpRequest($host, $port, $method, $path, $params) {
   }
 
   // Create the connection
-  $sock = fsockopen($host, $port);
+  $sock = fsockopen($host, $port, $errno, $errst, $timeout);
+  stream_set_timeout($sock, $timeout);
   if ($method == "GET") {
     $path .= "?" . $data;
   }
@@ -1476,7 +1477,6 @@ function format_bytes($a_bytes)
     }
 }
 
-
 //Get some user input from the command line
 function get_user_response()
 {
@@ -1485,5 +1485,6 @@ function get_user_response()
 
   return( trim($line) );
 }
+
 
 ?>

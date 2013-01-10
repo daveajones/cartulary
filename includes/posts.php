@@ -696,7 +696,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
 
       //Ping the rss cloud if this is not an archive AND rsscloud is enabled
       if($archive == FALSE && $enable_rsscloud == 1) {
-        $resp = httpRequest($rss_cloud_domain, $rss_cloud_port, $rss_cloud_method, $rss_cloud_ping_path, array("url" => $s3url));
+        $resp = httpRequest($rss_cloud_domain, $rss_cloud_port, $rss_cloud_method, $rss_cloud_ping_path, array("url" => $s3url), $rss_cloud_timeout);
         loggit(1, "Pinged the rss cloud for feed: [$s3url].");
       }
     }

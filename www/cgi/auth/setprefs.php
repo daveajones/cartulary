@@ -565,7 +565,7 @@ loggit(1,"Prefs for user: [$uid] were updated.");
 //If any river-affecting prefs change, we need to rebuild the river json
 if( $oldprefs['maxriversize'] != $maxriversize ||
     $oldprefs['maxriversizemobile'] != $maxriversizemobile ||
-    $oldprefs['maxriverhours'] != $maxriverhours ||
+    $oldprefs['riverhours'] != $riverhours ||
     $oldprefs['fulltextriver'] != $fulltextriver ||
     $oldprefs['s3bucket'] != $s3bucket )
 {  build_river_json($uid, NULL, TRUE);  }

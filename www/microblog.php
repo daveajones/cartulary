@@ -133,24 +133,30 @@
 		<!-- External enclosures box. -->
         	<div id="divExtEnclosures">
 		<?if(!empty($_REQUEST['extenclosure'])) {
-          	$extenclosures = $_REQUEST['extenclosure'];
-		$eec = 0;
-          	foreach($extenclosures as $extenclosure) {
-            	?>Enclosure: <input type="text" name="extenclosure[<?echo $eec?>][url]" value="<?echo $extenclosure['url']?>" /><?
-            	?><input type="text" name="extenclosure[<?echo $eec?>][type]" value="<?echo $extenclosure['type']?>" /><?
-            	?><input type="text" name="extenclosure[<?echo $eec?>][length]" value="<?echo $extenclosure['length']?>" /><?
-		$eec++;
-          	}
-        	}?>
+		  ?><ul><?
+          	  $extenclosures = $_REQUEST['extenclosure'];
+		  $eec = 0;
+                  $lastencurl = "";
+          	  foreach( $extenclosures as $extenclosure ) {
+                    if( $lastencurl != $extenclosure['url'] ) {
+		      $lastencurl = $extenclosure['url'];
+            	      ?><li>Enclosure: <input type="text" name="extenclosure[<?echo $eec?>][url]" value="<?echo $extenclosure['url']?>" /><?
+            	      if( !empty($extenclosure['type']) ){?><input type="text" name="extenclosure[<?echo $eec?>][type]" value="<?echo $extenclosure['type']?>" /><?}
+            	      if( !empty($extenclosure['length']) ){?><input type="text" name="extenclosure[<?echo $eec?>][length]" value="<?echo $extenclosure['length']?>" /></li><?}
+  		      $eec++;
+                    }
+          	  }
+        	?></ul><?}?>
         	</div>
 
 		<!-- RT source info. -->
         	<div id="divRtSource">
 		<?if(!empty($_REQUEST['source'])) {
-          	$source = $_REQUEST['source'];
-          	?>Source: <input type="text" name="source[url]" value="<?echo trim($source['url'])?>" /><?
-          	?><input type="text" name="source[title]" value="<?echo trim($source['title'])?>" /><?
-        	}?>
+		  ?><ul><?
+          	  $source = $_REQUEST['source'];
+          	  ?><li>Source: <input type="text" name="source[url]" value="<?echo trim($source['url'])?>" /><?
+          	  ?><input type="text" name="source[title]" value="<?echo trim($source['title'])?>" /></li><?
+        	  ?></ul><?}?>
         	</div>
 	</div>
         </fieldset>

@@ -70,11 +70,15 @@ body {
   white-space: pre-line;
 }
 .pageContentWrapper.River #stream .section .article .bodypic {
-  margin:10px auto;
+  clear:both;
+  display:block;
+  margin:20px auto 10px;
   max-width:500px;
 }
 .pageContentWrapper.River #stream .section .encpicture {
-  margin:10px auto;
+  clear:both;
+  display:block;
+  margin:20px auto 10px;
   max-width: 500px;
 }
 .pageContentWrapper.River #stream .section .riverminitar { 
@@ -84,12 +88,16 @@ body {
   margin:8px;
 }
 .pageContentWrapper.River #stream .section .article .bodyvid {
-  margin:10px auto;
+  clear:both;
+  display:block;
+  margin:20px auto 10px;
   width:500px;
   height:300px;
 }
 .pageContentWrapper.River #stream .section .article .encvideo {
-  margin:10px auto;
+  clear:both;
+  display:block;
+  margin:20px auto 10px;
   width:500px;
   height:300px;
 }
@@ -110,7 +118,10 @@ body {
 .pageContentWrapper.River #stream .section > .article .aUnSticky {  float:right;  }
 .pageContentWrapper.River #stream .section > .article .header {  font-size:150%;  }
 .pageContentWrapper.River #stream .section > .article .footer {  margin:40px 0 0;  }
-.pageContentWrapper.River #stream .section > .article .footer .actions {  background-color:yellow; margin:0;  }
+.pageContentWrapper.River #stream .section > .article .footer .actions {
+  clear:both;
+  display:block;
+}
 .pageContentWrapper.River #stream .section > .article .footer .actions img {
   float:right;
   padding:5px;
@@ -535,7 +546,7 @@ body {
      -moz-border-radius: 4px;
           border-radius: 4px;
 }
-.pageContentWrapper.Prefs #divPrefs #divPref input.urlinput {  width:95%;  }
+.pageContentWrapper.Prefs #divPrefs input.urlinput {  width:95%;  }
 /* --------------------------------------------------- */
 
 

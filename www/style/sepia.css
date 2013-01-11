@@ -117,18 +117,20 @@ a {  color:#059;  }
 }
 .pageContentWrapper.River #stream .section .article h3 {
   font-size:120%;
-  margin-bottom:10px;
+  margin:4px 0 10px;
 }
 .pageContentWrapper.River #stream .section .article .description {
   font-size:110%;
 }
 .pageContentWrapper.River #stream .section .article .bodypic {
   display:block;
+  clear:both;
   margin:20px auto 10px;
   max-width:500px;
 }
 .pageContentWrapper.River #stream .section .encpicture {
   display:block;
+  clear:both;
   margin:20px auto 10px;
   max-width: 500px;
 }
@@ -136,16 +138,18 @@ a {  color:#059;  }
   float:right;
   max-height:64px;
   max-width:64px;
-  margin:8px;
+  margin:4px 8px 8px;
 }
 .pageContentWrapper.River #stream .section .article .bodyvid {
   display:block;
+  clear:both;
   margin:10px auto 10px;
   width:500px;
   height:300px;
 }
 .pageContentWrapper.River #stream .section .article .encvideo {
   display:block;
+  clear:both;
   margin:10px auto 10px;
   width:500px;
   height:300px;

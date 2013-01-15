@@ -1,4 +1,8 @@
 <?
+/*
+        Simple php udp socket server
+        http://www.binarytides.com/udp-socket-programming-in-php/
+*/
 
 //Reduce errors
 error_reporting(~E_WARNING);

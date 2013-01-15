@@ -2,12 +2,13 @@
 
 /*
         Simple php udp socket client
+	http://www.binarytides.com/udp-socket-programming-in-php/
 */
 
 //Reduce errors
 error_reporting(~E_WARNING);
 
-$server = gethostbyname('cart.southernbread.org');
+$server = gethostbyname('remote.cartserver.com');
 $port = 8904;
 
 if(!($sock = socket_create(AF_INET, SOCK_DGRAM, 0)))

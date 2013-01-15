@@ -120,7 +120,7 @@
 
 <div id="stream-wrap">
   <div id="stream">
-    <p class="notice"><?if($platform != "mobile" && $platform != "tablet") { echo "The river requires javascript."; } else { echo "Loading river..."; }?></p>
+    <p class="notice"><img id="imgLoadRiverSpinner" class="imgSpinner" src="/images/spinner.gif" alt="" /> Loading river...</p>
   </div>
 </div>
 
@@ -158,11 +158,11 @@
 	<div id="divBuddies" class="pull-right" style="float:right;">
   	<h3><u>Following</u></h3>
   	<?
-    	$outlines = get_outlines($uid,$max);
-    	foreach($outlines as $outline) {
-      	if($outline['type'] == "sopml") {
-      	?><img class="minitar" src="<?echo $outline['avatarurl']?>" alt="" /><?
-      	}
+    	$outlines = get_outlines($uid, $max);
+    	foreach($outlines as $ou) {
+      	  if($ou['type'] == "sopml") {
+      	    ?><img class="minitar" src="<?echo (!empty($ou['avatarurl']) ? $ou['avatarurl'] : $default_avatar_url)?>" alt="" /><?
+      	  }
     	}
   	?>
 	</div>

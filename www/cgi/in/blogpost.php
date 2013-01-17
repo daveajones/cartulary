@@ -205,7 +205,7 @@ if( isset($_REQUEST['tweet']) && twitter_is_enabled($uid) ) {
         if( !empty($shorturl) ) {
 	  $twlink = $shorturl;
         }
-	if( (strlen($twtext)) < 138 && isset($archiveurl) ) {
+	if( strlen($title.$content) < 138 && isset($archiveurl) ) {
 	  $twlink = "";
 	}
 

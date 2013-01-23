@@ -1103,9 +1103,9 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
       <div class=\"item\">
         <p class=\"pubdate\">".date("D, d M Y H:i", $post['createdon'])."</p>\n        <div class=\"content\">";
         if( !empty($post['title']) ) {
-		$html .= "        <h3>".htmlspecialchars(trim($post['title']))."</h3>\n";
+		$html .= "        <h3>".xmlentities(trim($post['title']))."</h3>\n";
         }
-        $html .= "        <p class=\"description\">".htmlspecialchars(trim( str_replace("\n", '', $post['content'] ) ))."</p>\n";
+        $html .= "        <p class=\"description\">".xmlentities(trim( str_replace("\n", '', $post['content'] ) ))."</p>\n";
         if( isset($enclosures) ) {
           if( is_array($enclosures) && count($enclosures) > 0 ) {
             foreach($enclosures as $enclosure) {

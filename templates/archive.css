@@ -641,8 +641,14 @@ img.avatarheader {  float:right; max-height: 64px;  }
 .pageContentWrapper.Archive .item .content {
   margin-left: 15px;
 }
+.pageContentWrapper.Archive .item .content h3 {
+  margin-bottom: 10px;
+}
 .pageContentWrapper.Archive .item .description {
   font-size:120%;
+}
+.pageContentWrapper.Archive .item h3 + p.description {
+  text-indent:10px;
 }
 .pageContentWrapper.Archive .item .shortlink {
   border-right: solid #111 1px;

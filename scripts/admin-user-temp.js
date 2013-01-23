@@ -17,7 +17,18 @@
         <a id="delete_${user.id}" class="aDeleteUser" title="Delete User" href="#"><img id="imgDeleteUser" class="icon-delete" src="/images/blank.gif" /></a>
         <a id="reset_${user.id}" class="aResetUser" title="Reset Password" href="#"><img id="imgResetUser" class="icon-reset" src="/images/blank.gif" /></a>
       </td>
-      <td>${user.name}</td>
+      <td>
+      {{if isBlank(user.avatarurl)}}
+        <img class="minitar" src="<?echo $default_avatar_url?>" alt="" />
+      {{else}}
+        <img class="minitar" src="${user.avatarurl}" alt="" />
+      {{/if}}
+      {{if user.sopml != false}}
+        <a href="${user.sopmlurl}">${user.name}</a>
+      {{else}}
+        ${user.name}
+      {{/if}}
+      </td>
       <?if($platform != "mobile") {?>
       <td>${user.email}</td>
       <?}?>

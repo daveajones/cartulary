@@ -439,6 +439,10 @@ body {
           border-radius: 4px;
 }
 .pageContentWrapper.Admin-user #divAdmin #divUserManage .trEditUser {  display:none;  }
+.pageContentWrapper.Admin-user #divAdmin #divUserManage .minitar {
+  margin:5px;
+  max-width:32px;
+}
 /* --------------------------------------------------- */
 
 

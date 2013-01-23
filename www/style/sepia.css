@@ -545,6 +545,10 @@ a {  color:#059;  }
 .pageContentWrapper.Admin-user #divAdmin #divUserManage .cellFocus {  background:#def;  }
 .pageContentWrapper.Admin-user #divAdmin #divUserManage .trEditUser {  display:none;  background:#def;  }
 .pageContentWrapper.Admin-user #divAdmin #divUserManage .trEditUser .btn-primary {  float:right;  }
+.pageContentWrapper.Admin-user #divAdmin #divUserManage .minitar {
+  margin:5px;
+  max-width:32px;
+}
 /* --------------------------------------------------- */
 
 

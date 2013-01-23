@@ -2482,7 +2482,19 @@ function get_users($max = NULL)
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
   //Look for the
-  $sqltxt = "SELECT id,name,email,lastlogin,stage,active,badlogins,username,admin FROM $table_user ORDER BY name DESC";
+  $sqltxt = "SELECT $table_user.id,
+                    $table_user.name,
+                    $table_user.email,
+                    $table_user.lastlogin,
+                    $table_user.stage,
+                    $table_user.active,
+                    $table_user.badlogins,
+                    $table_user.username,
+                    $table_user.admin,
+                    $table_prefs.avatarurl
+             FROM $table_user
+	     LEFT JOIN $table_prefs ON $table_user.id = $table_prefs.uid
+             ORDER BY $table_user.name DESC";
 
   if($max != NULL) {
     $sqltxt .= " LIMIT $max";
@@ -2501,7 +2513,7 @@ function get_users($max = NULL)
     return(FALSE);
   }
 
-  $sql->bind_result($uid,$uname,$uemail,$ulastlogin,$ustage,$uactive,$ubadlogins,$uusername,$uadmin) or print(mysql_error());
+  $sql->bind_result($uid,$uname,$uemail,$ulastlogin,$ustage,$uactive,$ubadlogins,$uusername,$uadmin,$uavatarurl) or print(mysql_error());
 
   $users = array();
   $count = 0;
@@ -2514,6 +2526,8 @@ function get_users($max = NULL)
                             'active' => $uactive,
                             'badlogins' => $ubadlogins,
                             'username' => $uusername,
+                            'sopmlurl' => get_social_outline_url($uid),
+                            'avatarurl' => $uavatarurl,
                             'admin' => $uadmin );
     $count++;
   }

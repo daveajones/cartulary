@@ -1233,7 +1233,7 @@ function get_avatar_url_from_outline($content = NULL)
   }
 
   //Child namespace was empty so no avatar found
-  loggit(2, "This outline content didn't have an avatar element in it's head.");
+  loggit(1, "This outline content didn't have an avatar element.");
   return(FALSE);
 }
 
@@ -1275,7 +1275,7 @@ function get_canonical_url_from_outline($content = NULL)
     return($url);
   }
 
-  //Child namespace was empty so no avatar found
+  //Child namespace was empty so no canonical link found
   loggit(2, "This outline content didn't have a canonical link element in it's head.");
   return(FALSE);
 }
@@ -1756,6 +1756,36 @@ function build_reading_list($title = NULL, $uid = NULL, $oid = NULL, $nos3 = FAL
   } else {
     return($url);
   }
+}
+
+
+//_______________________________________________________________________________________
+//Return a social outline url for a given user id
+function get_social_outline_url($uid = NULL)
+{
+  //Check parameters
+  if( empty($uid) ) {
+    loggit(2,"The user id is blank or corrupt: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Does the user have S3 enabled?
+  if( !s3_is_enabled($uid) && !sys_s3_is_enabled() ) {
+    return(FALSE);
+  }
+
+  //First we get all the key info
+  $s3info = get_s3_info($uid);
+
+  //Get the file name
+  $filename = $default_social_outline_file_name;
+
+  //Construct the url and return it
+  $s3url = get_s3_url($uid, '', $filename);
+  return($s3url);
 }
 
 

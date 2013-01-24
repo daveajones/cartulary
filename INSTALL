@@ -139,13 +139,10 @@ echo '##---------------------------------------------------'
 echo '##                                                   '
 echo '##  Create Admin user account.                       '
 echo '##                                                   '
-echo '##  - This step will give you a username and         '
-echo '##    password.  Write it down!!!                    '
-echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-php /opt/cartulary/bin/usercheck.php 2>>/tmp/cartinstall.log
+php /opt/cartulary/bin/usercheck.php 2>>/tmp/cartinstall.log >/tmp/cartinstall.pass
 
 
 ##: 10. Install Crontab
@@ -179,9 +176,14 @@ php /opt/cartulary/bin/buildrivers.php
 
 ##: All done!
 echo
-echo 'At this point the system is functional.  You can reach it in your browser at the FQDN'
-echo 'you gave above, using the username/password you were given above.'
+echo 'At this point the system is functional.  Just point your browser at the FQDN'
+echo 'you gave above.  The Admin credentials are:'
+echo
+cat /tmp/cartinstall.pass
+echo
 echo 'It would be a good idea to peruse through the cartulary.conf file and make any tweaks'
 echo 'you want at this point before using the system in earnest, like setting the'
 echo 'timezone and setting up a more secure password for the cartulary MySQL user.'
+echo
 echo 'A log of the installation is at /tmp/cartinstall.log  Enjoy!'
+rm /tmp/cartinstall.pass

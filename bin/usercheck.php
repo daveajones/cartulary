@@ -12,7 +12,8 @@
         set_user_as_admin( $newadmin );
         set_password( $newadmin, $newpassw );
         loggit(2, "Admin user not found.  Created: [cartulary@localhost] with password: [$newpassw].");
-        echo "Admin user not found.  Created: [cartulary@localhost] with password: [$newpassw].\n";
+        echo "  Username: cartulary@localhost\n";
+        echo "  Password: $newpassw\n";
 
 	//Let's subscribe this user to the default subscription list, just to get
         //some feeds and an outline in the system

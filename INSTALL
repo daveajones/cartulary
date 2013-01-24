@@ -175,15 +175,24 @@ php /opt/cartulary/bin/feedscan.php
 php /opt/cartulary/bin/buildrivers.php
 
 ##: All done!
+clear
+echo '##-----------------------------------------------------------------------------------'
 echo
-echo 'At this point the system is functional.  Just point your browser at the FQDN'
-echo 'you gave above.  The Admin credentials are:'
+echo 'Installation is finished.  Just point your browser at the FQDN you gave above and    '
+echo 'log in with:'
 echo
 cat /tmp/cartinstall.pass
 echo
-echo 'It would be a good idea to peruse through the cartulary.conf file and make any tweaks'
-echo 'you want at this point before using the system in earnest, like setting the'
+echo 'At this point it would be a good idea to peruse through the cartulary.conf file and  '
+echo 'make any tweaks you want before using the system in earnest, like setting the'
 echo 'timezone and setting up a more secure password for the cartulary MySQL user.'
 echo
+echo 'It would also be a good idea to tweak your php.ini file to allow for larger file     '
+echo 'uploads (for enclosures) and longer script timeouts (for slow feeds).                '
+echo
 echo 'A log of the installation is at /tmp/cartinstall.log  Enjoy!'
+echo
+echo '##-----------------------------------------------------------------------------------'
+
+##: Remove the password temp file.
 rm /tmp/cartinstall.pass

@@ -1,4 +1,7 @@
-  <ul id="ulPostList">   
+  <ul id="ulPostList">
+  {{if posts.length < 1}}
+    <center>You haven't posted anything. Why not?</center>
+  {{/if}}
   {{each(p, post) posts}}
 	<li id="${post.id}" data-title="{{if isBlank(post.title)}}${getShortTitle(post.content)}{{else}}${post.title}{{/if}}">
                 <span class="spnPostControls">

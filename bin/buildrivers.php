@@ -1,10 +1,6 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_bin_init.php"?>
 <?
-  // Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
-  include "$confroot/$includes/util.php";
-  include "$confroot/$includes/auth.php";
-  include "$confroot/$includes/feeds.php";
-
   //Let's not run twice
   if(($pid = cronHelper::lock()) !== FALSE) {
 

@@ -1,11 +1,6 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_bin_init.php"?>
 <?
-  // Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
-  include "$confroot/$includes/util.php";
-  include "$confroot/$includes/auth.php";
-  include "$confroot/$includes/feeds.php";
-  include "$confroot/$includes/opml.php";
-
   //Let's not run twice
   if(($pid = cronHelper::lock()) !== FALSE) {
 
@@ -15,7 +10,6 @@
     loggit(1, "OUTLINESCAN: Backup is in progress, so skipping this scan.");
     exit(0);
   }
-
 
   //Globals and flags
   $ouchange = FALSE;
@@ -125,6 +119,15 @@
 	echo "    No subscribers. Skipping outline.\n";
     }
 
+  }
+
+  //Make sure that admin users are subscribed to the admin log feed
+  $fid = add_feed($system_url.$adminlogfeed, NULL, FALSE);
+  $users = get_admin_users();
+  foreach($users as $user) {
+    loggit(1, "DEBUG: Linking admin user: [".$user['name']."] to admin log feed: [".$system_url.$adminlogfeed."]");
+    link_feed_to_user($fid, $user['id']);
+    mark_feed_as_sticky($fid, $user['id']);
   }
 
   //Remove the lock file

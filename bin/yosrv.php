@@ -1,3 +1,5 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_bin_init.php"?>
 <?
 /*
         Simple php udp socket server

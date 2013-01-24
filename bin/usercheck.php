@@ -1,14 +1,6 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_bin_init.php"?>
 <?
-  // Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
-  include "$confroot/$includes/util.php";
-  include "$confroot/$includes/auth.php";
-  include "$confroot/$includes/admin.php";
-  include "$confroot/$includes/feeds.php";
-  include "$confroot/$includes/opml.php";
-  include "$confroot/$includes/posts.php";
-  include "$confroot/$includes/articles.php";
-
   //Let's not run twice
   if(($pid = cronHelper::lock()) !== FALSE) {
 
@@ -20,19 +12,14 @@
         set_user_as_admin( $newadmin );
         set_password( $newadmin, $newpassw );
         loggit(2, "Admin user not found.  Created: [cartulary@localhost] with password: [$newpassw].");
-        echo "Admin user not found.  Created: [cartulary@localhost] with password: [$newpassw].\n";
-
-	//Let's subscribe this user to the default subscription list, just to get
-        //some feeds and an outline in the system
-        $oid = add_outline('http://localhost'.$default_subscription_list_url, $newadmin);
       }
     }
 
     //Make sure that admin users are subscribed to the admin log feed
-    $fid = add_feed('http://localhost'.$adminlogfeed, NULL, TRUE, NULL);
+    $fid = add_feed($system_url.$adminlogfeed, NULL, FALSE);
     $users = get_admin_users();
     foreach($users as $user) {
-      loggit(1, "Linking admin user: [".$user['name']."] to admin log feed: [http://localhost".$adminlogfeed."]");
+      loggit(1, "Linking admin user: [".$user['name']."] to admin log feed: [".$system_url.$adminlogfeed."]");
       link_feed_to_user($fid, $user['id']);
       mark_feed_as_sticky($fid, $user['id']);
     }

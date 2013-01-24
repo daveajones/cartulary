@@ -1,15 +1,8 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_bin_init.php"?>
 <?
-  // Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
-  include "$confroot/$includes/util.php";
-  include "$confroot/$includes/auth.php";
-  include "$confroot/$includes/feeds.php";
-  include "$confroot/$includes/opml.php";
-  include "$confroot/$includes/posts.php";
-  include "$confroot/$includes/articles.php";
-
   //Let's not run twice
-  if(($pid = cronHelper::lock()) !== FALSE) {
+  if( ($pid = cronHelper::lock()) !== FALSE ) {
 
     //Let's not scan while other scripts are in process
     if( file_exists("$confroot/$run/backup.php.lock") ) {
@@ -42,10 +35,8 @@
       }
     }
 
-  //Remove the lock file
-  cronHelper::unlock();
+    //Release the lock
+    cronHelper::unlock();
   }
-
-  // Log and leave
-  return(TRUE);
+  exit(0);
 ?>

@@ -12,10 +12,14 @@
 ##: 0. Warning.
 clear
 echo 'This install script assumes it is being run on a virgin install of Ubuntu server 12.04 LTS.'
-echo 'Running this file as-is on a production system is going to most likely wreck some stuff.'
-echo 'If that is the case, you should stop NOW and do the install by hand.'
+echo 'Running this file as-is on a production system is going to most likely wreck a lot of stuff.'
+echo 'If that is the case, you should  **STOP NOW**  and do the installation by hand.'
+echo
 read -p "Press [Enter] if you are sure you want to run this script..."
-read -p "This is your last chance to back out.  Are you really sure? [Enter]"
+echo
+read -p "We're about to modify a whole bunch of stuff, like php.ini, mysql, etc.?  Are you really sure? [Enter]"
+echo
+read -p "This is your last chance to back out.  Are you really, really sure this is a virgin system? [Enter]"
 
 
 ##: 1. Install Apache and PHP5
@@ -61,6 +65,9 @@ echo
 echo  >> /etc/php5/apache2/php.ini
 echo '[cartulary]' >> /etc/php5/apache2/php.ini
 echo 'cartulary_conf="/opt/cartulary"' >> /etc/php5/apache2/php.ini
+echo 'post_max_size=300M' >> /etc/php5/apache2/php.ini
+echo 'upload_max_filesize=300M' >> /etc/php5/apache2/php.ini
+echo 'max_execution_time=90' >> /etc/php5/apache2/php.ini
 echo  >> /etc/php5/cli/php.ini
 echo '[cartulary]' >> /etc/php5/cli/php.ini
 echo 'cartulary_conf="/opt/cartulary"' >> /etc/php5/cli/php.ini

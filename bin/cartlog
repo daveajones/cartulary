@@ -2,5 +2,5 @@
 
 CARTLOC=`echo '<?include get_cfg_var("cartulary_conf")."/includes/env.php"; echo "$confroot/$log";?>' | php`
 
-tail -n30 -f $CARTLOC/*.log | ccze
+tail -n30 -f $CARTLOC/*.log /var/log/apache2/error.log | ccze
 

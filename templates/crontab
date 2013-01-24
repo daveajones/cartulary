@@ -3,7 +3,7 @@
 ##: It will usually be located in /etc/cron.d/cartulary in a modern debian based install.
 ##: ----------
 
-*/10 * * * * root timeout 580 php /opt/cartulary/bin/feedscan.php
+*/20 * * * * root timeout 1100 php /opt/cartulary/bin/feedscan.php
 */5  * * * * root php /opt/cartulary/bin/usercheck.php
 */1  * * * * root php /opt/cartulary/bin/buildrivers.php
 17   * * * * root php /opt/cartulary/bin/outlinescan.php

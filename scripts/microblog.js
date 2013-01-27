@@ -88,9 +88,11 @@ $(document).ready( function() {
         	        $('#chkTweet').prop("checked", !$('#chkTweet').prop("checked"));
                 	$('#imgTweet').toggleClass('icon-twitter');
 	                $('#imgTweet').toggleClass('icon-notwitter');
+			$('#txtContent').trigger('keyup');
         	});
 		if( $('#chkTweet').is(":checked") ) {
                		$('#imgTweet').removeClass('icon-notwitter').addClass('icon-twitter');
+			$('#txtContent').trigger('keyup');
 		} else {
 	               	$('#imgTweet').removeClass('icon-twitter').addClass('icon-notwitter');
 		}
@@ -149,6 +151,7 @@ $(document).ready( function() {
                                 }
 				}, 100);
                         }
+			$('#txtContent').trigger('keyup');
 		});
 
 

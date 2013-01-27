@@ -18,6 +18,9 @@ tar -zcvf ~/cartulary-bak-$BAKDATE.tar.gz /opt/cartulary
 ##: Get into the repo folder
 cd cartulary-master
 
+##: Backup newuser sub list
+cp /opt/cartulary/www/newuser.opml /tmp
+
 ##: Put new files in place
 cp -R bin/* /opt/cartulary/bin
 cp -R includes/* /opt/cartulary/includes
@@ -25,6 +28,9 @@ cp -R libraries/* /opt/cartulary/libraries
 cp -R scripts/* /opt/cartulary/scripts
 cp -R templates/* /opt/cartulary/templates
 cp -R www/* /opt/cartulary/www
+
+##: Restore newuser sub list
+cp /tmp/newuser.opml /opt/cartulary/www
 
 ##: Get out of the repo
 cd ..

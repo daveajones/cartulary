@@ -6,6 +6,7 @@
 */20 * * * * root timeout 1100 php /opt/cartulary/bin/feedscan.php
 */5  * * * * root php /opt/cartulary/bin/usercheck.php
 */1  * * * * root php /opt/cartulary/bin/buildrivers.php
+*/30  * * * * root php /opt/cartulary/bin/buildsysrivers.php
 17   * * * * root php /opt/cartulary/bin/outlinescan.php
 27   * * * * root php /opt/cartulary/bin/archive.php
 48   * * * * root php /opt/cartulary/bin/syscheck.php

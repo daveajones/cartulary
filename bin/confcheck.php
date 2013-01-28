@@ -129,8 +129,17 @@
     fclose($fh);
 
     //Log it
-    add_admin_log_item("The server had no configuration file. A fresh one was created.", "Cartulary.conf generated.");
+    add_admin_log_item("A new configuration file was created.", "Cartulary.conf generated.");
 
+    //If this is an upgrade (passed on the command line), install the cron job from template
+    if( isset($argv[1]) ) {
+      if( $argv[1] == "upgrade" ) {
+        rename( $cronloc, "/tmp/cartulary-cron.old.".time() );
+        $cmdtorun = "php $confroot/bin/syscheck.php";
+        $output = `$cmdtorun`;
+        echo $output;
+      }
+    }
 
   //Remove the lock file
   cronHelper::unlock();

@@ -40,4 +40,4 @@ rm -rf cartulary-master/
 rm master.zip
 
 ##: Run confcheck
-php /opt/cartulary/bin/confcheck.php
+php /opt/cartulary/bin/confcheck.php upgrade

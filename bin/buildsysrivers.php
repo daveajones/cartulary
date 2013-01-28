@@ -16,12 +16,18 @@
 
   	//Build the server-wide river if those values aren't blank
   	$tstart = time();
-        build_server_river_json(100);
+        $s3info = get_sys_s3_info();
+        if( !empty($s3info['riverbucket']) && !empty($s3info['riverfile']) ) {
+          build_server_river_json(100);
+        } else {
+    	  loggit(1, "Skipping server-wide river build. Bucket or file value is empty.");
+    	  echo "Skipping server-wide river build. Bucket or file value is empty.\n\n";
+        }
 
   	//Calculate how long it took to build the rivers
   	$took = time() - $tstart;
-  	loggit(1, "It took: [$took] seconds to build the server-wide river.");
 
+    	loggit(1, "It took: [$took] seconds to build the server-wide river.");
   	loggit(1, "Done.");
 
         //Release the lock

@@ -4262,6 +4262,277 @@ function search_feed_items($uid = NULL, $query = NULL, $max = NULL)
 }
 
 
+//_______________________________________________________________________________________
+//Build a json array of feed items for the entire server
+function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
+{
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+  require_once "$confroot/$libraries/s3/S3.php";
+  require_once "$confroot/$includes/opml.php";
+
+  $start = time() - (6 * 3600);
+  $dmax = 100;
+  $mmax = 50;
+
+  //The river array
+  $river = array();
+  $driver = array();
+  $mriver = array();
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Get the items
+  $sqltxt = "SELECT $table_nfitem.id,
+                    $table_nfitem.title,
+                    $table_nfitem.url,
+                    $table_nfitem.timestamp,
+                    $table_nfitem.feedid,
+                    $table_nfitem.timeadded,
+                    $table_nfitem.enclosure,
+                    $table_nfitem.description,
+                    $table_nfitem.sourceurl,
+                    $table_nfitem.sourcetitle,
+		    $table_nfitem.author
+             FROM $table_nfitem
+             WHERE $table_nfitem.timeadded > ?
+             AND $table_nfitem.`old` = 0";
+  $sqltxt .= " ORDER BY $table_nfitem.timeadded DESC";
+  //loggit(3, $sqltxt);
+
+  //Make sure to set the LIMIT to the higher of the two max values, so we cover both
+  if($max == NULL) {
+    $max = $dmax;
+    if( $mmax > $dmax ) {
+      $max = $mmax;
+    }
+  }
+  $sqltxt .= " LIMIT $max";
+
+  //loggit(1, "[$sqltxt]");
+  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql->bind_param("d", $start) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+
+  //See if there were any items returned
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(1,"The server has an empty river.");
+    return(FALSE);
+  }
+
+  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$timeadded,$enclosure,$description,$sourceurl,$sourcetitle,$author) or print(mysql_error());
+
+  $fcount = -1;
+  $icount = 0;
+  $ticount = 0;
+  $drcount = 0;
+  $mrcount = 0;
+  $firstid = "";
+  $lastfeedid = "";
+  $pubdate = time();
+  while($sql->fetch()){
+    $feed = get_feed_info($feedid);
+
+    //Save the time stamp of the first item to use as a pubdate
+    if( $firstid == "" ) {
+      $pubdate = $timeadded;
+      $firstid = $id;
+    }
+
+    //Keep track of which feed we're in along the way
+    if($lastfeedid != $feedid) {
+      $fcount++;
+      $icount = 0;
+      $lastfeedid = $feedid;
+
+      //Insert a new array that will contain the feed
+      $river[$fcount] = array(
+		'feedId' => $feedid,
+		'feedUrl' => $feed['url'],
+		'websiteUrl' => $feed['link'],
+		'feedTitle' => $feed['title'],
+		'feedDescription' => '',
+		'itemIndex' => $ticount,
+		'whenLastUpdate' => date("D, d M Y H:i:s O", $feed['lastupdate'])
+      );
+
+      //Does this feed have an avatar url?
+      if( !empty($feed['avatarurl']) ) {  $river[$fcount]['avatarUrl'] = $feed['avatarurl']; }
+
+      //Start a sub-array in this feed array to hold items
+      $river[$fcount]['item'] = array();
+
+    }
+
+    //Body text of item
+    $itembody = truncate_text($description, 512);
+
+    //Fill in the details of this item
+    $river[$fcount]['item'][$icount] = array(
+		'index' => $ticount,
+	        'body' => $itembody,
+	        'permaLink' => $url,
+		'pubDate' => date("D, d M Y H:i:s O", $timeadded),
+	        'title' => $title,
+	        'link' => $url,
+	        'id' => $id
+    );
+
+    //Is there an author attribution?
+    if(!empty($author)) {
+	$river[$fcount]['item'][$icount]['author'] = $author;
+    }
+
+    //Does this item specify a source attribution?
+    if(!empty($sourceurl)) {
+	$river[$fcount]['item'][$icount]['sourceurl'] = $sourceurl;
+    }
+    if(!empty($sourcetitle)) {
+	$river[$fcount]['item'][$icount]['sourcetitle'] = $sourcetitle;
+    }
+
+    //Are there any enclosures?
+    $enclosures = unserialize($enclosure);
+    if($enclosures != FALSE) {
+	    if( !empty($enclosures) ) {
+		if(!empty($enclosures[0]['url'])){ // && !empty($enclosures[0]['type']) && !empty($enclosures[0]['length'])) {
+		      $river[$fcount]['item'][$icount]['enclosure'] = $enclosures;
+		}
+	    }
+    }
+
+    //We're building two rivers here.  One for desktop and one for mobile
+    if( $ticount <= $dmax ) {  $driver = $river; $drcount++;  }
+    if( $ticount <= $mmax ) {  $mriver = $river; $mrcount++;  }
+
+    $icount++;
+    $ticount++;
+  }
+
+  $sql->close() or print(mysql_error());
+
+  //Encapsulate the river
+  $doutput['updatedFeeds']['updatedFeed'] = $driver;
+  $moutput['updatedFeeds']['updatedFeed'] = $mriver;
+
+  //Add metadata
+  $doutput['metadata'] = array(
+	"docs" => "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html",
+	"whenGMT" => date("D, d M Y H:i:s O", $pubdate),
+	"whenLocal" => date("D, d M Y H:i:s O", $pubdate),
+	"version" => "3",
+	"secs" => "1",
+        "firstId" => $firstid,
+        "lastBuildDate" => time()
+  );
+  $moutput['metadata'] = array(
+	"docs" => "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html",
+	"whenGMT" => date("D, d M Y H:i:s O", $pubdate),
+	"whenLocal" => date("D, d M Y H:i:s O", $pubdate),
+	"version" => "3",
+	"secs" => "1",
+        "firstId" => $firstid,
+        "lastBuildDate" => time()
+  );
+
+  //Json encode the river
+  $djsonriver = "onGetRiverStream(".json_encode($doutput).")";
+  $mjsonriver = "onGetRiverStream(".json_encode($moutput).")";
+
+  //Let's return the river asked for
+  $jsonriver = $djsonriver;
+  if( $mobile == TRUE ) {
+    $jsonriver = $mjsonriver;
+  }
+
+  //If we can get some sane S3 credentials then let's go
+  if( sys_s3_is_enabled() ) {
+      //First we get all the key info
+      $s3info = get_sys_s3_info();
+
+      //Subpath?  Must begin with a slash
+      $subpath = "";
+
+      //Put the desktop file
+      $filename = $default_river_json_file_name;
+      $s3res = putInS3($djsonriver, $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "application/json");
+      if(!$s3res) {
+	loggit(2, "Could not create S3 file: [$filename].");
+        //loggit(3, "Could not create S3 file: [$filename].");
+      } else {
+        $s3url = get_server_river_s3_url($subpath, $filename);
+        loggit(3, "Wrote server river json to S3 at url: [$s3url].");
+      }
+
+      //Construct the server river html file
+      $fh = fopen("$confroot/$templates/$cg_template_html_river", "r");
+      $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_template_html_river"));
+      //Replace the tags
+      $rftemplate = str_replace('[RIVER_TITLE]', $s3info['rivertitle'], $rftemplate);
+      $rftemplate = str_replace('[RIVER_JSON_URL]', $s3url, $rftemplate);
+      $rftemplate = str_replace('[SCRIPT_JQUERY]', $cg_script_js_jquery, $rftemplate);
+      $rftemplate = str_replace('[SCRIPT_JQTEMPLATES]', $cg_script_js_jqtemplates, $rftemplate);
+      $rftemplate = str_replace('[DATE]', date("D, d M Y H:i:s O"), $rftemplate);
+      $rftemplate = str_replace('[SYS_NAME]', $system_name, $rftemplate);
+      $rftemplate = str_replace('[SYS_VERSION]', $version, $rftemplate);
+      //Close the template
+      fclose($fh);
+
+      //Put the html template
+      $filename = $s3info['riverfile'];
+      $s3res = putInS3($rftemplate, $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/html");
+      if(!$s3res) {
+	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+        //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+      } else {
+        $s3url = get_server_river_s3_url($subpath, $filename);
+        loggit(1, "Wrote server river html to S3 at url: [$s3url].");
+      }
+
+      //Put the support files
+      $filename = $cg_template_css_river;
+      $s3res = putFileInS3("$confroot/$templates/$cg_template_css_river", $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/css");
+      if(!$s3res) {
+	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+        //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+      } else {
+        $s3url = get_server_river_s3_url($subpath, $filename);
+        loggit(1, "Wrote server river html to S3 at url: [$s3url].");
+      }
+
+      $filename = $cg_script_js_jquery;
+      $s3res = putFileInS3("$confroot/$scripts/$cg_script_js_jquery", $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/javascript");
+      if(!$s3res) {
+	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+        //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+      } else {
+        $s3url = get_server_river_s3_url($subpath, $filename);
+        loggit(1, "Wrote jquery script to S3 at url: [$s3url].");
+      }
+
+      $filename = $cg_script_js_jqtemplates;
+      $s3res = putFileInS3("$confroot/$scripts/$cg_script_js_jqtemplates", $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/javascript");
+      if(!$s3res) {
+	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+        //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+      } else {
+        $s3url = get_server_river_s3_url($subpath, $filename);
+        loggit(1, "Wrote jquery templates script to S3 at url: [$s3url].");
+      }
+
+  }
+
+  loggit(1,"Returning: [$drcount] items in server river.");
+  loggit(1,"Returning: [$mrcount] items in server river.");
+  return($jsonriver);
+}
+
+
 
 //########################################################################################
 ?>

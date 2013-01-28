@@ -16,6 +16,11 @@
     $l_s3bucket = "";
     $l_s3cname = "";
     $l_s3backup = "";
+    $l_s3riverbucket = "";
+    $l_s3rivercname = "";
+    $l_s3riverfile = "index.html";
+    $l_s3rivertitle = "Community River";
+    $l_rsscloud = 0;
 
     //If there is already a config file, let's hang on to it
     if( file_exists($cfname) ) {
@@ -29,6 +34,11 @@
         $l_s3bucket = $s3_sys_bucket;
         $l_s3cname = $s3_sys_cname;
         $l_s3backup = $s3_sys_backup;
+        $l_s3riverbucket = $s3_sys_server_river_bucket;
+        $l_s3rivercname = $s3_sys_server_river_cname;
+        $l_s3riverfile = $s3_sys_server_river_file;
+        $l_s3rivertitle = $s3_sys_server_river_title;
+        $l_rsscloud = $enable_rsscloud;
       }
 
       rename( $cfname, $cfname.'.old.'.time() );
@@ -80,7 +90,32 @@
     if( empty($response) ) { $response = $l_s3backup; }
     $template = str_replace('s3backupbucketvalue', $response, $template);
 
-    //Eliminate the newinstall flag if it's set and bring in the default feed list
+    echo "Do you want a server-wide river? If so, what S3 bucket should we use? [$l_s3riverbucket]: ";
+    $response = get_user_response();
+    if( empty($response) ) { $response = $l_s3riverbucket; }
+    $template = str_replace('s3riverbucketvalue', $response, $template);
+
+    echo "Does the server-wide river bucket have a dns CNAME pointed to it?  If so, what is it? [$l_s3rivercname]: ";
+    $response = get_user_response();
+    if( empty($response) ) { $response = $l_s3rivercname; }
+    $template = str_replace('s3rivercnamevalue', $response, $template);
+
+    echo "What filename do you use for the server-wide river html file? [$l_s3riverfile]: ";
+    $response = get_user_response();
+    if( empty($response) ) { $response = $l_s3riverfile; }
+    $template = str_replace('s3riverfilevalue', $response, $template);
+
+    echo "What do you want the title of the server-wide river to be? [$l_s3rivertitle]: ";
+    $response = get_user_response();
+    if( empty($response) ) { $response = $l_s3rivertitle; }
+    $template = str_replace('s3rivertitlevalue', $response, $template);
+
+    //Preserve rssCloud setting
+    if( $l_rsscloud == 1 ) {
+      $template = str_replace('enable_rsscloud=0', 'enable_rsscloud=1', $template);
+    }
+
+    //Eliminate the newinstall flag if it's set
     if( !isset($cartularynewinstall) ) {
       $template = str_replace('cartularynewinstall=1', "", $template);
     }

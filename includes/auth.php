@@ -2822,7 +2822,11 @@ function get_sys_s3_info() {
         $s3info['bucket'] = preg_replace('{/$}', '', $s3_sys_bucket);
         $s3info['backup'] = preg_replace('{/$}', '', $s3_sys_backup);
         $s3info['cname'] = $s3_sys_cname;
-        loggit(3, "DEBUG: ".print_r($s3info, TRUE));
+        $s3info['riverbucket'] = $s3_sys_server_river_bucket;
+        $s3info['rivercname'] = $s3_sys_server_river_cname;
+        $s3info['riverfile'] = $s3_sys_server_river_file;
+        $s3info['rivertitle'] = $s3_sys_server_river_title;
+        //loggit(3, "DEBUG: ".print_r($s3info, TRUE));
         return($s3info);
   }
 

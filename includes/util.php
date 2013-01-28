@@ -1157,6 +1157,7 @@ class Bcrypt {
   }
 }
 
+
 //Build an s3 url off of a given users prefs and a path and filename
 function get_s3_url($uid = NULL, $path = NULL, $filename = NULL) {
 
@@ -1189,6 +1190,44 @@ function get_s3_url($uid = NULL, $path = NULL, $filename = NULL) {
     $url = $prot.$host;
     if( !empty($s3info['bucket']) ) {
       $url .= "/".trim($s3info['bucket'], '/');
+    }
+  }
+
+  if( !empty($path) ) {
+    $url .= "/".$path;
+  }
+
+  if( !empty($filename) ) {
+    $url .= "/".$filename;
+  }
+
+  return($url);
+}
+
+
+//Build an s3 url for the server's river files
+function get_server_river_s3_url($path = NULL, $filename = NULL) {
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Globals
+  $url = '';
+  $prot = 'http://';
+  $host = 's3.amazonaws.com';
+  $path = trim($path, '/');
+  $filename = ltrim($filename, '/');
+
+  //Get key s3 info
+  $s3info = get_sys_s3_info();
+
+  //First let's get a proper hostname value
+  if( !empty($s3info['rivercname']) ) {
+      $url = $prot.trim($s3info['rivercname'], '/');
+  } else {
+    $url = $prot.$host;
+    if( !empty($s3info['riverbucket']) ) {
+      $url .= "/".trim($s3info['riverbucket'], '/');
     }
   }
 

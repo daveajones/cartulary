@@ -36,8 +36,12 @@
         $l_s3backup = $s3_sys_backup;
         $l_s3riverbucket = $s3_sys_server_river_bucket;
         $l_s3rivercname = $s3_sys_server_river_cname;
-        $l_s3riverfile = $s3_sys_server_river_file;
-        $l_s3rivertitle = $s3_sys_server_river_title;
+        if( isset($s3_sys_server_river_file) ) {
+          $l_s3riverfile = $s3_sys_server_river_file;
+        }
+        if( isset($s3_sys_server_river_title) ) {
+          $l_s3rivertitle = $s3_sys_server_river_title;
+        }
         $l_rsscloud = $enable_rsscloud;
       }
 

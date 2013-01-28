@@ -33,10 +33,14 @@
     //Get the users list
     $users = get_users();
 
-    //Reset badlogin counters for all users
+    //Do maintainence for each user
     foreach( $users as $user ) {
       $uid = $user['id'];
+      //Reset bad login counter
       badlogin_reset( get_email_from_uid($uid) );
+      //Self subscription check
+      $s3sopml = get_s3_url($uid, NULL, $default_social_outline_file_name);
+      $oid = add_social_outline($s3sopml, $uid);
     }
 
   //Remove the lock file

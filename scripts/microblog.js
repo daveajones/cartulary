@@ -127,6 +127,9 @@ $(document).ready( function() {
                                         <?} else {?>
 			                loadPostList('#divPostList', '#microblog-template');
 					<?}?>
+					$('#chkTweet').prop("checked", false);
+                                        $('#imgTweet').removeClass('icon-twitter').addClass('icon-notwitter');
+					$('#file_upload').uploadifive('clearQueue');
                                 }
                                 $('#imgSpinner').hide();
                                 $('#btnSubmit').attr("disabled", false);

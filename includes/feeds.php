@@ -54,13 +54,13 @@ function get_feed_title($content = NULL)
   //Look for a title node in the rss
   foreach($x->channel->title as $entry) {
     loggit(1, "Found a title node: [$entry].");
-    return($entry);
+    return((string)$entry);
   }
 
   //Look for atom nodes
   foreach($x->title as $entry) {
     loggit(1, "Found a title node: [$entry].");
-    return($entry);
+    return((string)$entry);
   }
 
   //None of the tests passed so return FALSE

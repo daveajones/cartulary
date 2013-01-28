@@ -140,7 +140,7 @@
 	                  if(!empty($pubfeeds)) {
 	                    foreach($pubfeeds as $pubfeed) {
 	                      ?><li class="pubfeed" data-url="<?echo $pubfeed['url']?>" data-title="<?echo $pubfeed['title']?>">
-	                        <a class="aDeletePubFeed" href='<?echo $delpubfeedcgi."?"."url=".$pubfeed['url'];?>'><img class="icon-remove-small" src="/images/blank.gif" alt="" /></a>
+	                        <a class="aDeletePubFeed" href='<?echo $delpubfeedcgi."?"."url=".urlencode($pubfeed['url']);?>'><img class="icon-remove-small" src="/images/blank.gif" alt="" /></a>
                                 <a href="<?echo $pubfeed['url']?>"><?echo $pubfeed['title']?></a></li><?
 	                    }
 	                  }

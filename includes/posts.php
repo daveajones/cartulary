@@ -676,7 +676,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
 	if( !empty($post['sourceurl']) || !empty($post['sourcetitle']) ) {
           $rss .= '        <source url="'.htmlspecialchars(trim($post['sourceurl'])).'">'.htmlspecialchars(trim($post['sourcetitle'])).'</source>'."\n";
 	}
-      $rss .= "        <author>$username</author>\n";
+      $rss .= "        <author>".get_email_from_uid($uid)."</author>\n";
       $rss .= $tweeted;
       $rss .= "      </item>\n";
   }

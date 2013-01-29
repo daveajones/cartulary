@@ -4458,7 +4458,7 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
       //Subpath?  Must begin with a slash
       $subpath = "";
 
-      //Put the desktop file
+      //Put the json river file
       $filename = $default_river_json_file_name;
       $s3res = putInS3($djsonriver, $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "application/json");
       if(!$s3res) {
@@ -4469,62 +4469,63 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
         loggit(3, "Wrote server river json to S3 at url: [$s3url].");
       }
 
-      //Construct the server river html file
-      $fh = fopen("$confroot/$templates/$cg_template_html_river", "r");
-      $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_template_html_river"));
-      //Replace the tags
-      $rftemplate = str_replace('[RIVER_TITLE]', $s3info['rivertitle'], $rftemplate);
-      $rftemplate = str_replace('[RIVER_JSON_URL]', $s3url, $rftemplate);
-      $rftemplate = str_replace('[SCRIPT_JQUERY]', $cg_script_js_jquery, $rftemplate);
-      $rftemplate = str_replace('[SCRIPT_JQTEMPLATES]', $cg_script_js_jqtemplates, $rftemplate);
-      $rftemplate = str_replace('[DATE]', date("D, d M Y H:i:s O"), $rftemplate);
-      $rftemplate = str_replace('[SYS_NAME]', $system_name, $rftemplate);
-      $rftemplate = str_replace('[SYS_VERSION]', $version, $rftemplate);
-      //Close the template
-      fclose($fh);
+      //We always put the json file if the bucket is enabled, but only put the html stuff if
+      //the riverfile value is non-blank
+      if( !empty($s3info['riverfile']) ) {
+        //Construct the server river html file
+        $fh = fopen("$confroot/$templates/$cg_template_html_river", "r");
+        $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_template_html_river"));
+        //Replace the tags
+        $rftemplate = str_replace('[RIVER_TITLE]', $s3info['rivertitle'], $rftemplate);
+        $rftemplate = str_replace('[RIVER_JSON_URL]', $s3url, $rftemplate);
+        $rftemplate = str_replace('[SCRIPT_JQUERY]', $cg_script_js_jquery, $rftemplate);
+        $rftemplate = str_replace('[SCRIPT_JQTEMPLATES]', $cg_script_js_jqtemplates, $rftemplate);
+        $rftemplate = str_replace('[DATE]', date("D, d M Y H:i:s O"), $rftemplate);
+        $rftemplate = str_replace('[SYS_NAME]', $system_name, $rftemplate);
+        $rftemplate = str_replace('[SYS_VERSION]', $version, $rftemplate);
+        //Close the template
+        fclose($fh);
 
-      //Put the html template
-      $filename = $s3info['riverfile'];
-      $s3res = putInS3($rftemplate, $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/html");
-      if(!$s3res) {
-	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-        //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-      } else {
-        $s3url = get_server_river_s3_url($subpath, $filename);
-        loggit(1, "Wrote server river html to S3 at url: [$s3url].");
+        //Put the html template
+        $filename = $s3info['riverfile'];
+        $s3res = putInS3($rftemplate, $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/html");
+        if(!$s3res) {
+          loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+          //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+        } else {
+          $s3url = get_server_river_s3_url($subpath, $filename);
+          loggit(1, "Wrote server river html to S3 at url: [$s3url].");
+        }
+
+      	//Put the support files
+      	$filename = $cg_template_css_river;
+      	$s3res = putFileInS3("$confroot/$templates/$cg_template_css_river", $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/css");
+      	if(!$s3res) {
+		loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+        	//loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+      	} else {
+        	$s3url = get_server_river_s3_url($subpath, $filename);
+        	loggit(1, "Wrote server river html to S3 at url: [$s3url].");
+      	}
+      	$filename = $cg_script_js_jquery;
+      	$s3res = putFileInS3("$confroot/$scripts/$cg_script_js_jquery", $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/javascript");
+      	if(!$s3res) {
+		loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+        	//loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+      	} else {
+        	$s3url = get_server_river_s3_url($subpath, $filename);
+        	loggit(1, "Wrote jquery script to S3 at url: [$s3url].");
+      	}
+      	$filename = $cg_script_js_jqtemplates;
+      	$s3res = putFileInS3("$confroot/$scripts/$cg_script_js_jqtemplates", $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/javascript");
+      	if(!$s3res) {
+		loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+        	//loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+      	} else {
+        	$s3url = get_server_river_s3_url($subpath, $filename);
+        	loggit(1, "Wrote jquery templates script to S3 at url: [$s3url].");
+      	}
       }
-
-      //Put the support files
-      $filename = $cg_template_css_river;
-      $s3res = putFileInS3("$confroot/$templates/$cg_template_css_river", $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/css");
-      if(!$s3res) {
-	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-        //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-      } else {
-        $s3url = get_server_river_s3_url($subpath, $filename);
-        loggit(1, "Wrote server river html to S3 at url: [$s3url].");
-      }
-
-      $filename = $cg_script_js_jquery;
-      $s3res = putFileInS3("$confroot/$scripts/$cg_script_js_jquery", $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/javascript");
-      if(!$s3res) {
-	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-        //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-      } else {
-        $s3url = get_server_river_s3_url($subpath, $filename);
-        loggit(1, "Wrote jquery script to S3 at url: [$s3url].");
-      }
-
-      $filename = $cg_script_js_jqtemplates;
-      $s3res = putFileInS3("$confroot/$scripts/$cg_script_js_jqtemplates", $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "text/javascript");
-      if(!$s3res) {
-	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-        //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-      } else {
-        $s3url = get_server_river_s3_url($subpath, $filename);
-        loggit(1, "Wrote jquery templates script to S3 at url: [$s3url].");
-      }
-
   }
 
   loggit(1,"Returning: [$drcount] items in server river.");

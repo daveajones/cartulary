@@ -881,7 +881,7 @@ Nicolas Gallagher - http://nicolasgallagher.com
 body {  background:#555;  }
 .container {
   width: 90%;
-  max-width:960px;
+  max-width:900px;
 }
 a {  color:#059;  }
 
@@ -903,6 +903,12 @@ img.avatarheader {  float:right; max-height: 64px;  }
 /* --------------------------------------------------- */
 
 
+.pageContentWrapper.River #divRiver {
+  position: relative;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:10px;
+}
 .pageContentWrapper.River #stream {  max-width: 900px; padding:1px;  }
 .pageContentWrapper.River #stream .notice {  color:white;  }
 .pageContentWrapper.River #stream-header {  display:none;  }
@@ -941,13 +947,13 @@ img.avatarheader {  float:right; max-height: 64px;  }
   display:block;
   clear:both;
   margin:20px auto 10px;
-  max-width:500px;
+  max-width:222px;
 }
 .pageContentWrapper.River #stream .section .encpicture {
   display:block;
   clear:both;
   margin:20px auto 10px;
-  max-width: 500px;
+  max-width: 222px;
 }
 .pageContentWrapper.River #stream .section .riverminitar { 
   float:right;
@@ -959,15 +965,13 @@ img.avatarheader {  float:right; max-height: 64px;  }
   display:block;
   clear:both;
   margin:10px auto 10px;
-  width:500px;
-  height:300px;
+  width:222px;
 }
 .pageContentWrapper.River #stream .section .article .encvideo {
   display:block;
   clear:both;
   margin:10px auto 10px;
-  width:500px;
-  height:300px;
+  width:222px;
 }
 .pageContentWrapper.River #stream .section > .header {
   padding:10px 10px 5px;
@@ -1016,3 +1020,30 @@ img.avatarheader {  float:right; max-height: 64px;  }
 } /* ---------------- End Media: All ----------------------- */
 /* --------------------------------------------------------- */
 
+
+
+/* ---------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------- */
+@media (min-width:1000px) { /* ---------- Start Media: Larger ----------- */
+/* ---------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------- */
+
+
+.pageContentWrapper.River #stream .section .article .bodypic {
+  max-width:500px;
+}
+.pageContentWrapper.River #stream .section .encpicture {
+  max-width: 500px;
+}
+.pageContentWrapper.River #stream .section .article .bodyvid {
+  width:500px;
+}
+.pageContentWrapper.River #stream .section .article .encvideo {
+  width:500px;
+}
+
+
+
+/* --------------------------------------------------------- */
+} /* ---------------- End Media: Larger -------------------- */
+/* --------------------------------------------------------- */

@@ -74,7 +74,7 @@ foreach( $outlines as $ou ) {
   if($ou['type'] == 'sopml') {
   ?><li class="liPerson smallPerson person" id="<?echo $ou['id']?>" data-id="<?echo $ou['id']?>" data-title="<?echo $ou['title']?>">
     <img class="personimg" src="<?echo (!empty($ou['avatarurl']) ? $ou['avatarurl'] : $default_avatar_url)?>" />
-    <span class="personcaption personcaption-block"><?echo $ou['ownername']?></span>
+    <span class="personcaption personcaption-block"><a href="<?echo $ou['url']?>"><?echo $ou['ownername']?></a></span>
     <a class="persondrop aUnsubscribe"  href="#"><img src="/images/glyph/glyphicons_191_circle_minus-red.png" /></a>
     <ul class="personList" style="display:none;">
     <?

@@ -151,7 +151,7 @@
 
     //Log the upgrade
     if( $action == "upgrade" ) {
-      add_admin_log_item("System was upgraded to version $version", "System Upgrade");
+      add_admin_log_item("System was upgraded from version $version", "System Upgrade");
     }
 
   //Remove the lock file

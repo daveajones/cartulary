@@ -401,7 +401,7 @@ a {  color:#059;  }
           border-radius: 4px;
 }
 
-.pageContentWrapper.Subscribe #divSubscribePeople a {  color:#722;  }
+.pageContentWrapper.Subscribe #divSubscribePeople a {  color:#ddd;  }
 .pageContentWrapper.Subscribe #divSubscribePeople .person {
   color:white;
   float:left;

@@ -41,3 +41,6 @@ rm master.zip
 
 ##: Run confcheck
 php /opt/cartulary/bin/confcheck.php upgrade
+
+##: Restart cron daemon
+/etc/init.d/cron restart

@@ -323,6 +323,19 @@ body {
      -moz-box-shadow: 0 0 3px 3px #333;
           box-shadow: 0 0 3px 3px #333;
 }
+.pageContentWrapper.Subscribe #divSubscribePeople .person ul li img.icon-warning {  display:inline;  }
+.pageContentWrapper.Subscribe #divSubscribePeople .person ul li a.aFeedRaw {  display:inline;  }
+.pageContentWrapper.Subscribe #divSubscribePeople .person ul li span.feed-properties {
+  display:inline-block;
+  float:right;
+}
+.pageContentWrapper.Subscribe #divSubscribePeople .person ul.personList li {
+  clear:both;
+  margin:3px 0 0;
+}
+.pageContentWrapper.Subscribe #divSubscribePeople .person ul.personList {
+  margin-top:12px;
+}
 .pageContentWrapper.Subscribe #divSubscribePeople .personcaption-block {
   display:block;
 }
@@ -338,7 +351,7 @@ body {
 }
 .pageContentWrapper.Subscribe #divSubscribePeople .bigPerson {
   width:95%;
-  max-width:222px
+  max-width:280px
 }
 .pageContentWrapper.Subscribe #divSubscribePeople .bigPerson .personimg {
   width:48px;

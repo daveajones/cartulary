@@ -111,8 +111,12 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-chown www-data /opt/cartulary/logs/* >>/tmp/cartinstall.log 2>&1
-
+touch /opt/cartulary/logs/error.log
+touch /opt/cartulary/logs/debug.log
+touch /opt/cartulary/logs/access.log
+chown ubuntu.www-data /opt/cartulary/logs >>/tmp/cartinstall.log 2>&1
+chown ubuntu.www-data /opt/cartulary/logs/* >>/tmp/cartinstall.log 2>&1
+chown ubuntu.www-data /opt/cartulary/spool >>/tmp/cartinstall.log 2>&1
 
 ##: 8. Create Cartulary Config File
 clear

@@ -4,6 +4,12 @@
   //Let's not run twice
   if(($pid = cronHelper::lock()) !== FALSE) {
 
+    //If this is being run as an upgrade
+    $action = "";
+    if( isset($argv[1]) ) {
+      $action = $argv[1];
+    }
+
     $cfname = "$confroot/conf/cartulary.conf";
     $cftemp = "$confroot/$templates/cartulary.conf";
 
@@ -24,7 +30,7 @@
 
     //If there is already a config file, let's hang on to it
     if( file_exists($cfname) ) {
-      if( !isset($cartularynewinstall) ) {
+      if( $action = "upgrade" ) {
         //Pull in the existing values
         $l_dbusername = $dbuser;
         $l_dbpassword = $dbpass;
@@ -135,14 +141,17 @@
     //Log it
     add_admin_log_item("A new configuration file was created.", "Cartulary.conf generated.");
 
-    //If this is an upgrade (passed on the command line), install the cron job from template
-    if( isset($argv[1]) ) {
-      if( $argv[1] == "upgrade" ) {
-        rename( $cronloc, "/tmp/cartulary-cron.old.".time() );
-        $cmdtorun = "php $confroot/bin/syscheck.php";
-        $output = `$cmdtorun`;
-        echo $output;
-      }
+    //If this is an upgrade, then install a new cron job
+    if( $action == "upgrade" ) {
+      rename( $cronloc, "/tmp/cartulary-cron.old.".time() );
+      $cmdtorun = "php $confroot/bin/syscheck.php";
+      $output = `$cmdtorun`;
+      echo $output;
+    }
+
+    //Log the upgrade
+    if( $action == "upgrade" ) {
+      add_admin_log_item("System was upgraded to version $version", "System Upgrade");
     }
 
   //Remove the lock file

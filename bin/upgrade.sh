@@ -69,3 +69,6 @@ php /opt/cartulary/bin/confcheck.php upgrade
 ##: Restart cron daemon
 echo
 restart cron
+
+echo
+echo 'Upgrade is finished.'

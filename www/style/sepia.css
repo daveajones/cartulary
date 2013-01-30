@@ -53,6 +53,7 @@ a {  color:#059;  }
 /* ----- Navbar ----- */
 #divMainMenu .navbar {  margin-top:10px;  }
 #divSearchMenu .navbar {  margin-top:5px;  }
+#divMainMenu .navbar a.sysname {  color:#999;  }
 .btnCloseSearchResults {  float:right;  }
 .popSearchResults {
   height:400px;

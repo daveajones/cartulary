@@ -9,6 +9,16 @@ BAKDATE=`date +'%Y%m%d%s'`
 cd /tmp
 
 ##: Grab the current repo and extract it
+clear
+echo
+echo '############################################################'
+echo '##----------------------------------------------------------'
+echo '##                                                          '
+echo '##  Grabbing the current release.                           '
+echo '##                                                          '
+echo '##----------------------------------------------------------'
+echo '############################################################'
+echo
 wget https://github.com/daveajones/cartulary/archive/master.zip
 unzip master.zip
 
@@ -40,7 +50,22 @@ rm -rf cartulary-master/
 rm master.zip
 
 ##: Run confcheck
+clear
+echo
+echo '############################################################'
+echo '##----------------------------------------------------------'
+echo '##                                                          '
+echo '##  Upgrade cartulary.conf file.                            '
+echo '##                                                          '
+echo '##  - If you mess up here, just run:                        '
+echo '##    > sudo php /opt/cartulary/bin/confcheck.php upgrade   '
+echo '##    after the upgrade finishes.                           '
+echo '##                                                          '
+echo '##----------------------------------------------------------'
+echo '############################################################'
+echo
 php /opt/cartulary/bin/confcheck.php upgrade
 
 ##: Restart cron daemon
+echo
 restart cron

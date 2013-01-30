@@ -214,8 +214,8 @@ $(function() {
     <form id="frmFeedImport" name="feedimport" action="/cgi/in/import.feed" method="POST">
       URL: <input type="text" id="txtFeedImportUrl" class="urlinput" name="url" />
       <input id="btnFeedImportSubmit" class="btn-primary" name="btnFeedImportSubmit" type="submit" value="Import" />
-      <img id="imgSpinner" alt="" src="/images/spinner.gif" />
     </form>
+    <div id="divWaitMessage" class="hide pagination-centered"><img id="imgSpinner" alt="" src="/images/spinner.gif" /> This could take a while. Please wait...</div>
   </div>
 </div>
 

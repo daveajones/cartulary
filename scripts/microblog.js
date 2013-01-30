@@ -148,16 +148,16 @@ $(document).ready( function() {
 			cache:		false,
                         clearForm:	true,
 			resetForm:	true,
-			timeout:	30000,
+			timeout:	60000,
                         beforeSubmit:   function() {
-                                $('#mdlFeedImport #imgSpinner').show();
+                                $('#mdlFeedImport #divWaitMessage,#imgSpinner').show();
                                 $('#mdlFeedImport input').attr("disabled", true);
                         },
                         success:        function(data) {
                                 if(data.status != "false") {
 			                loadPostList('#divPostList', '#microblog-template');
                                 }
-                                $('#mdlFeedImport #imgSpinner').hide();
+                                $('#mdlFeedImport #divWaitMessage,#imgSpinner').hide();
                                 $('#mdlFeedImport input').attr("disabled", false);
                                 showMessage( data.description, data.status, 5 );
 				$('#mdlFeedImport').modal('hide')
@@ -165,7 +165,7 @@ $(document).ready( function() {
 			error:		function(x, t, m) {
 				showMessage( "Error: " + m + "(" + t + ")", false, 60 );
 				$('#mdlFeedImport').modal('hide')
-                                $('#mdlFeedImport #imgSpinner').hide();
+                                $('#mdlFeedImport #divWaitMessage,#imgSpinner').hide();
                                 $('#mdlFeedImport input').attr("disabled", false);
 			}
                 });

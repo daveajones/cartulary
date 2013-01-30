@@ -27,7 +27,7 @@ if ( isset($_REQUEST['url']) && !empty($_REQUEST['url']) ) {
 }
 
 
-//First, bring in the feed, but don't link it to a user. Garbage collection
+//First, bring in the feed, but don't link it to a user. We
 //will remove it later and this ensures it won't show up in anyone's river.
 $fid = add_feed($url, NULL, FALSE);
 
@@ -48,6 +48,9 @@ $items = get_items_by_feed_id($fid, 9999);
 foreach( $items as $it ) {
   add_post($uid, $it['description'], $it['url'], FALSE, $it['enclosure'], array('url' => $it['sourceurl'], 'title' => $it['sourcetitle']), FALSE, $it['title'], $it['timestamp']);
 }
+
+//Now remove the feed
+delete_feed($fid);
 
 //Now rebuild the static files
 build_blog_rss_feed($uid, NULL, FALSE);

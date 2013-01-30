@@ -51,12 +51,13 @@
         $l_rsscloud = $enable_rsscloud;
       }
 
-      rename( $cfname, $cfname.'.old.'.time() );
+      copy( $cfname, $cfname.'.old.'.time() );
     }
 
     //Now read in the config file template
     $fh = fopen($cftemp, "r");
     $template = fread($fh, filesize($cftemp));
+    fclose($fh);
 
     //Replace the tags
     echo "What is your mysql username? [$l_dbusername]: ";
@@ -130,9 +131,6 @@
       $template = str_replace('cartularynewinstall=1', "", $template);
     }
 
-    //Close the template
-    fclose($fh);
-
     //Write the new config file
     $fh = fopen($cfname, "w+");
     fwrite( $fh, $template );
@@ -144,7 +142,7 @@
     //If this is an upgrade, then install a new cron job
     if( $action == "upgrade" ) {
       rename( $cronloc, "/tmp/cartulary-cron.old.".time() );
-      $cmdtorun = "php $confroot/bin/syscheck.php";
+      $cmdtorun = "php $confroot/bin/syscheck.php upgrade";
       $output = `$cmdtorun`;
       echo $output;
     }

@@ -4,6 +4,12 @@
   //Let's not run twice
   if(($pid = cronHelper::lock()) !== FALSE) {
 
+        //If this is being run as an upgrade
+        $action = "";
+        if( isset($argv[1]) ) {
+          $action = $argv[1];
+        }
+
         //Let's check the system
         loggit(3, "Checking server health...");
         $healthy = TRUE;
@@ -23,10 +29,12 @@
         //Make sure the system has the correct crontab entries
         if( !file_exists("$cronloc") ) {
           copy( "$confroot/$templates/crontab", "$cronloc");
-          echo "WARNING: The server had no cron file. A fresh one was created.\n";
-          loggit(2, "The server had no cron file. A fresh one was created.");
-          //Add an administrative log entry for this event
-          add_admin_log_item("WARNING: The server had no cron file. A fresh one was created.", "Cron File Missing.");
+          if( $action == "" ) {
+            echo "WARNING: The server had no cron file. A fresh one was created.\n";
+            loggit(2, "The server had no cron file. A fresh one was created.");
+            //Add an administrative log entry for this event
+            add_admin_log_item("WARNING: The server had no cron file. A fresh one was created.", "Cron File Missing.");
+          }
           $healthy = FALSE;
         }
 
@@ -36,7 +44,7 @@
         loggit(3, "It took: [$took] seconds to check server health.");
 
         //Log an unhealthy system check
-        if( $healthy != TRUE ) {
+        if( $healthy != TRUE && $action == "" ) {
           echo "WARNING:  The system isn't healthy.  See previous log entries for details.\n";
           loggit(3, "WARNING: The system isn't healthy.  See previous log entries for details.");
         }

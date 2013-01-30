@@ -83,9 +83,9 @@ function ajaxFormEditUser(elEditUserForm) {
             if(data.status == "true") {
                 $('.trEditUser').hide();
                 loadUserManage('#divUserManage', '#manageusers-template'); 
-                $('.trEditUser .spinner').hide();
-                $('.trEditUser .btn-primary').attr('disabled', false);
             }
+            $('.trEditUser .spinner').hide();
+            $('.trEditUser .btn-primary').attr('disabled', false);
         }
     });
 
@@ -103,9 +103,9 @@ function ajaxFormCreateUser(elCreateUserForm) {
             showMessage( data.description, data.status, 90 );
             if(data.status == "true") {
                 loadUserManage('#divUserManage', '#manageusers-template'); 
-                $('.divCreateSubmit .spinner').hide();
-                $('.divCreateSubmit .btn-primary').attr('disabled', false);
             }
+            $('.divCreateSubmit .btn-primary').attr('disabled', false);
+            $('.divCreateSubmit .spinner').hide();
         }
     });
 

@@ -81,7 +81,7 @@ function get_post($id = NULL)
 
 //_______________________________________________________________________________________
 //Add an post to the post repository
-function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, $enclosure = FALSE, $source = FALSE, $twitter = FALSE, $title = "")
+function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, $enclosure = FALSE, $source = FALSE, $twitter = FALSE, $title = "", $timestamp = NULL)
 {
   //Check parameters
   if($uid == NULL) {
@@ -119,7 +119,11 @@ function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, 
 
   //Timestamp
   $id = random_gen(128);
-  $createdon = time();
+  if( empty($timestamp) ) {
+    $createdon = time();
+  } else {
+    $createdon = $timestamp;
+  }
 
   //Did the post go to twitter?
   if($twitter == TRUE) {

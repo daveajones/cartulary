@@ -101,7 +101,7 @@ $(document).ready( function() {
 	                $('#imgTweet').toggleClass('icon-notwitter');
         	});
 
-
+                //Ajaxify the blog post form
                 $('#frmBlogPost').ajaxForm({
                         <?if($device=="android") {?>dataType:       'html',<?
                         } else {?>dataType:       'json',<?}?>
@@ -110,8 +110,8 @@ $(document).ready( function() {
 			resetForm:	true,
 			timeout:	30000,
                         beforeSubmit:   function() {
-                                $('#imgSpinner').show();
-                                $('#btnSubmit').attr("disabled", true);
+                                $('#divPostSubmit #imgSpinner').show();
+                                $('.blogPostWrapper input,textarea,button').attr("disabled", true);
                         },
                         success:        function(data) {
                                 if(data.status == "false") {
@@ -131,15 +131,45 @@ $(document).ready( function() {
                                         $('#imgTweet').removeClass('icon-twitter').addClass('icon-notwitter');
 					$('#file_upload').uploadifive('clearQueue');
                                 }
-                                $('#imgSpinner').hide();
-                                $('#btnSubmit').attr("disabled", false);
+                                $('#divPostSubmit #imgSpinner').hide();
+                                $('.blogPostWrapper input,textarea,button').attr("disabled", false);
 				$('#spnCharCount').text( <?echo $default_blog_post_max_chars?> - $('#txtContent').val().length );
                         },
 			error:		function(x, t, m) {
 				showMessage( "Error: " + m + "(" + t + ")", false, 60 );
+                                $('.blogPostWrapper input,textarea,button').attr("disabled", false);
 		                loadPostList('#divPostList', '#microblog-template');
 			}
                 });
+
+                //Ajaxify the feed import modal
+                $('#frmFeedImport').ajaxForm({
+                        dataType:       'json',
+			cache:		false,
+                        clearForm:	true,
+			resetForm:	true,
+			timeout:	30000,
+                        beforeSubmit:   function() {
+                                $('#mdlFeedImport #imgSpinner').show();
+                                $('#mdlFeedImport input').attr("disabled", true);
+                        },
+                        success:        function(data) {
+                                if(data.status != "false") {
+			                loadPostList('#divPostList', '#microblog-template');
+                                }
+                                $('#mdlFeedImport #imgSpinner').hide();
+                                $('#mdlFeedImport input').attr("disabled", false);
+                                showMessage( data.description, data.status, 5 );
+				$('#mdlFeedImport').modal('hide')
+                        },
+			error:		function(x, t, m) {
+				showMessage( "Error: " + m + "(" + t + ")", false, 60 );
+				$('#mdlFeedImport').modal('hide')
+                                $('#mdlFeedImport #imgSpinner').hide();
+                                $('#mdlFeedImport input').attr("disabled", false);
+			}
+                });
+
 
 		//Set up some paste handling to catch pasted links
 		$('#txtContent').bind('paste', function() {

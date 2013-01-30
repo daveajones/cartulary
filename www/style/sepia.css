@@ -300,6 +300,11 @@ a {  color:#059;  }
   font-weight:bold;
   font-size:120%;
 }
+#mdlFeedImport .modal-header {
+  background-color:#ddd;
+  border-bottom:solid #ccc 1px;
+}
+#mdlFeedImport #btnFeedImportSubmit {  margin-left:8px;  }
 /* --------------------------------------------------- */
 
 

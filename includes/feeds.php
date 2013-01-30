@@ -3029,7 +3029,7 @@ function get_feed_items($fid = NULL, $max = NULL)
     //Send the registration post if rssCloud is enabled AND the feed has been updated within the last 2 weeks
     //We don't want to keep cloud registrations in place for feeds that rarely update
     if( $enable_rsscloud == 1 && (time() - $feed['lastupdate']) < 1209600 ) {
-      loggit(1, "RSSCLOUD: Registering at: [$regurl] for feed [$fid].");
+      loggit(1, "RSSCLOUD: Registering at: [".$rcregurl['host']."] for feed [$fid].");
       $resp = httpRequest($rcregurl['host'], $rcregurl['port'], "POST", $rcregurl['path'], array(  "notifyProcedure" => '', "port" => '80', "path" => '/cgi/in/ping',
                           	                                   "protocol" => 'http-post', "url1" => $url, "domain" => $rss_cloud_url )
       );
@@ -4533,6 +4533,85 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
   return($jsonriver);
 }
 
+
+//_______________________________________________________________________________________
+//Retrieve all the items from a particular feed
+function get_items_by_feed_id($fid = NULL, $max = NULL)
+{
+  //Check parameters
+  if( empty($fid) ) {
+    loggit(2,"The feed id given is corrupt or blank: [$fid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Run the query
+  $sqltxt = "SELECT url,
+                    description,
+                    timestamp,
+                    enclosure,
+                    title,
+		    sourceurl,
+		    sourcetitle
+	     FROM $table_nfitem
+	     WHERE feedid=?
+             ORDER BY timestamp ASC";
+
+  if($max != NULL) {
+    $sqltxt .= " LIMIT $max";
+  } else {
+    $sqltxt .= " LIMIT $default_max_list";
+  }
+
+  loggit(3, "[$sqltxt]");
+  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql->bind_param("s", $fid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+
+  //See if there were any items returned
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(1,"No feed items returned for: [$fid].");
+    return(array());
+  }
+
+  $sql->bind_result($aurl,
+                    $adescription,
+                    $atimestamp,
+                    $aenclosure,
+                    $atitle,
+                    $asourceurl,
+                    $asourcetitle
+  ) or print(mysql_error());
+
+  $items = array();
+  $count = 0;
+  while($sql->fetch()){
+    $items[$count] = array( 'url' => $aurl,
+                            'title' => $atitle,
+                            'description' => $adescription,
+                            'timestamp' => $atimestamp,
+			    'enclosure' => $aenclosure,
+			    'sourceurl' => $asourceurl,
+			    'sourcetitle' => $asourcetitle
+    );
+    $count++;
+  }
+
+  $sql->close() or print(mysql_error());
+
+  loggit(3, print_r($items, TRUE));
+
+  loggit(1,"Returning: [$count] items for feed: [$fid]");
+  return($items);
+}
 
 
 //########################################################################################

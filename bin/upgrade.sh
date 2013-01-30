@@ -19,6 +19,7 @@ echo '##                                                          '
 echo '##----------------------------------------------------------'
 echo '############################################################'
 echo
+rm master.zip
 wget https://github.com/daveajones/cartulary/archive/master.zip
 unzip master.zip
 

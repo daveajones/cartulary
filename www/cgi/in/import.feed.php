@@ -49,6 +49,14 @@ foreach( $items as $it ) {
   add_post($uid, $it['description'], $it['url'], FALSE, $it['enclosure'], array('url' => $it['sourceurl'], 'title' => $it['sourcetitle']), FALSE, $it['title'], $it['timestamp']);
 }
 
+//Now rebuild the static files
+build_blog_rss_feed($uid, NULL, FALSE);
+build_blog_opml_feed($uid, NULL, FALSE);
+build_blog_html_archive($uid, NULL, FALSE);
+build_blog_html_archive($uid, NULL, TRUE);
+build_blog_script_widget($uid, 20, FALSE);
+loggit(1, "User: [$uid]'s static files were rebuilt.");
+
 
 //--------------------------------------------------------------------------------
 //Give feedback that all went well

@@ -32,6 +32,7 @@
 
         <div class="section{{if linkedOutlineId}} ${linkedOutlineId}{{/if}}{{if feedHidden == 1}} elHidden{{/if}}{{if linkedOutlineType}} ${linkedOutlineType}{{/if}}">
             <div class="header">
+                <?if( $cg_terror == 1) {?><div class="pull-right"><button class="btn btn-mini btn-danger" onclick="javascript:alert('Nice job douchebag!');">Report this post<br/>as terrorism.</button></div><?}?>
                 <h2>
                     <span class="header-tools">
 <?//                    {{if websiteUrl}}<a href="${websiteUrl}">{{/if}}<img class="icon" src="${River.methods.getFavicon(websiteUrl)}" alt="">{{if websiteUrl}}</a>{{/if}}
@@ -131,7 +132,6 @@
                           </div>
 			<?}?>
                 {{if item.sticky}}<a class="aUnSticky" href="#" data-id="${item.id}"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>{{/if}}
-		    <!-- <div class="pull-right"><button class="btn btn-mini btn-danger" onclick="javascript:alert('Nice job douchebag!');">Report this post<br/>as terrorism.</button></div> -->
                     {{if River.settings.social === true && (item.permaLink || item.link)}}
                         <div><a href="http://twitter.com/share?text={{if item.title}}${item.title}{{else}}${River.methods.getText(item.body)}{{/if}}&amp;url={{if item.permaLink}}${encodeURIComponent(item.permaLink)}{{else}}${encodeURIComponent(item.link)}{{/if}}" rel="external nofollow" target="_blank" title="Share this on Twitter">Tweet</a></div>
                         <div><a href="http://www.facebook.com/sharer.php?t={{if item.title}}${item.title}{{else}}${River.methods.getText(item.body)}{{/if}}&amp;u={{if item.permaLink}}${encodeURIComponent(item.permaLink)}{{else}}${encodeURIComponent(item.link)}{{/if}}" rel="external nofollow" target="_blank" title="Share this on Facebook">Share</a></div>

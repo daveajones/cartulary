@@ -148,7 +148,7 @@ $(document).ready( function() {
 			cache:		false,
                         clearForm:	true,
 			resetForm:	true,
-			timeout:	60000,
+			timeout:	90000,
                         beforeSubmit:   function() {
                                 $('#mdlFeedImport #divWaitMessage,#imgSpinner').show();
                                 $('#mdlFeedImport input').attr("disabled", true);

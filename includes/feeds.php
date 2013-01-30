@@ -4607,7 +4607,7 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
 
   $sql->close() or print(mysql_error());
 
-  loggit(3, print_r($items, TRUE));
+  //loggit(3, print_r($items, TRUE));
 
   loggit(1,"Returning: [$count] items for feed: [$fid]");
   return($items);

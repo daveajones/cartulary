@@ -132,10 +132,6 @@ function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, 
     $twitter = 0;
   }
 
-  //Clean the user input
-  $title = xmlentities($title);
-  $content = xmlentities($content);
-
   //Now that we have a good id, put the post into the database
   $stmt = "INSERT INTO $table_post (id,url,content,createdon,shorturl,enclosure,sourceurl,sourcetitle,twitter,title) VALUES (?,?,?,?,?,?,?,?,?,?)";
   $sql=$dbh->prepare($stmt) or loggit(2, "SQL Error: [".$dbh->error."]");

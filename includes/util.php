@@ -1538,4 +1538,13 @@ function get_user_response()
 }
 
 
+//Get a filename without any trailing extensions
+function chop_extension( $file = NULL )
+{
+  $info = pathinfo($file);
+  $file_name = basename($file, '.'.$info['extension']);
+
+  return($file_name);
+}
+
 ?>

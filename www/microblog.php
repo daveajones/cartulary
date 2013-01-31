@@ -43,8 +43,8 @@
   //Get feed locations
   if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {
     $s3blogfeed = get_s3_url($uid, NULL, get_microblog_feed_filename($uid));
-    $s3blogopml = get_s3_url($uid, NULL, $default_blog_opml_file_name);
-    $s3bloghtml = get_s3_url($uid, NULL, $default_blog_archive_file_name);
+    $s3blogopml = get_s3_url($uid, NULL, get_microblog_opml_filename($uid));
+    $s3bloghtml = get_s3_url($uid, NULL, get_microblog_html_filename($uid));
   }
 
   //Generate a datestamp

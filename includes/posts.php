@@ -574,7 +574,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
 
   //Get the correct link
   if( $prefs['mblinkhome'] == 0 || empty($prefs['homepagelink']) ) {
-    $feedlink = get_s3_url($uid, NULL, get_microblog_archive_filename($uid));
+    $feedlink = get_s3_url($uid, NULL, get_microblog_html_filename($uid));
   } else {
     $feedlink = $prefs['homepagelink'];
   }
@@ -904,7 +904,7 @@ function build_blog_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts
     $s3info = get_s3_info($uid);
 
     //Get the microblog feed file name
-    $filename = $default_blog_opml_file_name;
+    $filename = get_microblog_opml_filename($uid);
     $arcpath = '';
 
     //Was this a request for a monthly archive?
@@ -956,6 +956,76 @@ function get_microblog_feed_filename($uid = NULL)
   //loggit(1,"Returning user name: [$username] for uid: [$uid]");
   return($prefs['mbfilename']);
 }
+
+
+//_______________________________________________________________________________________
+//Get the file name of the microblog opml file
+function get_microblog_opml_filename($uid = NULL)
+{
+  //If uid is zero then balk
+  if( empty($uid) ) {
+    loggit(2,"Can't get the username from this uid: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Get the user's prefs
+  $prefs = get_user_prefs($uid);
+  if( empty($prefs['mbfilename']) ) {
+    return($default_blog_opml_file_name);
+  }
+
+  return( chop_extension($prefs['mbfilename']).".opml" );
+}
+
+
+//_______________________________________________________________________________________
+//Get the file name of the microblog html file
+function get_microblog_html_filename($uid = NULL)
+{
+  //If uid is zero then balk
+  if( empty($uid) ) {
+    loggit(2,"Can't get the username from this uid: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Get the user's prefs
+  $prefs = get_user_prefs($uid);
+  if( empty($prefs['mbfilename']) ) {
+    return($default_blog_html_file_name);
+  }
+
+  return( chop_extension($prefs['mbfilename']).".html" );
+}
+
+
+//_______________________________________________________________________________________
+//Get the file name of the microblog javascript widget file
+function get_microblog_js_filename($uid = NULL)
+{
+  //If uid is zero then balk
+  if( empty($uid) ) {
+    loggit(2,"Can't get the username from this uid: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Get the user's prefs
+  $prefs = get_user_prefs($uid);
+  if( empty($prefs['mbfilename']) ) {
+    return($default_blog_js_file_name);
+  }
+
+  return( chop_extension($prefs['mbfilename']).".js" );
+}
+
 
 
 //_______________________________________________________________________________________
@@ -1165,7 +1235,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
     $s3info = get_s3_info($uid);
 
     //Get the microblog feed file name
-    $filename = get_microblog_archive_filename($uid);
+    $filename = get_microblog_html_filename($uid);
     $arcpath = '';
 
     //Was this a request for a monthly archive?
@@ -1286,7 +1356,7 @@ function build_blog_script_widget($uid = NULL, $max = NULL, $archive = FALSE, $p
     $s3info = get_s3_info($uid);
 
     //Get the microblog feed file name
-    $filename = get_microblog_archive_widget_filename($uid);
+    $filename = get_microblog_js_filename($uid);
     $arcpath = '';
 
     //Was this a request for a monthly archive?

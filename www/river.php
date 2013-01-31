@@ -8,11 +8,11 @@
   if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {
     $s3blogfeed = get_s3_url($uid, NULL, get_microblog_feed_filename($uid));
     $s3cartfeed = get_s3_url($uid, NULL, get_cartulary_feed_filename($uid));
-    $s3blogopml = get_s3_url($uid, NULL, $default_blog_opml_file_name);
+    $s3blogopml = get_s3_url($uid, NULL, get_microblog_opml_filename($uid));
     $s3cartopml = get_s3_url($uid, NULL, $default_opml_file_name);
     $s3sopml = get_s3_url($uid, NULL, $default_social_outline_file_name);
     $s3readlist = get_s3_url($uid, NULL, $default_readinglist_file_name);
-    $s3widget = get_s3_url($uid, NULL, $default_blog_archive_widget_filename);
+    $s3widget = get_s3_url($uid, NULL, get_microblog_js_filename($uid));
   }
 
   //Did they specify how many posts they wanted in the list?

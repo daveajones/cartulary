@@ -127,7 +127,7 @@
 	<h2>Microblog</h2>
 	<ul>
 		<li>My microblog title should be: <input name="microblogtitle" class="urlinput" type="text" value="<?echo $prefs['microblogtitle']?>" /></li>
-		<li>I want my microblog rss feed filename to be: <input id="mbfilename" name="mbfilename" type="text" value="<?echo $prefs['mbfilename']?>" /></li>
+		<li>I want my microblog filename to be: <input id="mbfilename" name="mbfilename" type="text" value="<?echo $prefs['mbfilename']?>" /></li>
 		<li>Microblog archives should use the stylesheet located at: <input name="mbarchivecss" class="urlinput" type="text" value="<?echo $prefs['mbarchivecss']?>" /> (url)</li>
 	        <div class="control-group">
 			<li>I'd rather use an external linkblog located at: <input name="linkblog" class="urlinput" type="text" value="<?echo $prefs['linkblog']?>" /> (url)</li>

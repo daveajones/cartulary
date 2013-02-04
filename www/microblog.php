@@ -140,7 +140,8 @@
           	  foreach( $extenclosures as $extenclosure ) {
                     if( $lastencurl != $extenclosure['url'] ) {
 		      $lastencurl = $extenclosure['url'];
-            	      ?><li>Enclosure: <input type="text" name="extenclosure[<?echo $eec?>][url]" value="<?echo $extenclosure['url']?>" /><?
+            	      ?><li><a href="#" class="aRemoveListItem"><img class="icon-remove-small" src="/images/blank.gif" /></a>
+                      Enclosure: <input type="text" name="extenclosure[<?echo $eec?>][url]" value="<?echo $extenclosure['url']?>" /><?
             	      if( !empty($extenclosure['type']) ){?><input type="text" name="extenclosure[<?echo $eec?>][type]" value="<?echo $extenclosure['type']?>" /><?}
             	      if( !empty($extenclosure['length']) ){?><input type="text" name="extenclosure[<?echo $eec?>][length]" value="<?echo $extenclosure['length']?>" /></li><?}
   		      $eec++;
@@ -154,7 +155,8 @@
 		<?if(!empty($_REQUEST['source'])) {
 		  ?><ul><?
           	  $source = $_REQUEST['source'];
-          	  ?><li>Source: <input type="text" name="source[url]" value="<?echo trim($source['url'])?>" /><?
+          	  ?><li><a href="#" class="aRemoveListItem"><img class="icon-remove-small" src="/images/blank.gif" /></a>
+                  Source: <input type="text" name="source[url]" value="<?echo trim($source['url'])?>" /><?
           	  ?><input type="text" name="source[title]" value="<?echo trim($source['title'])?>" /></li><?
         	  ?></ul><?}?>
         	</div>

@@ -322,7 +322,7 @@ function purge_old_sessions($time = NULL)
 
   //Log and return
   loggit(1,"Removed: [$rows] old sessions.");
-  return(TRUE);
+  return($rows);
 }
 
 

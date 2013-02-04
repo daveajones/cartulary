@@ -4,12 +4,30 @@
 ##: ----------
 MAILTO=""
 
+##: The main feed aggregator 
 */20 * * * * root timeout 1100 php /opt/cartulary/bin/feedscan.php
-*/5  * * * * root php /opt/cartulary/bin/usercheck.php
-*/1  * * * * root php /opt/cartulary/bin/buildrivers.php
-*/30  * * * * root php /opt/cartulary/bin/buildsysrivers.php
+
+##: The outline and list aggregator
 17   * * * * root php /opt/cartulary/bin/outlinescan.php
+
+##: User upkeep
+*/5  * * * * root php /opt/cartulary/bin/usercheck.php
+
+##: Server maint
+*/15  * * * * root php /opt/cartulary/bin/clean.php
+
+##: Build main user rivers
+*/1  * * * * root php /opt/cartulary/bin/buildrivers.php
+
+##: Build alternate rivers
+*/30  * * * * root php /opt/cartulary/bin/buildsysrivers.php
+
+##: Build user-level archives
 27   * * * * root php /opt/cartulary/bin/archive.php
+
+##: Server health check
 48   * * * * root php /opt/cartulary/bin/syscheck.php
+
+##: Backup
 58   2 * * * root php /opt/cartulary/bin/backup.php
 

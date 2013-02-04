@@ -83,6 +83,11 @@ $(document).ready( function() {
 			$('#file_upload').uploadifive('upload');
 		});
 
+		//Attach removers to extra elements
+		$('.aRemoveListItem').click(function() {
+			$(this).parent('li').remove();
+		});
+
 		//Set up the twitter check-box, img interaction
 	        $('#imgTweet').bind('click', function() {
         	        $('#chkTweet').prop("checked", !$('#chkTweet').prop("checked"));

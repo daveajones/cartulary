@@ -1,3 +1,4 @@
+//Reloads the post list with an ajax call
 function loadPostList(elDiv, elTemplate) {
       $(elDiv).empty();
       $(elDiv).append('<center><p>Loading post list...</p><img src="/images/spinner.gif" alt="" /></center>');
@@ -17,6 +18,7 @@ function loadPostList(elDiv, elTemplate) {
       return(true);
 }
 
+//Sets up the post deletion links in the post list
 function bindDeletePost(elDeleteLink) {
     $(elDeleteLink).click(function() {
         var postId = $(this).attr("data-id");
@@ -34,6 +36,7 @@ function bindDeletePost(elDeleteLink) {
     return(true);
 }
 
+//Gets an abbreviated title for cleaner display in the post list
 function getShortTitle(contentString) {
     cleanContent = contentString.replace(/\W/g, '');
     shortContent = cleanContent.substring(0, 20);
@@ -41,6 +44,7 @@ function getShortTitle(contentString) {
     return(shortContent);
 }
 
+//Unhide the enclosure section
 function showEnclosures() {
 	$('#divEnclosures').show();
 }
@@ -48,6 +52,7 @@ function showEnclosures() {
 $(document).ready( function() {
 		var linkExtraction = true;
 
+		//Deletes a post with an ajax call
         	$('.aDeletePost').click(function() {
                 	var aobj = $(this);
                 	var delurl = aobj.attr("href");
@@ -74,14 +79,23 @@ $(document).ready( function() {
                 	return false;
         	});
 
+		$('#fileMobile').change(function() {
+			$('#divEnclosures').show();
+			$('#divEnclosures #spnQueueText').text('File selected: ' + $('#fileMobile').val());
+		});
+
+		//The enclosure attachment button click handler
 		$('#btnAttachFile').bind('click', function() {
 			$('#divUpload').show();
 		});
 
+		//Start an enclosure upload
+                <?if( $device != "android" ) {?>
 		$('#aUploadTrigger').bind('click', function() {
 			$('#divEnclosures').show();
 			$('#file_upload').uploadifive('upload');
 		});
+                <?}?>
 
 		//Attach removers to extra elements
 		$('.aRemoveListItem').click(function() {
@@ -134,7 +148,12 @@ $(document).ready( function() {
 					<?}?>
 					$('#chkTweet').prop("checked", false);
                                         $('#imgTweet').removeClass('icon-twitter').addClass('icon-notwitter');
+					$('#divEnclosures').hide();
+					<?if($device=="android") {?>
+					$("#fileMobile").replaceWith($("#fileMobile").clone(true));
+					<?} else {?>
 					$('#file_upload').uploadifive('clearQueue');
+                                        <?}?>
                                 }
                                 $('#divPostSubmit #imgSpinner').hide();
                                 $('.blogPostWrapper input,textarea,button').attr("disabled", false);

@@ -40,6 +40,14 @@ cp -R scripts/* /opt/cartulary/scripts
 cp -R templates/* /opt/cartulary/templates
 cp -R www/* /opt/cartulary/www
 
+##: Set permissions
+touch /opt/cartulary/logs/error.log
+touch /opt/cartulary/logs/debug.log
+touch /opt/cartulary/logs/access.log
+chown www-data /opt/cartulary/logs >>/tmp/cartinstall.log 2>&1
+chown www-data /opt/cartulary/logs/* >>/tmp/cartinstall.log 2>&1
+chown www-data /opt/cartulary/spool >>/tmp/cartinstall.log 2>&1
+
 ##: Restore newuser sub list
 cp /tmp/newuser.opml /opt/cartulary/www
 

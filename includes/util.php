@@ -1547,4 +1547,28 @@ function chop_extension( $file = NULL )
   return($file_name);
 }
 
+//http://stackoverflow.com/questions/6284553/using-an-array-as-needles-in-strpos
+//Search for a substring with an array as the needle
+function strposa($haystack, $needles=array(), $offset=0) {
+        $chr = array();
+        foreach($needles as $needle) {
+                $res = strpos($haystack, $needle, $offset);
+                if ($res !== false) $chr[$needle] = $res;
+        }
+        if(empty($chr)) return false;
+        return min($chr);
+}
+
+
+//Determine if a url points to a picture file based on the extension
+function url_is_a_picture( $url = NULL )
+{
+
+  if( strposa($url, array('.jpg','.png','.jpeg','.gif')) !== FALSE ) {
+    return(TRUE);
+  }
+
+  return(FALSE);
+}
+
 ?>

@@ -132,6 +132,9 @@ function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, 
     $twitter = 0;
   }
 
+  //Clean the input
+  //$content = xmlentities($content);
+
   //Now that we have a good id, put the post into the database
   $stmt = "INSERT INTO $table_post (id,url,content,createdon,shorturl,enclosure,sourceurl,sourcetitle,twitter,title) VALUES (?,?,?,?,?,?,?,?,?,?)";
   $sql=$dbh->prepare($stmt) or loggit(2, "SQL Error: [".$dbh->error."]");
@@ -1155,6 +1158,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
 
   $html .= "\n
       <title>$title</title>
+      <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
       <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0\">
       <link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"$css\" />
       </head><body><div class=\"container\"><div class=\"row page-header\" id=\"divPageTitle\">";
@@ -1202,6 +1206,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
 		$html .= "        <h3>".xmlentities(trim($post['title']))."</h3>\n";
         }
         $html .= "        <p class=\"description\">".xmlentities(trim( str_replace("\n", '', $post['content'] ) ))."</p>\n";
+        //$html .= "        <p class=\"description\">".htmlspecialchars($post['content'])."</p>\n";
         if( isset($enclosures) ) {
           if( is_array($enclosures) && count($enclosures) > 0 ) {
             foreach($enclosures as $enclosure) {

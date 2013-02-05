@@ -97,6 +97,11 @@
                 </div>
 
 		<div id="divLower">
+
+                <?if( (s3_is_enabled($uid) || sys_s3_is_enabled()) && ($device != "ipad" && $device != "iphone" && $device != "wphone") ) {?>
+		<a id="btnAttachFile" title="Attach enclosures."><img class="icon-attach" src="/images/blank.gif" alt="" /></a>
+		<?}?>
+
 		<!-- Title box. -->
         	<div id="divTitle">
 		<img class="icon-text-height" src="/images/blank.gif" /><input name="title" id="txtTitle" type="text" placeholder="Title your post..." value="<?echo $title?>" />
@@ -107,25 +112,23 @@
 		<img class="icon-hyperlink-small" src="/images/blank.gif" /><input name="link" id="txtLink" type="text" placeholder="Paste a link here..." value="<?echo $link?>" />
 		</div>
 
-                <?if( (s3_is_enabled($uid) || sys_s3_is_enabled()) && ($device != "ipad" && $device != "iphone" && $device != "wphone") ) {?>
-		<a id="btnAttachFile" class="pull-right"><img class="icon-attach" src="/images/blank.gif" alt="" /></a>
-		<?}?>
 		</div>
 
 		<!-- Enclosure drop zone. -->
                 <?if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {?>
-		<div id="divEnclosures">
-			Files:
+		<div id="divEnclosures" class="dropzone">
 			<input type="hidden" name="datestamp" value="<?echo $datestamp?>" />
-			<div id="queue">Drop file(s) here...</div>
+			<div id="queue"><span id="spnQueueText">Drop file(s) here...</span></div>
 		</div>
 
 		<!-- Uploadify controls. -->
 		<div id="divUpload">
 			<?if($device=="android") {?>
-			<input type="file" name="file_mobile" id="fileMobile" />
+	        	<input type="file" name="file_mobile" id="fileMobile" />
 			<?} else {?>
-	        	<input type="file" name="file_upload" id="file_upload" /><a id="aUploadTrigger" href="#"">Upload Files</a>
+			You can drag and drop files into this page to attach them.<br/>
+                        Or you can
+	        	<input type="file" name="file_upload" id="file_upload" /> ... then ... <a id="aUploadTrigger" href="#"">Upload Them</a> if they don't upload automatically.
 			<?}?>
 		</div>
 		<?}?>
@@ -141,9 +144,13 @@
                     if( $lastencurl != $extenclosure['url'] ) {
 		      $lastencurl = $extenclosure['url'];
             	      ?><li><a href="#" class="aRemoveListItem"><img class="icon-remove-small" src="/images/blank.gif" /></a>
-                      Enclosure: <input type="text" name="extenclosure[<?echo $eec?>][url]" value="<?echo $extenclosure['url']?>" /><?
-            	      if( !empty($extenclosure['type']) ){?><input type="text" name="extenclosure[<?echo $eec?>][type]" value="<?echo $extenclosure['type']?>" /><?}
-            	      if( !empty($extenclosure['length']) ){?><input type="text" name="extenclosure[<?echo $eec?>][length]" value="<?echo $extenclosure['length']?>" /></li><?}
+		      <?if( url_is_a_picture($extenclosure['url']) ) {?>
+                      <img class="imgenclosure" src="<?echo $extenclosure['url']?>" />
+                      <?}?>
+                      External Enclosure:<br/>
+                      <input type="text" name="extenclosure[<?echo $eec?>][url]" value="<?echo $extenclosure['url']?>" /><?
+            	      if( !empty($extenclosure['type']) ){?><input type="text" class="hide" name="extenclosure[<?echo $eec?>][type]" value="<?echo $extenclosure['type']?>" /><?}
+            	      if( !empty($extenclosure['length']) ){?><input type="text" class="hide" name="extenclosure[<?echo $eec?>][length]" value="<?echo $extenclosure['length']?>" /></li><?}
   		      $eec++;
                     }
           	  }
@@ -156,7 +163,8 @@
 		  ?><ul><?
           	  $source = $_REQUEST['source'];
           	  ?><li><a href="#" class="aRemoveListItem"><img class="icon-remove-small" src="/images/blank.gif" /></a>
-                  Source: <input type="text" name="source[url]" value="<?echo trim($source['url'])?>" /><?
+                  Source Attribution:<br/>
+                  <input type="text" name="source[url]" value="<?echo trim($source['url'])?>" /><?
           	  ?><input type="text" name="source[title]" value="<?echo trim($source['title'])?>" /></li><?
         	  ?></ul><?}?>
         	</div>
@@ -182,24 +190,7 @@
 <?//--- Include the footer bar html fragments -----------?>
 <?include "$confroot/$templates/$template_html_footerbar"?>
 <script>
-<?if($device!="android") {?>
-$(function() {
-    $('#file_upload').uploadifive({
-        'auto'         : true,
-        'method'       : 'post',
-        'dnd'          : true,
-        'queueID'      : 'queue',
-        'uploadScript' : '/cgi/in/upload',
-        'formData'     : {
-          'datestamp'  : '<?echo $datestamp?>'
-	},
-        'onUploadFile' : function(file) {
-            var filename = file.name.replace(/\s/g,"");
-            $('#frmBlogPost').append('<input type="hidden" name="enclosure[]" value="<?echo $datestamp."_"?>' + filename.toLowerCase() + '" />');
-        }
-    })
-});
-<?}?>
+<?include "$confroot/$scripts/microblog-upload.js"?>
 </script>
 <script>
 <?include "$confroot/$scripts/microblog.js"?>

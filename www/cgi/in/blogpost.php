@@ -114,18 +114,26 @@ if( isset($_REQUEST['enclosure']) ) {
   $enclosure = FALSE;
 }
 $enclosures = array();
+if( !empty($enclosure) ) {
+  foreach( $enclosure as $encfile ) {
+    $encarray = json_decode($encfile, TRUE);
+    //loggit(3, "DEBUG: ".print_r($encarray, TRUE));
+    $enclosures[] = array( 'url' => (string)$encarray['url'],
+			   'length' => (string)$encarray['length'],
+			   'type' => (string)$encarray['type']
+    );
+  }
+}
+/*
 if( !empty($enclosure) && ($s3info != FALSE) ) {
   loggit(3, "Enclosures incoming: ".print_r($enclosure, TRUE));
   foreach($enclosure as $encfile) {
     putFileInS3("$confroot/$spooldir/$uid"."_".$encfile, $encfile, $s3info['bucket']."/enc", $s3info['key'], $s3info['secret']);
-    $enclosures[] = array( 'url' => get_s3_url($uid, '/enc/', $encfile),
-			   'length' => filesize("$confroot/$spooldir/$uid"."_".$encfile),
-			   'type' => mime_content_type("$confroot/$spooldir/$uid"."_".$encfile)
-    );
     unlink("$confroot/$spooldir/$uid"."_".$encfile);
   }
   loggit(3, "Enclosures outgoing: ".print_r($enclosures, TRUE));
 }
+*/
 if( !empty($_REQUEST['extenclosure']) ) {
   $extenclosures = $_REQUEST['extenclosure'];
   if(!isset($enclosures)) {

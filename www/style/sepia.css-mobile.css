@@ -182,6 +182,8 @@ body {  background:#4d4d4d;  }
      -moz-border-radius: 4px;
           border-radius: 4px;
 }
+.pageContentWrapper.Microblog #divBlogPost ul {  list-style:none; margin-left:0;  }
+.pageContentWrapper.Microblog #divBlogPost ul li {  background-color:#eee;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostIt {  float:right;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostSubmit #chkTweet {  display:none;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostText #txtContent {
@@ -190,8 +192,6 @@ body {  background:#4d4d4d;  }
   width:97%;
   height:130px;
 }
-.pageContentWrapper.Microblog #divBlogPost #divEnclosures {  display:none;  }
-.pageContentWrapper.Microblog #divBlogPost #divUpload {  display:none;  }
 .pageContentWrapper.Microblog #divPostList {
   position: relative;
   margin-top:10px;
@@ -204,12 +204,106 @@ body {  background:#4d4d4d;  }
           border-radius: 4px;
 }
 .pageContentWrapper.Microblog #divPostList ul {  list-style:none;  }
-.pageContentWrapper.Microblog #divPostList li {  padding:10px 7px 10px;  }
+.pageContentWrapper.Microblog #divPostList li {  padding:10px 0 10px;  }
 .pageContentWrapper.Microblog #divPostList li:hover {  background-color:#ddd;  }
 .pageContentWrapper.Microblog #divPostList li .spnPostControls {  float:right; }
 .pageContentWrapper.Microblog #divPostList li .spnPostTitle {
   font-weight:bold;
   font-size:120%;
+}
+
+/* ----- File/Enclosure Stuff ----- */
+.pageContentWrapper.Microblog #divBlogPost #fileMobile {
+  height:50px;
+  width:100%;
+}
+.pageContentWrapper.Microblog #divBlogPost #divEnclosures #spnQueueText {
+  display:none;
+  display:inline-block;
+  margin:10px auto 20px;
+}
+.pageContentWrapper.Microblog #divBlogPost #divEnclosures {
+  display:none;
+  background:#eee;
+  text-align:center;
+  padding:10px;
+  min-height:60px;
+  border:dashed #ccc 4px;  
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Microblog #divBlogPost #divUpload {  display:none;  }
+.pageContentWrapper.Microblog #divBlogPost #divExtEnclosures ul li {
+  padding:10px 8px 10px;
+  margin:0 0 5px;
+  min-height:66px;
+  background-color: #ccc;
+  border: 1px dashed #aaa;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Microblog #divBlogPost #divExtEnclosures ul li input {
+  width:70%;
+}
+.pageContentWrapper.Microblog #divBlogPost #divRtSource ul li {
+  padding:10px 8px 10px;
+  margin:0 0 5px;
+  background-color: #ccc;
+  border: 1px dashed #aaa;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Microblog #divBlogPost #divRtSource ul li input {
+  width:70%;
+}
+.pageContentWrapper.Microblog #divBlogPost #divExtEnclosures .imgenclosure {
+  float:right;
+  height:64px;
+}
+.pageContentWrapper.Microblog #divBlogPost #divUpload,#divExtEnclosures,#divRtSource {
+  padding-top:5px;
+  margin-top:5px;
+}
+.pageContentWrapper.Microblog #divBlogPost #divUpload {
+  text-align:center;
+  line-height:40px;
+}
+.pageContentWrapper.Microblog #divBlogPost #divUpload #aUploadTrigger {
+  padding:5px;
+  color:black;
+  border:solid black 1px;
+  -webkit-border-radius: 2px;
+     -moz-border-radius: 2px;
+          border-radius: 2px;
+  background: #c9de96; /* Old browsers */
+  background: -moz-linear-gradient(top,  #c9de96 0%, #8ab66b 44%, #398235 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#c9de96), color-stop(44%,#8ab66b), color-stop(100%,#398235)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #c9de96 0%,#8ab66b 44%,#398235 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #c9de96 0%,#8ab66b 44%,#398235 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #c9de96 0%,#8ab66b 44%,#398235 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  #c9de96 0%,#8ab66b 44%,#398235 100%); /* W3C */
+}
+.pageContentWrapper.Microblog #divBlogPost #btnAttachFile {
+  float:right;
+  margin:8px;
+}
+.pageContentWrapper.Microblog #divBlogPost #divEnclosures #queue {
+    width:100%;        
+    min-height: 50px;
+    overflow: auto;
+    padding: 3px;
+}
+.pageContentWrapper.Microblog #divBlogPost #divEnclosures #queue .uploadifive-queue-item {
+  padding:10px 8px 10px;
+  margin:0 0 5px;
+  background-color: #ccc;
+  text-align:left;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
 }
 /* --------------------------------------------------- */
 

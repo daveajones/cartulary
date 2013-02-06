@@ -14,6 +14,7 @@
     $cftemp = "$confroot/$templates/cartulary.conf";
 
     //Default values
+    $l_serverguid = random_gen(64);
     $l_dbusername = "cartulary";
     $l_dbpassword = "cartulary";
     $l_fqdn = "localhost";
@@ -47,6 +48,9 @@
         }
         if( isset($s3_sys_server_river_title) ) {
           $l_s3rivertitle = $s3_sys_server_river_title;
+        }
+        if( isset($cg_main_serverguid) ) {
+          $l_serverguid = $cg_main_serverguid;
         }
         $l_rsscloud = $enable_rsscloud;
       }
@@ -120,6 +124,9 @@
     $response = get_user_response();
     if( empty($response) ) { $response = $l_s3rivertitle; }
     $template = str_replace('s3rivertitlevalue', $response, $template);
+
+    //Preserve server guid
+    $template = str_replace('server.guid.goes.here', $l_serverguid, $template);
 
     //Preserve rssCloud setting
     if( $l_rsscloud == 1 ) {

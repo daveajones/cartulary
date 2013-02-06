@@ -47,7 +47,7 @@ $(document).ready( function() {
 	//##: ----------------------------------
         $('#frmSubscribe').ajaxForm({
                 dataType:       'json',
-                timeout:        20000,
+                timeout:        60000,
                 beforeSubmit:   function() {
                         $('#frmSubscribe .imgSpinner').show();
                         $('#frmSubscribe .btnSubmit').attr("disabled", true);
@@ -72,7 +72,7 @@ $(document).ready( function() {
 	//##: ----------------------------------
         $('.feedFinderForm').ajaxForm({
                 dataType:       'json',
-                timeout:        20000,
+                timeout:        60000,
                 beforeSubmit:   function() {
                         $('.imgSpinner').show();
                         $('.feedFinderForm .btnSubmit').attr("disabled", true);
@@ -140,7 +140,7 @@ $(document).ready( function() {
                 } else {
 		        newform.ajaxForm({
                 		dataType:       'json',
-		                timeout:        30000,
+		                timeout:        60000,
 		                beforeSubmit:   function() {
                 		        $('.mainControls .imgSpinner').show();
 		                        $('.mainControls button').attr("disabled", true);
@@ -216,7 +216,7 @@ $(document).ready( function() {
                 } else {
 		        newform.ajaxForm({
                 		dataType:       'json',
-		                timeout:        30000,
+		                timeout:        60000,
 		                beforeSubmit:   function() {
                 		        $('.mainControls .imgSpinner').show();
 		                        $('.mainControls button').attr("disabled", true);
@@ -280,7 +280,7 @@ $(document).ready( function() {
                 } else {
 		        newform.ajaxForm({
                 		dataType:       'json',
-		                timeout:        30000,
+		                timeout:        60000,
 		                beforeSubmit:   function() {
                 		        $('.mainControls .imgSpinner').show();
 		                        $('.mainControls button').attr("disabled", true);
@@ -349,7 +349,7 @@ $(document).ready( function() {
                 } else {
 		        newform.ajaxForm({
                 		dataType:       'json',
-		                timeout:        30000,
+		                timeout:        60000,
 		                beforeSubmit:   function() {
                 		        $('.mainControls .imgSpinner').show();
 		                        $('.mainControls button').attr("disabled", true);
@@ -466,7 +466,7 @@ function bindUnsubLinks() {
                         $.ajax({
                                 url: cgiurl + '?id=' + rowid,
                                 type: "GET",
-                                timeout: 30000,
+                                timeout: 60000,
                                 dataType:       'json',
                                 success:        function(data) {
                                         if(data.status == "false") {
@@ -499,7 +499,7 @@ function bindStickyButtons() {
                 $.ajax({
                         url:    cgiurl + '?fid=' + fid + sticky,
                         type:   "GET",
-                        timeout:        20000,
+                        timeout:        60000,
                         dataType:       'json',
                         success:        function(data) {
                                 if(data.status == "false") {
@@ -536,7 +536,7 @@ function bindHiddenButtons() {
                 $.ajax({
                         url:    cgiurl + '?fid=' + fid + hidden,
                         type:   "GET",
-                        timeout:        20000,
+                        timeout:        60000,
                         dataType:       'json',
                         success:        function(data) {
                                 if(data.status == "false") {

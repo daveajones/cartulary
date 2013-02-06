@@ -1024,6 +1024,20 @@ if( !function_exists( 'xmlentities' ) ) {
     }
 }
 
+
+//First do a full replacement, then selectively re-convert safe tags
+function safe_html($content = NULL, $tags = array()) {
+
+  $content = str_replace("\n", '<br/>', $content);
+
+  $content = xmlentities($content);
+
+  $content = str_replace('&lt;br/&gt;', '<br/>', $content);
+
+
+  return($content);
+}
+
 //Search in a multidimensional array
 function in_array_r($needle, $haystack, $strict = true) {
     foreach ($haystack as $item) {

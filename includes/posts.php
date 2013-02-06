@@ -1205,8 +1205,8 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
         if( !empty($post['title']) ) {
 		$html .= "        <h3>".xmlentities(trim($post['title']))."</h3>\n";
         }
-        $html .= "        <p class=\"description\">".xmlentities(trim( str_replace("\n", '', $post['content'] ) ))."</p>\n";
-        //$html .= "        <p class=\"description\">".htmlspecialchars($post['content'])."</p>\n";
+        //$html .= "        <p class=\"description\">".xmlentities(trim( str_replace("\n", '', $post['content'] ) ))."</p>\n";
+        $html .= "        <p class=\"description\">".safe_html(trim($post['content']))."</p>\n";
         if( isset($enclosures) ) {
           if( is_array($enclosures) && count($enclosures) > 0 ) {
             foreach($enclosures as $enclosure) {

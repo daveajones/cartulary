@@ -138,7 +138,7 @@ if( empty($url) && (count($enclosures) > 0) ) {
 
 //If there is no link then give a link back to the html archive
 if( empty($url) ) { //&& isset($_REQUEST['tweet']) ) {
-  $url = get_s3_url($uid, '/arc'.date('/Y/m/d/'), get_microblog_archive_filename($uid).'?ts='.time());
+  $url = get_s3_url($uid, '/arc'.date('/Y/m/d/'), get_microblog_html_filename($uid).'?ts='.time());
   $archiveurl = TRUE;
 }
 

@@ -63,7 +63,7 @@
                     {{if item.title}}
                         ${item.title}
                     {{else}}
-                        ${River.methods.getText(item.body)}
+                        ${River.methods.newGetText(item.body)}
                     {{/if}}
                     {{if item.permaLink || item.link}}</a>{{/if}}
                     </h3>
@@ -75,7 +75,7 @@
                     <img class="thumbnail" src="${thumbnail.url}" width="${thumbnail.width}" height="${thumbnail.height}" alt="">
                 {{/each}}
 
-                    ${River.methods.getText(item.body)}
+                    ${River.methods.newGetText(item.body)}
                     {{if Hidepics == false && River.methods.convertYoutube(item.link) != false}}
                         <br/><br/><iframe class="bodyvid" src="${River.methods.convertYoutube(item.link)}" frameborder="0" allowfullscreen></iframe>
                     {{else Hidepics == false && River.methods.getImages(item.body) != false}}

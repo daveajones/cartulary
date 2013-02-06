@@ -41,13 +41,13 @@ River.generate = (function () {
  		_populate(jsonRiverData);
 		console.log("DEBUG: Populated river locally.");
 
-                <?if($g_platform != "mobile"){?>
+		<?if($g_platform != "mobile"){?>
                 // check river data every 5 minutes
                 setInterval(function () {
-                        _init(url, callback, initialized);
+        		_init(url, callback, initialized);
                 }, 300000);
-                <?}?>
-
+		<?}?>
+		
 		initialized = true;
 	     	return true;
         }
@@ -460,6 +460,7 @@ River.methods = (function () {
     function _newGetText(html) {
       var breakToken = '_______break_______',
       lineBreakedHtml = html.replace(/<br\s?\/?>/gi, breakToken).replace(/<p\.*?>(.*?)<\/p>/gi, breakToken + '$1' + breakToken);
+      //return $('<div>').html(lineBreakedHtml).text().replace(new RegExp(breakToken, 'g'), '\n');
       return $('<div>').html(lineBreakedHtml).text().replace(new RegExp(breakToken, 'g'), '\n');
     }
 
@@ -560,6 +561,7 @@ River.methods = (function () {
         isVideo : _isVideo,
         getDomain : _getDomain,
         getFavicon : _getFavicon,
+	newGetText : _newGetText,
         getText : _getText,
         getMediaType : _getMediaType,
         getEnclosureSize : _getEnclosureSize,

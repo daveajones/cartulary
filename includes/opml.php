@@ -1553,14 +1553,16 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
         <dateModified>".date("D, d M Y H:i:s O", time())."</dateModified>
         <ownerName>".get_user_name_from_uid($uid)."</ownerName>
         <ownerId>".$uid."</ownerId>
-        <sopml:guid>[a registered global guid]</sopml:guid>
+        <sopml:guid>".$cg_main_serverguid."::".$uid."</sopml:guid>
         <sopml:luid>".$uid."</sopml:luid>
         <sopml:url>".$sopmlurl."</sopml:url>
         <sopml:avatar>".$prefs['avatarurl']."</sopml:avatar>
-        <sopml:timezone>".$prefs['timezone']."</sopml:timezone>
-        <sopml:updateStart host=\"".$system_url."\" url=\"/update/start\" required=\"host callback key\" />
-        <sopml:updateStop host=\"".$system_url."\" url=\"/update/stop\" required=\"host callback key\" />
-        <sopml:updateChange host=\"".$system_url."\" url=\"/update/change\" required=\"host callback key\" />
+        <sopml:timezone>".$prefs['timezone']."</sopml:timezone>";
+  if($cg_opmlcloud_enabled == 1) {
+  $opml .= "
+        <sopml:updates host=\"".$cg_opmlcloud_host."\" port=\"".$cg_opmlcloud_port."\" type=\"".$cg_opmlcloud_type."\" register=\"R:".$sopmlurl."\" />";
+  }
+  $opml .= "
       </head>\n";
 
   $opml .= "
@@ -1570,15 +1572,15 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
   $opml .= "
           <outline text=\"My Stuff\">";
   $opml .= "
-              <outline text=\"$mbtitle\" description=\"$mbtitle\" type=\"rss\" xmlUrl=\"$blogurl\" sopml:disposition=\"pub\" sopml:contains=\"text\" sopml:lastupdate=\"\" />";
+              <outline text=\"$mbtitle\" description=\"$mbtitle\" type=\"rss\" xmlUrl=\"$blogurl\" sopml:disposition=\"pub\" sopml:contains=\"mixed\" />";
   if($prefs['publicdefault'] != 1) {
     $opml .= "
-              <outline text=\"$catitle\" description=\"$catitle\" type=\"rss\" xmlUrl=\"$carturl\" sopml:disposition=\"pub\" sopml:contains=\"text html\" sopml:lastupdate=\"\"/>";
+              <outline text=\"$catitle\" description=\"$catitle\" type=\"rss\" xmlUrl=\"$carturl\" sopml:disposition=\"pub\" sopml:contains=\"html\" />";
   }
   if( $pubfeeds != FALSE ) {
     foreach( $pubfeeds as $pubfeed ) {
       $opml .= "
-              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($pubfeed['title']))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($pubfeed['url'])."\" sopml:disposition=\"pub\" sopml:contains=\"text html image audio video\" sopml:lastupdate=\"\" sopml:attention=\"\" />";
+              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($pubfeed['title']))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($pubfeed['url'])."\" sopml:disposition=\"pub\" sopml:contains=\"mixed\" sopml:attention=\"50\" />";
     }
   }
   $opml .= "
@@ -1598,7 +1600,7 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
         $sticky = 'sopml:sticky="true"';
       }
       $opml .= "
-              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($feed['title']))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($feed['url'])."\" sopml:disposition=\"sub\" sopml:contains=\"text html image audio video\" sopml:lastupdate=\"\" sopml:attention=\"\" $sticky $hidden />";
+              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($feed['title']))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($feed['url'])."\" sopml:disposition=\"sub\" sopml:contains=\"mixed\" sopml:attention=\"50\" $sticky $hidden />";
   }
   $opml .= "
           </outline>";

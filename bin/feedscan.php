@@ -7,7 +7,7 @@
   //Let's not scan while other scripts are in process
   if( file_exists("$confroot/$run/backup.php.lock") ) {
     cronHelper::unlock();
-    loggit(3, "FEEDSCAN: Backup is in progress, so skipping this scan.");
+    loggit(1, "FEEDSCAN: Backup is in progress, so skipping this scan.");
     exit(0);
   }
 
@@ -48,7 +48,7 @@
     }
 
     if($subcount > 0) {
-      	loggit(3, "Checking feed: [ $ccount | ".$feed['title']." | ".$feed['url']."].");
+      	loggit(1, "Checking feed: [ $ccount | ".$feed['title']." | ".$feed['url']."].");
     	$result = get_feed_items($feed['id']);
     	if($result == -1) {
         	loggit(2, "Error getting items for feed: [".$feed['title']." | ".$feed['url']."]");
@@ -85,14 +85,14 @@
   echo "\n";
 
   //Calculate time took to scan the river
-  loggit(3, "It took ".(time() - $tstart)." seconds to scan [$ccount] of [$totalfeeds] feeds.");
-  loggit(3, "Total checked: [$ccount]. Updated: [$ncount]. Deleted: [$dcount]. New items: [$newitems].");
+  loggit(1, "It took ".(time() - $tstart)." seconds to scan [$ccount] of [$totalfeeds] feeds.");
+  loggit(1, "Total checked: [$ccount]. Updated: [$ncount]. Deleted: [$dcount]. New items: [$newitems].");
   echo "      It took ".(time() - $tstart)." seconds to scan [$ccount] of [$totalfeeds] feeds.\n";
   echo "Total checked: [$ccount]. Updated: [$ncount]. Deleted: [$dcount]. New items: [$newitems].\n";
 
 
   // Log and leave
-  loggit(3, "Feedscan finished.");
+  loggit(1, "Feedscan finished.");
 
   //Remove the lock file
   cronHelper::unlock();

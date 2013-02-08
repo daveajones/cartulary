@@ -658,7 +658,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
         if( !empty($post['title']) ) {
           $rss .= "        <title>".htmlspecialchars(trim($post['title']))."</title>\n";
         }
-        $rss .= "        <description><![CDATA[".trim( str_replace("\n", '', $post['content'] ) )."]]></description>
+        $rss .= "        <description><![CDATA[".trim($post['content'])."]]></description>
         <pubDate>".date("D, d M Y H:i:s O", $post['createdon'])."</pubDate>\n";
         $rss .= $guid."\n";
         if(!empty($rsslink)) { $rss .= $rsslink."\n"; }

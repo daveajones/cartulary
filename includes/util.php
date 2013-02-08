@@ -197,6 +197,16 @@ function clean_html($htmldata = NULL)
 }
 
 //Truncate the text in a string to a specific word count
+function limit_words($text, $limit) {
+      if (strlen($text) > $limit) {
+          $words = str_word_count($text, 2);
+          $pos = array_keys($words);
+          $text = substr($text, 0, $pos[$limit]);
+      }
+      return $text;
+}
+
+//Truncate the text in a string to a specific word count
 function limit_text($text, $limit) {
       if (strlen($text) > $limit) {
           $words = str_word_count($text, 2);
@@ -222,6 +232,20 @@ function truncate_text($string = NULL, $length){
     }
     return($output);
 }
+
+
+//http://stackoverflow.com/questions/1193500/php-truncate-html-ignoring-tags
+//Truncate html to a specific word count, but keep it valid
+function truncate_html($html, $max_words) {
+  if( str_word_count($html) > $max_words ) {
+    $buffer = tidy_repair_string(limit_words($html, $max_words)."...", array('wrap' => 0, 'show-body-only' => TRUE), 'utf8');
+    $buffer = preg_replace("/\<.*\.\.\..*\>/", "", $buffer);
+    return($buffer);
+  }
+
+  return($html);
+}
+
 
 //Extensions to the mysqli class to allow returning fetch_assoc possible
 //See here: http://www.php.net/manual/en/mysqli-stmt.fetch.php#72720
@@ -1583,6 +1607,35 @@ function url_is_a_picture( $url = NULL )
   }
 
   return(FALSE);
+}
+
+
+//http://stackoverflow.com/questions/770219/how-can-i-remove-attributes-from-an-html-tag
+//Strip attributes from an html tag
+function stripAttributes($s, $allowedattr = array()) {
+  if (preg_match_all("/<[^>]*\\s([^>]*)\\/*>/msiU", $s, $res, PREG_SET_ORDER)) {
+   foreach ($res as $r) {
+     $tag = $r[0];
+     $attrs = array();
+     preg_match_all("/\\s.*=(['\"]).*\\1/msiU", " " . $r[1], $split, PREG_SET_ORDER);
+     foreach ($split as $spl) {
+      $attrs[] = $spl[0];
+     }
+     $newattrs = array();
+     foreach ($attrs as $a) {
+      $tmp = explode("=", $a);
+      if (trim($a) != "" && (!isset($tmp[1]) || (trim($tmp[0]) != "" && !in_array(strtolower(trim($tmp[0])), $allowedattr)))) {
+
+      } else {
+          $newattrs[] = $a;
+      }
+     }
+     $attrs = implode(" ", $newattrs);
+     $rpl = str_replace($r[1], $attrs, $tag);
+     $s = str_replace($tag, $rpl, $s);
+   }
+  }
+  return $s;
 }
 
 ?>

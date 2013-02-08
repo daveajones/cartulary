@@ -3658,7 +3658,7 @@ function river_updated($uid = NULL)
 
 //_______________________________________________________________________________________
 //Stick a built river array into the rivers table
-function update_river($uid = NULL, $river = NULL, $mriver = NULL)
+function update_river($uid = NULL, $river = NULL, $mriver = NULL, $hash = NULL)
 {
   //Check parameters
   if($uid == NULL) {
@@ -3689,7 +3689,7 @@ function update_river($uid = NULL, $river = NULL, $mriver = NULL)
   }
 
   //Hash the river for change detection
-  $conthash = md5($striver);
+  //$conthash = md5($striver);
 
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
@@ -3697,7 +3697,7 @@ function update_river($uid = NULL, $river = NULL, $mriver = NULL)
   //Now that we have a good uid and river, put the river in the database
   $stmt = "REPLACE INTO $table_river (userid,lastbuild,river,conthash,firstid,updated,mriver) VALUES (?,?,?,?,?,0,?)";
   $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ssssss", $uid,$lastbuild,$striver,$conthash,$firstid,$mtriver) or print(mysql_error());
+  $sql->bind_param("ssssss", $uid,$lastbuild,$striver,$hash,$firstid,$mtriver) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->close() or print(mysql_error());
 
@@ -3928,14 +3928,25 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     }
 
     //Properly fill the item's body text
-    if($prefs['fulltextriver'] == 1) {
-      $description = preg_replace('/\r+/', '', $description);
-      $description = preg_replace('/\s+/', ' ', $description);
-      $itembody = str_replace(array('<p>','</p>','<br>','<br/>','<br />','<h2>','</h2>'), "\n", $description);
-      $itembody = preg_replace('/\n\s?\n+/', "\n\n", $itembody);
-    } else {
-      $itembody = truncate_text($description, 512);
+    $description = str_replace(array('&lt;','&gt;','&nbsp;'), array('<','>',' '), $description);
+    $description = strip_tags($description, '<p><br><hr><h1><h2><h3><h4><img><video><audio><iframe>'); //Strip all html comments and tags except these
+    $description = stripAttributes($description, array('src','type'));
+    if($prefs['fulltextriver'] == 0) {
+      $description = truncate_html($description, 150);
     }
+    //$description = preg_replace("/\r+/g", "", $description); //Strip carriage returns
+
+    $description = preg_replace("/\ \ +/", " ", $description); //Replace continuous whitespace with just one space
+    $description = str_replace(array('<p>',  '<p >',  '</p>', '<br>',  '<br/>', '<br />', '<hr>', '<hr/>', '<hr />',
+                                     '<h1>', '</h1>', '<h2>', '</h2>', '<h3>',  '</h3>',  '<h4>', '</h4>'
+    ), "\n\n", $description);
+    $description = preg_replace('/\t+/', '', $description); //Get rid of tabs
+    $description = preg_replace("/\ ?\n\n\ ?/", "\n\n", $description);
+    $description = preg_replace("/\n \n/", "\n\n", $description);
+    $description = preg_replace("/[\r\n]\n+/", "\n\n", $description);
+    $description = preg_replace("/\>[\r\n]+/", ">", $description);
+    $itembody = trim($description);
+
 
     //Fill in the details of this item
     $river[$fcount]['item'][$icount] = array(
@@ -4027,13 +4038,18 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 
   //Let's be smart about this and not re-publish a river that hasn't changed
   $pubriver = get_river_info($uid);
-  if( $pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) ) {
+  $newhash = md5(serialize($driver));
+
+  //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
+  //loggit(3, "River hash: NEW: [$newhash]");
+
+  if( $pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash) ) {
     //loggit(3, "User: [$uid]'s river has not changed. No need to publish.");
     return($jsonriver);
   }
 
   //Put this built river in the database
-  update_river($uid, $doutput, $moutput);
+  update_river($uid, $doutput, $moutput, $newhash);
 
   //If we can get some sane S3 credentials then let's go
   if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {

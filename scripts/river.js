@@ -404,9 +404,9 @@ River.methods = (function () {
 
 	var imgs = ehtml.getElementsByTagName("img");
 	for( var i=0 ; i < imgs.length ; i++ ){
-            if( imgs[i].src.indexOf(systemUrl) == -1 ) {
-	    	return(imgs[i].src);
-            }
+	    //if( _isImage(imgs[i].src) ) {
+		return(imgs[i].src);
+	    //}
 	}
 
 	return(false);

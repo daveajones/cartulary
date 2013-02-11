@@ -3,6 +3,7 @@
 <link rel="stylesheet" type="text/css" href="/style/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="/style/style.css" />
 <link rel="stylesheet" type="text/css" href="/style/river.css" />
+<link href='http://fonts.googleapis.com/css?family=Crete+Round' rel='stylesheet' type='text/css'>
 <?
   if ( isset($g_prefs['stylesheet']) && !empty($g_prefs['stylesheet']) ) {
     $mainstyle=$g_prefs['stylesheet'];

@@ -576,13 +576,6 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
 
 
 /* --------------------------------------------------- */
-/* ----- Fonts and other imports ----- */
-@import url(http://fonts.googleapis.com/css?family=Orienta);
-/* --------------------------------------------------- */
-
-
-
-/* --------------------------------------------------- */
 /* ----- Body and other major elements ----- */
 body {  background:#555;  }
 .container {
@@ -612,6 +605,7 @@ img.avatarheader {  float:right; max-height: 64px;  }
 /* --------------------------------------------------- */
 /* ----- Microblog HTML Archive ----- */
 .pageContentWrapper.Archive #divArchive {
+  font-family:"Crete Round", serif;
   position: relative;
   margin-left:auto;
   margin-right:auto;
@@ -642,21 +636,26 @@ img.avatarheader {  float:right; max-height: 64px;  }
   margin-left: 15px;
 }
 .pageContentWrapper.Archive .item .content h3 {
+  font-size:170%;
   margin-bottom: 10px;
 }
 .pageContentWrapper.Archive .item .description {
-  font-size:120%;
+  font-family:"Crete Round", serif;
+  font-size:150%;
   line-height:150%;
 }
 .pageContentWrapper.Archive .item h3 + p.description {
-  text-indent:10px;
+  font-size:150%;
+  margin-left:10px;
 }
 .pageContentWrapper.Archive .item .shortlink {
   border-right: solid #111 1px;
   padding-right: 3px;
 }
 .pageContentWrapper.Archive .item .enclosureimg {
-  max-width:80%;
+  display:block;
+  margin:10px auto 10px;
+  max-width:50%;
 }
 .pageContentWrapper.Archive .item .link {
   border-right: solid #111 1px;

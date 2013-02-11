@@ -1162,6 +1162,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
       <title>$title</title>
       <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
       <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0\">
+      <link rel=\"stylesheet\" type=\"text/css\" href=\"http://fonts.googleapis.com/css?family=Crete+Round\" />
       <link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"$css\" />
       </head><body><div class=\"container\"><div class=\"row page-header\" id=\"divPageTitle\">";
 

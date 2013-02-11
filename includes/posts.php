@@ -358,7 +358,7 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
                             'shorturl' => $ashorturl,
                             'createdon' => $acreatedon,
                             'content' => $acontent,
-			    'enclosure' => $aenclosure,
+			    'enclosure' => unserialize($aenclosure),
 			    'sourceurl' => $asourceurl,
 			    'sourcetitle' => $asourcetitle,
 			    'tweeted' => $tweeted,
@@ -646,8 +646,10 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
           }
 	}
         if( !empty($post['enclosure']) ) {
-          $enclosures = unserialize($post['enclosure']);
-        }
+          $enclosures = $post['enclosure'];
+        } else {
+          $enclosures = array();
+	}
         $tweeted = '';
         if( $post['tweeted'] == 1 ) {
                 $tweeted = "        <sopml:tweeted>true</sopml:tweeted>\n";
@@ -1196,7 +1198,9 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
           }
 	}
         if( !empty($post['enclosure']) ) {
-          $enclosures = unserialize($post['enclosure']);
+          $enclosures = $post['enclosure'];
+        } else {
+          $enclosures = array();
         }
 
        $html .= "

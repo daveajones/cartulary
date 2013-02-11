@@ -6,15 +6,10 @@
 
 
 /* --------------------------------------------------- */
-/* ----- Fonts and other imports ----- */
-@import url(http://fonts.googleapis.com/css?family=Orienta);
-/* --------------------------------------------------- */
-
-
-
-/* --------------------------------------------------- */
 /* ----- Body and other major elements ----- */
-/* body {  background:#4d4d4d url(../images/bg-body.jpg) repeat top left;  } */
+body {
+  font-family:sans-serif;
+}
 
 body > .container {
   width:90%;
@@ -93,7 +88,6 @@ a {  color:#059;  }
 .pageContentWrapper.River #stream .notice {  color:white;  }
 .pageContentWrapper.River #stream-header {  display:none;  }
 .pageContentWrapper.River #stream .section {
-  font-family:'Orienta', sans-serif;
   position: relative;
   background-color:#fff;
   margin:0 0 20px;
@@ -107,12 +101,13 @@ a {  color:#059;  }
   white-space: pre-line;
 }
 .pageContentWrapper.River #stream .section > .article {
-  padding:20px 20px 8px;
+  padding:20px 20px 15px;
   word-wrap:break-word;
   word-break:hyphenate;
 }
 .pageContentWrapper.River #stream .section > .article + .article {
-  padding:0 20px 8px;
+  border-top:solid #ccc 1px;
+  padding:20px 20px 8px;
   word-wrap:break-word;
   word-break:hyphenate;
 }
@@ -213,7 +208,7 @@ a {  color:#059;  }
           border-radius: 4px;
 }
 .pageContentWrapper.Articles #divPageArticle #article {
-  font-family: Georgia, sans-serif;
+  font-family: "Crete Round", serif;
   font-size: 130%;
   line-height: 150%;
   background-color: #FBF0D9;
@@ -262,6 +257,7 @@ a {  color:#059;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostIt {  float:right;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostSubmit #chkTweet {  display:none;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostText #txtContent {
+  font-family: "Crete Round", serif;
   font-size:150%;
   line-height:130%;
   margin-top:10px;
@@ -374,6 +370,7 @@ a {  color:#059;  }
      -moz-border-radius: 4px;
           border-radius: 4px;
 }
+/* -- post list -- */
 .pageContentWrapper.Microblog #divPostList {
   position: relative;
   margin-top:10px;
@@ -385,14 +382,54 @@ a {  color:#059;  }
      -moz-border-radius: 4px;
           border-radius: 4px;
 }
-.pageContentWrapper.Microblog #divPostList ul {  list-style:none;  }
-.pageContentWrapper.Microblog #divPostList li {  padding:10px 7px 10px;  }
-.pageContentWrapper.Microblog #divPostList li:hover {  background-color:#ddd;  }
-.pageContentWrapper.Microblog #divPostList li .spnPostControls {  float:right; }
+.pageContentWrapper.Microblog #divPostList ul {
+  margin-left:0;
+  list-style:none;
+}
+.pageContentWrapper.Microblog #divPostList li {
+  font-family: "Crete Round", serif;
+  padding:10px;
+  margin-bottom:20px;
+  background-color:#ddd;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+.pageContentWrapper.Microblog #divPostList li .spnPostControls {  float:right;  }
+.pageContentWrapper.Microblog #divPostList li .spnPostContent {
+  font-size:130%;
+}
 .pageContentWrapper.Microblog #divPostList li .spnPostTitle {
   font-weight:bold;
-  font-size:120%;
+  font-size:130%;
 }
+.pageContentWrapper.Microblog #divPostList li .divPostContent {
+  position: relative;
+  margin-top:10px;
+  padding:20px;
+  *padding-top: 19px;
+  white-space: pre-line;
+}
+.pageContentWrapper.Microblog #divPostList li .padforenclosure {
+  min-height:100px;
+}
+.pageContentWrapper.Microblog #divPostList li .divPostListEnclosures {
+  clear:both;
+  border-top:solid #ccc 1px;
+  margin-top:8px;
+  padding-top:8px;
+}
+.pageContentWrapper.Microblog #divPostList li .divPostListEnclosures img.mbthumbnail {
+  margin:3px;
+  vertical-align:top;
+  max-height:128px;
+}
+.pageContentWrapper.Microblog #divPostList li .divPostListEnclosures img.mbthumbnail:hover {
+  max-height:100%;
+  max-width:500px;
+}
+/* -- end post list -- */
 #mdlFeedImport .modal-header {
   background-color:#ddd;
   border-bottom:solid #ccc 1px;

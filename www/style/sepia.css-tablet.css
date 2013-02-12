@@ -318,6 +318,17 @@ body {
           border-radius: 4px;
 }
 /* ----------------------------------------------------------------------- testing ----------------------------------------------------------------------------- */
+#divPostList .noposts {
+  position: relative;
+  margin-top:10px;
+  padding:20px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
 #divPostList {  margin-top:20px;  }
 .postList {  margin:0 auto;  }
 .postList .postItem {

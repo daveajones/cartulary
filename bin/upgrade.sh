@@ -1,6 +1,14 @@
 #!/bin/bash
 
 ##: This script needs to be run with sudo
+ROOT_UID="0"
+
+#Check if run as root
+if [ "$UID" -ne "$ROOT_UID" ] ; then
+	echo "You must run this script with sudo."
+	exit 1
+fi
+
 
 ##: Get a datestamp
 BAKDATE=`date +'%Y%m%d%s'`

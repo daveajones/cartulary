@@ -9,6 +9,16 @@
 ##:   file like "sudo cartulary-master/INSTALL"
 
 
+##: This script needs to be run with sudo
+ROOT_UID="0"
+
+#Check if run as root
+if [ "$UID" -ne "$ROOT_UID" ] ; then
+        echo "You must run this script with sudo."
+        exit 1
+fi
+
+
 ##: 0. Warning.
 clear
 echo 'This install script assumes it is being run on a virgin install of Ubuntu server 12.04 LTS.'

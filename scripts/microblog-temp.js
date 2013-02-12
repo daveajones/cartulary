@@ -1,6 +1,6 @@
   <div id="ulPostList" class="postList">
   {{if posts.length < 1}}
-    <center>You haven't posted anything. Why not?</center>
+    <center class="noposts">You haven't posted anything. Why not?</center>
   {{/if}}
   {{each(p, post) posts}}
 	<div id="${post.id}" data-title="{{if isBlank(post.title)}}${getShortTitle(post.content)}{{else}}${post.title}{{/if}}" class="postItem well {{if isBlank(post.title) == false}}postItemComplex{{/if}}">

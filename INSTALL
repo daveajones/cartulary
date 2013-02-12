@@ -98,6 +98,7 @@ echo '#####################################################'
 echo
 cp /opt/cartulary/templates/apache.conf /etc/apache2/sites-available/cartulary >>/tmp/cartinstall.log 2>&1
 ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cartulary >>/tmp/cartinstall.log 2>&1
+a2enmod headers
 /etc/init.d/apache2 restart >>/tmp/cartinstall.log 2>&1
 
 

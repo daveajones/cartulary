@@ -1150,8 +1150,10 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
   //Get a stylesheet
   if( !empty($prefs['mbarchivecss']) ) {
     $css = $prefs['mbarchivecss'];
+    $cssexternal = TRUE;
   } else {
     $css = $default_archive_style_filename;
+    $cssexternal = FALSE;
   }
 
   //The feed string
@@ -1161,9 +1163,23 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
   $html .= "\n
       <title>$title</title>
       <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
-      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0\">
-      <link rel=\"stylesheet\" type=\"text/css\" href=\"http://fonts.googleapis.com/css?family=Crete+Round\" />
-      <link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"$css\" />
+      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0\">";
+
+  if($cssexternal == TRUE) {
+    $html .= "\n      <link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"$css\" />";
+  } else {
+    //Bring in the archive style sheet
+    $fh = fopen("$confroot/$templates/$default_archive_style_filename", "r");
+    $rftemplate = fread($fh, filesize("$confroot/$templates/$default_archive_style_filename"));
+    //Replace the tags
+    $rftemplate = str_replace('[SYSTEM_URL]', $system_url, $rftemplate);
+    //Close the template
+    fclose($fh);
+    //Add to the html page
+    $html .= "\n      <style>\n".$rftemplate."</style>";
+  }
+
+  $html .= "\n
       </head><body><div class=\"container\"><div class=\"row page-header\" id=\"divPageTitle\">";
 
   if( !empty($prefs['avatarurl']) ) {
@@ -1263,20 +1279,6 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
       $s3url = get_s3_url($uid, $arcpath, $filename);
       loggit(1, "Wrote file to S3 at url: [$s3url].");
     }
-
-    //Put the style file
-    $s3res = putFileInS3("$confroot/$templates/$default_archive_style_filename",
-                         $default_archive_style_filename,
-                         $s3info['bucket'].$arcpath,
-                         $s3info['key'], $s3info['secret'], "text/css");
-    if(!$s3res) {
-      loggit(2, "Could not create S3 file: [$default_archive_style_filename] for user: [$username].");
-      //loggit(3, "Could not create S3 file: [$default_archive_style_filename] for user: [$username].");
-    } else {
-      $s3url = get_s3_url($uid, $arcpath, $default_archive_style_filename);
-      loggit(1, "Wrote file to S3 at url: [$s3url].");
-    }
-
   }
 
 

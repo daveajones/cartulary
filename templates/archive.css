@@ -576,6 +576,33 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
 
 
 /* --------------------------------------------------- */
+/* ----- Fonts --------------------------------------- */
+@font-face {
+    font-family: 'CreteRoundItalic';
+    src: url('[SYSTEM_URL]/style/CreteRound-Italic-webfont.eot');
+    src: url('[SYSTEM_URL]/style/CreteRound-Italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('[SYSTEM_URL]/style/CreteRound-Italic-webfont.woff') format('woff'),
+         url('[SYSTEM_URL]/style/CreteRound-Italic-webfont.ttf') format('truetype'),
+         url('[SYSTEM_URL]/style/CreteRound-Italic-webfont.svg#CreteRoundItalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'CreteRoundRegular';
+    src: url('[SYSTEM_URL]/style/CreteRound-Regular-webfont.eot');
+    src: url('[SYSTEM_URL]/style/CreteRound-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('[SYSTEM_URL]/style/CreteRound-Regular-webfont.woff') format('woff'),
+         url('[SYSTEM_URL]/style/CreteRound-Regular-webfont.ttf') format('truetype'),
+         url('[SYSTEM_URL]/style/CreteRound-Regular-webfont.svg#CreteRoundRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+/* --------------------------------------------------- */
+
+
+/* --------------------------------------------------- */
 /* ----- Body and other major elements ----- */
 body {  background:#555;  }
 .container {
@@ -605,7 +632,7 @@ img.avatarheader {  float:right; max-height: 64px;  }
 /* --------------------------------------------------- */
 /* ----- Microblog HTML Archive ----- */
 .pageContentWrapper.Archive #divArchive {
-  font-family:"Crete Round", serif;
+  font-family:"CreteRoundRegular", serif;
   position: relative;
   margin-left:auto;
   margin-right:auto;
@@ -640,7 +667,7 @@ img.avatarheader {  float:right; max-height: 64px;  }
   margin-bottom: 10px;
 }
 .pageContentWrapper.Archive .item .description {
-  font-family:"Crete Round", serif;
+  font-family:"CreteRoundRegular", serif;
   font-size:150%;
   line-height:150%;
 }

@@ -5,6 +5,32 @@
 /* ---------------------------------------------------------------------- */
 
 
+/* --------------------------------------------------- */
+/* ----- Fonts --------------------------------------- */
+@font-face {
+    font-family: 'CreteRoundItalic';
+    src: url('/style/CreteRound-Italic-webfont.eot');
+    src: url('/style/CreteRound-Italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/style/CreteRound-Italic-webfont.woff') format('woff'),
+         url('/style/CreteRound-Italic-webfont.ttf') format('truetype'),
+         url('/style/CreteRound-Italic-webfont.svg#CreteRoundItalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'CreteRoundRegular';
+    src: url('/style/CreteRound-Regular-webfont.eot');
+    src: url('/style/CreteRound-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/style/CreteRound-Regular-webfont.woff') format('woff'),
+         url('/style/CreteRound-Regular-webfont.ttf') format('truetype'),
+         url('/style/CreteRound-Regular-webfont.svg#CreteRoundRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+/* --------------------------------------------------- */
+
 
 /* --------------------------------------------------- */
 /* ----- Body and other major elements ----- */
@@ -306,7 +332,7 @@ body {  background:#4d4d4d;  }
           border-radius: 4px;
 }
 /* ----------------------------------------------------------------------- testing ----------------------------------------------------------------------------- */
-.pageContentWrapper.Microblog #divBlogPost input {
+.pageContentWrapper.Microblog #divBlogPost input,textarea {
   font-family: "CreteRoundRegular", serif;
 }
 .pageContentWrapper.Microblog #divBlogPost #divPostIt input {  font-size:120%;  }

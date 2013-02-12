@@ -290,7 +290,6 @@ a {  color:#059;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostIt {  float:right;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostSubmit #chkTweet {  display:none;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostText #txtContent {
-  font-family: "CreteRoundRegular", serif;
   font-size:150%;
   line-height:130%;
   margin-top:10px;
@@ -469,7 +468,7 @@ a {  color:#059;  }
 }
 #mdlFeedImport #btnFeedImportSubmit {  margin-left:8px;  }
 /* ----------------------------------------------------------------------- testing ----------------------------------------------------------------------------- */
-.pageContentWrapper.Microblog #divBlogPost input {
+.pageContentWrapper.Microblog #divBlogPost input, textarea {
   font-family: "CreteRoundRegular", serif;
 }
 .pageContentWrapper.Microblog #divBlogPost #divPostIt input {  font-size:120%;  }

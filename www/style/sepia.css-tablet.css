@@ -184,13 +184,28 @@ body {
           border-radius: 4px;
 }
 .pageContentWrapper.Articles #divPageArticle #article {
-  font-family: Georgia, sans-serif;
+  font-family: "CreteRoundRegular", serif;
   font-size: 130%;
   line-height: 150%;
   background-color: #FBF0D9;
   color: #5F4B32;
   padding: 15px;
   padding-top: 10px;
+}
+.pageContentWrapper.Articles #divPageArticle #article #source {
+  font-size:80%;
+  text-align:right;
+  border-bottom:solid grey 1px;
+  margin-bottom:10px;
+}
+.pageContentWrapper.Articles #divPageArticle #article #headline {
+  margin-bottom:20px;
+}
+.pageContentWrapper.Articles #divPageArticle #article #content p {
+  font-family: "CreteRoundRegular", serif;
+  font-size: 18px;
+  line-height: 20px;
+  margin-bottom: 20px;
 }
 .pageContentWrapper.Articles #divPageArticle #article #headline {  font-size:80%; margin-bottom:20px;  }
 .pageContentWrapper.Articles #divPageArticle #article #content img {  max-width:500px;  }

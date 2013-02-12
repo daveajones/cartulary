@@ -318,6 +318,10 @@ body {
           border-radius: 4px;
 }
 /* ----------------------------------------------------------------------- testing ----------------------------------------------------------------------------- */
+.pageContentWrapper.Microblog #divBlogPost input {
+  font-family: "CreteRoundRegular", serif;
+}
+.pageContentWrapper.Microblog #divBlogPost #divPostIt input {  font-size:120%;  }
 #divPostList .noposts {
   position: relative;
   margin-top:10px;

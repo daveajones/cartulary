@@ -6,11 +6,34 @@
 
 
 /* --------------------------------------------------- */
-/* ----- Body and other major elements ----- */
-body {
-  font-family:sans-serif;
-}
+/* ----- Fonts --------------------------------------- */
+@font-face {
+    font-family: 'CreteRoundItalic';
+    src: url('/style/CreteRound-Italic-webfont.eot');
+    src: url('/style/CreteRound-Italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/style/CreteRound-Italic-webfont.woff') format('woff'),
+         url('/style/CreteRound-Italic-webfont.ttf') format('truetype'),
+         url('/style/CreteRound-Italic-webfont.svg#CreteRoundItalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
 
+}
+@font-face {
+    font-family: 'CreteRoundRegular';
+    src: url('/style/CreteRound-Regular-webfont.eot');
+    src: url('/style/CreteRound-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/style/CreteRound-Regular-webfont.woff') format('woff'),
+         url('/style/CreteRound-Regular-webfont.ttf') format('truetype'),
+         url('/style/CreteRound-Regular-webfont.svg#CreteRoundRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+/* --------------------------------------------------- */
+
+
+/* --------------------------------------------------- */
+/* ----- Body and other major elements ----- */
 body > .container {
   width:90%;
   margin-left:auto;
@@ -106,8 +129,7 @@ a {  color:#059;  }
   word-break:hyphenate;
 }
 .pageContentWrapper.River #stream .section > .article + .article {
-  border-top:solid #ccc 1px;
-  padding:20px 20px 8px;
+  padding:10px 20px 8px;
   word-wrap:break-word;
   word-break:hyphenate;
 }
@@ -208,7 +230,7 @@ a {  color:#059;  }
           border-radius: 4px;
 }
 .pageContentWrapper.Articles #divPageArticle #article {
-  font-family: "Crete Round", serif;
+  font-family: "CreteRoundRegular", serif;
   font-size: 130%;
   line-height: 150%;
   background-color: #FBF0D9;
@@ -216,9 +238,20 @@ a {  color:#059;  }
   padding: 15px;
   padding-top: 10px;
 }
-.pageContentWrapper.Articles #divPageArticle #article #headline {
+.pageContentWrapper.Articles #divPageArticle #article #source {
   font-size:80%;
+  text-align:right;
+  border-bottom:solid grey 1px;
+  margin-bottom:10px;
+}
+.pageContentWrapper.Articles #divPageArticle #article #headline {
   margin-bottom:20px;
+}
+.pageContentWrapper.Articles #divPageArticle #article #content p {
+  font-family: "CreteRoundRegular", serif;
+  font-size: 18px;
+  line-height: 20px;
+  margin-bottom: 20px;
 }
 .pageContentWrapper.Articles #divPageArticle #article #content img {  max-width:500px;  }
 .pageContentWrapper.Articles #divPageArticle #article #content iframe {  max-width:500px;  }
@@ -257,7 +290,7 @@ a {  color:#059;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostIt {  float:right;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostSubmit #chkTweet {  display:none;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostText #txtContent {
-  font-family: "Crete Round", serif;
+  font-family: "CreteRoundRegular", serif;
   font-size:150%;
   line-height:130%;
   margin-top:10px;
@@ -387,7 +420,7 @@ a {  color:#059;  }
   list-style:none;
 }
 .pageContentWrapper.Microblog #divPostList li {
-  font-family: "Crete Round", serif;
+  font-family: "CreteRoundRegular", serif;
   padding:10px;
   margin-bottom:20px;
   background-color:#ddd;

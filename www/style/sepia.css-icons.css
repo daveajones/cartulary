@@ -4,6 +4,8 @@
 .icon-book { background:url('/images/glyph/glyphicons_071_book.png') 6px 6px no-repeat; width:60px; height:60px; border:0; margin-right:8px; }
 .icon-book-small { background:url('/images/glyph/glyphicons_halflings_042_book.png') 0px 5px no-repeat; width:20px; height:20px; border:0; outline:none; }
 .icon-remove { background:url('/images/glyph/glyphicons_197_remove.png') 3px 3px no-repeat; width:30px; height:30px; border:0; margin-right:8px; }
+.icon-remove-1 { display:inline-block; background:url('/images/glyph/glyphicons_halflings_086_remove.png') 3px 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
+.icon-remove-small { display:inline-block; background:url('/images/glyph/glyphicons_halflings_086_remove.png') 3px 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .icon-share { background:url('/images/glyph/glyphicons_222_share.png') 6px 6px no-repeat; width:60px; height:60px; border:0; margin-right:8px; }
 .icon-rss { display:inline-block; background:url('/images/glyph/glyphicons_397_rss.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
 .icon-html { display:inline-block; background:url('/images/glyph/glyphicons_329_web_browser.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
@@ -11,7 +13,7 @@
 .icon-import { display:inline-block; background:url('/images/glyph/glyphicons_417_rss-import.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
 .icon-twitter { display:inline-block; background:url('/images/glyph/glyphicons_391_twitter_t.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
 .icon-notwitter { display:inline-block; background:url('/images/glyph/glyphicons_391_twitter_t_invert.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
-.icon-attach { display:inline-block; background:url('/images/glyph/glyphicons_062_attach.png') 0 0 no-repeat; width: 54px; height:54px; border:none; outline:none; }
+.icon-attach { display:inline-block; background:url('/images/glyph/glyphicons_062_attach.png') 3px 3px no-repeat; width: 30px; height:30px; border:none; outline:none; }
 .icon-folder { display:inline-block; background:url('/images/glyph/glyphicons_halflings_117_folder_open.png') 0 6px no-repeat; width: 20px; height:20px; border:none;  outline:none; }
 .icon-retweet { display:inline-block; background:url('/images/glyph/glyphicons_halflings_114_retweet.png') 0 7px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .icon-retweet-1 { display:inline-block; background:url('/images/glyph/glyphicons_080_retweet.png') 3px 5px no-repeat; width:30px; height:30px; border:none; outline:none; }
@@ -25,9 +27,9 @@
 .icon-feed-unsticky { display:inline-block; background:url('/images/glyph/glyphicons_halflings_083_circle_ok.png') 3px 3px no-repeat; width: 20px; height:20px; border:none;  outline:none; }
 .icon-feed-sticky { display:inline-block; background:url('/images/glyph/glyphicons_halflings_087_ok.png') 3px 3px no-repeat; width: 20px; height:20px; border:none;  outline:none; }
 .icon-feed-raw { display:inline-block; background:url('/images/glyph/glyphicons_halflings_031_list-alt.png') 0 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
+.icon-extlink-1 { display:inline-block; background:url('/images/glyph/glyphicons_halflings_065_share.png') 3px 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .icon-extlink-small { display:inline-block; background:url('/images/glyph/glyphicons_halflings_065_share.png') 3px 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .icon-arrow-right { display:inline-block; background:url('/images/glyph/glyphicons_halflings_091_arrow-right.png') 3px 5px no-repeat; width:20px; height:20px; border:none; outline:none; }
-.icon-remove-small { display:inline-block; background:url('/images/glyph/glyphicons_halflings_086_remove.png') 3px 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .icon-list-small { display:inline-block; background:url('/images/glyph/glyphicons_halflings_031_list.png') 3px 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .icon-text-height { display:inline-block; background:url('/images/glyph/glyphicons_halflings_049_text_height.png') 0 2px no-repeat; width: 20px; height:20px; border:none;  outline:none; }
 .icon-text-width { display:inline-block; background:url('/images/glyph/glyphicons_halflings_050_text_width.png') 0 2px no-repeat; width: 20px; height:20px; border:none;  outline:none; }

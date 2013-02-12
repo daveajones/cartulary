@@ -8,17 +8,19 @@ function loadPostList(elDiv, elTemplate) {
               $(elTemplate).tmpl(data.data).appendTo(elDiv);
               bindDeletePost('.aDeletePost');
 
-      //Go masonry
-      $(function(){
-        var $container = $('div.postList');
-        $container.imagesLoaded(function(){
-          $container.masonry({
-            itemSelector : '.postItem',
-            isFitWidth   : true
-          });
-        });
-      });
-
+              //Go masonry
+              <?if($platform != "mobile") {?>
+      	      $(function(){
+       		var $container = $('div.postList');
+       		$container.imagesLoaded(function(){
+                  $container.masonry({
+            	    itemSelector : '.postItem',
+            	    isFitWidth   : true
+          	  });
+        	});
+      	      });
+              <?}?>
+		
           } else {
               $(elDiv).append("<p>Error retrieving JSON data: [" + data.description + "]</p>");
           }
@@ -31,7 +33,7 @@ function loadPostList(elDiv, elTemplate) {
 function bindDeletePost(elDeleteLink) {
     $(elDeleteLink).click(function() {
         var postId = $(this).attr("data-id");
-        var postTitle = $(this).parent().parent().attr("data-title");
+        var postTitle = $(this).parent().parent().parent().attr("data-title");
         if( confirm("Do you really want to delete '" + postTitle + "'?") == false ) return false;
         $('#divPostList ul li#' + postId).css({"text-decoration":"line-through"});
         $.getJSON("/cgi/in/delete.post?postId="+postId, function(data) {

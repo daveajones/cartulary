@@ -37,10 +37,10 @@
               <div class="postFooter">
 	      <span class="postDate">${prettyDate(post.createdon * 1000)}</span>
               <span class="postControls">
-  	          <a class="aDeletePost" data-id="${post.id}" href="#" title="Delete Post"><img class="icon-remove-small" src="/images/blank.gif" alt="" /></a>
-                  {{if post.shorturl}}<a href="${post.shorturl}"><img class="icon-extlink-small" src="/images/blank.gif" alt="" /></a>
+  	          <a class="aDeletePost" data-id="${post.id}" href="#" title="Delete Post"><img class="icon-remove-1" src="/images/blank.gif" alt="" /></a>
+                  {{if post.shorturl}}<a href="${post.shorturl}"><img class="icon-extlink-1" src="/images/blank.gif" alt="" /></a>
                   {{else}}
-		    {{if isBlank(post.url) == false}}<a href="${post.url}"><img class="icon-extlink-small" src="/images/blank.gif" alt="" /></a>{{/if}}
+		    {{if isBlank(post.url) == false}}<a href="${post.url}"><img class="icon-extlink-1" src="/images/blank.gif" alt="" /></a>{{/if}}
 		  {{/if}}
               </span>
 	      </div>

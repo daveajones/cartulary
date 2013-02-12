@@ -7,9 +7,18 @@ function loadPostList(elDiv, elTemplate) {
               $(elDiv).empty();
               $(elTemplate).tmpl(data.data).appendTo(elDiv);
               bindDeletePost('.aDeletePost');
-              //bindResetUser('.aResetUser');
-              //bindEditUser('.aEditUser');
-              //ajaxFormEditUser('.frmEditUser');
+
+      //Go masonry
+      $(function(){
+        var $container = $('div.postList');
+        $container.imagesLoaded(function(){
+          $container.masonry({
+            itemSelector : '.postItem',
+            isFitWidth   : true
+          });
+        });
+      });
+
           } else {
               $(elDiv).append("<p>Error retrieving JSON data: [" + data.description + "]</p>");
           }
@@ -260,4 +269,5 @@ $(document).ready( function() {
 		if( $('#txtLink').val() != '') {
 			linkExtraction = false;
 		}
+               
 });

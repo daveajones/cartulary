@@ -472,6 +472,8 @@ a {  color:#059;  }
   font-family: "CreteRoundRegular", serif;
 }
 .pageContentWrapper.Microblog #divBlogPost #divPostIt input {  font-size:120%;  }
+#divPostList {  margin-top:20px;  }
+.postList {  margin:0 auto;  }
 #divPostList .noposts {
   position: relative;
   margin-top:10px;
@@ -483,8 +485,6 @@ a {  color:#059;  }
      -moz-border-radius: 4px;
           border-radius: 4px;
 }
-#divPostList {  margin-top:20px;  }
-.postList {  margin:0 auto;  }
 .postList .postItem {
   float:left;
   margin:10px;
@@ -492,6 +492,16 @@ a {  color:#059;  }
   font-family: "CreteRoundRegular", serif;
   font-size: 130%;
   line-height: 130%;
+  word-wrap:break-word;
+  word-break:hyphenate;
+}
+.postList .toolPanel {
+  padding-top:0;
+  padding-bottom:0;
+  background-color:transparent;
+  border:none;
+  width:312px;
+  color:black;
 }
 .postList .postItemComplex {
   width:680px;
@@ -501,9 +511,8 @@ a {  color:#059;  }
   max-width:100%;
   max-height:200px;
 }
-.postList .postItem a {
+.postList .postItem .divPostListEnclosures a {
   font-size:80%;
-  color:#003;
 }
 .postList .postItem .spnPostControls {
   float:left;

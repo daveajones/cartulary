@@ -1,6 +1,17 @@
   <div id="ulPostList" class="postList">
   {{if posts.length < 1}}
     <center class="noposts">You haven't posted anything. Why not?</center>
+  {{else}}
+    <div class="postItem well toolPanel">
+      Microblog Shortcuts:
+      <br/><br/>
+      <center>
+        <a class="rss" href="<?if(!empty($s3blogfeed)) { echo $s3blogfeed; } else { echo $microblogpage."-rss"; }?>" label="RSS"><img class="icon-rss" src="/images/blank.gif" alt="" /></a>
+        <a class="html" href="<?if(!empty($s3bloghtml)) { echo $s3bloghtml; } else { echo $microblogpage."-html"; }?>" label="HTML"><img class="icon-html" src="/images/blank.gif" alt="" /></a>
+        <a class="opml" href="<?if(!empty($s3blogopml)) { echo $s3blogopml; } else { echo $microblogpage."-opml"; }?>" label="OPML"><img class="icon-opml" src="/images/blank.gif" alt="" /></a>
+        <a class="import" href="#mdlFeedImport" data-toggle="modal" label="Import Feed"><img class="icon-import" src="/images/blank.gif" alt="" /></a>
+      </center>
+    </div>
   {{/if}}
   {{each(p, post) posts}}
 	<div id="${post.id}" data-title="{{if isBlank(post.title)}}${getShortTitle(post.content)}{{else}}${post.title}{{/if}}" class="postItem well {{if isBlank(post.title) == false}}postItemComplex{{/if}}">
@@ -12,7 +23,7 @@
                   {{if enclosure && enclosure.length > 0}}<div class="divPostListEnclosures">{{/if}}
                   {{each(e, enc) enclosure}}
 		    {{if isImage(enc.url)}}<a href="${enc.url}" title="Hover to embiggen. Click to open."><img class="mbthumbnail" src="${enc.url}" /></a>
-		    {{else}}<a href="${enc.url}" title="Click to open.">Download Enclosure</a>
+		    {{else}} - <a href="${enc.url}" title="Click to open.">Download Enclosure</a>
                     {{/if}}
 		  {{/each}}
                   {{if enclosure && enclosure.length > 0}}</div>{{/if}}
@@ -26,7 +37,7 @@
                   {{if enclosure && enclosure.length > 0}}<div class="divPostListEnclosures">{{/if}}
 		  {{each(e, enc) enclosure}}
 		    {{if isImage(enc.url)}}<a href="${enc.url}" title="Hover to embiggen. Click to open."><img class="mbthumbnail" src="${enc.url}" /></a>
-		     {{else}}<a href="${enc.url}" title="Click to open.">Download Enclosure</a>
+		     {{else}} - <a href="${enc.url}" title="Click to open.">Download Enclosure</a>
                      {{/if}}
 		  {{/each}}
                   {{if enclosure && enclosure.length > 0}}</div>{{/if}}

@@ -68,8 +68,7 @@
 <?include "$confroot/$templates/$template_html_menubar"?>
 
 <div class="row page-header" id="divPageTitle">
-	<h1><?echo $tree_location?> <a class="rss" href="<?if(!empty($s3blogfeed)) { echo $s3blogfeed; } else { echo $microblogpage."-rss"; }?>" label="RSS"><img class="icon-rss" src="/images/blank.gif" alt="" /></a><a class="html" href="<?if(!empty($s3bloghtml)) { echo $s3bloghtml; } else { echo $microblogpage."-html"; }?>" label="HTML"><img class="icon-html" src="/images/blank.gif" alt="" /></a><a class="opml" href="<?if(!empty($s3blogopml)) { echo $s3blogopml; } else { echo $microblogpage."-opml"; }?>" label="OPML"><img class="icon-opml" src="/images/blank.gif" alt="" /></a><a class="import" href="#mdlFeedImport" data-toggle="modal" label="Import Feed"><img class="icon-import" src="/images/blank.gif" alt="" /></a>
-            <small><span id="message"></span></small>
+	<h1><?echo $tree_location?><small><span id="message"></span></small>
         </h1>
 </div>
 

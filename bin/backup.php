@@ -4,6 +4,14 @@
   //Let's not run twice
   if(($pid = cronHelper::lock()) !== FALSE) {
 
+	//Reset logs
+	$fp = fopen("$confroot/$log/$acclog", "w");
+	fclose($fp);
+	$fp = fopen("$confroot/$log/$errlog", "w");
+	fclose($fp);
+	$fp = fopen("$confroot/$log/$dbglog", "w");
+	fclose($fp);
+
         //Is s3 enabled and a backup bucket specified?
         if( !sys_s3_is_enabled() ) {
   		loggit(3, "System level S3 not enabled in conf file.");

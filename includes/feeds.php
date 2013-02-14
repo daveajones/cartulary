@@ -3982,30 +3982,8 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 
     }
 
-/*    //Properly fill the item's body text
-    $media_tags = extract_media($description);
-    $description = str_replace(array('&lt;','&gt;','&nbsp;'), array('<','>',' '), $description);
-    $description = strip_tags($description, '<p><br><hr><h1><h2><h3><h4>'); //Strip all html comments and tags except these
-    $description = stripAttributes($description, array('src','type'));
     if($prefs['fulltextriver'] == 0) {
-      $description = truncate_html($description, 100);
-    }
-    //$description = preg_replace("/\r+/g", "", $description); //Strip carriage returns
-
-    $description = preg_replace("/\ \ +/", " ", $description); //Replace continuous whitespace with just one space
-    $description = str_replace(array('<p>',  '<p >',  '</p>', '<br>',  '<br/>', '<br />', '<hr>', '<hr/>', '<hr />',
-                                     '<h1>', '</h1>', '<h2>', '</h2>', '<h3>',  '</h3>',  '<h4>', '</h4>'
-    ), "\n\n", $description);
-    $description = preg_replace('/\t+/', '', $description); //Get rid of tabs
-    $description = preg_replace("/\ ?\n\n\ ?/", "\n\n", $description);
-    $description = preg_replace("/\n \n/", "\n\n", $description);
-    $description = preg_replace("/[\r\n]\n+/", "\n\n", $description);
-    $description = preg_replace("/\>[\r\n]+/", ">", $description);
-    $itembody = trim($description.$media_tags);
-*/
-
-    if($prefs['fulltextriver'] == 0) {
-      $itembody = truncate_text($description, 300);
+      $itembody = truncate_text($description, 300)."...";
     } else {
       $itembody = $description;
     }
@@ -4448,7 +4426,7 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
     }
 
     //Body text of item
-    $itembody = truncate_text($description, 300);
+    $itembody = truncate_text($description, 512)."...";
 
     //Fill in the details of this item
     $river[$fcount]['item'][$icount] = array(
@@ -4693,6 +4671,7 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
 
 
 //_______________________________________________________________________________________
+// ***** under construction ******
 //Build a server-wide rss feed
 function build_server_rss_feed($max = NULL)
 {
@@ -4702,11 +4681,7 @@ function build_server_rss_feed($max = NULL)
 
   //Get a proper max value
   if($max == NULL) {
-    if( !empty($prefs['maxlist']) ) {
-      $max = $prefs['maxlist'];
-    } else {
       $max = $default_max_rss_items;
-    }
   }
 
   //Get the right timezone

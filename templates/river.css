@@ -909,7 +909,7 @@ img.avatarheader {  float:right; max-height: 64px;  }
   margin-right:auto;
   margin-top:10px;
 }
-.pageContentWrapper.River #stream {  max-width: 900px; padding:1px;  }
+.pageContentWrapper.River #stream {  max-width: 600px; padding:1px;  }
 .pageContentWrapper.River #stream .notice {  color:white;  }
 .pageContentWrapper.River #stream-header {  display:none;  }
 .pageContentWrapper.River #stream .section {
@@ -927,6 +927,7 @@ img.avatarheader {  float:right; max-height: 64px;  }
   white-space: pre-line;
 }
 .pageContentWrapper.River #stream .section > .article {
+  white-space: pre-line;
   padding:20px 20px 8px;
   word-wrap:break-word;
   word-break:hyphenate;

@@ -152,6 +152,22 @@ a {  color:#059;  }
   margin:20px auto 10px;
   max-width: 500px;
 }
+.pageContentWrapper.River #stream .section .encpicture2 {
+  margin:20px auto 10px;
+  max-width: 49%;
+}
+.pageContentWrapper.River #stream .section .encpicture3 {
+  margin:20px auto 10px;
+  max-width: 29%;
+}
+.pageContentWrapper.River #stream .section .encpicture4 {
+  margin:20px auto 10px;
+  max-width: 24%;
+}
+.pageContentWrapper.River #stream .section .encpictures {
+  margin:20px auto 10px;
+  max-width: 100px;
+}
 .pageContentWrapper.River #stream .section .riverminitar { 
   float:right;
   max-height:64px;

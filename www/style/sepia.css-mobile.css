@@ -245,6 +245,7 @@ body {  background:#4d4d4d;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostSubmit #chkTweet {  display:none;  }
 .pageContentWrapper.Microblog #divBlogPost #divPostText #txtContent {
   font-size:150%;
+  line-height:120%;
   margin-top:10px;
   width:97%;
   height:130px;

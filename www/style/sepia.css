@@ -486,6 +486,7 @@ a {  color:#059;  }
 /* ----------------------------------------------------------------------- testing ----------------------------------------------------------------------------- */
 .pageContentWrapper.Microblog #divBlogPost input, textarea {
   font-family: "CreteRoundRegular", serif;
+  line-height
 }
 .pageContentWrapper.Microblog #divBlogPost #divPostIt input {  font-size:120%;  }
 #divPostList {  margin-top:20px;  }

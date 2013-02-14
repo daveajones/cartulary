@@ -1393,5 +1393,30 @@ function build_blog_script_widget($uid = NULL, $max = NULL, $archive = FALSE, $p
   return($html);
 }
 
+
+//_______________________________________________________________________________________
+//Purge blog posts that dont have any microblog catalog linkage
+function purge_orphaned_blog_posts()
+{
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Find posts that have no linkage
+  $stmt = "DELETE FROM $table_post WHERE NOT EXISTS ( SELECT * FROM $table_mbcatalog WHERE $table_post.id = $table_mbcatalog.postid )";
+  $sql=$dbh->prepare($stmt) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $delcount = $sql->affected_rows or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and leave
+  loggit(3,"Deleted: [$delcount] orphaned blog posts.");
+  return($delcount);
+}
+
+
+
 //########################################################################################
 ?>

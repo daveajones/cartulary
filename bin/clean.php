@@ -19,7 +19,8 @@
         echo "Purged $ret orphaned articles.\n";
 
 	//Clean blog posts that don't have links to them anymore
-	//purge_orphaned_blog_posts();
+	$ret = purge_orphaned_blog_posts();
+        echo "Purged $ret orphaned blog posts.\n";
 
 	//etc.
 

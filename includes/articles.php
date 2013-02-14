@@ -708,7 +708,7 @@ function unlink_article($uid = NULL, $aid = NULL)
 
 //_______________________________________________________________________________________
 //Purge article catalogs from the database that aren't linked to anyone
-function purge_orphaned_article_catalog()
+function purge_orphaned_articles()
 {
   //Includes
   include get_cfg_var("cartulary_conf").'/includes/env.php';
@@ -717,16 +717,15 @@ function purge_orphaned_article_catalog()
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
   //Find articles that have no linkage
-  $stmt = "DELETE FROM $table_catalog WHERE userid=? AND articleid=?";
+  $stmt = "DELETE FROM $table_article WHERE NOT EXISTS ( SELECT * FROM $table_catalog WHERE $table_article.id = $table_catalog.articleid )";
   $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $uid, $aid) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $delcount = $sql->affected_rows or print(mysql_error());
   $sql->close() or print(mysql_error());
 
   //Log and leave
-  loggit(1,"Deleted: [$delcount] article: [$aid] from user: [$uid].");
-  return(TRUE);
+  loggit(3,"Deleted: [$delcount] orphaned articles.");
+  return($delcount);
 }
 
 

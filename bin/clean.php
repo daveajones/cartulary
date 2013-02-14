@@ -10,7 +10,18 @@
 
 
   	//Clean session table
-        purge_old_sessions( $tstart - 345600 );
+        $ret = purge_old_sessions( $tstart - 345600 );
+        echo "Purged $ret old sessions.\n";
+
+
+	//Clean articles that don't have links to them anymore
+	$ret = purge_orphaned_articles();
+        echo "Purged $ret orphaned articles.\n";
+
+	//Clean blog posts that don't have links to them anymore
+	//purge_orphaned_blog_posts();
+
+	//etc.
 
 	//Clean spool directory
         $spooldir = "$confroot/$cg_folder_spool/";

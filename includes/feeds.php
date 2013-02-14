@@ -3411,7 +3411,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $description = $item->summary;
     if( isset($item->content) ) {
       $description = (string)$item->content;
-      loggit(3, "DEBUG - ATOM content: [".print_r($item->content, TRUE)."].");
+      //loggit(3, "DEBUG - ATOM content: [".print_r($item->content, TRUE)."].");
     }
 
     //Find links and enclosures
@@ -3454,12 +3454,12 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       $esize = "";
       if( $mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video' ) {
         $esize = check_head_size($mediatag['src']);
-        loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
+        //loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
       }
       if( empty($esize) || $esize > 2500) {
         $enclosures[] = array( 'url' => $mediatag['src'], 'length' => $esize, 'type' => $mediatag['type'] );
       } else {
-        loggit(3, "  DISCARDING TINY ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
+        //loggit(3, "  DISCARDING TINY ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
     }
 
@@ -3588,12 +3588,12 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       $esize = "";
       if( $mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video' ) {
         $esize = check_head_size($mediatag['src']);
-        loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
+        //loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
       }
       if( empty($esize) || $esize > 3000) {
         $enclosures[] = array( 'url' => $mediatag['src'], 'length' => $esize, 'type' => $mediatag['type'] );
       } else {
-        loggit(3, "  DISCARDING TINY ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
+        //loggit(3, "  DISCARDING TINY ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
     }
 

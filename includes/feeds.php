@@ -3408,6 +3408,12 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     //-----ATOM--------------------------------------------------------------------------------------------------------------------------------------------------
     $mcount = count($item->link);
 
+    $description = $item->summary;
+    if( isset($item->content) ) {
+      $description = (string)$item->content;
+      loggit(3, "DEBUG - ATOM content: [".print_r($item->content, TRUE)."].");
+    }
+
     //Find links and enclosures
     $linkurl = "#";
     $enclosures = array();
@@ -3426,7 +3432,6 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         //loggit(3, "Item struct: [".print_r($item, true)."].");
       }
     }
-    $enclosure = serialize($enclosures);
 
     //Fix up twitter links
     if(strpos($linkurl, 'twitter.com') !== FALSE) {
@@ -3440,17 +3445,43 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 	}
     }
 
+    //Clean the incoming description
+    $cleaned = clean_feed_item_content($description, 0, TRUE, TRUE);
+    $description = $cleaned['text'];
+
+    //Attach extracted media tags as enclosures with correct type
+    foreach( $cleaned['media'] as $mediatag ) {
+      $esize = "";
+      if( $mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video' ) {
+        $esize = check_head_size($mediatag['src']);
+        loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
+      }
+      if( empty($esize) || $esize > 2500) {
+        $enclosures[] = array( 'url' => $mediatag['src'], 'length' => $esize, 'type' => $mediatag['type'] );
+      } else {
+        loggit(3, "  DISCARDING TINY ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
+      }
+    }
+
+    //Serialize enclosures
+    $enclosure = serialize($enclosures);
+
     //De-relativize links
     $httploc = strpos($linkurl, 'http');
     if( $httploc === FALSE || $httploc > 1 ) {
         $linkurl = '';
     }
 
+    //debug
+    //loggit(3, "NEW ITEM - CLEANED: ".print_r($cleaned, TRUE) );
+    //loggit(3, "NEW ITEM - TEXT: ".print_r($description, TRUE) );
+    //loggit(3, "NEW ITEM - ENCLOSURES: ".print_r($enclosures, TRUE) );
+
     $sourceurl="";
     $sourcetitle="";
     $author="";
 
-    $sql->bind_param("ssssssssssss", $id,$fid,$item->title,$linkurl,$item->summary,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author) or print(mysql_error());
+    $sql->bind_param("ssssssssssss", $id,$fid,$item->title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author) or print(mysql_error());
   } else {
     //-----RSS----------------------------------------------------------------------------------------------------------------------------------------------------
     $linkurl = $item->link;
@@ -3548,8 +3579,32 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         $linkurl = '';
     }
 
+    //Clean the incoming description
+    $cleaned = clean_feed_item_content($description, 0, TRUE, TRUE);
+    $description = $cleaned['text'];
+
+    //Attach extracted media tags as enclosures with correct type
+    foreach( $cleaned['media'] as $mediatag ) {
+      $esize = "";
+      if( $mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video' ) {
+        $esize = check_head_size($mediatag['src']);
+        loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
+      }
+      if( empty($esize) || $esize > 3000) {
+        $enclosures[] = array( 'url' => $mediatag['src'], 'length' => $esize, 'type' => $mediatag['type'] );
+      } else {
+        loggit(3, "  DISCARDING TINY ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
+      }
+    }
+
     //Serialize the enclosure array
     $enclosure = serialize($enclosures);
+
+    //debug
+    //loggit(3, "NEW ITEM - CLEANED: ".print_r($cleaned, TRUE) );
+    //loggit(3, "NEW ITEM - TEXT: ".print_r($description, TRUE) );
+    //loggit(3, "NEW ITEM - ENCLOSURES: ".print_r($enclosures, TRUE) );
+
 
     $sql->bind_param("ssssssssssss", $id,$fid,$item->title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author) or print(mysql_error());
   }
@@ -3927,12 +3982,13 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 
     }
 
-    //Properly fill the item's body text
+/*    //Properly fill the item's body text
+    $media_tags = extract_media($description);
     $description = str_replace(array('&lt;','&gt;','&nbsp;'), array('<','>',' '), $description);
-    $description = strip_tags($description, '<p><br><hr><h1><h2><h3><h4><img><video><audio><iframe>'); //Strip all html comments and tags except these
+    $description = strip_tags($description, '<p><br><hr><h1><h2><h3><h4>'); //Strip all html comments and tags except these
     $description = stripAttributes($description, array('src','type'));
     if($prefs['fulltextriver'] == 0) {
-      $description = truncate_html($description, 150);
+      $description = truncate_html($description, 100);
     }
     //$description = preg_replace("/\r+/g", "", $description); //Strip carriage returns
 
@@ -3945,8 +4001,14 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     $description = preg_replace("/\n \n/", "\n\n", $description);
     $description = preg_replace("/[\r\n]\n+/", "\n\n", $description);
     $description = preg_replace("/\>[\r\n]+/", ">", $description);
-    $itembody = trim($description);
+    $itembody = trim($description.$media_tags);
+*/
 
+    if($prefs['fulltextriver'] == 0) {
+      $itembody = truncate_text($description, 300);
+    } else {
+      $itembody = $description;
+    }
 
     //Fill in the details of this item
     $river[$fcount]['item'][$icount] = array(

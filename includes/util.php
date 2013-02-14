@@ -247,6 +247,132 @@ function truncate_html($html, $max_words) {
 }
 
 
+//Extract img, video, audio and iframe tags from a piece of html
+function extract_media($html) {
+  $media_tags = array();
+  $idx = 0;
+
+  $dom = new DOMDocument;
+  $dom->loadHTML(tidy_repair_string($html));
+
+  $tags = $dom->getElementsByTagName('img');
+  foreach($tags as $tag) {
+    $src = $tag->getAttribute('src');
+    if( strpos($src, 'http') === 0 ) {
+    $media_tags[$idx] = array( 'tag'  => 'img',
+                               'type' => 'image',
+                               'src'  => trim($src),
+			       'raw'  => "<img src=\"$src\" />" );
+    $idx++;
+    }
+  }
+
+  $tags = $dom->getElementsByTagName('audio');
+  foreach($tags as $tag) {
+    $src = $tag->getAttribute('src');
+    if( strpos($src, 'http') === 0 ) {
+    $media_tags[$idx] = array( 'tag' =>  'audio',
+                               'type' => 'audio',
+                               'src' =>  trim($src),
+			       'raw' =>  "<audio src=\"$src\"></audio>" );
+    $idx++;
+    }
+  }
+
+  $tags = $dom->getElementsByTagName('video');
+  foreach($tags as $tag) {
+    $src = $tag->getAttribute('src');
+    if( strpos($src, 'http') === 0 ) {
+    $media_tags[$idx] = array( 'tag'  => 'video',
+                               'type' => 'video',
+                               'src'  => trim($src),
+			       'raw'  => "<video src=\"$src\"></video>" );
+    $idx++;
+    }
+  }
+
+  $tags = $dom->getElementsByTagName('iframe');
+  foreach($tags as $tag) {
+    $src = $tag->getAttribute('src');
+    if( strpos($src, 'http') === 0 ) {
+    $media_tags[$idx] = array( 'tag'  => 'iframe',
+                               'type' => 'text/html',
+                               'src'  => trim($src),
+			       'raw'  => "<iframe src=\"$src\"></iframe>" );
+    $idx++;
+    }
+  }
+
+
+  return($media_tags);
+}
+
+
+//Take a chunk of text or html, clean it up and make is safe for the aggregator
+function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $withmedia = TRUE)
+{
+    if( empty($content) ) {
+        if( $asarray == TRUE ) {
+          return( array('text' => '', 'media' => '') );
+        }
+        return('');
+    }
+
+    //First, extract all the media related tags
+    $media_tags = extract_media($content);
+
+    //Replace encoded html with real html
+    $content = str_replace('&amp;', '&', $content);
+    $content = str_replace(array('&lt;','&gt;','&nbsp;'), array('<','>',' '), $content);
+
+    //Strip out all the html tags except for the ones that control textual layout
+    $content = strip_tags($content, '<p><br><hr><h1><h2><h3><h4>');
+
+    //Strip the attributes from remaining tags
+    $content = stripAttributes($content);
+
+    //Replace continuous whitespace with just one space
+    $content = preg_replace("/\ \ +/", " ", $content);
+
+    //Replace all tags that would normally cause line breaks with actual line break codes
+    $content = str_replace(array('<p>',  '<p >',  '</p>', '<br>',  '<br/>', '<br />', '<hr>', '<hr/>', '<hr />',
+                                 '<h1>', '</h1>', '<h2>', '</h2>', '<h3>',  '</h3>',  '<h4>', '</h4>'), "\n\n", $content);
+
+    //Strip tab codes
+    $content = preg_replace('/\t+/', '', $content);
+
+    //Consolidate all strings of multiple linebreaks down to just 2
+    $content = preg_replace("/\ ?\n\n\ ?/", "\n\n", $content);
+    $content = preg_replace("/\n \n/", "\n\n", $content);
+    $content = preg_replace("/[\r\n]\n+/", "\n\n", $content);
+    $content = preg_replace("/\>[\r\n]+/", ">", $content);
+
+    //If a length was requested, chop it
+    if( $length > 0 ) {
+      $content = truncate_html($content, $length);
+    }
+
+
+    //Return the clean content and the media tags in an array
+    if( $asarray == TRUE ) {
+      if( $withmedia == TRUE ) {
+        return( array('text' => trim($content), 'media' => $media_tags) );
+      } else {
+        return( array('text' => trim($content)) );
+      }
+    }
+
+    //Build the string to pass back
+    if( $withmedia == TRUE ) {
+      foreach( $media_tags as $tag ) {
+  	$content .= $tag['raw'];
+      }
+    }
+
+    return(trim($content));
+}
+
+
 //Extensions to the mysqli class to allow returning fetch_assoc possible
 //See here: http://www.php.net/manual/en/mysqli-stmt.fetch.php#72720
 class mysqli_Extended extends mysqli
@@ -470,14 +596,51 @@ function check_head_lastmod($url, $timeout = 5){
 
 }
 
+//Do a HEAD request on a url to see what the Last-Modified time is
+function check_head_size($url, $timeout = 5){
+
+  //Check parameters
+  if($url == NULL) {
+    loggit(2,"The url is blank or corrupt: [$url]");
+    return(FALSE);
+  }
+
+  $url = str_replace( "feed://", "http://", $url );
+
+  $curl = curl_init();
+
+  curl_setopt($curl, CURLOPT_URL,$url);
+    //don't fetch the actual page, you only want headers
+    curl_setopt($curl, CURLOPT_NOBODY, true);
+    curl_setopt($curl, CURLOPT_HEADER, true);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
+    //stop it from outputting stuff to stdout
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, $timeout );
+    curl_setopt( $curl, CURLOPT_TIMEOUT, 30 );
+
+    $result = curl_exec($curl);
+
+    $info = curl_getinfo($curl);
+
+    if ($info['download_content_length'] != -1) { //otherwise unknown
+      return($info['download_content_length']);
+    } else {
+      return('');
+    }
+
+}
+
 function get_final_url( $url, $timeout = 5 )
 {
     $url = str_replace( "&amp;", "&", trim($url) );
     $url = str_replace( "feed://", "http://", $url );
+    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
 
     $cookie = tempnam ("/tmp", "CURLCOOKIE");
     $ch = curl_init();
-    curl_setopt( $ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1" );
+    curl_setopt( $ch, CURLOPT_USERAGENT, $ua );
     curl_setopt( $ch, CURLOPT_URL, $url );
     curl_setopt( $ch, CURLOPT_COOKIEJAR, $cookie );
     curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
@@ -495,7 +658,7 @@ function get_final_url( $url, $timeout = 5 )
     //Normal re-direct
     if ($response['http_code'] == 301 || $response['http_code'] == 302)
     {
-        ini_set("user_agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1");
+        ini_set("user_agent", $ua);
         $headers = get_headers($response['url']);
 
         $location = "";
@@ -523,17 +686,17 @@ function get_final_url( $url, $timeout = 5 )
 }
 
 /* gets the data from a URL */
-function fetchUrl($url, $timeout = 5)
+function fetchUrl($url, $timeout = 30)
 {
     $url = str_replace( "feed://", "http://", $url );
 
 	$ch = curl_init();
-	$userAgent = 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; .NET CLR 1.1.4322)';
-	curl_setopt($ch,CURLOPT_USERAGENT, $userAgent);
-	curl_setopt($ch,CURLOPT_URL,$url);
-	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-	curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
-        curl_setopt($ch,CURLOPT_TIMEOUT, 30);
+        $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+	curl_setopt($ch,CURLOPT_USERAGENT, $ua);
+	curl_setopt($ch,CURLOPT_URL, $url);
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, $timeout);
+        curl_setopt($ch,CURLOPT_TIMEOUT, $timeout);
         curl_setopt($ch,CURLOPT_ENCODING, "");
 	$data = curl_exec($ch);
         $response = curl_getinfo($ch);

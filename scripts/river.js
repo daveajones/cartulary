@@ -375,25 +375,33 @@ River.methods = (function () {
     };
 
     function _isImage(url, type) {
-        if ( type.indexOf('image') != -1 ) { 
-		return true;
-        }
+        if ( type.indexOf('image') != -1 ) {  return true;  }
+        if ( url.indexOf('.jpg')   != -1 ) {  return true;  }
+        if ( url.indexOf('.jpeg')   != -1 ) {  return true;  }
+        if ( url.indexOf('.png')   != -1 ) {  return true;  }
+        if ( url.indexOf('.gif')   != -1 ) {  return true;  }
 	
 	return false;
     };
 
     function _isAudio(url, type) {
-        if ( type.indexOf('audio') != -1 ) { 
-		return true;
-        }
+        if ( type.indexOf('audio') != -1 ) {  return true;  }
+        if ( url.indexOf('.mp3')   != -1 ) {  return true;  }
+        if ( url.indexOf('.m4a')   != -1 ) {  return true;  }
+        if ( url.indexOf('.wav')   != -1 ) {  return true;  }
+        if ( url.indexOf('.ogg')   != -1 ) {  return true;  }
+        if ( url.indexOf('.wma')   != -1 ) {  return true;  }
 	
 	return false;
     };
 
     function _isVideo(url, type) {
-        if ( type.indexOf('video') != -1 ) { 
-		return true;
-        }
+        if ( type.indexOf('video') != -1 ) {  return true;  }
+        if ( url.indexOf('.mp4')   != -1 ) {  return true;  }
+        if ( url.indexOf('.m4v')   != -1 ) {  return true;  }
+        if ( url.indexOf('.avi')   != -1 ) {  return true;  }
+        if ( url.indexOf('.mov')   != -1 ) {  return true;  }
+        if ( url.indexOf('.wmv')   != -1 ) {  return true;  }
 	
 	return false;
     };

@@ -143,7 +143,7 @@
                     if( $lastencurl != $extenclosure['url'] ) {
 		      $lastencurl = $extenclosure['url'];
             	      ?><li><a href="#" class="aRemoveListItem"><img class="icon-remove-small" src="/images/blank.gif" /></a>
-		      <?if( url_is_a_picture($extenclosure['url']) ) {?>
+		      <?if( url_is_a_picture($extenclosure['url']) || strpos($extenclosure['type'], "image") !== FALSE ) {?>
                       <img class="imgenclosure" src="<?echo $extenclosure['url']?>" />
                       <?}?>
                       External Enclosure:<br/>

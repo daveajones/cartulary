@@ -352,30 +352,56 @@ River.methods = (function () {
 	return false;
     };
 
-    function _isImage(url) {
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.jpg') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.jpeg') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.png') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.gif') != -1 && url.indexOf('http') == 0 ) { return true; }
+    function _convertEnclosure(url, type) {
+	if( type.indexOf('image') != -1 ) { return true; }
+
+    }
+
+    function _urlNotRelative(url) {
+        if ( url.indexOf(systemUrl) == -1 && url.indexOf('http') == 0 ) { return true; }
+
+        return false;
+    };
+
+    function _countEnclosuresOfType(enclosures, typecheck) {
+	var cnt = 0;
+        $.each(enclosures, function() {
+	        if ( this.type.indexOf(typecheck) != -1 ) { 
+			cnt++;
+        	}
+	});
+	
+	return cnt;
+    };
+
+    function _isImage(url, type) {
+        if ( type.indexOf('image') != -1 ) { 
+		return true;
+        }
 	
 	return false;
     };
 
-    function _isAudio(url) {
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.mp3') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.m4a') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.wav') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.ogg') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.wmv') != -1 && url.indexOf('http') == 0 ) { return true; }
+    function _isAudio(url, type) {
+        if ( type.indexOf('audio') != -1 ) { 
+		return true;
+        }
 	
 	return false;
     };
 
-    function _isVideo(url) {
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.mp4') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.avi') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.mov') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.m4v') != -1 && url.indexOf('http') == 0 ) { return true; }
+    function _isVideo(url, type) {
+        if ( type.indexOf('video') != -1 ) { 
+		return true;
+        }
+	
+	return false;
+    };
+
+    function _isIframe(url, type) {
+        if ( type.indexOf('text/html') != -1 ) {
+		return true;
+        }
 	
 	return false;
     };
@@ -404,9 +430,9 @@ River.methods = (function () {
 
 	var imgs = ehtml.getElementsByTagName("img");
 	for( var i=0 ; i < imgs.length ; i++ ){
-	    //if( _isImage(imgs[i].src) ) {
+	    if( _urlNotRelative(imgs[i].src) ) {
 		return(imgs[i].src);
-	    //}
+	    }
 	}
 
 	return(false);
@@ -421,7 +447,7 @@ River.methods = (function () {
 	    var vid=vids[i];
 
             if ( vid.hasAttribute('src') ) {
-	    	if ( vid.src.indexOf(systemUrl) == -1 && vid.src.indexOf('.m4v') != -1 ) { 
+	    	if ( _urlNotRelative(vid.src) ) { 
 	    		return(vid.src);
             	}
             }
@@ -429,7 +455,35 @@ River.methods = (function () {
 	    var sources=vid.getElementsByTagName("source");
             for(var n=0;n<sources.length;n++){
 	    	var source=sources[n];
-	        if ( vid.src.indexOf(systemUrl) == -1 && source.src.indexOf('.m4v') != -1 ) { 
+	        if ( _urlNotRelative(vid.src) ) { 
+	            return(source.src);
+            	} else {
+		    return(false);
+                }  
+	    }
+	}
+
+        return(false);
+    }
+
+    function _getAudios(html) {
+        var ehtml = document.createElement('div');
+        ehtml.innerHTML = html;
+
+	var vids = ehtml.getElementsByTagName("audio");
+	for(var i=0;i<vids.length;i++){
+	    var vid=vids[i];
+
+            if ( vid.hasAttribute('src') ) {
+	    	if ( _urlNotRelative(vid.src) ) { 
+	    		return(vid.src);
+            	}
+            }
+
+	    var sources=vid.getElementsByTagName("source");
+            for(var n=0;n<sources.length;n++){
+	    	var source=sources[n];
+	        if ( _urlNotRelative(vid.src) ) { 
 	            return(source.src);
             	} else {
 		    return(false);
@@ -447,10 +501,10 @@ River.methods = (function () {
 	var vids = ehtml.getElementsByTagName("iframe");
 	for(var i=0;i<vids.length;i++){
 	    var vid=vids[i];
-            if ( vid.src.indexOf('youtube.com') != -1 ) { 
+            if ( _urlNotRelative(vid.src) ) { 
 	            return(vid.src);
             } else {
-		    return(false);
+	    	    return(false);
             }
 	}
 
@@ -556,9 +610,12 @@ River.methods = (function () {
         filterRiver : _filterRiver,
         convertYoutube : _convertYoutube,
 	isAvatar : _isAvatar,
+        urlNotRelative : _urlNotRelative,
+        countEnclosuresOfType : _countEnclosuresOfType,
 	isImage : _isImage,
 	isAudio : _isAudio,
         isVideo : _isVideo,
+        isIframe  : _isIframe,
         getDomain : _getDomain,
         getFavicon : _getFavicon,
 	newGetText : _newGetText,
@@ -571,6 +628,7 @@ River.methods = (function () {
         htmlDecode : _htmlDecode,
         getImages : _getImages,
         getVideos : _getVideos,
+        getAudios : _getAudios,
         getIframes : _getIframes,
         prettyDate : _prettyDate
     };

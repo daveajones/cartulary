@@ -35,8 +35,6 @@
                 <?if( $cg_terror == 1) {?><div class="pull-right"><button class="btn btn-mini btn-danger" onclick="javascript:alert('Nice job douchebag!');">Report this post<br/>as terrorism.</button></div><?}?>
                 <h2>
                     <span class="header-tools">
-<?//                    {{if websiteUrl}}<a href="${websiteUrl}">{{/if}}<img class="icon" src="${River.methods.getFavicon(websiteUrl)}" alt="">{{if websiteUrl}}</a>{{/if}}
-//                    <a href="${feedUrl}" title="Raw feed."><img class="icon-list-small" src="/images/blank.gif" alt="" /></a> ?>
                     {{if feedSticky == 1}}<a class="aFeedUnSticky" href="#" data-id="${feedId}"><img class="icon-feed-unsticky" src="/images/blank.gif" alt="" /></a>
                     {{else}}<a class="aFeedSticky" href="#" data-id="${feedId}"><img class="icon-feed-sticky" src="/images/blank.gif" alt="" /></a>
                     {{/if}}
@@ -78,26 +76,34 @@
                     ${River.methods.newGetText(item.body)}
                     {{if Hidepics == false && River.methods.convertYoutube(item.link) != false}}
                         <br/><br/><iframe class="bodyvid" src="${River.methods.convertYoutube(item.link)}" frameborder="0" allowfullscreen></iframe>
-                    {{else Hidepics == false && River.methods.getImages(item.body) != false}}
-                    	<br/><a href="${River.methods.getImages(item.body)}" title="Click to embiggen."><img class="bodypic" src="${River.methods.getImages(item.body)}" alt="" /></a>
-                    {{else Hidepics == false && River.methods.getVideos(item.body) != false}}
-                        <br/><br/><video class="bodyvid" src="${River.methods.getVideos(item.body)}" preload="metadata" controls></video>
-                    {{else Hidepics == false && River.methods.getIframes(item.body) != false}}
-                        <br/><br/><iframe class="bodyvid" src="${River.methods.getIframes(item.body)}" frameborder="0" allowfullscreen></iframe>
                     {{/if}}
                 </div>
             {{/if}}
 
                 <div class="enclosureview">
 		    {{each(e,enclosure) item.enclosure}}
-                        {{if River.methods.isImage(enclosure.url) && (Hidebigpics == false || enclosure.length < 50000) && River.methods.getImages(item.body) != enclosure.url}}
-                            <a href="${enclosure.url}" alt=""><img class="encpicture" src="${enclosure.url}" /></a>
-                        {{else River.methods.isAudio(enclosure.url)}}
+                        {{if River.methods.isImage(enclosure.url, enclosure.type) && (Hidebigpics == false || enclosure.length < 50000)}}
+                            <a href="${enclosure.url}">
+			    {{if River.methods.countEnclosuresOfType(item.enclosure, 'image') == 2}}
+                              <img class="encpicture2" src="${enclosure.url}" alt="" />
+			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') == 3}}
+                              <img class="encpicture3" src="${enclosure.url}" alt="" />
+			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') == 4}}
+                              <img class="encpicture4" src="${enclosure.url}" alt="" />
+			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') >= 5}}
+                              <img class="encpictures" src="${enclosure.url}" alt="" />
+			    {{else}}
+                              <img class="encpicture" src="${enclosure.url}" alt="" />
+			    {{/if}}
+                            </a>
+                        {{else River.methods.isAudio(enclosure.url, enclosure.type)}}
                             <audio class="encaudio" src="${enclosure.url}" preload="metadata" controls></audio>
                             <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
-                        {{else River.methods.isVideo(enclosure.url)}}
+                        {{else River.methods.isVideo(enclosure.url, enclosure.type)}}
                             <video class="encvideo" src="${enclosure.url}" preload="metadata" controls></video>
                             <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
+                        {{else River.methods.isIframe(enclosure.url, enclosure.type)}}
+                            <iframe class="bodyvid" src="${enclosure.url}" frameborder="0" allowfullscreen></iframe>
                         {{/if}}
 		    {{/each}}
 		</div>
@@ -123,9 +129,6 @@
                             <input type="hidden" name="extenclosure[${e}][type]" value="${enclosure.type}" />
                             <input type="hidden" name="extenclosure[${e}][length]" value="${enclosure.length}" />
                           {{/each}}
-                          {{if Hidepics == false && River.methods.getImages(item.body) != false}}
-                      	    <input type="hidden" name="extenclosure[][url]" value="${River.methods.getImages(item.body)}" />
-			  {{/if}}
 			  <input type="hidden" name="source[url]" value="${feedUrl}" />
 			  <input type="hidden" name="source[title]" value="${feedTitle}" />
 			  </form>
@@ -139,11 +142,6 @@
                     {{if item.comments}}
                         <div><a href="${item.comments}" rel="external nofollow" target="_blank">Comment</a></div>
                     {{/if}}
-<?
-//                    {{each(e,enclosure) item.enclosure}}
-//                        <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
-//                    {{/each}}
-?>
                     </div>
 		    </div>
                     <div class="footclear"></div>

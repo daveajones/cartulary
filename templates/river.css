@@ -949,11 +949,34 @@ img.avatarheader {  float:right; max-height: 64px;  }
   margin:20px auto 10px;
   max-width:222px;
 }
+.pageContentWrapper.River #stream .section .enclosureview {
+  text-align:center;
+}
 .pageContentWrapper.River #stream .section .encpicture {
   display:block;
   clear:both;
   margin:20px auto 10px;
-  max-width: 222px;
+  max-width: 500px;
+}
+.pageContentWrapper.River #stream .section .encpicture2 {
+  display:inline-block;
+  margin:20px auto 10px;
+  max-width: 49%;
+}
+.pageContentWrapper.River #stream .section .encpicture3 {
+  display:inline-block;
+  margin:20px auto 10px;
+  max-width: 29%;
+}
+.pageContentWrapper.River #stream .section .encpicture4 {
+  display:inline-block;
+  margin:20px auto 10px;
+  max-width: 24%;
+}
+.pageContentWrapper.River #stream .section .encpictures {
+  display:inline-block;
+  margin:20px auto 10px;
+  max-width: 20%;
 }
 .pageContentWrapper.River #stream .section .riverminitar { 
   float:right;

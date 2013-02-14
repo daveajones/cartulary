@@ -36,7 +36,7 @@
 
     <div id="stream-wrap">
       <div id="stream">
-        <p class="notice"><img id="imgLoadRiverSpinner" class="imgSpinner" src="/images/spinner.gif" alt="" /> Loading river...</p>
+        <p class="notice">Loading river...</p>
       </div>
     </div>
 
@@ -79,12 +79,11 @@
                   {{if River.methods.isAvatar(enclosure.url)}}<img class="riverminitar" src="${enclosure.url}" src="/images/blank.gif" alt="" />{{/if}}
                 {{/each}}
                 <div class="header">
-                    <h3>
-                                        {{if item.permaLink || item.link}}<a class="articlelink" name="${item.id}" href="${item.permaLink || item.link}" rel="external">{{/if}}
-                                        {{if item.title}}
+                    <h3>{{if item.permaLink || item.link}}<a class="articlelink" name="${item.id}" href="${item.permaLink || item.link}" rel="external">{{/if}}
+                    {{if item.title}}
                         ${item.title}
                     {{else}}
-                        ${River.methods.getText(item.body)}
+                        ${River.methods.newGetText(item.body)}
                     {{/if}}
                     {{if item.permaLink || item.link}}</a>{{/if}}
                     </h3>
@@ -96,29 +95,37 @@
                     <img class="thumbnail" src="${thumbnail.url}" width="${thumbnail.width}" height="${thumbnail.height}" alt="">
                 {{/each}}
 
-                    ${River.methods.getText(item.body)}
+                    ${River.methods.newGetText(item.body)}
                     {{if Hidepics == false && River.methods.convertYoutube(item.link) != false}}
                         <br/><br/><iframe class="bodyvid" src="${River.methods.convertYoutube(item.link)}" frameborder="0" allowfullscreen></iframe>
-                    {{else Hidepics == false && River.methods.getImages(item.body) != false}}
-                    	<br/><a href="${River.methods.getImages(item.body)}" title="Click to embiggen."><img class="bodypic" src="${River.methods.getImages(item.body)}" alt="" /></a>
-                    {{else Hidepics == false && River.methods.getVideos(item.body) != false}}
-                        <br/><br/><video class="bodyvid" src="${River.methods.getVideos(item.body)}" preload="metadata" controls></video>
-                    {{else Hidepics == false && River.methods.getIframes(item.body) != false}}
-                        <br/><br/><iframe class="bodyvid" src="${River.methods.getIframes(item.body)}" frameborder="0" allowfullscreen></iframe>
                     {{/if}}
                 </div>
             {{/if}}
 
                 <div class="enclosureview">
 		    {{each(e,enclosure) item.enclosure}}
-                        {{if River.methods.isImage(enclosure.url) && (Hidebigpics == false || enclosure.length < 50000) && River.methods.getImages(item.body) != enclosure.url}}
-                            <a href="${enclosure.url}" alt=""><img class="encpicture" src="${enclosure.url}" /></a>
-                        {{else River.methods.isAudio(enclosure.url)}}
+                        {{if River.methods.isImage(enclosure.url, enclosure.type) && (Hidebigpics == false || enclosure.length < 50000)}}
+                            <a href="${enclosure.url}">
+			    {{if River.methods.countEnclosuresOfType(item.enclosure, 'image') == 2}}
+                              <img class="encpicture2" src="${enclosure.url}" alt="" />
+			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') == 3}}
+                              <img class="encpicture3" src="${enclosure.url}" alt="" />
+			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') == 4}}
+                              <img class="encpicture4" src="${enclosure.url}" alt="" />
+			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') >= 5}}
+                              <img class="encpictures" src="${enclosure.url}" alt="" />
+			    {{else}}
+                              <img class="encpicture" src="${enclosure.url}" alt="" />
+			    {{/if}}
+                            </a>
+                        {{else River.methods.isAudio(enclosure.url, enclosure.type)}}
                             <audio class="encaudio" src="${enclosure.url}" preload="metadata" controls></audio>
                             <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
-                        {{else River.methods.isVideo(enclosure.url)}}
+                        {{else River.methods.isVideo(enclosure.url, enclosure.type)}}
                             <video class="encvideo" src="${enclosure.url}" preload="metadata" controls></video>
                             <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
+                        {{else River.methods.isIframe(enclosure.url, enclosure.type)}}
+                            <iframe class="bodyvid" src="${enclosure.url}" frameborder="0" allowfullscreen></iframe>
                         {{/if}}
 		    {{/each}}
 		</div>
@@ -322,6 +329,154 @@ River.generate = (function () {
 
 
 River.methods = (function () {
+	function _bindStickyLinks() {
+        	//Bind some new clicks to the stickybuttons
+        	$('.aUnSticky').click(function() {
+                	var bobj = $(this);
+                	var id = bobj.attr("data-id");
+	
+                	//Make the call
+                	$.ajax({
+                        	url:    '/cgi/in/unsticky?id=' + id,
+                        	type:   "GET",
+                        	timeout:        20000,
+                        	dataType:       'json',
+                        	success:        function(data) {
+                                	if(data.status == "false") {
+                                                showMessage( data.description, data.status, 5 );
+                                	} else {
+                                                //showMessage( data.description, data.status, 5 );
+                                	}
+					//$('#' + id).removeClass('sticky');
+					if( $('#' + id).siblings('.sticky').length < 1 ) {
+					  $('#' + id).parent().remove();
+					} else {
+					  $('#' + id).remove();
+					}
+					bobj.remove();
+                        	}
+                	});
+	
+                	return false;
+        	});
+	}
+
+        function _bindFeedStickyLinks() {
+                //Bind some new clicks to the stickybuttons
+                $('.aFeedUnSticky').click(function() {
+                        var bobj = $(this);
+                        var id = bobj.attr("data-id");
+                        bobj.addClass("fsticky" + id);
+
+                        //Make the call
+                        $.ajax({
+                                url:    '/cgi/in/setfeedprops?fid=' + id + '&unsticky=true',
+                                type:   "GET",
+                                timeout:        20000,
+                                dataType:       'json',
+                                success:        function(data) {
+                                        if(data.status == "false") {
+                                                showMessage( data.description, data.status, 5 );
+                                        } else {
+                                                showMessage( data.description, data.status, 5 );
+                                                $('.fsticky' + data.id).removeClass('aFeedUnSticky').addClass('aFeedSticky');
+                                                $('.fsticky' + data.id + '> img').removeClass('icon-feed-unsticky').addClass('icon-feed-sticky');
+                                        }
+                                }
+                        });
+
+                        return false;
+                });
+                $('.aFeedSticky').click(function() {
+                        var bobj = $(this);
+                        var id = bobj.attr("data-id");
+                        bobj.addClass("fsticky" + id);
+
+                        //Make the call
+                        $.ajax({
+                                url:    '/cgi/in/setfeedprops?fid=' + id + '&sticky=true',
+                                type:   "GET",
+                                timeout:        20000,
+                                dataType:       'json',
+                                success:        function(data) {
+                                        if(data.status == "false") {
+                                                showMessage( data.description, data.status, 5 );
+                                        } else {
+                                                showMessage( data.description, data.status, 5 );
+                                                $('.fsticky' + data.id).removeClass('aFeedSticky').addClass('aFeedUnSticky');
+                                                $('.fsticky' + data.id + '> img').removeClass('icon-feed-sticky').addClass('icon-feed-unsticky');
+                                        }
+                                }
+                        });
+
+                        return false;
+                });
+        }
+
+
+	function _bindSubscribeLinks() {
+        	//Bind some new clicks to the subscription links
+        	$('.aSubscribe').click(function() {
+                	var bobj = $(this);
+                	var sourceurl = bobj.attr("data-sourceurl");
+	
+                	//Make the call
+                	$.ajax({
+                        	url:    '/cgi/in/subscribe?url=' + sourceurl,
+                        	type:   "GET",
+                        	timeout:        20000,
+                        	dataType:       'json',
+                        	success:        function(data) {
+                                	if(data.status == "false") {
+                                                showMessage( data.description, data.status, 5 );
+                                	} else {
+                                                showMessage( data.description, data.status, 5 );
+                                	}
+                        	}
+                	});
+	
+                	return false;
+        	});
+	}
+
+    function _initRiverFilter() {
+                $('.chkOutlineFilter').change( function() {
+                        River.methods.filterRiver('.chkOutlineFilter');
+                });
+
+                $('.chkOutlineFilterAll').change( function() {
+                        if( $(this).is(':checked') ) {
+                                $('.chkOutlineFilter').attr('checked', true);
+                        } else {
+                                $('.chkOutlineFilter').attr('checked', false);
+                        }
+                        River.methods.filterRiver('.chkOutlineFilter');
+                });
+    }
+	
+    function _filterRiver(chkClass) {
+        if( $('#stream-filterbox').is(":visible") )  {
+        	$(chkClass).each(function (i) {
+	            	var oid = $(this).attr('data-id');
+        	    	if( $(this).is(':checked') ) {
+                		$('#stream .section' + oid).show();
+	            	} else {
+        	        	$('#stream .section' + oid).hide();
+            		}
+        	});
+       	} else {
+		$(chkClass).show();
+        }
+        $('#spnItemCount').empty().append($('.article:visible').length);
+    }
+
+    function _bindFilterToggle() {
+        $('#stream-filter').click( function() {
+            $('#stream-filterbox').toggle();
+        });
+        _filterRiver('.chkOutlineFilter');
+    }
+
     function _convertYoutube(url) {
 	var ytcode;
         if ( ( url !== null ) && ( url !== "" ) && ( url.indexOf('youtube.com') > -1 || url.indexOf('youtu.be') > -1) ) {
@@ -347,30 +502,56 @@ River.methods = (function () {
 	return false;
     };
 
-    function _isImage(url) {
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.jpg') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.jpeg') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.png') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.gif') != -1 && url.indexOf('http') == 0 ) { return true; }
+    function _convertEnclosure(url, type) {
+	if( type.indexOf('image') != -1 ) { return true; }
+
+    }
+
+    function _urlNotRelative(url) {
+        if ( url.indexOf(systemUrl) == -1 && url.indexOf('http') == 0 ) { return true; }
+
+        return false;
+    };
+
+    function _countEnclosuresOfType(enclosures, typecheck) {
+	var cnt = 0;
+        $.each(enclosures, function() {
+	        if ( this.type.indexOf(typecheck) != -1 ) { 
+			cnt++;
+        	}
+	});
+	
+	return cnt;
+    };
+
+    function _isImage(url, type) {
+        if ( type.indexOf('image') != -1 ) { 
+		return true;
+        }
 	
 	return false;
     };
 
-    function _isAudio(url) {
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.mp3') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.m4a') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.wav') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.ogg') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.wmv') != -1 && url.indexOf('http') == 0 ) { return true; }
+    function _isAudio(url, type) {
+        if ( type.indexOf('audio') != -1 ) { 
+		return true;
+        }
 	
 	return false;
     };
 
-    function _isVideo(url) {
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.mp4') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.avi') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.mov') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.m4v') != -1 && url.indexOf('http') == 0 ) { return true; }
+    function _isVideo(url, type) {
+        if ( type.indexOf('video') != -1 ) { 
+		return true;
+        }
+	
+	return false;
+    };
+
+    function _isIframe(url, type) {
+        if ( type.indexOf('text/html') != -1 ) {
+		return true;
+        }
 	
 	return false;
     };
@@ -399,9 +580,9 @@ River.methods = (function () {
 
 	var imgs = ehtml.getElementsByTagName("img");
 	for( var i=0 ; i < imgs.length ; i++ ){
-            if( imgs[i].src.indexOf(systemUrl) == -1 ) {
-	    	return(imgs[i].src);
-            }
+	    if( _urlNotRelative(imgs[i].src) ) {
+		return(imgs[i].src);
+	    }
 	}
 
 	return(false);
@@ -416,7 +597,7 @@ River.methods = (function () {
 	    var vid=vids[i];
 
             if ( vid.hasAttribute('src') ) {
-	    	if ( vid.src.indexOf(systemUrl) == -1 && vid.src.indexOf('.m4v') != -1 ) { 
+	    	if ( _urlNotRelative(vid.src) ) { 
 	    		return(vid.src);
             	}
             }
@@ -424,7 +605,35 @@ River.methods = (function () {
 	    var sources=vid.getElementsByTagName("source");
             for(var n=0;n<sources.length;n++){
 	    	var source=sources[n];
-	        if ( vid.src.indexOf(systemUrl) == -1 && source.src.indexOf('.m4v') != -1 ) { 
+	        if ( _urlNotRelative(vid.src) ) { 
+	            return(source.src);
+            	} else {
+		    return(false);
+                }  
+	    }
+	}
+
+        return(false);
+    }
+
+    function _getAudios(html) {
+        var ehtml = document.createElement('div');
+        ehtml.innerHTML = html;
+
+	var vids = ehtml.getElementsByTagName("audio");
+	for(var i=0;i<vids.length;i++){
+	    var vid=vids[i];
+
+            if ( vid.hasAttribute('src') ) {
+	    	if ( _urlNotRelative(vid.src) ) { 
+	    		return(vid.src);
+            	}
+            }
+
+	    var sources=vid.getElementsByTagName("source");
+            for(var n=0;n<sources.length;n++){
+	    	var source=sources[n];
+	        if ( _urlNotRelative(vid.src) ) { 
 	            return(source.src);
             	} else {
 		    return(false);
@@ -442,10 +651,10 @@ River.methods = (function () {
 	var vids = ehtml.getElementsByTagName("iframe");
 	for(var i=0;i<vids.length;i++){
 	    var vid=vids[i];
-            if ( vid.src.indexOf('youtube.com') != -1 ) { 
+            if ( _urlNotRelative(vid.src) ) { 
 	            return(vid.src);
             } else {
-		    return(false);
+	    	    return(false);
             }
 	}
 
@@ -455,6 +664,7 @@ River.methods = (function () {
     function _newGetText(html) {
       var breakToken = '_______break_______',
       lineBreakedHtml = html.replace(/<br\s?\/?>/gi, breakToken).replace(/<p\.*?>(.*?)<\/p>/gi, breakToken + '$1' + breakToken);
+      //return $('<div>').html(lineBreakedHtml).text().replace(new RegExp(breakToken, 'g'), '\n');
       return $('<div>').html(lineBreakedHtml).text().replace(new RegExp(breakToken, 'g'), '\n');
     }
 
@@ -542,13 +752,23 @@ River.methods = (function () {
     };
     
     return {
+        bindStickyLinks : _bindStickyLinks,
+        bindFeedStickyLinks : _bindFeedStickyLinks,
+        bindSubscribeLinks : _bindSubscribeLinks,
+        bindFilterToggle : _bindFilterToggle,
+        initRiverFilter : _initRiverFilter,
+        filterRiver : _filterRiver,
         convertYoutube : _convertYoutube,
 	isAvatar : _isAvatar,
+        urlNotRelative : _urlNotRelative,
+        countEnclosuresOfType : _countEnclosuresOfType,
 	isImage : _isImage,
 	isAudio : _isAudio,
         isVideo : _isVideo,
+        isIframe  : _isIframe,
         getDomain : _getDomain,
         getFavicon : _getFavicon,
+	newGetText : _newGetText,
         getText : _getText,
         getMediaType : _getMediaType,
         getEnclosureSize : _getEnclosureSize,
@@ -558,6 +778,7 @@ River.methods = (function () {
         htmlDecode : _htmlDecode,
         getImages : _getImages,
         getVideos : _getVideos,
+        getAudios : _getAudios,
         getIframes : _getIframes,
         prettyDate : _prettyDate
     };

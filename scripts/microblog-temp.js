@@ -19,29 +19,25 @@
         	<span class="spnPostTitle">${post.title}</span>
                 <div class="divPostContent">
                   ${post.content}
-                  <?if( $platform != "mobile" ) {?>
                   {{if enclosure && enclosure.length > 0}}<div class="divPostListEnclosures">{{/if}}
                   {{each(e, enc) enclosure}}
 		    {{if isImage(enc.url)}}<a href="${enc.url}" title="Hover to embiggen. Click to open."><img class="mbthumbnail" src="${enc.url}" /></a>
-		    {{else}} - <a href="${enc.url}" title="Click to open.">Download Enclosure</a>
+		    {{else}}<div class="download"> - <a href="${enc.url}" title="Click to open.">Download Enclosure</a></div>
                     {{/if}}
 		  {{/each}}
                   {{if enclosure && enclosure.length > 0}}</div>{{/if}}
-		  <?}?>
                 </div>
 
                 {{else}}
 		<span class="spnPostContent">
                   ${post.content}
-                  <?if($platform != "mobile") {?>
                   {{if enclosure && enclosure.length > 0}}<div class="divPostListEnclosures">{{/if}}
 		  {{each(e, enc) enclosure}}
 		    {{if isImage(enc.url)}}<a href="${enc.url}" title="Hover to embiggen. Click to open."><img class="mbthumbnail" src="${enc.url}" /></a>
-		     {{else}} - <a href="${enc.url}" title="Click to open.">Download Enclosure</a>
+		     {{else}}<div class="download"> - <a href="${enc.url}" title="Click to open.">Download Enclosure</a></div>
                      {{/if}}
 		  {{/each}}
                   {{if enclosure && enclosure.length > 0}}</div>{{/if}}
-                  <?}?>
                 </span>
               {{/if}}
 

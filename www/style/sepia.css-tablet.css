@@ -101,6 +101,9 @@ body {
   margin:20px auto 10px;
   max-width:500px;
 }
+.pageContentWrapper.River #stream .section .enclosureview {
+  text-align:center;
+}
 .pageContentWrapper.River #stream .section .encpicture {
   clear:both;
   display:block;
@@ -108,18 +111,22 @@ body {
   max-width: 500px;
 }
 .pageContentWrapper.River #stream .section .encpicture2 {
+  display:inline-block;
   margin:20px auto 10px;
   max-width: 49%;
 }
 .pageContentWrapper.River #stream .section .encpicture3 {
+  display:inline-block;
   margin:20px auto 10px;
   max-width: 29%;
 }
 .pageContentWrapper.River #stream .section .encpicture4 {
+  display:inline-block;
   margin:20px auto 10px;
   max-width: 24%;
 }
 .pageContentWrapper.River #stream .section .encpictures {
+  display:inline-block;
   margin:20px auto 10px;
   max-width: 100px;
 }
@@ -407,7 +414,6 @@ body {
 .postList .postItem img {
   margin:0 auto;
   max-width:100%;
-  max-height:200px;
 }
 .postList .postItem a {
   font-size:80%;
@@ -417,8 +423,16 @@ body {
   float:left;
 }
 .postList .postItem .divPostListEnclosures {
+  text-align:center;
   margin-top:8px;
   padding-top:8px;
+}
+.postList .postItem .divPostListEnclosures .download {
+  font-size:80%;
+  display:block;
+}
+.postList .postItem .divPostListEnclosures img {
+  display:inline-block;
 }
 .postList .postItem .divPostContent {
   position: relative;

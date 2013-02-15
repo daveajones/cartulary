@@ -3481,7 +3481,9 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $sourcetitle="";
     $author="";
 
-    $sql->bind_param("ssssssssssss", $id,$fid,$item->title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author) or print(mysql_error());
+    $title = strip_tags((string)$item->title);
+
+    $sql->bind_param("ssssssssssss", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author) or print(mysql_error());
   } else {
     //-----RSS----------------------------------------------------------------------------------------------------------------------------------------------------
     $linkurl = $item->link;
@@ -3605,8 +3607,9 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     //loggit(3, "NEW ITEM - TEXT: ".print_r($description, TRUE) );
     //loggit(3, "NEW ITEM - ENCLOSURES: ".print_r($enclosures, TRUE) );
 
+    $title = strip_tags((string)$item->title);
 
-    $sql->bind_param("ssssssssssss", $id,$fid,$item->title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author) or print(mysql_error());
+    $sql->bind_param("ssssssssssss", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author) or print(mysql_error());
   }
   $sql->execute() or loggit(3, $dbh->error);
   $sql->close() or print(mysql_error());
@@ -3983,7 +3986,11 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     }
 
     if($prefs['fulltextriver'] == 0) {
-      $itembody = truncate_text($description, 300)."...";
+      if( strlen($description) > 300 ) {
+        $itembody = truncate_text($description, 300)."...";
+      } else {
+        $itembody = $description;
+      }
     } else {
       $itembody = $description;
     }
@@ -4426,7 +4433,11 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
     }
 
     //Body text of item
-    $itembody = truncate_text($description, 512)."...";
+    if( strlen($description) > 512 ) {
+      $itembody = truncate_text($description, 512)."...";
+    } else {
+      $itembody = $description;
+    }
 
     //Fill in the details of this item
     $river[$fcount]['item'][$icount] = array(

@@ -3424,10 +3424,12 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       }
       //Enclosures are links also
       if($item->link[$lcount]['rel'] == "enclosure") {
-        $enclosures[] = array( 'url' => (string)$item->link[$lcount]->attributes()->href,
-			       'length' => (string)$item->link[$lcount]->attributes()->length,
-                               'type' => (string)$item->link[$lcount]->attributes()->type
-        );
+        if( !in_array_r((string)$item->link[$lcount]->attributes()->href, $enclosures) ) {
+          $enclosures[] = array( 'url' => (string)$item->link[$lcount]->attributes()->href,
+			         'length' => (string)$item->link[$lcount]->attributes()->length,
+                                 'type' => (string)$item->link[$lcount]->attributes()->type
+          );
+        }
         //loggit(3, "Found an ATOM enclosure: [".print_r($enclosures, true)."].");
         //loggit(3, "Item struct: [".print_r($item, true)."].");
       }
@@ -3456,10 +3458,10 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         $esize = check_head_size($mediatag['src']);
         //loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
       }
-      if( empty($esize) || $esize > 2500) {
+      if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
         $enclosures[] = array( 'url' => $mediatag['src'], 'length' => $esize, 'type' => $mediatag['type'] );
       } else {
-        //loggit(3, "  DISCARDING TINY ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
+        loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
     }
 
@@ -3493,10 +3495,12 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $mcount = count($item->enclosure);
     $enclosures = array();
     for($i = 0; $i < $mcount; $i++ ) {
-        $enclosures[$i] = array( 'url' => (string)$item->enclosure[$i]->attributes()->url,
+        if( !in_array_r((string)$item->enclosure[$i]->attributes()->url, $enclosures) ) {
+          $enclosures[$i] = array( 'url' => (string)$item->enclosure[$i]->attributes()->url,
 			         'length' => (string)$item->enclosure[$i]->attributes()->length,
                                  'type' => (string)$item->enclosure[$i]->attributes()->type
-        );
+          );
+        }
         //loggit(3, "Found an RSS enclosure: [".print_r($item->enclosure, TRUE)."].");
     }
 
@@ -3592,10 +3596,10 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         $esize = check_head_size($mediatag['src']);
         //loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
       }
-      if( empty($esize) || $esize > 3000) {
+      if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
         $enclosures[] = array( 'url' => $mediatag['src'], 'length' => $esize, 'type' => $mediatag['type'] );
       } else {
-        //loggit(3, "  DISCARDING TINY ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
+        loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
     }
 

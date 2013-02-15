@@ -18,4 +18,6 @@
               <outline text="The Imgur Gallery" description="" htmlUrl="" xmlUrl="http://feeds.feedburner.com/ImgurGallery?format=xml" />
               <outline text="Hack a Day" description="" htmlUrl="http://hackaday.com" xmlUrl="http://hackaday.com/feed/" />
               <outline text="Reuters: Top News" description="" htmlUrl="http://af.reuters.com" xmlUrl="http://feeds.reuters.com/reuters/AFRICATopNews" />
+	      <outline text="Recent Commits to cartulary:master" description="" xmlUrl="https://github.com/daveajones/cartulary/commits/master.atom" />
+	      <outline text="SOPML Google Group" description="" xmlUrl="http://groups.google.com/group/sopml/feed/rss_v2_0_msgs.xml" />
       </body></opml>

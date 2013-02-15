@@ -11,7 +11,6 @@
     $s3blogopml = get_s3_url($uid, NULL, get_microblog_opml_filename($uid));
     $s3cartopml = get_s3_url($uid, NULL, $default_opml_file_name);
     $s3sopml = get_s3_url($uid, NULL, $default_social_outline_file_name);
-    $s3readlist = get_s3_url($uid, NULL, $default_readinglist_file_name);
     $s3widget = get_s3_url($uid, NULL, get_microblog_js_filename($uid));
   }
 
@@ -130,7 +129,6 @@
 	        <h3><u>My Feeds</u></h3>
 	        <ul id="ulMyStuff">
         		<li><a href="<?echo $s3sopml?>">My Social Outline</a></li>
-	               	<li><a href="<?echo $s3readlist?>">My Reading List</a></li>
 	                <li><a href="<?echo $s3blogfeed?>"><?echo get_microblog_title($uid)?></a></li>
 	                <?if($prefs['publicdefault'] != 1) {?>
 	                <li><a href="<?echo $s3cartfeed?>"><?echo get_cartulary_title($uid)?></a></li>

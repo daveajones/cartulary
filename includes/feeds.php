@@ -2362,7 +2362,7 @@ function del_pub_feed($uid = NULL, $url = NULL)
   }
 
   //Log and leave
-  loggit(3,"Deleted feed: [$url] from sopml feed table for user: [$uid].");
+  loggit(1,"Deleted feed: [$url] from sopml feed table for user: [$uid].");
   return(TRUE);
 }
 
@@ -2908,7 +2908,7 @@ function delete_feed_items($fid = NULL)
 
   //Log and leave
   if($delcount > 0) {
-    loggit(3,"Deleted: [$delcount] items for orphaned feed: [$fid].");
+    loggit(1,"Deleted: [$delcount] items for orphaned feed: [$fid].");
   }
   return($delcount);
 }
@@ -2944,7 +2944,7 @@ function delete_feed($fid = NULL)
   }
 
   //Log and leave
-  loggit(3,"Deleted feed: [$fid] from feed table.");
+  loggit(1,"Deleted feed: [$fid] from feed table.");
   return(TRUE);
 }
 
@@ -3015,7 +3015,7 @@ function get_feed_items($fid = NULL, $max = NULL)
       set_feed_stats($fid, $stats);
       return(-1);
     } else {
-      loggit(3, "DEBUG: Doing once per day check on error-prone feed: [$url].");
+      loggit(2, "DEBUG: Doing once per day check on error-prone feed: [$url].");
     }
   }
 
@@ -3055,7 +3055,7 @@ function get_feed_items($fid = NULL, $max = NULL)
   }
   $goodurl = get_final_url($url);
   if($goodurl != $url) {
-    loggit(3, "DEBUG: Re-direct: Feed: [$url] re-directs to: [$goodurl].");
+    loggit(1, "Re-direct: Feed: [$url] re-directs to: [$goodurl].");
   }
   $tstart = time();
   $content = fetchUrl($goodurl);
@@ -3225,7 +3225,7 @@ function get_all_feeds($max = NULL)
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
   //Look for the
-  $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed ORDER BY $table_newsfeed.errors ASC, $table_newsfeed.lastcheck ASC";
+  $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed ORDER BY $table_newsfeed.lastcheck ASC";
 
   if($max != NULL) {
     $sqltxt .= " LIMIT $max";
@@ -3461,7 +3461,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
         $enclosures[] = array( 'url' => $mediatag['src'], 'length' => $esize, 'type' => $mediatag['type'] );
       } else {
-        loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
+        //loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
     }
 
@@ -3599,7 +3599,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
         $enclosures[] = array( 'url' => $mediatag['src'], 'length' => $esize, 'type' => $mediatag['type'] );
       } else {
-        loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
+        //loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
     }
 
@@ -4118,7 +4118,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
         //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
       } else {
         $s3url = get_s3_url($uid, $subpath, $filename);
-        loggit(3, "Wrote desktop river to S3 at url: [$s3url].");
+        loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
       }
       //Put the mobile file
       $filename = $default_river_json_mobile_file_name;
@@ -4537,7 +4537,7 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
         //loggit(3, "Could not create S3 file: [$filename].");
       } else {
         $s3url = get_server_river_s3_url($subpath, $filename);
-        loggit(3, "Wrote server river json to S3 at url: [$s3url].");
+        loggit(1, "Wrote server river json to S3 at url: [$s3url].");
       }
 
       //We always put the json file if the bucket is enabled, but only put the html stuff if
@@ -4639,7 +4639,7 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
     $sqltxt .= " LIMIT $default_max_list";
   }
 
-  loggit(3, "[$sqltxt]");
+  //loggit(3, "[$sqltxt]");
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
   $sql->bind_param("s", $fid) or print(mysql_error());
   $sql->execute() or print(mysql_error());

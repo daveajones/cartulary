@@ -1147,6 +1147,13 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
     $title = "What $username is saying.";
   }
 
+  //Get the correct link
+  if( $prefs['mblinkhome'] == 0 || empty($prefs['homepagelink']) ) {
+    $homelink = get_s3_url($uid, NULL, get_microblog_html_filename($uid));
+  } else {
+    $homelink = $prefs['homepagelink'];
+  }
+
   //Get a stylesheet
   if( !empty($prefs['mbarchivecss']) ) {
     $css = $prefs['mbarchivecss'];
@@ -1187,7 +1194,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
   }
 
   $html .= "\n
-      <h1>$title <small>(<a href=\"".$prefs['homepagelink']."\">Homepage</a>)</small>";
+      <h1>$title <small>(<a href=\"".$homelink."\">Homepage</a>)</small>";
 
 
   $html .= "</h1>

@@ -19,8 +19,8 @@
   $totalfeeds = count($feeds);
 
   //Only scan the top 25% of feeds per scan
-  //$scancount = ($totalfeeds * .20) + 1;
-  $scancount = $totalfeeds;
+  //$scancount = $totalfeeds;
+  $scancount = ($totalfeeds * .20) + 1;
 
   loggit(3, " ----- Start scan of [$scancount] of [$totalfeeds] feeds.");
   echo "Scanning [$scancount] of [$totalfeeds] feeds.\n\n";
@@ -85,14 +85,14 @@
   echo "\n";
 
   //Calculate time took to scan the river
-  loggit(1, "It took ".(time() - $tstart)." seconds to scan [$ccount] of [$totalfeeds] feeds.");
-  loggit(1, "Total checked: [$ccount]. Updated: [$ncount]. Deleted: [$dcount]. New items: [$newitems].");
+  loggit(3, "It took ".(time() - $tstart)." seconds to scan [$ccount] of [$totalfeeds] feeds.");
+  loggit(3, "Total checked: [$ccount]. Updated: [$ncount]. Deleted: [$dcount]. New items: [$newitems].");
   echo "      It took ".(time() - $tstart)." seconds to scan [$ccount] of [$totalfeeds] feeds.\n";
   echo "Total checked: [$ccount]. Updated: [$ncount]. Deleted: [$dcount]. New items: [$newitems].\n";
 
 
   // Log and leave
-  loggit(1, "Feedscan finished.");
+  loggit(3, "Feedscan finished.");
 
   //Remove the lock file
   cronHelper::unlock();

@@ -5,7 +5,7 @@
 MAILTO=""
 
 ##: The main feed aggregator 
-*/20 * * * * root timeout 1100 php /opt/cartulary/bin/feedscan.php
+*/5 * * * * root timeout 240 php /opt/cartulary/bin/feedscan.php
 
 ##: The outline and list aggregator
 17   * * * * root php /opt/cartulary/bin/outlinescan.php

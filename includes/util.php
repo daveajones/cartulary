@@ -342,10 +342,9 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
     $content = preg_replace('/\t+/', '', $content);
 
     //Consolidate all strings of multiple linebreaks down to just 2
-    $content = preg_replace("/\ ?\n\n\ ?/", "\n\n", $content);
-    $content = preg_replace("/\n \n/", "\n\n", $content);
+    $content = preg_replace("/\ +\n\n\ +/", "\n\n", $content);
+    $content = preg_replace("/\n\ +\n/", "\n\n", $content);
     $content = preg_replace("/[\r\n]\n+/", "\n\n", $content);
-    $content = preg_replace("/\>[\r\n]+/", ">", $content);
 
     //If a length was requested, chop it
     if( $length > 0 ) {
@@ -1455,7 +1454,8 @@ function stripText($text)
   return $clean;
 }
 
-
+//http://www.php.net/manual/en/function.json-decode.php#107107
+//Clean data for json_encode
 function prepareJSON($input) {
 
     //This will convert ASCII/ISO-8859-1 to UTF-8.

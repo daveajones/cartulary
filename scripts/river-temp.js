@@ -49,7 +49,9 @@
             <div class="article{{if item.sticky}} sticky{{/if}} fulltext" id="${item.id}" data-index="${item.index}">
                 {{if avatarUrl}}{{if i < 1}}<img class="riverminitar" src="${avatarUrl}" src="/images/blank.gif" alt="" />{{/if}}{{/if}}
                 {{each(e,enclosure) item.enclosure}}
-                  {{if River.methods.isAvatar(enclosure.url)}}<img class="riverminitar" src="${enclosure.url}" src="/images/blank.gif" alt="" />{{/if}}
+                  {{if River.methods.isAvatar(enclosure.url)}}
+                    <img class="riverminitar" src="${enclosure.url}" src="/images/blank.gif" alt="" title="Enclosure: ${e}."/>
+                  {{/if}}
                 {{/each}}
                 <div class="header">
                     <h3>
@@ -69,10 +71,6 @@
 
             {{if item.title && item.body}}
                 <div class="description">
-                {{each(t,thumbnail) item.thumbnail}}
-                    <img class="thumbnail" src="${thumbnail.url}" width="${thumbnail.width}" height="${thumbnail.height}" alt="">
-                {{/each}}
-
                     ${River.methods.newGetText(item.body)}
                     {{if Hidepics == false && River.methods.convertYoutube(item.link) != false}}
                         <br/><br/><iframe class="bodyvid" src="${River.methods.convertYoutube(item.link)}" frameborder="0" allowfullscreen></iframe>
@@ -82,7 +80,7 @@
 
                 <div class="enclosureview">
 		    {{each(e,enclosure) item.enclosure}}
-                        {{if River.methods.isImage(enclosure.url, enclosure.type) && (Hidebigpics == false || enclosure.length < 50000)}}
+                        {{if River.methods.isImage(enclosure.url, enclosure.type) && (Hidebigpics == false || enclosure.length < 50000) && River.methods.isAvatar(enclosure.url) == false}}
                             <a href="${enclosure.url}">
 			    {{if River.methods.countEnclosuresOfType(item.enclosure, 'image') == 2}}
                               <img class="encpicture2" src="${enclosure.url}" alt="" />

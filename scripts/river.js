@@ -348,6 +348,7 @@ River.methods = (function () {
 
     function _isAvatar(url) {
         if ( url.indexOf('gravatar') != -1 ) { return true; }
+        if ( url.indexOf('twimg.com/profile_images') != -1 ) { return true; }
 	
 	return false;
     };

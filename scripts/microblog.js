@@ -147,9 +147,10 @@ $(document).ready( function() {
                                 if(data.status == "false") {
 	                                showMessage( data.description, data.status, 5 );
                                 } else {
-					<?if($device=="android") {?>alert('Post successful.');<?}?>
+	                                showMessage( "Post Successful!", data.status, 5 );
 					$('#txtContent').val('');
                                         $('#txtLink').val('');
+                                        $('#divShortLink').remove();
 					$('#divRtSource').empty();
 					$('#divExtEnclosures').empty();
 				        <?if($prefs['mbreturnhome'] == 1) {?>

@@ -15,6 +15,7 @@
   $description = "";
   $title = "";
   $link = "";
+  $shortlink = "";
   $enclosure = "";
   if( isset($_REQUEST['description']) ) {
     $description = $_REQUEST['description'];
@@ -25,6 +26,9 @@
   }
   if( isset($_REQUEST['link']) ) {
     $link = $_REQUEST['link'];
+  }
+  if( isset($_REQUEST['shorturl']) ) {
+    $shortlink = $_REQUEST['shorturl'];
   }
   if( isset($_REQUEST['enclosure']) ) {
     $enclosure = $_REQUEST['enclosure'];
@@ -103,13 +107,20 @@
 
 		<!-- Title box. -->
         	<div id="divTitle">
-		<img class="icon-text-height" src="/images/blank.gif" /><input name="title" id="txtTitle" type="text" placeholder="Title your post..." value="<?echo $title?>" />
+		<img class="icon-text-height" src="/images/blank.gif" title="Title of Post" /><input name="title" id="txtTitle" type="text" placeholder="Title your post..." value="<?echo $title?>" />
 		</div>
 
 		<!-- Link box. -->
         	<div id="divLink">
-		<img class="icon-hyperlink-small" src="/images/blank.gif" /><input name="link" id="txtLink" type="text" placeholder="Paste a link here..." value="<?echo $link?>" />
+		<img class="icon-hyperlink-small" src="/images/blank.gif" title="External Link" /><input name="link" id="txtLink" type="text" placeholder="Paste a link here..." value="<?echo $link?>" />
 		</div>
+
+		<!-- Short link box. -->
+                <?if( !empty($shortlink) ) {?>
+        	<div id="divShortLink">
+		<img class="icon-hyperlink-small" src="/images/blank.gif" title="Shortened Link" /><input name="shortlink" id="txtShortLink" type="text" value="<?echo $shortlink?>" />
+		</div>
+                <?}?>
 
 		</div>
 

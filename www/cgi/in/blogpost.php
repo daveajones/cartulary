@@ -50,6 +50,14 @@ if( strlen($title) > 250 ) {
   exit(1);
 }
 
+//Get the short link
+$jsondata['fieldname'] = "shortlink";
+if ( isset($_REQUEST['shortlink']) ) {
+  $shorturl = $_REQUEST['shortlink'];
+} else {
+  $shorturl = FALSE;
+}
+
 //Get the link
 $jsondata['fieldname'] = "link";
 if ( isset($_REQUEST['link']) ) {
@@ -143,10 +151,8 @@ if( empty($url) ) { //&& isset($_REQUEST['tweet']) ) {
 }
 
 //Do we need a short url?
-if( !empty($url) ) {
+if( !empty($url) && $shorturl == FALSE ) {
   $shorturl = get_short_url($uid, $url);
-} else {
-  $shorturl = FALSE;
 }
 
 //Put this post in the database

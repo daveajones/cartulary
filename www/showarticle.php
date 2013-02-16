@@ -52,9 +52,9 @@
 			<?$rturl = $article['url'];?>
 
 			<?if ( !empty($prefs['linkblog']) ) {?>
-			<a class="rt" title="Send to linkblog." href="<?echo $prefs['linkblog']?>/?description=<?echo urlencode($article['title'])?>&link=<?echo urlencode($rturl)?>"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
+			<a class="rt" title="Send to linkblog." href="<?echo $prefs['linkblog']?>/?description=<?echo urlencode($article['title'])?>&link=<?echo urlencode($rturl)?><?if(!empty($article['shorturl'])){echo '&shorturl='.urlencode($article['shorturl']);}?>"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
 			<?} else {?>
-			<a class="rt" title="Send to linkblog." href="<?echo $microblogpage?>?description=<?echo urlencode($article['title'])?>&link=<?echo urlencode($rturl)?><?if(!empty($article['sourceurl'])){echo '&source[url]='.urlencode($article['sourceurl']);}?><?if(!empty($article['sourcetitle'])){echo '&source[title]='.urlencode($article['sourcetitle']);}?>"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
+			<a class="rt" title="Send to linkblog." href="<?echo $microblogpage?>?description=<?echo urlencode($article['title'])?>&link=<?echo urlencode($rturl)?><?if(!empty($article['sourceurl'])){echo '&source[url]='.urlencode($article['sourceurl']);}?><?if(!empty($article['sourcetitle'])){echo '&source[title]='.urlencode($article['sourcetitle']);}?><?if(!empty($article['shorturl'])){echo '&shorturl='.urlencode($article['shorturl']);}?>"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
 	          	<?}?>
                         <a class="link" title="Link to original source url." href="<?echo $article['url'];?>"><img class="icon-hyperlink" src="/images/blank.gif" alt="" /> </a>
 		</div>

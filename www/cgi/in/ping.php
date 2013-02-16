@@ -1,9 +1,6 @@
-<?php
-// Includes
-include get_cfg_var("cartulary_conf").'/includes/env.php';
-include "$confroot/$includes/util.php";
-include "$confroot/$includes/auth.php";
-include "$confroot/$includes/feeds.php";
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_cgi_init_noauth.php"?>
+<?
 
 //Dump the incoming POST to debug
 loggit(3, "RSSCLOUD: ".print_r($_REQUEST, TRUE));
@@ -23,12 +20,6 @@ if( empty($_REQUEST['url']) ) {
 loggit(1, "RSSCLOUD: Incoming ping for url: [".$_REQUEST['url']."].");
 $id = feed_exists($_REQUEST['url']);
 if( $id == FALSE ) {
-  exit(0);
-}
-
-//Anyone interested?
-$subcount = get_feed_subscriber_count($id);
-if( $subcount == 0 ) {
   exit(0);
 }
 

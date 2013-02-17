@@ -138,7 +138,7 @@ $(document).ready( function() {
 			cache:		false,
                         clearForm:	true,
 			resetForm:	true,
-			timeout:	30000,
+			timeout:	60000,
                         beforeSubmit:   function() {
                                 $('#divPostSubmit #imgSpinner').show();
                                 $('.blogPostWrapper input,textarea,button').attr("disabled", true);

@@ -81,7 +81,7 @@ echo '##                                                          '
 echo '##----------------------------------------------------------'
 echo '############################################################'
 echo
-php /opt/cartulary/bin/confcheck.php upgrade
+php /opt/cartulary/bin/confcheck.php upgrade silent
 
 ##: Restart cron daemon
 echo

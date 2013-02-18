@@ -318,7 +318,7 @@ function extract_media($html) {
         } else {
 	  continue;
 	}
-          loggit(3, "DEBUG: $src");
+          //loggit(3, "DEBUG: $src");
       }
     }
   }
@@ -340,7 +340,7 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
 
     //Let's not waste time if this is not html
     if( !this_is_html($content) ) {
-        loggit(3, "DEBUG: No html found in item body.");
+        //loggit(3, "DEBUG: No html found in item body.");
         if( $asarray == TRUE ) {
           return( array('text' => $content, 'media' => '') );
         }
@@ -1561,7 +1561,7 @@ function getAlternateLinkUrl($html = NULL) {
 }
 
 function absolutizeUrl($url = NULL, $rurl = NULL) {
-  loggit(3, "Absolutizing url: [$url] with referer: [$rurl].");
+  //loggit(3, "Absolutizing url: [$url] with referer: [$rurl].");
 
   //Check if the url is good first
   $pos = strpos($url, 'http');
@@ -1572,7 +1572,7 @@ function absolutizeUrl($url = NULL, $rurl = NULL) {
   //Check if url has a preceding slash
   $pos = strpos($url, '/');
   if( $pos !== FALSE && $pos == 0 ) {
-    loggit(3, "Url: [$url] is root-relative.");
+    //loggit(3, "Url: [$url] is root-relative.");
     $rp = parse_url($rurl);
     if( $rp != FALSE ) {
       return($rp['scheme']."://".$rp['host'].$url);
@@ -1584,7 +1584,7 @@ function absolutizeUrl($url = NULL, $rurl = NULL) {
   //Check if url has preceding dots
   $pos = strpos($url, '../');
   if( $pos !== FALSE && $pos == 0 ) {
-    loggit(3, "Url: [$url] is dot-relative.");
+    //loggit(3, "Url: [$url] is dot-relative.");
     $rp = parse_url($rurl);
     if( $rp != FALSE ) {
       $slashpos = strrpos(rtrim($rp['path'], '/'), '/');
@@ -1599,7 +1599,7 @@ function absolutizeUrl($url = NULL, $rurl = NULL) {
   }
 
   //Fix up the referring url as a base url
-  loggit(3, "Url: [$url] is truly relative.");
+  //loggit(3, "Url: [$url] is truly relative.");
   $rp = parse_url($rurl);
   if( $rp != FALSE ) {
     return(rtrim($rp['scheme']."://".$rp['host'].$rp['path'], '/')."/".$url);
@@ -1607,7 +1607,7 @@ function absolutizeUrl($url = NULL, $rurl = NULL) {
     return($url);
   }
 
-  loggit(3, "Url: [$url] was messed up.");
+  //loggit(3, "Url: [$url] was messed up.");
   return($url);
 }
 

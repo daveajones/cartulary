@@ -1,12 +1,6 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_cgi_init.php"?>
 <?
-//[!------------SECURITY-------------------------------!]
-
-// Includes
-include get_cfg_var("cartulary_conf").'/includes/env.php';
-include "$confroot/$includes/util.php";
-include "$confroot/$includes/auth.php";
-include "$confroot/$includes/feeds.php";
-include "$confroot/$includes/opml.php";
 
 // Json header
 header("Cache-control: no-cache, must-revalidate");
@@ -259,7 +253,7 @@ if( feed_is_linked_by_url($url, $uid) ) {
   //Feed was already linked to this user
   loggit(2,"The feed: [$url] was already subscribed to by user: [$uid].");
   $jsondata['status'] = "false";
-  $jsondata['description'] = "Brother, you already follow that feed.";
+  $jsondata['description'] = "You already follow that feed.";
   echo json_encode($jsondata);
   exit(1);
 }

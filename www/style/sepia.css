@@ -184,7 +184,8 @@ a {  color:#059;  }
   max-width:64px;
   margin:4px 8px 8px;
 }
-.pageContentWrapper.River #stream .section .article .enciframe {
+.pageContentWrapper.River #stream .section .bodyvid,
+.pageContentWrapper.River #stream .section .enciframe {
   display:block;
   clear:both;
   margin:10px auto 10px;

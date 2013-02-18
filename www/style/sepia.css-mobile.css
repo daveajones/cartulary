@@ -136,7 +136,8 @@ body {  background:#4d4d4d;  }
   max-height:32px;
   margin:8px;
 }
-.pageContentWrapper.River #stream .section .article .enciframe {
+.pageContentWrapper.River #stream .section .bodyvid,
+.pageContentWrapper.River #stream .section .enciframe {
   clear:both;
   display:block;
   margin:13px auto 10px;

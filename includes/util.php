@@ -250,60 +250,80 @@ function truncate_html($html, $max_words) {
 //Extract img, video, audio and iframe tags from a piece of html
 function extract_media($html) {
   $media_tags = array();
+  $tag_types = array('a','img','audio','video','iframe');
   $idx = 0;
 
+  //Load the document
   $dom = new DOMDocument;
   $dom->loadHTML(tidy_repair_string($html));
 
-  $tags = $dom->getElementsByTagName('img');
-  foreach($tags as $tag) {
-    $src = $tag->getAttribute('src');
-    if( strpos($src, 'http') === 0 ) {
-    $media_tags[$idx] = array( 'tag'  => 'img',
-                               'type' => 'image',
-                               'src'  => trim($src),
-			       'raw'  => "<img src=\"$src\" />" );
-    $idx++;
+  //Loop through the given tag types and determine what type of media they reference
+  foreach( $tag_types as $tagname ) {
+    $tags = $dom->getElementsByTagName($tagname);
+
+    //Loop through any extracted tags of this type
+    foreach($tags as $tag) {
+
+      //Check for an href first
+      $src = (string)$tag->getAttribute('href');
+      if( strlen($src) < 8 ) {
+        //If href value looks bogus, try for a src value
+        $src = (string)$tag->getAttribute('src');
+        if( strlen($src) < 8 ) {
+          //That looks bad too. Skip to next tag found.
+          continue;
+        }
+      }
+
+      //Ignore feed broker services
+      if( strpos($src, 'feedsportal.com') !== FALSE ) {  continue;  }
+      if( strpos($src, 'feedburner.com') !== FALSE ) {  continue;  }
+
+      //See if this is an external url that we've never seen before
+      if( strpos($src, 'http') === 0 && !in_array_r($src, $media_tags) ) {
+
+	//Now check what type it is based on the url text
+        $thistype = url_is_media($src);
+        if( $thistype == 'image' || $tagname == 'img' ) {
+          $media_tags[$idx] = array( 'tag'  => 'img',
+                                     'stag' => $tagname,
+                                     'type' => 'image',
+                                     'src'  => trim($src),
+	    	                     'raw'  => "<img src=\"$src\" />" );
+          $idx++;
+        } else
+        if( $thistype == 'audio' || $tagname == 'audio' ) {
+          $media_tags[$idx] = array( 'tag'  => 'audio',
+                                     'stag' => $tagname,
+                                     'type' => 'audio',
+                                     'src'  => trim($src),
+	    		             'raw'  => "<audio src=\"$src\"></audio>" );
+          $idx++;
+        } else
+        if( $thistype == 'video' || $tagname == 'video' ) {
+          $media_tags[$idx] = array( 'tag'  => 'video',
+                                     'stag' => $tagname,
+                                     'type' => 'video',
+                                     'src'  => trim($src),
+	    		             'raw'  => "<video src=\"$src\"></video>" );
+          $idx++;
+        } else
+        if( $tagname == 'iframe' ) {
+          $media_tags[$idx] = array( 'tag'  => 'iframe',
+                                     'stag' => $tagname,
+                                     'type' => 'text/html',
+                                     'src'  => trim($src),
+	    		             'raw'  => "<iframe src=\"$src\"></iframe>" );
+          $idx++;
+        } else {
+	  continue;
+	}
+          loggit(3, "DEBUG: $src");
+      }
     }
   }
 
-  $tags = $dom->getElementsByTagName('audio');
-  foreach($tags as $tag) {
-    $src = $tag->getAttribute('src');
-    if( strpos($src, 'http') === 0 ) {
-    $media_tags[$idx] = array( 'tag' =>  'audio',
-                               'type' => 'audio',
-                               'src' =>  trim($src),
-			       'raw' =>  "<audio src=\"$src\"></audio>" );
-    $idx++;
-    }
-  }
-
-  $tags = $dom->getElementsByTagName('video');
-  foreach($tags as $tag) {
-    $src = $tag->getAttribute('src');
-    if( strpos($src, 'http') === 0 ) {
-    $media_tags[$idx] = array( 'tag'  => 'video',
-                               'type' => 'video',
-                               'src'  => trim($src),
-			       'raw'  => "<video src=\"$src\"></video>" );
-    $idx++;
-    }
-  }
-
-  $tags = $dom->getElementsByTagName('iframe');
-  foreach($tags as $tag) {
-    $src = $tag->getAttribute('src');
-    if( strpos($src, 'http') === 0 ) {
-    $media_tags[$idx] = array( 'tag'  => 'iframe',
-                               'type' => 'text/html',
-                               'src'  => trim($src),
-			       'raw'  => "<iframe src=\"$src\"></iframe>" );
-    $idx++;
-    }
-  }
-
-
+  //loggit(3, "DEBUG: media_tags: ".print_r($media_tags, TRUE));
   return($media_tags);
 }
 
@@ -318,8 +338,20 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
         return('');
     }
 
+    //Let's not waste time if this is not html
+    if( !this_is_html($content) ) {
+        loggit(3, "DEBUG: No html found in item body.");
+        if( $asarray == TRUE ) {
+          return( array('text' => $content, 'media' => '') );
+        }
+        return($content);
+    }
+
     //First, extract all the media related tags
     $media_tags = extract_media($content);
+
+    //Strip all line breaks since breakage is controlled by the markup
+    $content = preg_replace("/[\r\n]+/", "", $content);
 
     //Replace encoded html with real html
     $content = str_replace('&amp;', '&', $content);
@@ -688,6 +720,7 @@ function get_final_url( $url, $timeout = 5 )
 function fetchUrl($url, $timeout = 30)
 {
     $url = str_replace( "feed://", "http://", $url );
+    $url = str_replace( ' ', '%20', $url );
 
 	$ch = curl_init();
         $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
@@ -1760,12 +1793,54 @@ function strposa($haystack, $needles=array(), $offset=0) {
         return min($chr);
 }
 
+//Determine what type of media a url points to based on the extension in the url
+function url_is_media( $url = NULL )
+{
+
+  //Pictures
+  if( strposa($url, array('.jpg','.png','.jpeg','.gif')) !== FALSE ) {
+    return('image');
+  }
+  //Audio
+  if( strposa($url, array('.mp3','.m4a','.wav','.ogg','.wmv')) !== FALSE ) {
+    return('audio');
+  }
+  //Video
+  if( strposa($url, array('.m4v','.mp4','.avi','.mov')) !== FALSE ) {
+    return('video');
+  }
+
+  return(FALSE);
+}
+
 
 //Determine if a url points to a picture file based on the extension
 function url_is_a_picture( $url = NULL )
 {
 
   if( strposa($url, array('.jpg','.png','.jpeg','.gif')) !== FALSE ) {
+    return(TRUE);
+  }
+
+  return(FALSE);
+}
+
+//Determine if a url points to an audio file based on the extension
+function url_is_audio( $url = NULL )
+{
+
+  if( strposa($url, array('.mp3','.m4a','.wav','.ogg','.wmv')) !== FALSE ) {
+    return(TRUE);
+  }
+
+  return(FALSE);
+}
+
+//Determine if a url points to a video file based on the extension
+function url_is_video( $url = NULL )
+{
+
+  if( strposa($url, array('.m4v','.mp4','.avi','.mov')) !== FALSE ) {
     return(TRUE);
   }
 
@@ -1799,6 +1874,16 @@ function stripAttributes($s, $allowedattr = array()) {
    }
   }
   return $s;
+}
+
+//http://stackoverflow.com/questions/5732758/detect-html-tags-in-a-string
+//Detect whether a string contains html tags
+function this_is_html( $string )
+{
+  if($string != strip_tags($string)) {
+    return(TRUE);
+  }
+  return(FALSE);
 }
 
 ?>

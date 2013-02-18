@@ -35,7 +35,7 @@
 
     //If there is already a config file, let's hang on to it
     if( file_exists($cfname) ) {
-      if( $action = "upgrade" ) {
+      if( $action == "upgrade" ) {
         //Pull in the existing values
         $l_dbusername = $dbuser;
         $l_dbpassword = $dbpass;

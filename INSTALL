@@ -35,7 +35,7 @@ read -p "This is your last chance to back out.  Are you really, really sure this
 ##: 1. Install Apache and PHP5
 clear
 echo 'Installing Apache, PHP and some modules.'
-apt-get update 2>install-e
+apt-get update
 apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-tidy ccze cstream
 
 

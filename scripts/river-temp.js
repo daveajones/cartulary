@@ -100,8 +100,10 @@
                         {{else River.methods.isVideo(enclosure.url, enclosure.type)}}
                             <video class="encvideo" src="${enclosure.url}" preload="metadata" controls></video>
                             <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
+			<?if( $platform != "mobile" ) {?>
                         {{else River.methods.isIframe(enclosure.url, enclosure.type)}}
-                            <iframe class="bodyvid" src="${enclosure.url}" frameborder="0" allowfullscreen></iframe>
+                            <iframe src="${enclosure.url}" frameborder="0" allowfullscreen></iframe>
+			<?}?>
                         {{/if}}
 		    {{/each}}
 		</div>

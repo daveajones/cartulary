@@ -102,6 +102,9 @@ body {  background:#4d4d4d;  }
 .pageContentWrapper.River #stream .section .enclosureview {
   text-align:center;
 }
+.pageContentWrapper.River #stream .section iframe {
+  max-width:100%;
+}
 .pageContentWrapper.River #stream .section .encpicture {
   clear:both;
   display:block;
@@ -133,7 +136,13 @@ body {  background:#4d4d4d;  }
   max-height:32px;
   margin:8px;
 }
-.pageContentWrapper.River #stream .section .article .bodyvid,.encvideo {
+.pageContentWrapper.River #stream .section .article .enciframe {
+  clear:both;
+  display:block;
+  margin:13px auto 10px;
+  width:222px;
+}
+.pageContentWrapper.River #stream .section .article .encvideo {
   clear:both;
   display:block;
   margin:13px auto 10px;

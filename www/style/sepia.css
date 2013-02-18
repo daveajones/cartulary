@@ -149,6 +149,9 @@ a {  color:#059;  }
 .pageContentWrapper.River #stream .section .enclosureview {
   text-align:center;
 }
+.pageContentWrapper.River #stream .section iframe {
+  max-width:100%;
+}
 .pageContentWrapper.River #stream .section .encpicture {
   display:block;
   clear:both;
@@ -181,7 +184,7 @@ a {  color:#059;  }
   max-width:64px;
   margin:4px 8px 8px;
 }
-.pageContentWrapper.River #stream .section .article .bodyvid {
+.pageContentWrapper.River #stream .section .article .enciframe {
   display:block;
   clear:both;
   margin:10px auto 10px;

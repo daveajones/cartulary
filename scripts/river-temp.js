@@ -80,7 +80,7 @@
 
                 <div class="enclosureview">
 		    {{each(e,enclosure) item.enclosure}}
-                        {{if River.methods.isImage(enclosure.url, enclosure.type) && (Hidebigpics == false || enclosure.length < 50000) && River.methods.isAvatar(enclosure.url) == false}}
+                        {{if River.methods.isImage(enclosure.url, enclosure.type) && (Hidebigpics == false || enclosure.length < 50000) && Hidepics == false && River.methods.isAvatar(enclosure.url) == false}}
                             <a href="${enclosure.url}">
 			    {{if River.methods.countEnclosuresOfType(item.enclosure, 'image') == 2}}
                               <img class="encpicture2" src="${enclosure.url}" alt="" />
@@ -97,12 +97,12 @@
                         {{else River.methods.isAudio(enclosure.url, enclosure.type)}}
                             <audio class="encaudio" src="${enclosure.url}" preload="metadata" controls></audio>
                             <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
-                        {{else River.methods.isVideo(enclosure.url, enclosure.type)}}
+                        {{else River.methods.isVideo(enclosure.url, enclosure.type) && Hidepics == false}}
                             <video class="encvideo" src="${enclosure.url}" preload="metadata" controls></video>
                             <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
-			<?if( $platform != "mobile" ) {?>
-                        {{else River.methods.isIframe(enclosure.url, enclosure.type)}}
-                            <iframe src="${enclosure.url}" frameborder="0" allowfullscreen></iframe>
+			<?if( $device != "iphone" && $device != "ipad" ) {?>
+                        {{else River.methods.isIframe(enclosure.url, enclosure.type) && Hidepics == false}}
+                            <iframe class="enciframe" src="${enclosure.url}" frameborder="0" allowfullscreen></iframe>
 			<?}?>
                         {{/if}}
 		    {{/each}}

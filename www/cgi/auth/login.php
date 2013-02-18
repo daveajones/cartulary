@@ -1,9 +1,6 @@
 <?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_cgi_init_noauth.php"?>
 <?
-
-// Includes
-include "$confroot/$includes/util.php";
-include "$confroot/$includes/auth.php";
 
 // Get the input
 $email=$_POST['email'];

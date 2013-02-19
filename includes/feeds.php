@@ -4112,7 +4112,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 
       //Put the desktop file
       $filename = $default_river_json_file_name;
-      $s3res = putInS3($djsonriver, $filename, $s3info['bucket'].$subpath, $s3info['key'], $s3info['secret'], "application/json");
+      $s3res = putInS3($djsonriver, $filename, $s3info['bucket'].$subpath, $s3info['key'], $s3info['secret'], "application/javascript");
       if(!$s3res) {
 	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
         //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -4122,7 +4122,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
       }
       //Put the mobile file
       $filename = $default_river_json_mobile_file_name;
-      $s3res = putInS3($mjsonriver, $filename, $s3info['bucket'].$subpath, $s3info['key'], $s3info['secret'], "application/json");
+      $s3res = putInS3($mjsonriver, $filename, $s3info['bucket'].$subpath, $s3info['key'], $s3info['secret'], "application/javascript");
       if(!$s3res) {
 	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
         //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -4531,7 +4531,7 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
 
       //Put the json river file
       $filename = $default_river_json_file_name;
-      $s3res = putInS3($djsonriver, $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "application/json");
+      $s3res = putInS3($djsonriver, $filename, $s3info['riverbucket'].$subpath, $s3info['key'], $s3info['secret'], "application/javascript");
       if(!$s3res) {
 	loggit(2, "Could not create S3 file: [$filename].");
         //loggit(3, "Could not create S3 file: [$filename].");

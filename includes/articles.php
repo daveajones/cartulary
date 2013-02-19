@@ -558,6 +558,7 @@ function build_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles = 
   //Includes
   include get_cfg_var("cartulary_conf").'/includes/env.php';
   require_once "$confroot/$libraries/s3/S3.php";
+  require_once "$confroot/$includes/feeds.php";
 
   $username = get_user_name_from_uid($uid);
   $prefs = get_user_prefs($uid);
@@ -590,7 +591,7 @@ function build_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles = 
   $title = get_cartulary_title($uid);
 
   //The feed string
-  $rss = '<?xml version="1.0"?>'."\n  <rss version=\"2.0\" xmlns:microblog=\"http://microblog.reallysimple.org/\" xmlns:media=\"http://search.yahoo.com/mrss/\">\n    <channel>";
+  $rss = '<?xml version="1.0"?>'."\n  <rss version=\"2.0\" xmlns:sopml=\"http://v1.sopml.com/\" xmlns:microblog=\"http://microblog.reallysimple.org/\">\n    <channel>";
 
   $rss .= "\n
       <title>$title</title>
@@ -601,8 +602,21 @@ function build_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles = 
       <lastBuildDate>".date("D, d M Y H:i:s O")."</lastBuildDate>
       <generator>$system_name, v$version</generator>
       <managingEditor>".get_email_from_uid($uid)." ($username)</managingEditor>
-      <cloud domain=\"rpc.rsscloud.org\" port=\"5337\" path=\"/rsscloud/pleaseNotify\" registerProcedure=\"\" protocol=\"http-post\" />
       <webMaster>".$email_filemaster."</webMaster>\n";
+
+      if( $enable_rsscloud == 1 ) {
+        $rss .= "      <cloud domain=\"".$rss_cloud_domain."\" port=\"".$rss_cloud_port."\" path=\"".$rss_cloud_notify_path."\" registerProcedure=\"\" protocol=\"".$rss_cloud_protocol."\" />\n";
+      }
+
+      if( $cg_opmlcloud_enabled == 1 ) {
+        $rss .= "      <sopml:updates host=\"".$cg_opmlcloud_host."\" port=\"".$cg_opmlcloud_port."\" type=\"".$cg_opmlcloud_type."\" value=\"".random_gen(16)."\" />\n";
+      }
+
+      if( !empty($prefs['avatarurl']) ) {
+        $rss .= "      <microblog:avatar>".$prefs['avatarurl']."</microblog:avatar>\n";
+        $rss .= "      <sopml:avatar>".$prefs['avatarurl']."</sopml:avatar>\n";
+      }
+
 
   foreach( $articles as $article ) {
           $linkfull = str_replace('&','&amp;',$article['url']);

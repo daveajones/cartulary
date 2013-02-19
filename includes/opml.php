@@ -1560,7 +1560,7 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
         <sopml:timezone>".$prefs['timezone']."</sopml:timezone>";
   if($cg_opmlcloud_enabled == 1) {
   $opml .= "
-        <sopml:updates host=\"".$cg_opmlcloud_host."\" port=\"".$cg_opmlcloud_port."\" type=\"".$cg_opmlcloud_type."\" register=\"R:".$sopmlurl."\" />";
+        <sopml:updates host=\"".$cg_opmlcloud_host."\" port=\"".$cg_opmlcloud_port."\" type=\"".$cg_opmlcloud_type."\" register=\"".random_gen(16)."\" />";
   }
   $opml .= "
       </head>\n";
@@ -1648,6 +1648,7 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
 //Create a new, blank outline to use as a reading list
 function build_reading_list($title = NULL, $uid = NULL, $oid = NULL, $nos3 = FALSE)
 {
+  loggit(3, "DEBUG: Something called build_reading_list()");
   //Check parameters
   if( empty($title) ) {
     loggit(2,"The outline title is blank or corrupt: [$title]");

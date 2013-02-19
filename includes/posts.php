@@ -618,14 +618,21 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
           <microblog:filename>".get_microblog_feed_filename($uid)."</microblog:filename>
           <microblog:startDay>$firstpostDate</microblog:startDay>
           <microblog:endDay>$lastpostDate</microblog:endDay>
-      </microblog:archive>";
+      </microblog:archive>\n";
   }
-  $rss .= "
-      <microblog:localTime>".date('n/j/Y; g:i:s A')."</microblog:localTime>
-      <cloud domain=\"".$rss_cloud_domain."\" port=\"".$rss_cloud_port."\" path=\"".$rss_cloud_notify_path."\" registerProcedure=\"\" protocol=\"".$rss_cloud_protocol."\" />\n";
+  $rss .= "      <microblog:localTime>".date('n/j/Y; g:i:s A')."</microblog:localTime>\n";
+
+  if( $enable_rsscloud == 1 ) {
+    $rss .= "      <cloud domain=\"".$rss_cloud_domain."\" port=\"".$rss_cloud_port."\" path=\"".$rss_cloud_notify_path."\" registerProcedure=\"\" protocol=\"".$rss_cloud_protocol."\" />\n";
+  }
+
+  if( $cg_opmlcloud_enabled == 1 ) {
+    $rss .= "      <sopml:updates host=\"".$cg_opmlcloud_host."\" port=\"".$cg_opmlcloud_port."\" type=\"".$cg_opmlcloud_type."\" value=\"".random_gen(16)."\" />\n";
+  }
 
   if( !empty($prefs['avatarurl']) ) {
     $rss .= "      <microblog:avatar>".$prefs['avatarurl']."</microblog:avatar>\n";
+    $rss .= "      <sopml:avatar>".$prefs['avatarurl']."</sopml:avatar>\n";
   }
 
   foreach( $posts as $post ) {

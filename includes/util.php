@@ -1475,7 +1475,7 @@ function get_server_river_s3_url($path = NULL, $filename = NULL) {
   return($url);
 }
 
-
+//Remove all characters except alphanum and dashes
 function stripText($text)
 {
   $text = strtolower(trim($text));
@@ -1486,6 +1486,18 @@ function stripText($text)
 
   return $clean;
 }
+
+//Make a filename html/script safe by taking out funky stuff
+function cleanFilename($text)
+{
+  $text = trim($text);
+
+  // strip all except these characters
+  $clean = ereg_replace("[^A-Za-z0-9\-\.\ ]", "", $text);
+
+  return $clean;
+}
+
 
 //http://www.php.net/manual/en/function.json-decode.php#107107
 //Clean data for json_encode

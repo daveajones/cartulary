@@ -402,7 +402,7 @@ if( strlen($mbfilename) > 255 ) {
   echo json_encode($jsondata);
   exit(1);
 }
-$prefs['mbfilename'] = $mbfilename;
+$prefs['mbfilename'] = cleanFilename($mbfilename);
 
 $jsondata['prefname'] = "cartfilename";
 if( strlen($cartfilename) > 255 ) {
@@ -413,7 +413,7 @@ if( strlen($cartfilename) > 255 ) {
   echo json_encode($jsondata);
   exit(1);
 }
-$prefs['cartfilename'] = $cartfilename;
+$prefs['cartfilename'] = cleanFilename($cartfilename);
 
 $jsondata['prefname'] = "mobilehidebigpics";
 if( ($mobilehidebigpics < 0) || ($mobilehidebigpics > 1) ) {

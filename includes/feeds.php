@@ -1686,7 +1686,7 @@ function mark_feed_as_updated($fid = NULL)
   $sql->close() or print(mysql_error());
 
   //Log and return
-  loggit(1,"Flagged feed: [$fid] as needing to be scanned.");
+  loggit(3,"Flagged feed: [$fid] as needing to be scanned.");
   return($updcount);
 }
 
@@ -3426,7 +3426,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       if($item->link[$lcount]['rel'] == "enclosure") {
         if( !in_array_r((string)$item->link[$lcount]->attributes()->href, $enclosures) ) {
           $enclosures[] = array( 'url' => (string)$item->link[$lcount]->attributes()->href,
-			         'length' => (string)$item->link[$lcount]->attributes()->length,
+			         'length' => 0 + (string)$item->link[$lcount]->attributes()->length,
                                  'type' => (string)$item->link[$lcount]->attributes()->type
           );
         }
@@ -3459,7 +3459,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         //loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
       }
       if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
-        $enclosures[] = array( 'url' => $mediatag['src'], 'length' => $esize, 'type' => $mediatag['type'] );
+        $enclosures[] = array( 'url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => $mediatag['type'] );
       } else {
         //loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
@@ -3497,7 +3497,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     for($i = 0; $i < $mcount; $i++ ) {
         if( !in_array_r((string)$item->enclosure[$i]->attributes()->url, $enclosures) ) {
           $enclosures[$i] = array( 'url' => (string)$item->enclosure[$i]->attributes()->url,
-			         'length' => (string)$item->enclosure[$i]->attributes()->length,
+			         'length' => 0 + (string)$item->enclosure[$i]->attributes()->length,
                                  'type' => (string)$item->enclosure[$i]->attributes()->type
           );
         }
@@ -3515,7 +3515,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         if( isset($kids[$i]->attributes()->url) ) {
           $murl = (string)$kids[$i]->attributes()->url;
           if( !in_array_r($murl, $enclosures) ) {
-            $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => '', 'type' => '' );
+            $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => '' );
             //loggit(3, "Thumbnail(s) found: ".print_r($kids[$i]->attributes(), TRUE));
             $ecount++;
           }
@@ -3529,7 +3529,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         if( isset($kids[$i]->attributes()->url) ) {
           $murl = (string)$kids[$i]->attributes()->url;
           if( !in_array_r($murl, $enclosures) ) {
-            $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => '', 'type' => '' );
+            $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => '' );
             //loggit(3, "Content found: ".print_r($kids[$i]->attributes(), TRUE));
             $ecount++;
           }
@@ -3597,7 +3597,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         //loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
       }
       if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
-        $enclosures[] = array( 'url' => $mediatag['src'], 'length' => $esize, 'type' => $mediatag['type'] );
+        $enclosures[] = array( 'url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => $mediatag['type'] );
       } else {
         //loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
@@ -4037,7 +4037,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     $enclosures = unserialize($enclosure);
     if($enclosures != FALSE) {
 	    if( !empty($enclosures) ) {
-		if(!empty($enclosures[0]['url'])){ // && !empty($enclosures[0]['type']) && !empty($enclosures[0]['length'])) {
+		if(!empty($enclosures[0]['url'])){
 		      $river[$fcount]['item'][$icount]['enclosure'] = $enclosures;
 		}
 	    }

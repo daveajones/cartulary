@@ -404,6 +404,76 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
 }
 
 
+//Take the html of an article and clean it up
+function clean_article_content($content = "", $length = 0, $asarray = FALSE, $withmedia = TRUE)
+{
+    if( empty($content) ) {
+        if( $asarray == TRUE ) {
+          return( array('text' => '', 'media' => '') );
+        }
+        return('');
+    }
+
+    //Let's not waste time if this is not html
+    if( !this_is_html($content) ) {
+        //loggit(3, "DEBUG: No html found in item body.");
+        if( $asarray == TRUE ) {
+          return( array('text' => $content, 'media' => '') );
+        }
+        return($content);
+    }
+
+    //First, extract all the media related tags
+    if($withmedia == TRUE) {
+      $media_tags = extract_media($content);
+    }
+
+    //Strip all line breaks since breakage is controlled by the markup
+    $content = preg_replace("/[\r\n]+/", "", $content);
+
+    //Replace encoded html with real html
+    $content = str_replace('&amp;', '&', $content);
+    $content = str_replace(array('&lt;','&gt;','&nbsp;'), array('<','>',' '), $content);
+
+    //Strip out all the html tags except for the ones that control textual layout
+    $content = strip_tags($content, '<p><h1><h2><h3><h4><ul><ol><li><table><thead><tbody><tr><td><a><img>');
+
+    //Strip the attributes from remaining tags
+    $content = stripAttributes($content, array('href','src'));
+
+    //Replace continuous whitespace with just one space
+    $content = preg_replace("/\ \ +/", " ", $content);
+
+    //Strip tab codes
+    $content = preg_replace('/\t+/', '', $content);
+
+    //If a length was requested, chop it
+    if( $length > 0 ) {
+      $content = truncate_html($content, $length);
+    }
+
+
+    //Return the clean content and the media tags in an array
+    if( $asarray == TRUE ) {
+      if( $withmedia == TRUE ) {
+        return( array('text' => trim($content), 'media' => $media_tags) );
+      } else {
+        return( array('text' => trim($content)) );
+      }
+    }
+
+    //Build the string to pass back
+    if( $withmedia == TRUE ) {
+      foreach( $media_tags as $tag ) {
+  	$content .= $tag['raw'];
+      }
+    }
+
+    return(trim($content));
+}
+
+
+
 //Extensions to the mysqli class to allow returning fetch_assoc possible
 //See here: http://www.php.net/manual/en/mysqli-stmt.fetch.php#72720
 class mysqli_Extended extends mysqli

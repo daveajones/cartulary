@@ -176,6 +176,28 @@
 <?include "$confroot/$scripts/river.js"?>
 </script>
 
+<!-- Show article modal dialog -->
+<div id="mdlShowArticle" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 class="artitle">&nbsp;</h3>
+  </div>
+  <div class="modal-body">
+    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Cartulizing...<br/><br/></center>
+    <div class="arbody"></div>
+  </div>
+  <div class="modal-footer">
+    <center class="arfooter hide">
+      <a class="opml" title="OPML Version" href="#"><img class="icon-opml" src="/images/blank.gif" alt="" /> </a>
+      <a class="print" title="Printer Friendly" href="#"><img class="icon-print" src="/images/blank.gif" alt="" /> </a>
+      <a class="rt" title="Send to Microblog" href="#"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
+      <a class="link" title="Link to Original" href="#"><img class="icon-hyperlink" src="/images/blank.gif" alt="" /> </a>
+    </center>
+  </div>
+</div>
+<!-- Show article modal dialog -->
+
+
 <?//--- Include the footer bar html fragments -----------?>
 <?include "$confroot/$templates/$template_html_footerbar"?>
 <script>

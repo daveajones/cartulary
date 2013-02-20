@@ -238,6 +238,57 @@ a {  color:#059;  }
 .pageContentWrapper.River #footer p {  font-size:0.6875em;  }
 .pageContentWrapper.River #stream .section .header h2 {  float:none; margin-top:0;  }
 .pageContentWrapper.River #stream .section .header .time {  float:none; padding:0; margin-top:0;  }
+
+/* ----- Article modal ----- */
+#mdlShowArticle {
+  background-color: #FBF0D9;
+  color: #5F4B32;
+  padding: 15px;
+  max-width:800px;
+}
+#mdlShowArticle .modal-header {
+  border-bottom:solid #ccc 1px;
+  min-height:30px;
+}
+#mdlShowArticle .modal-header .artitle {
+  background-color: #FBF0D9;
+  font-family: "CreteRoundRegular", serif;
+  color: #5F4B32;
+  font-size: 140%;
+  line-height: 150%;
+}
+#mdlShowArticle .modal-body .arbody p {
+  background-color: #FBF0D9;
+  font-family: "CreteRoundRegular", serif;
+  font-size: 120%;
+  line-height: 130%;
+  word-spacing: 0.02em;
+  letter-spacing: 0.02em;
+  color: #5F4B32;
+}
+#mdlShowArticle .modal-footer {
+  background-color: #FBF0D9;
+  border-top:solid #ccc 1px;
+}
+#mdlShowArticle .modal-body .arbody img {
+  margin:8px;
+  max-width:40%;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 20%;
+  margin: 0;
+  width: 60%;
+  height: 88%;
+}
+.modal-body {
+  max-height: 73%;
+}
+.modal.fade.in {
+  top: 0;
+}
 /* --------------------------------------------------- */
 
 

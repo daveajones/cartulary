@@ -2,6 +2,16 @@
 <?include "$confroot/$templates/php_cgi_init_with_followup.php"?>
 <?
 
+if( isset($_REQUEST['json']) ) {
+  // Json header
+  header("Cache-control: no-cache, must-revalidate");
+  header("Content-Type: application/json");
+  $jsondata = array();
+  $json = TRUE;
+} else {
+  $json = FALSE;
+}
+
 //Globals
 $html_only = true;
 $linkonly = FALSE;
@@ -18,7 +28,7 @@ function __autoload($class_name) {
 	static $mapping = array(
 		// Include SimplePie for RSS/Atom parsing
 		'SimplePie' => 'simplepie/simplepie.class.php',
-		'SimplePie_Misc' => 'simplepie/simplepie.class.php',	
+		'SimplePie_Misc' => 'simplepie/simplepie.class.php',
 		'SimplePie_HTTP_Parser' => 'simplepie/simplepie.class.php',
 		'SimplePie_File' => 'simplepie/simplepie.class.php',
 		// Include FeedCreator for RSS/Atom creation
@@ -47,6 +57,7 @@ function __autoload($class_name) {
 		return false;
 	}
 }
+
 
 //////////////////////////////////////////////
 // Convert $html to UTF8
@@ -194,17 +205,44 @@ if( ($mret > 0) && !empty($mrmatches[1]) ) {
 
 // ---------- BEGIN ARTICLE EXISTENCE CHECK ----------
 //Is this URL already in the database?
-loggit(1, "Received request for article at: [$url].");
+loggit(3, "Received request for article at: [$url].");
 $aid = article_exists($url);
 if( $aid ) {
-	loggit(1, "Article at: [$url] already exists in the repository as id: [$aid].");
-	link_article_to_user($aid, $uid);
+	loggit(3, "Article: [$url] already exists as: [$aid].");
         $art = get_article($aid);
-        $title = $art['title'];
-        $slimcontent = $art['content'];
-	$linkonly = TRUE;
+
+	if( user_can_view_article($aid, $uid) ) {
+		loggit(3, "Article already linked to user: [$uid].");
+		//Return the article as a json object if that was asked for
+		if( $json ) {
+		  //Give feedback that all went well
+		  $jsondata['status'] = "true";
+		  $jsondata['article'] = array(
+                    'id'          => $aid,
+                    'title'       => $art['title'],
+                    'body'        => $art['content'],
+                    'url'         => $url,
+                    'shorturl'    => $art['shorturl'],
+                    'sourceurl'   => $art['sourceurl'],
+                    'sourcetitle' => $art['sourcetitle']
+		  );
+		  echo json_encode($jsondata);
+		  return(0);
+		} else {
+		  //Redirect to the article viewer to see it
+		  header("Location: $showarticlepage?aid=$aid");
+		  return(0);
+		}
+	} else {
+		loggit(3, "Linking article: [$aid] to user: [$uid].");
+		link_article_to_user($aid, $uid);
+		$slimcontent = $art['content'];
+		$linkonly = TRUE;
+	}
+
+} else {
+  loggit(3, "Article: [$url] does not exist.");
 }
-loggit(3, "Got to 1");
 // ---------- END ARTICLE EXISTENCE CHECK ----------
 
 
@@ -259,9 +297,8 @@ if($linkonly == FALSE) {
 		//Get the page
 		if ($response) {
 			$effective_url = $response['effective_url'];
-			loggit(3, "The effective url is: [$effective_url].");
+			loggit(3, "Article effective url is: [$effective_url].");
 
-			/* if (!url_allowed($effective_url)) die('URL blocked'); */
 			$html = $response['body'];
 			// remove strange things here
 			$html = str_replace('</[>', '', $html);
@@ -271,15 +308,28 @@ if($linkonly == FALSE) {
 
 	  	//Was there an error?
 		if (!$response || $response['status_code'] >= 400) {
-			die('('.$response['status_code'].') Error retrieving '.$url.' ['.$effective_url.']');
+			if( $json == TRUE ) {
+				//Give feedback that all was not well
+				$jsondata['status'] = "false";
+				$jsondata['article'] = array( 'id'          => 'error',
+                                			      'title'       => '',
+                                			      'body'        => '<center><p>Could not retreive article. Server returned response code: ['.$response['status_code'].']. Click <a href="'.$url.'">here</a> to link out to the full source article.</p></center>',
+			                                      'url'         => $url,
+                              				      'shorturl'    => '',
+			                                      'sourceurl'   => '',
+				                              'sourcetitle' => ''
+							     );
+				echo json_encode($jsondata);
+				return(0);
+			} else {
+				die('('.$response['status_code'].') Error retrieving '.$url.' ['.$effective_url.']');
+			}
 		}
 
 	  	//Is this a youtube link?
 	  	if(preg_match('/youtube\.com/i', $url)) {
                         loggit(3, "Cartulizing a Youtube video.");
-	        	//preg_match("/v[\/\=]([A-Za-z0-9\_]*)/i", $url, $matches);
 	        	preg_match("/v[\/\=]([A-Za-z0-9\_\-]*)/i", $url, $matches) || die("Couldn't extract YouTube ID string.");
-			//preg_match("/\<input.*name\=\"video\_id\".*value\=\"(.*)\".*\>/i", $html, $matches) || die("Couldn't extract the YouTube video ID");
 			$content = '<br/><iframe class="bodyvid" src="http://www.youtube.com/embed/'.$matches[1].'" frameborder="0" allowfullscreen></iframe>';
 	        	preg_match("/\<meta.*property\=\"og\:title\".*content\=\"(.*)\".*\>/i", $html, $matches) || die("Couldn't extract the YouTube video title.");
 			$title = $matches[1];
@@ -291,8 +341,23 @@ if($linkonly == FALSE) {
 			if ($auto_extract) {
 				$extract_result = $extractor->process($html, $effective_url);
 				if (!$extract_result) {
-                                  echo "<html><head><meta http-equiv=\"refresh\" content=\"2;URL='$url'\"></head><body><p>Extraction failed. Forwarding to original url in 2 seconds.</p><p>Link is below if redirect does not work:<br/><a href=\"$url\">$url</a></p></body></html>";
-				  exit(1);
+					if( $json == TRUE ) {
+						//Give feedback that all was not well
+						$jsondata['status'] = "false";
+						$jsondata['article'] = array( 'id'          => 'error',
+                		                			      'title'       => '',
+                                					      'body'        => '<center><p>Extraction failed.  Click <a href="'.$url.'">here</a> to link out to the full source article.</p></center>',
+			                        		              'url'         => $url,
+		                              				      'shorturl'    => '',
+					                                      'sourceurl'   => '',
+						                              'sourcetitle' => ''
+									     );
+						echo json_encode($jsondata);
+						return(0);
+					} else {
+		                                echo "<html><head><meta http-equiv=\"refresh\" content=\"2;URL='$url'\"></head><body><p>Extraction failed. Forwarding to original url in 2 seconds.</p><p>Link is below if redirect does not work:<br/><a href=\"$url\">$url</a></p></body></html>";
+						exit(1);
+					}
                                 }
 				$readability = $extractor->readability;
 				$content_block = $extractor->getContent();
@@ -348,65 +413,66 @@ if($linkonly == FALSE) {
 
 	//Calculate how long it took to cartulize this article
 	$took = time() - $tstart;
-	loggit(3, "It took: [$took] seconds to cartulize article: [$aid].");
+	loggit(3, "Article: [$url] took: [$took] seconds to cartulize.");
 }
 // ---------- END ARTICLE PROCESSING ----------
 
 
 
 // ---------- BEGIN URL SHORTENING ----------
-$tstart = time();
-//Shorten the URL?
-if($prefs['shortcart'] == 1) {
-  $shorturl = get_short_url($uid, $url);
-} else {
-  $shorturl = FALSE;
-}
-//Calculate how long it took
-$took = time() - $tstart;
-loggit(3, "It took: [$took] seconds to shorten the url for article: [$aid].");
+  $tstart = time();
+  //Shorten the URL?
+  if($prefs['shortcart'] == 1) {
+    $shorturl = get_short_url($uid, $url);
+  } else {
+    $shorturl = FALSE;
+  }
+  //Calculate how long it took
+  $took = time() - $tstart;
+  loggit(3, "It took: [$took] seconds to shorten the url for article: [$aid].");
 // ---------- END URL SHORTENING ----------
 
 
 // ---------- BEGIN SOURCE ATTRIBUTION HANDLING ----------
-//Check for a source url and title
-$sourceurl = NULL;
-$sourcetitle = NULL;
-if( isset($_REQUEST['surl']) ) {
-  $sourceurl = $_REQUEST['surl'];
-}
-if( isset($_REQUEST['stitle']) ) {
-  $sourcetitle = $_REQUEST['stitle'];
-}
+  //Check for a source url and title
+  $sourceurl = NULL;
+  $sourcetitle = NULL;
+  if( isset($_REQUEST['surl']) ) {
+    $sourceurl = $_REQUEST['surl'];
+  }
+  if( isset($_REQUEST['stitle']) ) {
+    $sourcetitle = $_REQUEST['stitle'];
+  }
 // ---------- END SOURCE ATTRIBUTION HANDLING ----------
 
 
 // ---------- BEGIN TITLE HANDLING ----------
-//Was a title specified in the request?  If so, set that as the title instead of the extracted one
-if(isset($_REQUEST['title'])) {
-  if(!empty($_REQUEST['title'])) {
-    $title = $_REQUEST['title'];
-    if( strpos($sourceurl, 'twitter.com') !== FALSE ) {
-      $title = '@'.$title;
+  //Was a title specified in the request?  If so, set that as the title instead of the extracted one
+  if(isset($_REQUEST['title'])) {
+    if(!empty($_REQUEST['title'])) {
+      $title = $_REQUEST['title'];
+      if( strpos($sourceurl, 'twitter.com') !== FALSE ) {
+        $title = '@'.$title;
+      }
     }
   }
-}
 // ---------- END TITLE HANDLING ----------
 
 
-$tstart = time();
 //Put this article in the database
 if($linkonly == FALSE) {
+  $tstart = time();
   $aid = add_article($url, $title, $slimcontent, $analysis, $uid, $shorturl, FALSE, $sourceurl, $sourcetitle);
+  //Calculate how long it took
+  $took = time() - $tstart;
+  loggit(3, "It took: [$took] seconds to add article: [$aid] to the database.");
 }
-//Calculate how long it took
-$took = time() - $tstart;
-loggit(3, "It took: [$took] seconds to add article: [$aid] to the database.");
 
 
-$tstart = time();
 //Does the user want his posts tweeted?
 if( $prefs['tweetcart'] == 1 && twitter_is_enabled($uid) ) {
+	$tstart = time();
+
 	$twtext = "Reading... ".trim($title);
         $twlink = "";
         if( !empty($url) ) {
@@ -423,28 +489,24 @@ if( $prefs['tweetcart'] == 1 && twitter_is_enabled($uid) ) {
 	} else {
         	loggit(2, "Article: [$aid] failed when posting to Twitter for user: [$uid]. See log for details.");
 	}
+
+	//Calculate how long it took
+	$took = time() - $tstart;
+	loggit(3, "It took: [$took] seconds to tweet article: [$aid].");
 }
-//Calculate how long it took
-$took = time() - $tstart;
-loggit(3, "It took: [$took] seconds to tweet article: [$aid].");
 
-
-$tstart = time();
 //Rebuild static files
-build_rss_feed($uid, NULL, FALSE);
-build_opml_feed($uid, NULL, FALSE);
-//Calculate how long it took
-$took = time() - $tstart;
-loggit(3, "It took: [$took] seconds to build static files after cartulizing article: [$aid].");
+  $tstart = time();
+  //Rebuild static files
+  build_rss_feed($uid, NULL, FALSE);
+  build_opml_feed($uid, NULL, FALSE);
+  //Calculate how long it took
+  $took = time() - $tstart;
+  loggit(3, "It took: [$took] seconds to build static files after cartulizing article: [$aid].");
 
 
 //Return the article as a json object if that was asked for
 if( isset($_REQUEST['json']) ) {
-  // Json header
-  header("Cache-control: no-cache, must-revalidate");
-  header("Content-Type: application/json");
-  $jsondata = array();
-
   //Give feedback that all went well
   $jsondata['status'] = "true";
   $jsondata['article'] = array( 'id'          => $aid,

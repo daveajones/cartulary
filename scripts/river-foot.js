@@ -93,20 +93,25 @@ $(document).ready( function() {
                 $('#mdlShowArticle .arfooter .print').attr('href', "#");
                 $('#mdlShowArticle .arfooter .link').attr('href', "#");
                 $('#mdlShowArticle .spinner').show();
-
-	    	//$('#mdlShowArticle').css("top", ( $(window).height() - $(this).height() ) / 2+$(window).scrollTop() + "px");
-    		//$('#mdlShowArticle').css("left", ( $(window).width() - $(this).width() ) / 2+$(window).scrollLeft() + "px");
+		
+		//Set the left position based on the current viewport size
+    		$('#mdlShowArticle').css("max-width", ( ($(window).width() + $(window).scrollLeft()) - 120) + "px");
+    		$('#mdlShowArticle').css("left", ( ($(window).width() - $('#mdlShowArticle').width() ) / 2 ) + $(window).scrollLeft() + "px");
+    		$('#mdlShowArticle .modal-body').css("max-width", ( $('#mdlShowArticle').width() - 30) + "px");
 
                 $('#mdlShowArticle').modal('show');
                 $.ajax({
         	        url: 	  href + '&json=true',
                         type: 	  "GET",
                         dataType: 'json',
+			timeout:  30000,
                         success:  function(data) {
 			                $('#mdlShowArticle .spinner').hide();
                 	          	if(data.status == "false") {
-                                        	showMessage( data.description, data.status, 5 );
+                                                $('#mdlShowArticle .artitle').append(data.article.title);
+                                                $('#mdlShowArticle .arbody').append(data.article.body);
                                         } else {
+				    		$('#mdlShowArticle .modal-body').css("height", ($(window).height() - 300) + "px");
                                                 $('#mdlShowArticle .artitle').append(data.article.title);
                                                 $('#mdlShowArticle .arbody').append(data.article.body);
                                                 $('#mdlShowArticle .arfooter .opml').attr('href', "<?echo $showarticlepage?>-opml?aid=" + data.article.id);
@@ -114,7 +119,12 @@ $(document).ready( function() {
                                                 $('#mdlShowArticle .arfooter .link').attr('href', data.article.url);
 				                $('#mdlShowArticle .arfooter').show();
                                         }
-                                  }
+                                  },
+                        error:	function(x, t, m) {
+		                  	$('#mdlShowArticle .spinner').hide();
+                                  	$('#mdlShowArticle .artitle').append('');
+                                  	$('#mdlShowArticle .arbody').append('<p>Error communicating with server. Connection problem?</p>');
+                        }
                 });
                 return false;
         });

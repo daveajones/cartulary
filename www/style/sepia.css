@@ -241,10 +241,16 @@ a {  color:#059;  }
 
 /* ----- Article modal ----- */
 #mdlShowArticle {
+  position: fixed;
+  top:20px;
+  right:0;
+  left:0;
+  margin: 0;
+  width:700px;
+  max-height:90%;
   background-color: #FBF0D9;
   color: #5F4B32;
   padding: 15px;
-  max-width:800px;
 }
 #mdlShowArticle .modal-header {
   border-bottom:solid #ccc 1px;
@@ -256,6 +262,9 @@ a {  color:#059;  }
   color: #5F4B32;
   font-size: 140%;
   line-height: 150%;
+}
+#mdlShowArticle .modal-body {
+  width:680px;
 }
 #mdlShowArticle .modal-body .arbody p {
   background-color: #FBF0D9;
@@ -273,21 +282,6 @@ a {  color:#059;  }
 #mdlShowArticle .modal-body .arbody img {
   margin:8px;
   max-width:40%;
-}
-.modal {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 20%;
-  margin: 0;
-  width: 60%;
-  height: 88%;
-}
-.modal-body {
-  max-height: 73%;
-}
-.modal.fade.in {
-  top: 0;
 }
 /* --------------------------------------------------- */
 

@@ -1,38 +1,9 @@
-<?php
-
-// Includes
-include get_cfg_var("cartulary_conf").'/includes/env.php';
-include "$confroot/$includes/util.php";
-include "$confroot/$includes/auth.php";
-include "$confroot/$includes/articles.php";
-
-
-// Valid session?  If not, get lost
-if(!is_logged_in()) {
-    //Hold on to the previous requested URI for post-login redirect
-    $ruri = $_SERVER['REQUEST_URI'];
-    loggit(3, "COOKIE: [".$ruri."]");
-    setcookie($postfollowcookie, $ruri, time() + 3600, '/');
-
-    header("Location: $loginpage");
-    exit(0);
-}
-setcookie($postfollowcookie, "", time() - 3600, '/');
-
-
-//Get user id
-$uid = get_user_id_from_sid(get_session_id());
-loggit(1, "User: [$uid] wants to cartulize an article.");
-
-//Get user prefs
-$prefs = get_user_prefs($uid);
-
-//Get the right timezone
-date_default_timezone_set('America/Chicago');
-
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_cgi_init_with_followup.php"?>
+<?
 
 //Globals
-$html_only = true; 
+$html_only = true;
 $linkonly = FALSE;
 
 // set include path
@@ -230,6 +201,7 @@ if( $aid ) {
 	link_article_to_user($aid, $uid);
         $art = get_article($aid);
         $title = $art['title'];
+        $slimcontent = $art['content'];
 	$linkonly = TRUE;
 }
 loggit(3, "Got to 1");
@@ -367,7 +339,9 @@ if($linkonly == FALSE) {
 			$analysis = implode(",",array_unique(str_word_count(strip_tags($content), 1)));
 
 		  	//Reduce all that whitespace
-		  	$slimcontent = preg_replace('~>\s+<~', '><', $content);
+		  	//$slimcontent = preg_replace('~>\s+<~', '><', $content);
+                        $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE);
+
 		}
 
 	}
@@ -464,11 +438,28 @@ $took = time() - $tstart;
 loggit(3, "It took: [$took] seconds to build static files after cartulizing article: [$aid].");
 
 
+//Return the article as a json object if that was asked for
+if( isset($_REQUEST['json']) ) {
+  // Json header
+  header("Cache-control: no-cache, must-revalidate");
+  header("Content-Type: application/json");
+  $jsondata = array();
 
+  //Give feedback that all went well
+  $jsondata['status'] = "true";
+  $jsondata['article'] = array( 'id'          => $aid,
+                                'title'       => $title,
+                                'body'        => $slimcontent,
+                                'url'         => $url,
+                                'shorturl'    => $shorturl,
+                                'sourceurl'   => $sourceurl,
+                                'sourcetitle' => $sourcetitle
+  );
+  echo json_encode($jsondata);
+  return(0);
+}
 
 //Redirect to the article viewer to see it
 header("Location: $showarticlepage?aid=$aid");
-
-exit;
 
 ?>

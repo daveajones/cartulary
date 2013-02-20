@@ -113,7 +113,11 @@
                     <div class="time">${River.methods.prettyDate(item.pubDate)}{{if item.sourceurl}}<span class="source"> via: <a href="${item.sourceurl}">${item.sourcetitle}</a> | <a class="aSubscribe" data-sourceurl="${encodeURIComponent(item.sourceurl)}" href="#">Subscribe</a></span>{{/if}}</div>
                     <div class="actions">
                         <?if($prefs['riverheadlinecart'] != 1) {?>
+                        <?if( $platform == "mobile" ) {?>
                           <div class="cartform"><a class="cartlink" href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}" rel="external nofollow"><img class="icon-book-small" src="/images/blank.gif" alt="" /></a></div>
+			<?} else {?>
+                          <div class="cartform"><a class="cartlink" href="#mdlShowArticle" data-id="${item.id}" data-toggle="modal" label="Cartulize Article" data-href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}"><img class="icon-book-small" src="/images/blank.gif" alt="" /></a></div>
+			<?}?>
                         <?}?>
                         <?if(!empty($prefs['linkblog'])) {?>
 			  <div><a href="<?echo $prefs['linkblog']?>/?description=${encodeURIComponent(item.title)}&link=${encodeURIComponent(item.link)}" rel="external nofollow" target="_blank">RT</a></div>
@@ -134,14 +138,7 @@
 			  </form>
                           </div>
 			<?}?>
-                {{if item.sticky}}<a class="aUnSticky" href="#" data-id="${item.id}"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>{{/if}}
-                    {{if River.settings.social === true && (item.permaLink || item.link)}}
-                        <div><a href="http://twitter.com/share?text={{if item.title}}${item.title}{{else}}${River.methods.getText(item.body)}{{/if}}&amp;url={{if item.permaLink}}${encodeURIComponent(item.permaLink)}{{else}}${encodeURIComponent(item.link)}{{/if}}" rel="external nofollow" target="_blank" title="Share this on Twitter">Tweet</a></div>
-                        <div><a href="http://www.facebook.com/sharer.php?t={{if item.title}}${item.title}{{else}}${River.methods.getText(item.body)}{{/if}}&amp;u={{if item.permaLink}}${encodeURIComponent(item.permaLink)}{{else}}${encodeURIComponent(item.link)}{{/if}}" rel="external nofollow" target="_blank" title="Share this on Facebook">Share</a></div>
-                    {{/if}}
-                    {{if item.comments}}
-                        <div><a href="${item.comments}" rel="external nofollow" target="_blank">Comment</a></div>
-                    {{/if}}
+	                {{if item.sticky}}<a class="aUnSticky" href="#" data-id="${item.id}"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>{{/if}}
                     </div>
 		    </div>
                     <div class="footclear"></div>

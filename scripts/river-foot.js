@@ -74,6 +74,51 @@ $(document).ready( function() {
                         return false;
                 });
 
+        <?if( $platform != "mobile" ) {?>
+	//Ajaxify the cartulize links
+        $('.cartlink').click(function() {
+	        var aobj = $(this);
+                var href = aobj.attr("data-href");
+
+                $('#mdlShowArticle .arfooter').hide();
+                var frmid = aobj.attr("data-id");
+                $('#mdlShowArticle .arfooter .rt').click(function() {
+			$('#frm'+ frmid).submit();
+                        return false;
+		});
+
+                $('#mdlShowArticle .artitle').empty();
+                $('#mdlShowArticle .arbody').empty();
+                $('#mdlShowArticle .arfooter .opml').attr('href', "#");
+                $('#mdlShowArticle .arfooter .print').attr('href', "#");
+                $('#mdlShowArticle .arfooter .link').attr('href', "#");
+                $('#mdlShowArticle .spinner').show();
+
+	    	//$('#mdlShowArticle').css("top", ( $(window).height() - $(this).height() ) / 2+$(window).scrollTop() + "px");
+    		//$('#mdlShowArticle').css("left", ( $(window).width() - $(this).width() ) / 2+$(window).scrollLeft() + "px");
+
+                $('#mdlShowArticle').modal('show');
+                $.ajax({
+        	        url: 	  href + '&json=true',
+                        type: 	  "GET",
+                        dataType: 'json',
+                        success:  function(data) {
+			                $('#mdlShowArticle .spinner').hide();
+                	          	if(data.status == "false") {
+                                        	showMessage( data.description, data.status, 5 );
+                                        } else {
+                                                $('#mdlShowArticle .artitle').append(data.article.title);
+                                                $('#mdlShowArticle .arbody').append(data.article.body);
+                                                $('#mdlShowArticle .arfooter .opml').attr('href', "<?echo $showarticlepage?>-opml?aid=" + data.article.id);
+                                                $('#mdlShowArticle .arfooter .print').attr('href', "<?echo $showarticlepage?>-print?aid=" + data.article.id);
+                                                $('#mdlShowArticle .arfooter .link').attr('href', data.article.url);
+				                $('#mdlShowArticle .arfooter').show();
+                                        }
+                                  }
+                });
+                return false;
+        });
+        <?}?>
 
         //Quickblog stuff
         $('#txtSaySomething').focus(function() {

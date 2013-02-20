@@ -283,8 +283,11 @@ River.methods = (function () {
                 	$('#mdlShowArticle .arfooter .print').attr('href', "#");
                 	$('#mdlShowArticle .arfooter .link').attr('href', "#");
                 	$('#mdlShowArticle .spinner').show();
+                      	$('#mdlShowArticle .modal-header').hide();
+                      	$('#mdlShowArticle .modal-footer').hide();
 	
                 	//Set the left position based on the current viewport size
+                        $('#mdlShowArticle .modal-body').css("height", "");
                 	$('#mdlShowArticle').css("max-width", ( ($(window).width() + $(window).scrollLeft()) - 120) + "px");
                 	$('#mdlShowArticle').css("left", ( ($(window).width() - $('#mdlShowArticle').width() ) / 2 ) + $(window).scrollLeft() + "px");
                 	$('#mdlShowArticle .modal-body').css("max-width", ( $('#mdlShowArticle').width() - 30) + "px");
@@ -296,6 +299,8 @@ River.methods = (function () {
                         	dataType: 'json',
                         	timeout:  30000,
                         	success:  function(data) {
+			                      	$('#mdlShowArticle .modal-header').show();
+                      				$('#mdlShowArticle .modal-footer').show();
                                         	$('#mdlShowArticle .spinner').hide();
                                         	if(data.status == "false") {
                                                 	$('#mdlShowArticle .artitle').append(data.article.title);
@@ -311,6 +316,8 @@ River.methods = (function () {
                                         	}
                                   	},
                         	error:  function(x, t, m) {
+			                      	$('#mdlShowArticle .modal-header').show();
+                      				$('#mdlShowArticle .modal-footer').show();
                                         	$('#mdlShowArticle .spinner').hide();
                                         	$('#mdlShowArticle .artitle').append('');
                                         	$('#mdlShowArticle .arbody').append('<p>Error communicating with server. Connection problem?</p>');

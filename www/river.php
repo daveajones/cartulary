@@ -183,7 +183,7 @@
     <h3 class="artitle">&nbsp;</h3>
   </div>
   <div class="modal-body">
-    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Cartulizing...<br/><br/></center>
+    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Cartulizing. Please wait...<br/><br/></center>
     <div class="arbody"></div>
   </div>
   <div class="modal-footer">

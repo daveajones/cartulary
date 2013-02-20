@@ -74,62 +74,6 @@ $(document).ready( function() {
                         return false;
                 });
 
-        <?if( $platform != "mobile" ) {?>
-	//Ajaxify the cartulize links
-        $('.cartlink').click(function() {
-	        var aobj = $(this);
-                var href = aobj.attr("data-href");
-
-                $('#mdlShowArticle .arfooter').hide();
-                var frmid = aobj.attr("data-id");
-                $('#mdlShowArticle .arfooter .rt').click(function() {
-			$('#frm'+ frmid).submit();
-                        return false;
-		});
-
-                $('#mdlShowArticle .artitle').empty();
-                $('#mdlShowArticle .arbody').empty();
-                $('#mdlShowArticle .arfooter .opml').attr('href', "#");
-                $('#mdlShowArticle .arfooter .print').attr('href', "#");
-                $('#mdlShowArticle .arfooter .link').attr('href', "#");
-                $('#mdlShowArticle .spinner').show();
-		
-		//Set the left position based on the current viewport size
-    		$('#mdlShowArticle').css("max-width", ( ($(window).width() + $(window).scrollLeft()) - 120) + "px");
-    		$('#mdlShowArticle').css("left", ( ($(window).width() - $('#mdlShowArticle').width() ) / 2 ) + $(window).scrollLeft() + "px");
-    		$('#mdlShowArticle .modal-body').css("max-width", ( $('#mdlShowArticle').width() - 30) + "px");
-
-                $('#mdlShowArticle').modal('show');
-                $.ajax({
-        	        url: 	  href + '&json=true',
-                        type: 	  "GET",
-                        dataType: 'json',
-			timeout:  30000,
-                        success:  function(data) {
-			                $('#mdlShowArticle .spinner').hide();
-                	          	if(data.status == "false") {
-                                                $('#mdlShowArticle .artitle').append(data.article.title);
-                                                $('#mdlShowArticle .arbody').append(data.article.body);
-                                        } else {
-				    		$('#mdlShowArticle .modal-body').css("height", ($(window).height() - 300) + "px");
-                                                $('#mdlShowArticle .artitle').append(data.article.title);
-                                                $('#mdlShowArticle .arbody').append(data.article.body);
-                                                $('#mdlShowArticle .arfooter .opml').attr('href', "<?echo $showarticlepage?>-opml?aid=" + data.article.id);
-                                                $('#mdlShowArticle .arfooter .print').attr('href', "<?echo $showarticlepage?>-print?aid=" + data.article.id);
-                                                $('#mdlShowArticle .arfooter .link').attr('href', data.article.url);
-				                $('#mdlShowArticle .arfooter').show();
-                                        }
-                                  },
-                        error:	function(x, t, m) {
-		                  	$('#mdlShowArticle .spinner').hide();
-                                  	$('#mdlShowArticle .artitle').append('');
-                                  	$('#mdlShowArticle .arbody').append('<p>Error communicating with server. Connection problem?</p>');
-                        }
-                });
-                return false;
-        });
-        <?}?>
-
         //Quickblog stuff
         $('#txtSaySomething').focus(function() {
                 $(this).switchClass('smallSaySomething', 'bigSaySomething', 300);
@@ -145,17 +89,6 @@ $(document).ready( function() {
                 $('#imgTwitter').toggleClass('icon-notwitter');
         });
 
-        //Filter stuff
-        $('.chkOutlineFilter').change( function() {
-                River.methods.filterRiver('.chkOutlineFilter');
-        });
-        $('.chkOutlineFilterAll').change( function() {
-                if( $(this).is(':checked') ) {
-                        $('.chkOutlineFilter').attr('checked', true);
-                } else {
-                        $('.chkOutlineFilter').attr('checked', false);
-                }
-                River.methods.filterRiver('.chkOutlineFilter');
-        });
-
 });
+
+

@@ -148,12 +148,10 @@ River.generate = (function () {
             $('.last-old').removeClass('last-old');
             $stream.find('#' + marker).addClass('last-old');
         }
-        River.methods.initRiverFilter();
-	River.methods.filterRiver('.chkOutlineFilter');
         River.methods.bindStickyLinks();
         River.methods.bindFeedStickyLinks();
         River.methods.bindSubscribeLinks();
-        River.methods.bindFilterToggle();
+        River.methods.bindCartLinks();
     };
     
     // expand stream items
@@ -264,6 +262,67 @@ River.methods = (function () {
         }
 
 
+	//Ajaxify the cartulize links
+	function _bindCartLinks() {
+        	<?if( $platform != "mobile" ) {?>
+        	$('.cartlink').unbind('click');
+        	$('.cartlink').click(function() {
+                	var aobj = $(this);
+                	var href = aobj.attr("data-href");
+	
+                	$('#mdlShowArticle .arfooter').hide();
+                	var frmid = aobj.attr("data-id");
+                	$('#mdlShowArticle .arfooter .rt').click(function() {
+                        	$('#frm'+ frmid).submit();
+                        	return false;
+                	});
+	
+                	$('#mdlShowArticle .artitle').empty();
+                	$('#mdlShowArticle .arbody').empty();
+                	$('#mdlShowArticle .arfooter .opml').attr('href', "#");
+                	$('#mdlShowArticle .arfooter .print').attr('href', "#");
+                	$('#mdlShowArticle .arfooter .link').attr('href', "#");
+                	$('#mdlShowArticle .spinner').show();
+	
+                	//Set the left position based on the current viewport size
+                	$('#mdlShowArticle').css("max-width", ( ($(window).width() + $(window).scrollLeft()) - 120) + "px");
+                	$('#mdlShowArticle').css("left", ( ($(window).width() - $('#mdlShowArticle').width() ) / 2 ) + $(window).scrollLeft() + "px");
+                	$('#mdlShowArticle .modal-body').css("max-width", ( $('#mdlShowArticle').width() - 30) + "px");
+	
+                	$('#mdlShowArticle').modal('show');
+                	$.ajax({
+                        	url:      href + '&json=true',
+                        	type:     "GET",
+                        	dataType: 'json',
+                        	timeout:  30000,
+                        	success:  function(data) {
+                                        	$('#mdlShowArticle .spinner').hide();
+                                        	if(data.status == "false") {
+                                                	$('#mdlShowArticle .artitle').append(data.article.title);
+                                                	$('#mdlShowArticle .arbody').append(data.article.body);
+                                        	} else {
+                                                	$('#mdlShowArticle .modal-body').css("height", ($(window).height() - 300) + "px");
+                                                	$('#mdlShowArticle .artitle').append(data.article.title);
+                                                	$('#mdlShowArticle .arbody').append(data.article.body);
+                                                	$('#mdlShowArticle .arfooter .opml').attr('href', "<?echo $showarticlepage?>-opml?aid=" + data.article.id);
+                                                	$('#mdlShowArticle .arfooter .print').attr('href', "<?echo $showarticlepage?>-print?aid=" + data.article.id);
+                                                	$('#mdlShowArticle .arfooter .link').attr('href', data.article.url);
+                                                	$('#mdlShowArticle .arfooter').show();
+                                        	}
+                                  	},
+                        	error:  function(x, t, m) {
+                                        	$('#mdlShowArticle .spinner').hide();
+                                        	$('#mdlShowArticle .artitle').append('');
+                                        	$('#mdlShowArticle .arbody').append('<p>Error communicating with server. Connection problem?</p>');
+                        	}
+                	});
+                	return false;
+        	});
+        	<?}?>
+        	return true;
+	}
+	
+
 	function _bindSubscribeLinks() {
         	//Bind some new clicks to the subscription links
         	$('.aSubscribe').click(function() {
@@ -288,44 +347,6 @@ River.methods = (function () {
                 	return false;
         	});
 	}
-
-    function _initRiverFilter() {
-                $('.chkOutlineFilter').change( function() {
-                        River.methods.filterRiver('.chkOutlineFilter');
-                });
-
-                $('.chkOutlineFilterAll').change( function() {
-                        if( $(this).is(':checked') ) {
-                                $('.chkOutlineFilter').attr('checked', true);
-                        } else {
-                                $('.chkOutlineFilter').attr('checked', false);
-                        }
-                        River.methods.filterRiver('.chkOutlineFilter');
-                });
-    }
-	
-    function _filterRiver(chkClass) {
-        if( $('#stream-filterbox').is(":visible") )  {
-        	$(chkClass).each(function (i) {
-	            	var oid = $(this).attr('data-id');
-        	    	if( $(this).is(':checked') ) {
-                		$('#stream .section' + oid).show();
-	            	} else {
-        	        	$('#stream .section' + oid).hide();
-            		}
-        	});
-       	} else {
-		$(chkClass).show();
-        }
-        $('#spnItemCount').empty().append($('.article:visible').length);
-    }
-
-    function _bindFilterToggle() {
-        $('#stream-filter').click( function() {
-            $('#stream-filterbox').toggle();
-        });
-        _filterRiver('.chkOutlineFilter');
-    }
 
     function _convertYoutube(url) {
 	var ytcode;
@@ -614,9 +635,7 @@ River.methods = (function () {
         bindStickyLinks : _bindStickyLinks,
         bindFeedStickyLinks : _bindFeedStickyLinks,
         bindSubscribeLinks : _bindSubscribeLinks,
-        bindFilterToggle : _bindFilterToggle,
-        initRiverFilter : _initRiverFilter,
-        filterRiver : _filterRiver,
+	bindCartLinks : _bindCartLinks,
         convertYoutube : _convertYoutube,
 	isAvatar : _isAvatar,
         urlNotRelative : _urlNotRelative,

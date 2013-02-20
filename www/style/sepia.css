@@ -266,20 +266,25 @@ a {  color:#059;  }
 #mdlShowArticle .modal-body {
   width:680px;
 }
+#mdlShowArticle .modal-body .arbody,
 #mdlShowArticle .modal-body .arbody p {
   background-color: #FBF0D9;
   font-family: "CreteRoundRegular", serif;
-  font-size: 120%;
+  font-size: 110%;
   line-height: 130%;
   word-spacing: 0.02em;
   letter-spacing: 0.02em;
   color: #5F4B32;
+}
+#mdlShowArticle .modal-body .arbody p {
+  margin-bottom:1.5em;
 }
 #mdlShowArticle .modal-footer {
   background-color: #FBF0D9;
   border-top:solid #ccc 1px;
 }
 #mdlShowArticle .modal-body .arbody img {
+  float:left;
   margin:8px;
   max-width:40%;
 }

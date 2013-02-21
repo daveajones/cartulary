@@ -255,6 +255,7 @@ a {  color:#059;  }
 #mdlShowArticle .modal-header {
   border-bottom:solid #ccc 1px;
   min-height:30px;
+  max-height:60px;
 }
 #mdlShowArticle .modal-header .artitle {
   background-color: #FBF0D9;
@@ -262,9 +263,6 @@ a {  color:#059;  }
   color: #5F4B32;
   font-size: 140%;
   line-height: 150%;
-}
-#mdlShowArticle .modal-body {
-  width:680px;
 }
 #mdlShowArticle .modal-body .arbody,
 #mdlShowArticle .modal-body .arbody p {
@@ -282,6 +280,7 @@ a {  color:#059;  }
 #mdlShowArticle .modal-footer {
   background-color: #FBF0D9;
   border-top:solid #ccc 1px;
+  max-height:20px;
 }
 #mdlShowArticle .modal-body .arbody img {
   float:left;

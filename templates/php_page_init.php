@@ -31,6 +31,12 @@
   }
   $platform = $g_platform;
 
+  //What device version?
+  $g_device_version = get_device_version();
+  if( isset($_REQUEST['device_version']) ) {
+    $g_device_version = $_REQUEST['device_version'];
+  }
+
   //Who is this user?
   $g_uid = get_user_id_from_sid(get_session_id());
   if( isset($_REQUEST['uid']) && is_admin($g_uid) ) {

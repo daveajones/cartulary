@@ -1818,6 +1818,44 @@ function get_platform_type()
 }
 
 
+//Discover what version of device this is
+function get_device_version()
+{
+  $device = "";
+
+  //Be nice to the error logs
+  if ( !isset($_SERVER['HTTP_USER_AGENT']) ) {
+    return($device);
+  }
+
+  if ( strstr($_SERVER['HTTP_USER_AGENT'], "Android 2")) {
+    $device = "2";
+  } else
+  if ( strstr($_SERVER['HTTP_USER_AGENT'], "Android 3")) {
+    $device = "3";
+  } else
+  if ( strstr($_SERVER['HTTP_USER_AGENT'], "Android 4")) {
+    $device = "4";
+  } else
+  if ( strstr($_SERVER['HTTP_USER_AGENT'], "OS 3")) {
+    $device = "3";
+  } else
+  if ( strstr($_SERVER['HTTP_USER_AGENT'], "OS 4")) {
+    $device = "4";
+  } else
+  if ( strstr($_SERVER['HTTP_USER_AGENT'], "OS 5")) {
+    $device = "5";
+  } else
+  if ( strstr($_SERVER['HTTP_USER_AGENT'], "OS 6")) {
+    $device = "6";
+  }
+
+
+  return($device);
+}
+
+
+
 //_____________________________________________________________________
 //_____http://www.php.net/manual/en/function.filesize.php#106935
 //Make a friendlier version of long byte strings

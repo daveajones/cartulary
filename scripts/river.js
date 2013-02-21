@@ -376,10 +376,10 @@ River.methods = (function () {
                 $(el + ' .modal-body').css('max-height', (modH - hfSize - exPad - 5) + "px" );
                 $(el + ' .modal-body').css('height', (modH - hfSize - exPad - 5) + "px" );    
 
-		//$(window).resize(function() {
-		//    clearTimeout(resizeTimer);
-		//    resizeTimer = setTimeout(sizeArticleModal(el, false), 300);
-		//});
+
+		$(window).smartresize(function(){
+			sizeArticleModal(el, false);
+		});
 
 		<?}?>			
 		return true;

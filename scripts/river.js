@@ -378,7 +378,7 @@ River.methods = (function () {
 		var resizeTimer;
 		$(window).resize(function() {
 		    clearTimeout(resizeTimer);
-		    resizeTimer = setTimeout(sizeArticleModal(el, false), 100);
+		    resizeTimer = setTimeout(sizeArticleModal(el, false), 300);
 		});
 
 		<?}?>			

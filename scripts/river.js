@@ -5,6 +5,7 @@ jQuery.fn.fadeSlideDown = function (speed, easing, callback) {
 };
 
 var River = River || {};
+var resizeTimer = null;
 
 // defaults
 River.defaults = {
@@ -375,7 +376,6 @@ River.methods = (function () {
                 $(el + ' .modal-body').css('max-height', (modH - hfSize - exPad - 5) + "px" );
                 $(el + ' .modal-body').css('height', (modH - hfSize - exPad - 5) + "px" );    
 
-		var resizeTimer;
 		$(window).resize(function() {
 		    clearTimeout(resizeTimer);
 		    resizeTimer = setTimeout(sizeArticleModal(el, false), 300);

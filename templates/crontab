@@ -1,11 +1,16 @@
 ##: ----------
 ##: This is the crontab that runs all the Cartulary scanners.
 ##: It will usually be located in /etc/cron.d/cartulary in a modern debian based install.
+##:
+##: |min|hour|day of month|month|day of week|
 ##: ----------
 MAILTO=""
 
-##: The main feed aggregator 
-*/5 * * * * root timeout 240 php /opt/cartulary/bin/feedscan.php
+##: The main feed aggregator (hard timeout after an hour)
+*/5 * * * * root timeout 3600 php /opt/cartulary/bin/feedscan.php
+
+##: Only scan high error feeds every 6 hours
+4 */6 * * * root timeout 3600 php /opt/cartulary/bin/feedscan.php error
 
 ##: The outline and list aggregator
 17   * * * * root php /opt/cartulary/bin/outlinescan.php

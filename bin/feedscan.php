@@ -14,13 +14,28 @@
   //Track the river scan time
   $tstart = time();
 
-  //Get the feed list
-  $feeds = get_all_feeds();
-  $totalfeeds = count($feeds);
+  //Do we want to scan error feeds or normal feeds?
+  $action = "";
+  if( in_array("error", $argv) ) {
+    $action = "error";
+    loggit(3, "Doing an error feed scan.");
+  }
 
-  //Only scan the top 25% of feeds per scan
-  //$scancount = $totalfeeds;
-  $scancount = ($totalfeeds * .20) + 1;
+  //Get the feed list
+  if( $action == "error" ) {
+    $feeds = get_error_feeds();
+  } else {
+    $feeds = get_all_feeds();
+  }
+  $totalfeeds = count($feeds);
+  $totaltime = $totalfeeds * 3;
+
+  //Only scan the oldest 33% of feeds per scan
+  if( $action == "error" ) {
+    $scancount = $totalfeeds;
+  } else {
+    $scancount = round( ($totalfeeds * .33) + 1 );
+  }
 
   loggit(3, " ----- Start scan of [$scancount] of [$totalfeeds] feeds.");
   echo "Scanning [$scancount] of [$totalfeeds] feeds.\n\n";
@@ -77,7 +92,13 @@
     echo "      It took ".(time() - $fstart)." seconds to scan this feed.\n";
     echo "\n";
 
-    //We stop scanning once we hit our 25% mark
+    //We stop scanning if this scan has taken longer than expected
+    if( (time() - $tstart) > $totaltime ) {
+      loggit(3, "Stop scan because it took longer than the expected: [$totaltime] seconds.");
+      break;
+    }
+
+    //We stop scanning once we hit our feed count limit for this pass
     if($ccount >= $scancount) {
       break;
     }

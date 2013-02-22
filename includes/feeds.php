@@ -3020,7 +3020,7 @@ function get_feed_items($fid = NULL, $max = NULL)
   }
 
   //Do we need to re-register?
-  if( !empty($feed['rsscloudregurl']) && ((time() - $feed['rsscloudlastreg']) > 86400 || $feed['rsscloudlastreg'] == '') ) {
+  if( !empty($feed['rsscloudregurl']) && ((time() - $feed['rsscloudlastreg']) > 86400 || $feed['rsscloudlastreg'] == '') && $enable_rsscloud == 1 ) {
     $rcregurl = parse_url($feed['rsscloudregurl']);
     //debug
     loggit(1, "RSSCLOUD: Feed: [$url] was last registered ".(time() - $feed['rsscloudlastreg'])." seconds ago. Time to renew.");
@@ -3128,7 +3128,7 @@ function get_feed_items($fid = NULL, $max = NULL)
   update_feed_avatar($fid, get_feed_avatar($x));
 
   //Does this feed support rssCloud?
-  if( isset($x->channel->cloud) ) {
+  if( isset($x->channel->cloud) && $enable_rsscloud == 1 ) {
     //loggit(3, "RSSCLOUD REG: Feed [$fid] has a cloud element.");
     $domain = (string)$x->channel->cloud->attributes()->domain;
     $port = (string)$x->channel->cloud->attributes()->port;
@@ -3224,8 +3224,8 @@ function get_all_feeds($max = NULL)
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
-  //Look for the
-  $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed ORDER BY $table_newsfeed.lastcheck ASC";
+  //Get all feeds with a low error count
+  $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed WHERE errors < 10 ORDER BY $table_newsfeed.lastcheck ASC";
 
   if($max != NULL) {
     $sqltxt .= " LIMIT $max";
@@ -3258,6 +3258,53 @@ function get_all_feeds($max = NULL)
   //loggit(1,"Returning: [$count] feeds in the system.");
   return($feeds);
 }
+
+
+//_______________________________________________________________________________________
+//Retrieve a list of all the feeds with error counts over the threshold
+function get_error_feeds($max = NULL)
+{
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Get feeds with a high error count
+  $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed WHERE errors > 10";
+
+  if($max != NULL) {
+    $sqltxt .= " LIMIT $max";
+  }
+
+  //loggit(1, "[$sqltxt]");
+  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+
+  //See if there were any feeds for this user
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(2,"There are no high error feeds in the system.");
+    return(FALSE);
+  }
+
+  $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or print(mysql_error());
+
+  $feeds = array();
+  $count = 0;
+  while($sql->fetch()){
+    $feeds[$count] = array( 'id' => $fid, 'title' => $ftitle, 'url' => $furl, 'createdon' => $fcreatedon );
+    $count++;
+  }
+
+  $sql->close() or print(mysql_error());
+
+  //loggit(1,"Returning: [$count] feeds in the system.");
+  return($feeds);
+}
+
 
 
 //_______________________________________________________________________________________
@@ -4687,6 +4734,7 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
 
 //_______________________________________________________________________________________
 // ***** under construction ******
+// *****    do not use      ******
 //Build a server-wide rss feed
 function build_server_rss_feed($max = NULL)
 {

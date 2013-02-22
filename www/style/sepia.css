@@ -275,6 +275,7 @@ a {  color:#059;  }
   color: #5F4B32;
 }
 #mdlShowArticle .modal-body .arbody p {
+  clear:both;
   margin-bottom:1.5em;
 }
 #mdlShowArticle .modal-footer {

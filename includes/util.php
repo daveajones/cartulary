@@ -1882,6 +1882,7 @@ function format_bytes($a_bytes)
     }
 }
 
+
 //Get some user input from the command line
 function get_user_response()
 {
@@ -1900,6 +1901,7 @@ function chop_extension( $file = NULL )
 
   return($file_name);
 }
+
 
 //http://stackoverflow.com/questions/6284553/using-an-array-as-needles-in-strpos
 //Search for a substring with an array as the needle
@@ -1945,6 +1947,7 @@ function url_is_a_picture( $url = NULL )
   return(FALSE);
 }
 
+
 //Determine if a url points to an audio file based on the extension
 function url_is_audio( $url = NULL )
 {
@@ -1955,6 +1958,7 @@ function url_is_audio( $url = NULL )
 
   return(FALSE);
 }
+
 
 //Determine if a url points to a video file based on the extension
 function url_is_video( $url = NULL )
@@ -1996,6 +2000,7 @@ function stripAttributes($s, $allowedattr = array()) {
   return $s;
 }
 
+
 //http://stackoverflow.com/questions/5732758/detect-html-tags-in-a-string
 //Detect whether a string contains html tags
 function this_is_html( $string )
@@ -2004,6 +2009,52 @@ function this_is_html( $string )
     return(TRUE);
   }
   return(FALSE);
+}
+
+
+//Get an external ip address for this server
+function get_external_ip_address()
+{
+  $reflector_url = "http://checkip.dyndns.com";
+
+  $data = fetchUrl($reflector_url);
+  $ret = preg_match('/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/', $data, $ipaddr);
+
+  if($ret === FALSE || $ret == 0) {
+    return(FALSE);
+  }
+
+  return(trim($ipaddr[0]));
+}
+
+
+//Create a redirect file for S3 that sends external users to the external
+//ip address of this host
+function create_external_access_file( $ipaddr = NULL, $bucket = NULL, $filename = NULL )
+{
+    //Check params
+    if( empty($ipaddr) ) {
+      loggit(2, "The ip address was blank or corrupt: [$ipaddr]");
+      return(FALSE);
+    }
+    if( empty($bucket) ) {
+      loggit(2, "The bucket name was blank or corrupt: [$bucket]");
+      return(FALSE);
+    }
+    if( empty($filename) ) {
+      loggit(2, "The file name was blank or corrupt: [$filename]");
+      return(FALSE);
+    }
+
+    //Get system S3 info
+    $s3info = get_sys_s3_info();
+
+    //Create a redirect stub
+    $file = create_short_url_file("http://".$ipaddr."/");
+    $result = putInS3($file, $filename, $bucket, $s3info['key'], $s3info['secret'], "text/html");
+
+
+    return($result);
 }
 
 ?>

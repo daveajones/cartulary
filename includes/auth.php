@@ -2826,12 +2826,85 @@ function get_sys_s3_info() {
         $s3info['rivercname'] = $s3_sys_server_river_cname;
         $s3info['riverfile'] = $s3_sys_server_river_file;
         $s3info['rivertitle'] = $s3_sys_server_river_title;
+        $s3info['redirectbucket'] = $s3_sys_server_redirect_bucket;
         //loggit(3, "DEBUG: ".print_r($s3info, TRUE));
         return($s3info);
   }
 
   loggit(1, "No system s3 info could be assembled.");
   return(FALSE);
+}
+
+
+//_______________________________________________________________________________________
+//Check if a flag is set in the flags table
+function sys_flag_is_set($flag = NULL)
+{
+  //Check parameters
+  if( empty($flag) ) {
+    loggit(2,"The flag name is blank or corrupt: [$flag]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Look for the url in the feed table
+  $sql=$dbh->prepare("SELECT value FROM $table_flag WHERE name=?") or print(mysql_error());
+  $sql->bind_param("s", $flag) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+  //See if any rows came back
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(3,"The [$flag] flag is not set.");
+    return(FALSE);
+  }
+  $sql->bind_result($flagval) or print(mysql_error());
+  $sql->fetch() or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  loggit(3,"The: [$flag] flag is set with value: [$flagval].");
+  return($flagval);
+}
+
+
+//_______________________________________________________________________________________
+//Set a flag value in the flags table
+function set_sys_flag($flag = NULL, $flagval = NULL)
+{
+  //Check parameters
+  if( empty($flag) ) {
+    loggit(2,"The flag name is blank or corrupt: [$flag]");
+    return(FALSE);
+  }
+  if( empty($flagval) ) {
+    loggit(2,"The flag value is blank or corrupt: [$flagval]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Timestamp
+  $tstamp = time();
+
+  //Look for the url in the feed table
+  $stmt = "INSERT INTO $table_flag (name,value,timeset,setby) VALUES(?,?,?,'sys') ON DUPLICATE KEY UPDATE value=?";
+  $sql = $dbh->prepare($stmt) or print(mysql_error());
+  $sql->bind_param("sdsd", $flag, $flagval, $tstamp, $flagval) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  loggit(3,"Set flag: [$flag] with value: [$flagval].");
+  return(TRUE);
 }
 
 

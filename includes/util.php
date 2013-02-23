@@ -2013,9 +2013,13 @@ function this_is_html( $string )
 
 
 //Get an external ip address for this server
-function get_external_ip_address()
+function get_external_ip_address( $reflector_url = NULL )
 {
-  $reflector_url = "http://checkip.dyndns.com";
+  //Check params
+  if( empty($reflector_url) ) {
+    loggit(2, "The ip reflector url was blank or corrupt: [$reflector_url]");
+    return(FALSE);
+  }
 
   $data = fetchUrl($reflector_url);
   $ret = preg_match('/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/', $data, $ipaddr);
@@ -2046,6 +2050,9 @@ function create_external_access_file( $ipaddr = NULL, $bucket = NULL, $filename 
       return(FALSE);
     }
 
+    //Make sure we have the library
+    require_once "$confroot/$libraries/s3/S3.php";
+
     //Get system S3 info
     $s3info = get_sys_s3_info();
 
@@ -2056,5 +2063,42 @@ function create_external_access_file( $ipaddr = NULL, $bucket = NULL, $filename 
 
     return($result);
 }
+
+
+//Set an amazon bucket to redirect to another location
+function set_bucket_redirect($bucket = NULL, $location = NULL) {
+
+  //Check parameters
+  if( empty($location) ) {
+    loggit(2, "Location missing from S3 redirect call: [$location].");
+    return(FALSE);
+  }
+  if( empty($bucket) ) {
+    loggit(2, "Bucket missing from S3 redirect call: [$bucket].");
+    return(FALSE);
+  }
+
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+  require_once "$confroot/$libraries/oauth/tmhOAuth.php";
+  require_once "$confroot/$libraries/s3/S3.php";
+
+  //Get system S3 info
+  $s3info = get_sys_s3_info();
+
+  //Set up
+  $s3 = new S3($s3info['key'], $s3info['secret']);
+
+  $s3res = $s3->setBucketRedirect($bucket, $location);
+  if(!$s3res) {
+       	loggit(3, "Could not create S3 bucket redirect: [$bucket -> $location].");
+	return(FALSE);
+  }
+
+  loggit(3, "Redirected S3 bucket: [$bucket] to [$location].");
+  return(TRUE);
+}
+
 
 ?>

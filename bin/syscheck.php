@@ -38,6 +38,16 @@
           $healthy = FALSE;
         }
 
+	//Check external ip address and update redirect bucket
+	if( !empty($s3_sys_server_redirect_bucket) && !empty($cg_external_ip_reflector_url) ) {
+	  $exip = get_external_ip_address($cg_external_ip_reflector_url);
+          if( !set_bucket_redirect($s3_sys_server_redirect_bucket, $exip) ) {
+            loggit(2, "Error setting bucket: [$s3_sys_server_redirect_bucket] to redirect to host: [$exip].");
+	  } else {
+            loggit(3, "Set bucket: [$s3_sys_server_redirect_bucket] to redirect to host: [$exip].");
+	  }
+	}
+
         //Calculate how long it took
         $took = time() - $tstart;
         echo "It took: [$took] seconds to check server health.";
@@ -48,6 +58,8 @@
           echo "WARNING:  The system isn't healthy.  See previous log entries for details.\n";
           loggit(3, "WARNING: The system isn't healthy.  See previous log entries for details.");
         }
+
+	echo "\n";
 
         //Release the lock
         cronHelper::unlock();

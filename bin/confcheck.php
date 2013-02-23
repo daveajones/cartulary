@@ -31,6 +31,8 @@
     $l_s3rivercname = "";
     $l_s3riverfile = "index.html";
     $l_s3rivertitle = "Community River";
+    $l_s3redirectbucket = "";
+    $l_ipreflectorurl = "http://checkip.dyndns.com";
     $l_rsscloud = 0;
 
     //If there is already a config file, let's hang on to it
@@ -47,6 +49,12 @@
         $l_s3backup = $s3_sys_backup;
         $l_s3riverbucket = $s3_sys_server_river_bucket;
         $l_s3rivercname = $s3_sys_server_river_cname;
+        if( isset($s3_sys_server_redirect_bucket) ) {
+  	  $l_s3redirectbucket = $s3_sys_server_redirect_bucket;
+	}
+        if( isset($cg_external_ip_reflector_url) ) {
+          $l_ipreflectorurl = $cg_external_ip_reflector_url;
+        }
         if( isset($s3_sys_server_river_file) ) {
           $l_s3riverfile = $s3_sys_server_river_file;
         }
@@ -141,6 +149,24 @@
     }
     if( empty($response) ) { $response = $l_s3backup; }
     $template = str_replace('s3backupbucketvalue', $response, $template);
+
+
+    $response = "";
+    if( $silent == FALSE ) {
+      echo "Do you have a bucket that will server as an external redirector to your server? [$l_s3redirectbucket]: ";
+      $response = get_user_response();
+    }
+    if( empty($response) ) { $response = $l_s3redirectbucket; }
+    $template = str_replace('s3redirectbucket', $response, $template);
+
+
+    $response = "";
+    if( $silent == FALSE ) {
+      echo "What url do you want to use as an external ip reflector service? [$l_ipreflectorurl]: ";
+      $response = get_user_response();
+    }
+    if( empty($response) ) { $response = $l_ipreflectorurl; }
+    $template = str_replace('http://checkip.dyndns.com', $response, $template);
 
 
     $response = "";

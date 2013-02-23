@@ -108,7 +108,7 @@ a {  color:#059;  }
 .pageContentWrapper.River #stream-sidebar-left {  display:none;  }
 .pageContentWrapper.River #stream-sidebar-right {  display:none;  }
 .pageContentWrapper.River #stream {  max-width:600px; padding:1px;  }
-.pageContentWrapper.River #stream .notice {  color:white;  }
+.pageContentWrapper.River #stream .notice {  width: 600px; color:white;  }
 .pageContentWrapper.River #stream-header {  display:none;  }
 .pageContentWrapper.River #stream .section {
   position: relative;

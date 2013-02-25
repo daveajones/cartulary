@@ -342,9 +342,9 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
     if( !this_is_html($content) ) {
         //loggit(3, "DEBUG: No html found in item body.");
         if( $asarray == TRUE ) {
-          return( array('text' => $content, 'media' => '') );
+          return( array('text' => trim($content), 'media' => '') );
         }
-        return($content);
+        return(trim($content));
     }
 
     //First, extract all the media related tags
@@ -383,13 +383,15 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
       $content = truncate_html($content, $length);
     }
 
+    //Now trim leading and trailing line breaks and white space
+    $content = trim($content);
 
     //Return the clean content and the media tags in an array
     if( $asarray == TRUE ) {
       if( $withmedia == TRUE ) {
-        return( array('text' => trim($content), 'media' => $media_tags) );
+        return( array('text' => $content, 'media' => $media_tags) );
       } else {
-        return( array('text' => trim($content)) );
+        return( array('text' => $content) );
       }
     }
 
@@ -400,7 +402,7 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
       }
     }
 
-    return(trim($content));
+    return($content);
 }
 
 
@@ -1914,6 +1916,71 @@ function strposa($haystack, $needles=array(), $offset=0) {
         if(empty($chr)) return false;
         return min($chr);
 }
+
+
+//Do our best to make a good mime type for a given url/type
+function make_mime_type( $url = NULL, $type = NULL )
+{
+
+  //Check params
+  if( empty($url) ) {
+    loggit(2, "The url was blank or corrupt: [$url]");
+    return(FALSE);
+  }
+
+  //Let's be clean
+  $type = trim($type);
+
+  // ----- Pictures
+  if( strposa($url, array('.jpg','.jpeg')) !== FALSE ) {  return('image/jpeg');  }
+  if( strposa($url, array('.png')) !== FALSE ) {  return('image/png');  }
+  if( strposa($url, array('.gif')) !== FALSE ) {  return('image/gif');  }
+
+  // ----- Textual
+  if( strposa($url, array('.htm','.html')) !== FALSE ) {  return('text/html');  }
+  if( strposa($url, array('.pdf')) !== FALSE ) {  return('application/pdf');  }
+
+
+  // ----- Audio
+  if( strposa($url, array('.mp3')) !== FALSE ) {  return('audio/mpeg3');  }
+  if( strposa($url, array('.wav')) !== FALSE ) {  return('audio/wav');  }
+  if( strposa($url, array('.m4a')) !== FALSE ) {  return('audio/mp4');  }
+  if( strposa($url, array('.aac')) !== FALSE ) {  return('audio/mp4');  }
+  if( strposa($url, array('.wma')) !== FALSE ) {  return('audio/x-ms-wma');  }
+  if( strposa($url, array('.ogg')) !== FALSE ) {  return('audio/ogg');  }
+  if( strposa($url, array('.oga')) !== FALSE ) {  return('audio/ogg');  }
+
+
+  // ----- Video
+  if( strposa($url, array('.m4v')) !== FALSE ) {  return('video/mp4');  }
+  if( strposa($url, array('.mp4')) !== FALSE ) {  return('video/mp4');  }
+  if( strposa($url, array('.wmv')) !== FALSE ) {  return('video/x-ms-wmv');  }
+  if( strposa($url, array('.ogv')) !== FALSE ) {  return('video/ogg');  }
+  if( strposa($url, array('.avi')) !== FALSE ) {  return('video/avi');  }
+  if( strposa($url, array('.mov')) !== FALSE ) {  return('video/quicktime');  }
+
+
+  //If none of those matched, see if there was a type hint
+  if( !empty($type) ) {
+    //Does this look like a good type already?
+    if( strpos($type, '/') !== FALSE) {
+      return($type);
+    }
+    //Is this a text type?
+    if( strpos($type, 'text') !== FALSE) {
+      return("text/plain");
+    }
+
+    //Guess not.  Let's assume that what's already
+    //given is a primary type and just add x-unknown
+    return($type."/x-unknown");
+  }
+
+
+  //Give up
+  return("application/octet-stream");
+}
+
 
 //Determine what type of media a url points to based on the extension in the url
 function url_is_media( $url = NULL )

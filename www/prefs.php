@@ -168,7 +168,7 @@
 			<li>I want to override the default style with the stylesheet located at this url: <input name="stylesheet" type="text" value="<?echo $prefs['stylesheet']?>" /></li>
 		</div>
 	        <div class="control-group">
-			<li>I want a maximum of <input name="maxlist" type="text" value="<?echo $prefs['maxlist']?>" /> articles to be listed in feeds and pages by default.</li>
+			<li>I want a maximum of <input name="maxlist" type="text" value="<?echo $prefs['maxlist']?>" /> items to be listed in feeds and on pages by default.</li>
 	        </div>
 	</ul>
 	</div>

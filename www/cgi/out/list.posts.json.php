@@ -8,7 +8,7 @@ $jsondata = array();
 
 
 //Get all the users in the system
-$posts = get_blog_posts($g_uid);
+$posts = get_blog_posts($g_uid, $g_prefs['maxlist']);
 
 
 //--------------------------------------------------------------------------------

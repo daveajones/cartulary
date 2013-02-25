@@ -192,6 +192,11 @@ body {
 .pageContentWrapper.River #stream .section .header .time {  float:none; padding:0; margin-top:0;  }
 .pageContentWrapper.River #stream .article h3 {  font-size:0.875em;  }
 .pageContentWrapper.River #stream .article .description {  font-size:0.8125em;  }
+.pageContentWrapper.River #stream .section .article .byline {
+  font-size: 80%;
+  margin-bottom:15px;
+  padding-bottom:8px;
+}
 /* ----- Article modal ----- */
 #mdlShowArticle {
   position: fixed;

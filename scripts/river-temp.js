@@ -69,6 +69,8 @@
                     </h3>
                 </div>
 
+            {{if item.author}}<div class="byline">by: <span class="author">${item.author}</span></div>{{/if}}
+
             {{if item.title && item.body}}
                 <div class="description">
                     ${River.methods.newGetText(item.body)}
@@ -110,7 +112,10 @@
 
                 <div class="footer" style="clear:both;">
 		    <div class="actionwrap">
-                    <div class="time">${River.methods.prettyDate(item.pubDate)}{{if item.sourceurl}}<span class="source"> via: <a href="${item.sourceurl}">${item.sourcetitle}</a> | <a class="aSubscribe" data-sourceurl="${encodeURIComponent(item.sourceurl)}" href="#">Subscribe</a></span>{{/if}}</div>
+                    <div class="time">
+                      ${River.methods.prettyDate(item.pubDate)}
+                      {{if item.sourceurl}}<span class="source"> via: <a href="${item.sourceurl}">${item.sourcetitle}</a> | <a class="aSubscribe" data-sourceurl="${encodeURIComponent(item.sourceurl)}" href="#">Subscribe</a></span>{{/if}}
+                    </div>
                     <div class="actions">
                         <?if($prefs['riverheadlinecart'] != 1) {?>
 			<?loggit(3, "Platform: [$g_platform], Device: [$g_device], Version: [$g_device_version]");?>

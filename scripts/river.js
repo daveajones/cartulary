@@ -494,6 +494,9 @@ River.methods = (function () {
         if ( type.indexOf('text/html') != -1 ) {
 		return true;
         }
+        if ( type.indexOf('application/pdf') != -1 ) {
+		return true;
+        }
 	
 	return false;
     };

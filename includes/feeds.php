@@ -3473,9 +3473,9 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       //Enclosures are links also
       if($item->link[$lcount]['rel'] == "enclosure") {
         if( !in_array_r((string)$item->link[$lcount]->attributes()->href, $enclosures) ) {
-          $enclosures[] = array( 'url' => (string)$item->link[$lcount]->attributes()->href,
+          $enclosures[] = array( 'url'    => (string)$item->link[$lcount]->attributes()->href,
 			         'length' => 0 + (string)$item->link[$lcount]->attributes()->length,
-                                 'type' => (string)$item->link[$lcount]->attributes()->type
+                                 'type'   => make_mime_type((string)$item->link[$lcount]->attributes()->href, (string)$item->link[$lcount]->attributes()->type)
           );
         }
         //loggit(3, "Found an ATOM enclosure: [".print_r($enclosures, true)."].");
@@ -3507,7 +3507,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         //loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
       }
       if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
-        $enclosures[] = array( 'url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => $mediatag['type'] );
+        $enclosures[] = array( 'url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => make_mime_type($mediatag['src'], $mediatag['type']) );
       } else {
         //loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
@@ -3563,7 +3563,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         if( !in_array_r((string)$item->enclosure[$i]->attributes()->url, $enclosures) ) {
           $enclosures[$i] = array( 'url' => (string)$item->enclosure[$i]->attributes()->url,
 			         'length' => 0 + (string)$item->enclosure[$i]->attributes()->length,
-                                 'type' => (string)$item->enclosure[$i]->attributes()->type
+                                 'type' => make_mime_type((string)$item->enclosure[$i]->attributes()->url, (string)$item->enclosure[$i]->attributes()->type)
           );
         }
         //loggit(3, "Found an RSS enclosure: [".print_r($item->enclosure, TRUE)."].");
@@ -3580,7 +3580,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         if( isset($kids[$i]->attributes()->url) ) {
           $murl = (string)$kids[$i]->attributes()->url;
           if( !in_array_r($murl, $enclosures) ) {
-            $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => '' );
+            $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => make_mime_type((string)$kids[$i]->attributes()->url) );
             //loggit(3, "Thumbnail(s) found: ".print_r($kids[$i]->attributes(), TRUE));
             $ecount++;
           }
@@ -3594,7 +3594,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         if( isset($kids[$i]->attributes()->url) ) {
           $murl = (string)$kids[$i]->attributes()->url;
           if( !in_array_r($murl, $enclosures) ) {
-            $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => '' );
+            $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => make_mime_type((string)$kids[$i]->attributes()->url) );
             //loggit(3, "Content found: ".print_r($kids[$i]->attributes(), TRUE));
             $ecount++;
           }
@@ -3662,7 +3662,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         //loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
       }
       if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
-        $enclosures[] = array( 'url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => $mediatag['type'] );
+        $enclosures[] = array( 'url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => make_mime_type($mediatag['src'], $mediatag['type']) );
       } else {
         //loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }

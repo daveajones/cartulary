@@ -135,10 +135,16 @@ a {  color:#059;  }
 }
 .pageContentWrapper.River #stream .section .article h3 {
   font-size:120%;
-  margin:4px 0 10px;
+  margin:4px 0 4px;
 }
 .pageContentWrapper.River #stream .section .article .description {
   font-size:110%;
+  margin-top:20px;
+}
+.pageContentWrapper.River #stream .section .article .byline {
+  font-size: 80%;
+  margin-bottom:15px;
+  padding-bottom:8px;
 }
 .pageContentWrapper.River #stream .section .article .bodypic {
   display:block;

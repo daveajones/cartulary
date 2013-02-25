@@ -597,6 +597,12 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
     $lastpostDate = date('Y-m-d', $posts[0]['createdon']);
   }
 
+  //Get the url of the social outline owner of this feed
+  $sopmlurl = "";
+  if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {
+    $sopmlurl = get_s3_url($uid, NULL, $default_social_outline_file_name);
+  }
+
 
 
   //The feed string
@@ -613,6 +619,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
       <managingEditor>".get_email_from_uid($uid)." ($username)</managingEditor>";
   if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {
       $rss .= "
+      <sopml:outline>$sopmlurl</sopml:outline>
       <microblog:archive>
           <microblog:url>".htmlspecialchars(get_s3_url($uid, "arc"))."/</microblog:url>
           <microblog:filename>".get_microblog_feed_filename($uid)."</microblog:filename>
@@ -692,7 +699,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
 	if( !empty($post['sourceurl']) || !empty($post['sourcetitle']) ) {
           $rss .= '        <source url="'.htmlspecialchars(trim($post['sourceurl'])).'">'.htmlspecialchars(trim($post['sourcetitle'])).'</source>'."\n";
 	}
-      $rss .= "        <author>".get_email_from_uid($uid)."</author>\n";
+      $rss .= "        <author>".get_email_from_uid($uid)." ($username)</author>\n";
       $rss .= $tweeted;
       $rss .= "      </item>\n";
   }

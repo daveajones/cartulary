@@ -3455,6 +3455,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     //-----ATOM--------------------------------------------------------------------------------------------------------------------------------------------------
     $mcount = count($item->link);
 
+    $title = clean_feed_item_content((string)$item->title, 0, FALSE, FALSE);
     $description = $item->summary;
     if( isset($item->content) ) {
       $description = (string)$item->content;
@@ -3526,16 +3527,33 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     //loggit(3, "NEW ITEM - TEXT: ".print_r($description, TRUE) );
     //loggit(3, "NEW ITEM - ENCLOSURES: ".print_r($enclosures, TRUE) );
 
+    //Does this item have a source tag?
     $sourceurl="";
+    if( $item->source->id ) {
+	$sourceurl = (string)$item->source->id;
+    }
     $sourcetitle="";
-    $author="";
+    if( $item->source->title ) {
+	$sourcetitle = strip_tags((string)$item->source->title);
+    }
 
-    $title = strip_tags((string)$item->title);
+    //Is there an author?
+    $author="";
+    if( $item->author->name ) {
+    	$author = strip_tags((string)$item->author->name);
+        //loggit(3, "AUTHOR FOUND: ".$author);
+    }
+
+    //Eliminate title if it's just a duplicate of the body
+    if( $description == $title ) {
+      $title = "";
+    }
 
     $sql->bind_param("ssssssssssss", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author) or print(mysql_error());
   } else {
     //-----RSS----------------------------------------------------------------------------------------------------------------------------------------------------
     $linkurl = $item->link;
+    $title = clean_feed_item_content((string)$item->title, 0, FALSE, FALSE);
     $description = $item->description;
 
     //We also need to find any enclosures
@@ -3613,13 +3631,13 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 	//loggit(3, "Item source url: ".$item->source->attributes()->url);
 	$sourceurl = (string)$item->source->attributes()->url;
 	//loggit(3, "Item source title: ".$item->source);
-	$sourcetitle = (string)$item->source;
+	$sourcetitle = strip_tags((string)$item->source);
     }
 
     //Is there an author?
     $author="";
     if( $item->author ) {
-    	$author = (string)$item->author;
+    	$author = strip_tags((string)$item->author);
         //loggit(3, "AUTHOR FOUND: ".$author);
     }
 
@@ -3658,7 +3676,10 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     //loggit(3, "NEW ITEM - TEXT: ".print_r($description, TRUE) );
     //loggit(3, "NEW ITEM - ENCLOSURES: ".print_r($enclosures, TRUE) );
 
-    $title = strip_tags((string)$item->title);
+    //Eliminate title if it's just a duplicate of the body
+    if( $description == $title ) {
+      $title = "";
+    }
 
     $sql->bind_param("ssssssssssss", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author) or print(mysql_error());
   }

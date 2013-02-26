@@ -1,14 +1,13 @@
 <?
 //A list of database schema updates for each version
 $cg_database_version['major'] = 0;
-$cg_database_version['minor'] = 1;
+$cg_database_version['minor'] = 2;
 $cg_database_updates = array();
 
-//Version 0 to 1 -------------------------------------------------------------------------------------------------
+//Version 0.0 to 0.1 -------------------------------------------------------------------------------------------------
 $cg_database_updates[0][0][] = <<<CGDB001
  ALTER TABLE `prefs` ADD `cartinriver` TINYINT NOT NULL DEFAULT '0' COMMENT 'Show cartulized articles in a modal.'
 CGDB001;
-
 $cg_database_updates[0][0][] = <<<CGDB002
  CREATE TABLE IF NOT EXISTS `dbversion` (
   `major` int(11) NOT NULL DEFAULT '0' COMMENT 'Major changes.',
@@ -17,16 +16,22 @@ $cg_database_updates[0][0][] = <<<CGDB002
   KEY `changed` (`changed`)
  ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Track database version and changes.'
 CGDB002;
-
 $cg_database_updates[0][0][] = <<<CGDB003
  ALTER TABLE `cartulary`.`dbversion` ADD UNIQUE `current` ( `major` , `minor` )
 CGDB003;
-
 $cg_database_updates[0][0][] = <<<CGDB004
  INSERT INTO `cartulary`.`dbversion` ( `major` , `minor` , `changed` ) VALUES ( '0', '1', CURRENT_TIMESTAMP )
 CGDB004;
 //----------------------------------------------------------------------------------------------------------------
 
+//Version 0.1 to 0.2 -------------------------------------------------------------------------------------------------
+$cg_database_updates[0][1][] = <<<CGDB011
+ ALTER TABLE `cartulary`.`flags` ADD PRIMARY KEY ( `name` )
+CGDB011;
+$cg_database_updates[0][1][] = <<<CGDB012
+ INSERT INTO `cartulary`.`dbversion` ( `major` , `minor` , `changed` ) VALUES ( '0', '2', CURRENT_TIMESTAMP )
+CGDB012;
+//----------------------------------------------------------------------------------------------------------------
 ?>
 
 

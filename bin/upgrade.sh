@@ -31,6 +31,12 @@ rm master.zip
 wget https://github.com/daveajones/cartulary/archive/master.zip
 unzip master.zip
 
+##: Stop cron
+stop cron
+
+##: Kill running jobs
+killall php
+
 ##: Back up the existing install
 tar -zcvf ~/cartulary-bak-$BAKDATE.tar.gz /opt/cartulary
 
@@ -83,9 +89,12 @@ echo '############################################################'
 echo
 php /opt/cartulary/bin/confcheck.php upgrade silent
 
+##: Check the database version
+php /opt/cartulary/bin/dbcheck.php
+
 ##: Restart cron daemon
 echo
-restart cron
+start cron
 
 echo
 echo 'Upgrade is finished.'

@@ -154,7 +154,20 @@ echo
 php /opt/cartulary/bin/confcheck.php 2>>/tmp/cartinstall.log
 
 
-##: 9. Install Cartulary Admin User
+##: 9. Check database version
+echo
+echo '#####################################################'
+echo '##---------------------------------------------------'
+echo '##                                                   '
+echo '##  Bring database current.                          '
+echo '##                                                   '
+echo '##---------------------------------------------------'
+echo '#####################################################'
+echo
+php /opt/cartulary/bin/dbcheck.php 2>>/tmp/cartinstall.log
+
+
+##: 10. Install Cartulary Admin User
 echo
 echo '#####################################################'
 echo '##---------------------------------------------------'
@@ -167,7 +180,7 @@ echo
 php /opt/cartulary/bin/usercheck.php 2>>/tmp/cartinstall.log >/tmp/cartinstall.pass
 
 
-##: 10. Install Crontab
+##: 11. Install Crontab
 echo
 echo '#####################################################'
 echo '##---------------------------------------------------'
@@ -181,7 +194,7 @@ php /opt/cartulary/bin/syscheck.php >>/tmp/cartinstall.log 2>&1
 /etc/init.d/cron restart >>/tmp/cartinstall.log 2>&1
 
 
-##: 11. Do an initial feed scan
+##: 12. Do an initial feed scan
 echo
 echo '#####################################################'
 echo '##---------------------------------------------------'

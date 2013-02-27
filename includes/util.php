@@ -255,7 +255,9 @@ function extract_media($html) {
 
   //Load the document
   $dom = new DOMDocument;
+  libxml_use_internal_errors(true);
   $dom->loadHTML(tidy_repair_string($html));
+  libxml_clear_errors();
 
   //Loop through the given tag types and determine what type of media they reference
   foreach( $tag_types as $tagname ) {
@@ -1588,7 +1590,9 @@ function prepareJSON($input) {
 
 function getAlternateLinkUrl($html = NULL) {
   $dom = new DOMDocument();
+  libxml_use_internal_errors(true);
   $dom->loadHTML($html);
+  libxml_clear_errors();
   $xpath = new DOMXPath($dom);
 
   $links = array();

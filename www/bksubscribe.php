@@ -34,14 +34,20 @@
 <!-- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -->
 <div class="row" id="divFeedFinder">
 <?
+$urltype="";
 if( isset($_REQUEST['url']) ) {
 	//Can we get an alternate link from the html at this url?
 	$url = trim($_REQUEST['url']);
         $url = get_final_url($url);
         $content = fetchUrl($url);
+        if( ($ftype = is_feed($content)) != FALSE ) {
+	  loggit(3, "DEBUG: Url itself is a feed.");
+	  $feedlocs[] = array( 'url' => $url, 'type' => $ftype, 'title' => $url, 'text' => '', 'element' => 'link' );
+	} else {
+  	  $feedlocs = getAlternateLinkUrl($content);
+	}
         $btnclass = "btn-warning";
         $btndesc = "Might be a feed.";
-	$feedlocs = getAlternateLinkUrl($content);
 	loggit(3, "DEBUG: ".print_r($feedlocs, TRUE));
 	if( !empty($feedlocs) && $content != FALSE ) {
           ?><h2>Feeds found: <img class="imgSpinner" src="/images/spinner.gif" /></h2><?

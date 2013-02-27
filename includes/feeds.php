@@ -3,6 +3,41 @@
 // API for managing feeds in the database
 
 
+//Test if the given content is an opml outline
+function is_feed($content = NULL)
+{
+  //Check parameters
+  if($content == NULL) {
+    loggit(2,"The content to test is blank or corrupt: [$content]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Load the content into a simplexml object
+  $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  if( $x === FALSE ) {
+    loggit(3,"The content didn't parse correctly.");
+    return(FALSE);
+  }
+
+  //Look for opml nodes
+  if( (string)$x->getName() == "rss" ) {
+    loggit(3, "Found a channel element. Looks like an RSS feed.");
+    return("application/rss+xml");
+  }
+  if( (string)$x->getName() == "feed" ) {
+    loggit(3, "Found a feed element. Looks like an ATOM feed.");
+    return("application/atom+xml");
+  }
+
+  //None of the tests passed so return FALSE
+  loggit(3,"The content tested was not an xml-based feed.");
+  return(FALSE);
+}
+
+
 //Test if the given content is a valid feed
 function feed_is_valid($content = NULL)
 {

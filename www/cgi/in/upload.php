@@ -19,17 +19,18 @@ $datestamp = $_POST['datestamp'];
 //Process the files coming in
 if (!empty($_FILES)) {
 	$tempFile   = $_FILES['Filedata']['tmp_name'];
+        $fileName   = cleanFilename($_FILES['Filedata']['name']);
 	$uploadDir  = $uploadDir;
-	$targetFile = $uploadDir . $uid."_".$datestamp."_".str_replace(' ', '', strtolower($_FILES['Filedata']['name']));
-	$targetS3File = $datestamp."_".str_replace(' ', '', strtolower($_FILES['Filedata']['name']));
+	$targetFile = $uploadDir . $uid."_".$datestamp."_".$fileName;
+	$targetS3File = $datestamp."_".$fileName;
 
 	// Validate the file type
 	$fileTypes = array('jpg', 'jpeg', 'gif', 'png', 'mp3', 'pdf'); // Allowed file extensions
-	$fileParts = pathinfo(str_replace(' ', '', strtolower($_FILES['Filedata']['name'])));
+	$fileParts = pathinfo($targetFile);
                 loggit(3, "DEBUG: ".print_r($_FILES, TRUE));
 
 	// Validate the filetype
-	if (in_array($fileParts['extension'], $fileTypes)) {
+	if( in_array($fileParts['extension'], $fileTypes) ) {
 
 		// Save the file
                 loggit(3, "Upload: moving [".$tempFile."] to [".$targetFile."].");

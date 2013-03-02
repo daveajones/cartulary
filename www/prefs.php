@@ -116,6 +116,7 @@
 		<li>But, never show more than: <input class="hourinput" name="maxriversize" type="text" value="<?echo $prefs['maxriversize']?>" /> items at a time.</li>
 		<li>And, never show more than: <input class="hourinput" name="maxriversizemobile" type="text" value="<?echo $prefs['maxriversizemobile']?>" /> items while on mobile.</li>
 		<li><input name="riverheadlinecart" type="checkbox" <?if ($prefs['riverheadlinecart'] == 1) echo "checked ";?>/> I want headlines to cartulize by default in the river.</li>
+		<li><input name="cartinriver" type="checkbox" <?if ($prefs['cartinriver'] == 1) echo "checked ";?>/> Don't use in-river cartulizing while on mobile.</li>
 		<li><input name="mobilehidebigpics" type="checkbox" <?if ($prefs['mobilehidebigpics'] == 1) echo "checked ";?>/> Hide large image/video enclosures in the river when on mobile.</li>
 		<li><input name="mobilehidepics" type="checkbox" <?if ($prefs['mobilehidepics'] == 1) echo "checked ";?>/> Hide body images/videos in the river when on mobile.</li>
 		<li><input name="fulltextriver" type="checkbox" <?if ($prefs['fulltextriver'] == 1) echo "checked ";?>/> I want to see the full text of each item.</li>

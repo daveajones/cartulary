@@ -52,6 +52,7 @@ if ( isset($_POST['maxriversize']) ) { $maxriversize = $_POST['maxriversize']; }
 if ( isset($_POST['maxriversizemobile']) ) { $maxriversizemobile = $_POST['maxriversizemobile']; } else { $maxriversizemobile = $default_river_max_items_mobile; };
 if ( isset($_POST['timezone']) ) { $timezone = $_POST['timezone']; } else { $timezone = $default_timezone; };
 if ( isset($_POST['fulltextriver']) ) { $fulltextriver = 1; } else { $fulltextriver = 0; };
+if ( isset($_POST['cartinriver']) ) { $cartinriver = 1; } else { $cartinriver = 0; };
 $jsondata = array();
 $jsondata['prefname'] = "";
 
@@ -529,6 +530,17 @@ if( ($fulltextriver < 0) || ($fulltextriver > 1) ) {
   exit(1);
 }
 $prefs['fulltextriver'] = $fulltextriver;
+
+$jsondata['prefname'] = "cartinriver";
+if( ($cartinriver < 0) || ($cartinriver > 1) ) {
+  //Log it
+  loggit(2,"The value for cartinriver pref was not within acceptable range: [$cartinriver]");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "Value of pref is out of range.";
+  echo json_encode($jsondata);
+  exit(1);
+}
+$prefs['cartinriver'] = $cartinriver;
 //--------------------------------------------------------
 //--------------------------------------------------------
 

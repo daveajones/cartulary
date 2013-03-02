@@ -117,9 +117,8 @@
                       {{if item.sourceurl}}<span class="source"> via: <a href="${item.sourceurl}">${item.sourcetitle}</a> | <a class="aSubscribe" data-sourceurl="${encodeURIComponent(item.sourceurl)}" href="#">Subscribe</a></span>{{/if}}
                     </div>
                     <div class="actions">
-                        <?if($prefs['riverheadlinecart'] != 1) {?>
-			<?loggit(3, "Platform: [$g_platform], Device: [$g_device], Version: [$g_device_version]");?>
-                        <?if( $g_device == "android" && $g_device_version == "2" ) {?>
+                        <?if( $g_prefs['riverheadlinecart'] != 1 ) {?>
+                        <?if( $g_prefs['cartinriver'] == 1 ) {?>
                           <div class="cartform"><a class="_cartlink" href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}" rel="external nofollow"><img class="icon-book-small" src="/images/blank.gif" alt="" /></a></div>
 			<?} else {?>
                           <div class="cartform"><a class="cartlink" href="#mdlShowArticle" data-id="${item.id}" data-toggle="modal" label="Cartulize Article" data-href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}"><img class="icon-book-small" src="/images/blank.gif" alt="" /></a></div>

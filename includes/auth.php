@@ -2418,11 +2418,12 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                maxriversize=?,
                maxriversizemobile=?,
                timezone=?,
-               fulltextriver=?
+               fulltextriver=?,
+	       cartinriver=?
            WHERE uid=?";
 
   $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsds",
+  $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdds",
                                 $prefs['publicdefault'],
 				$prefs['publicrss'],
 				$prefs['publicopml'],
@@ -2461,6 +2462,7 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
 				$prefs['maxriversizemobile'],
                                 $prefs['timezone'],
                                 $prefs['fulltextriver'],
+				$prefs['cartinriver'],
 				$uid
   ) or print(mysql_error());
   $sql->execute() or print(mysql_error());

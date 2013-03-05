@@ -144,7 +144,7 @@ function add_admin_log_item($content = NULL, $title = "", $url = "", $enclosure 
   $stmt = "INSERT INTO $table_adminlog (url,content,createdon,title,enclosure,sourceurl,sourcetitle) VALUES (?,?,?,?,?,?,?)";
   $sql=$dbh->prepare($stmt) or loggit(2, "SQL Error: [".$dbh->error."]");
   $sql->bind_param("sssssss", $url,$content,$createdon,$title,$enclosure,$source['url'],$source['title']) or loggit(2, "SQL Error: [".$dbh->error."]");
-  loggit(3,"Executing SQL: [".$stmt."]");
+  //loggit(3,"Executing SQL: [".$stmt."]");
   $sql->execute() or loggit(2, "SQL Error: [".$dbh->error."]");
   $sql->close() or loggit(2, "SQL Error: [".$dbh->error."]");
 
@@ -173,7 +173,7 @@ function get_admin_log_items($max = NULL)
     $sqltxt .= " LIMIT $max";
   }
 
-  loggit(3, "[$sqltxt]");
+  //loggit(3, "[$sqltxt]");
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->store_result() or print(mysql_error());

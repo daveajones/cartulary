@@ -4,13 +4,6 @@
   //Let's not run twice
   if(($pid = cronHelper::lock()) !== FALSE) {
 
-        //Let's not scan while other scripts are in process
-        if( file_exists("$confroot/$run/backup.php.lock") ) {
-          cronHelper::unlock();
-          loggit(3, "BUILDSYSRIVER: Backup is in progress, so skipping this build.");
-          exit(0);
-        }
-
   	loggit(1, "Building server river...");
   	echo "Building server river.\n\n";
 

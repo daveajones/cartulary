@@ -1476,15 +1476,23 @@ function get_s3_url($uid = NULL, $path = NULL, $filename = NULL) {
   //Includes
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
+  //Get key s3 info
+  $s3info = get_s3_info($uid);
+  $slashpos = strpos($s3info['bucket'], "/");
+  if( $slashpos === FALSE ) {
+    $mybucket = $s3info['bucket'];
+    $myfolder = "";
+  } else {
+    $mybucket = substr($s3info['bucket'], 0, $slashpos);
+    $myfolder = substr($s3info['bucket'], $slashpos + 1);
+  }
+
   //Globals
   $url = '';
   $prot = 'http://';
-  $host = 's3.amazonaws.com';
+  $host = $mybucket.'.s3.amazonaws.com';
   $path = trim($path, '/');
   $filename = ltrim($filename, '/');
-
-  //Get key s3 info
-  $s3info = get_s3_info($uid);
 
   //First let's get a proper hostname value
   if( !empty($s3info['cname']) ) {
@@ -1496,9 +1504,12 @@ function get_s3_url($uid = NULL, $path = NULL, $filename = NULL) {
   } else {
     $url = $prot.$host;
     if( !empty($s3info['bucket']) ) {
-      $url .= "/".trim($s3info['bucket'], '/');
+      //$url .= "/".trim($s3info['bucket'], '/');
+      $url .= "/".$myfolder;
     }
   }
+
+  $url = trim($url, "/");
 
   if( !empty($path) ) {
     $url .= "/".$path;
@@ -1507,7 +1518,8 @@ function get_s3_url($uid = NULL, $path = NULL, $filename = NULL) {
   if( !empty($filename) ) {
     $url .= "/".$filename;
   }
-
+//loggit(3, "DEBUG: ".print_r($s3info, TRUE));
+loggit(3, "DEBUG: $url");
   return($url);
 }
 
@@ -1564,10 +1576,10 @@ function stripText($text)
 //Make a filename html/script safe by taking out funky stuff
 function cleanFilename($text)
 {
-  $text = trim($text);
+  $text = strtolower(trim($text));
 
   // strip all except these characters
-  $clean = ereg_replace("[^A-Za-z0-9\-\.\ ]", "", $text);
+  $clean = ereg_replace("[^A-Za-z0-9\-\.]", "", $text);
 
   return $clean;
 }

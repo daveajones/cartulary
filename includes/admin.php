@@ -79,7 +79,6 @@ function create_user($email = NULL, $silent = NULL, $inside = NULL, $active = NU
   //Create an initial prefs entry
   init_user_prefs($newuid);
 
-
   //Log it
   loggit(1, "Created the new user: [$email|$newuid|$password|$username|$name]");
 
@@ -174,7 +173,7 @@ function get_admin_log_items($max = NULL)
     $sqltxt .= " LIMIT $max";
   }
 
-  //loggit(3, "[$sqltxt]");
+  loggit(3, "[$sqltxt]");
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->store_result() or print(mysql_error());
@@ -302,6 +301,14 @@ function build_admin_log_rss_feed($max = NULL)
   }
 
   $rss .= "\n    </channel>\n  </rss>";
+
+
+  //Mark feed as updated internally
+  $afid = feed_exists("http://localhost".$adminlogfeed);
+  if( $afid != FALSE ) {
+    mark_feed_as_updated($afid);
+  }
+
 
 
   loggit(1, "Built admin log rss feed.");

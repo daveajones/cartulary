@@ -88,7 +88,11 @@ if( strlen($url) > 760 ) {
 $url = trim($url);
 
 //Is the feed even valid?
-$content = fetchUrl($url);
+if( $urltarget == "local" ) {
+  $content = @file_get_contents($url);
+} else {
+  $content = fetchUrl($url);
+}
 if( isset($_REQUEST['dig']) ) {
   //Can we get an alternate link from the html at this url?
   $feedloc = getAlternateLinkUrl($content);
@@ -277,7 +281,7 @@ if( feed_is_linked_by_url($url, $uid) ) {
   //Feed was already linked to this user
   loggit(2,"The feed: [$url] was already subscribed to by user: [$uid].");
   $jsondata['status'] = "false";
-  $jsondata['description'] = "Brother, you already follow that feed.";
+  $jsondata['description'] = "You already follow that feed.";
   echo json_encode($jsondata);
   exit(1);
 }

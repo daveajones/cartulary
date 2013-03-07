@@ -118,12 +118,13 @@
                     </div>
                     <div class="actions">
                         <?if( $g_prefs['riverheadlinecart'] != 1 ) {?>
-                        <?if( $g_prefs['cartinriver'] == 1 ) {?>
+                        <?if( $g_prefs['cartinriver'] == 1 && $g_platform['mobile'] ) {?>
                           <div class="cartform"><a class="_cartlink" href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}" rel="external nofollow"><img class="icon-book-small" src="/images/blank.gif" alt="" /></a></div>
 			<?} else {?>
                           <div class="cartform"><a class="cartlink" href="#mdlShowArticle" data-id="${item.id}" data-toggle="modal" label="Cartulize Article" data-href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}"><img class="icon-book-small" src="/images/blank.gif" alt="" /></a></div>
 			<?}?>
                         <?}?>
+
                         <?if(!empty($prefs['linkblog'])) {?>
 			  <div><a href="<?echo $prefs['linkblog']?>/?description=${encodeURIComponent(item.title)}&link=${encodeURIComponent(item.link)}" rel="external nofollow" target="_blank">RT</a></div>
 			<?} else {?>

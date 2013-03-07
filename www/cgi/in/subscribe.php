@@ -85,7 +85,7 @@ if( strlen($url) > 760 ) {
 }
 
 //Let's clean up the URL a bit to try and help the user
-$url = trim($url);
+$url = trim(clean_url($url));
 
 //Is the feed even valid?
 if( $urltarget == "local" ) {

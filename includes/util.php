@@ -671,7 +671,7 @@ function check_head_lastmod($url, $timeout = 5){
     return(FALSE);
   }
 
-  $url = str_replace( "feed://", "http://", $url );
+  $url = clean_url($url);
 
   $curl = curl_init();
 
@@ -710,7 +710,7 @@ function check_head_size($url, $timeout = 5){
     return(FALSE);
   }
 
-  $url = str_replace( "feed://", "http://", $url );
+  $url = clean_url($url);
 
   $curl = curl_init();
 
@@ -737,10 +737,33 @@ function check_head_size($url, $timeout = 5){
 
 }
 
-function get_final_url( $url, $timeout = 5 )
+//Clean up potentially problematic urls
+function clean_url($url = NULL)
 {
+    //Check parameters
+    if( empty($url) ) {
+      loggit(2, "The url is missing or empty: [$url].");
+      return(FALSE);
+    }
+
+    //Detect whether or not this url is encoded
+    if( strpos($url, "%") !== FALSE ) {
+      //loggit(3, "Url in: [$url].");
+      $url = urldecode($url);
+      //loggit(3, "Url out: [$url].");
+    }
+
     $url = str_replace( "&amp;", "&", trim($url) );
     $url = str_replace( "feed://", "http://", $url );
+    $url = str_replace( ' ', '%20', $url );
+
+    return($url);
+}
+
+//Follow redirects to get to the final, good url
+function get_final_url( $url, $timeout = 5 )
+{
+    $url = clean_url($url);
     $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
 
     $cookie = tempnam ("/tmp", "CURLCOOKIE");
@@ -776,15 +799,14 @@ function get_final_url( $url, $timeout = 5 )
     }
 
     //Javascript re-direct
-    if (    preg_match("/window\.location\.replace\('(.*)'\)/i", $content, $value) ||
-            preg_match("/window\.location\=\"(.*)\"/i", $content, $value)
-    )
-    {
+    if( preg_match("/window\.location\.replace\('(.*)'\)/i", $content, $value) || preg_match("/window\.location\=\"(.*)\"/i", $content, $value) ) {
 	//loggit(3, "DEBUG: This was a javascript redirect.");
-        return get_final_url ( $value[1] );
-    }
-    else
-    {
+        if( strpos($value[1], "http") !== FALSE ) {
+          return get_final_url ( $value[1] );
+        } else {
+          return $response['url'];
+	}
+    } else {
 	//loggit(3, "DEBUG: No redirection.");
         return $response['url'];
     }
@@ -793,8 +815,7 @@ function get_final_url( $url, $timeout = 5 )
 /* gets the data from a URL */
 function fetchUrl($url, $timeout = 30)
 {
-    $url = str_replace( "feed://", "http://", $url );
-    $url = str_replace( ' ', '%20', $url );
+	$url = clean_url($url);
 
 	$ch = curl_init();
         $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
@@ -961,6 +982,65 @@ function get_s3_buckets($key, $secret) {
   return($buckets);
 }
 
+function get_s3_bucket_location($key, $secret, $bucket) {
+  //Check parameters
+  if (empty($key)) {
+    loggit(2, "Key missing from S3 put call: [$key].");
+    return(FALSE);
+  }
+  if (empty($secret)) {
+    loggit(2, "Secret missing from S3 put call: [$secret].");
+    return(FALSE);
+  }
+  if (empty($bucket)) {
+    loggit(2, "Bucket missing from S3 put call: [$bucket].");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Set up
+  require_once "$confroot/$libraries/s3/S3.php";
+  $s3 = new S3($key, $secret);
+
+  //Get a list of buckets
+  $bucketloc = $s3->getBucketLocation($bucket);
+
+  //Were we able to get a list?
+  if($bucketloc == FALSE) {
+    loggit(2, "Could not get a bucket location using: [$key | $secret | $bucket].");
+    return(FALSE);
+  }
+
+  //Give back the buckets array
+  //loggit(3, "DEBUG: Bucket: [$bucket] is located in: [$bucketloc].");
+  return($bucketloc);
+}
+
+function get_s3_regional_dns($location) {
+
+  //Check parameters
+  if (empty($location)) {
+    loggit(2, "Location missing from S3 call: [$location].");
+    return(FALSE);
+  }
+
+  //Open the file
+  switch($location) {
+    case "EU":
+      return("s3-eu-west-1.amazonaws.com");
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+    default:
+      return("s3.amazonaws.com");
+      break;
+  }
+}
+
 function putInS3($content, $filename, $bucket, $key, $secret, $contenttype = NULL) {
 
   //Check parameters
@@ -993,6 +1073,7 @@ function putInS3($content, $filename, $bucket, $key, $secret, $contenttype = NUL
   require_once "$confroot/$libraries/s3/S3.php";
   $s3 = new S3($key, $secret);
 
+
   //Construct bucket subfolder path, if any
   $s3bucket = $bucket;
   if(stripos($s3bucket, '/', 1) === FALSE) {
@@ -1004,6 +1085,7 @@ function putInS3($content, $filename, $bucket, $key, $secret, $contenttype = NUL
   }
 
   loggit(1, "putInS3(): Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
+  //get_s3_bucket_location($key, $secret, $bucket);
 
   if($contenttype == NULL) {
     $s3res = $s3->putObjectString($content, $bucket, $subpath.$filename, S3::ACL_PUBLIC_READ);
@@ -1055,7 +1137,6 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
   require_once "$confroot/$libraries/s3/S3.php";
   $s3 = new S3($key, $secret);
 
-
   //Construct bucket subfolder path, if any
   $s3bucket = $bucket;
   if(stripos($s3bucket, '/', 1) === FALSE) {
@@ -1067,6 +1148,7 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
   }
 
   loggit(1, "Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
+  //get_s3_bucket_location($key, $secret, $bucket);
 
   $content = $s3->inputFile($file);
   if($contenttype == NULL) {
@@ -1518,8 +1600,9 @@ function get_s3_url($uid = NULL, $path = NULL, $filename = NULL) {
   if( !empty($filename) ) {
     $url .= "/".$filename;
   }
-//loggit(3, "DEBUG: ".print_r($s3info, TRUE));
-loggit(3, "DEBUG: $url");
+
+  //loggit(3, "DEBUG: ".print_r($s3info, TRUE));
+  //loggit(3, "DEBUG: $url");
   return($url);
 }
 
@@ -1664,6 +1747,7 @@ function absolutizeUrl($url = NULL, $rurl = NULL) {
   //loggit(3, "Absolutizing url: [$url] with referer: [$rurl].");
 
   //Check if the url is good first
+  $url = clean_url($url);
   $pos = strpos($url, 'http');
   if( $pos !== FALSE && $pos == 0 ) {
     return($url);
@@ -1945,6 +2029,7 @@ function make_mime_type( $url = NULL, $type = NULL )
   }
 
   //Let's be clean
+  $url = clean_url($url);
   $type = trim($type);
 
   // ----- Pictures
@@ -2001,6 +2086,9 @@ function make_mime_type( $url = NULL, $type = NULL )
 //Determine what type of media a url points to based on the extension in the url
 function url_is_media( $url = NULL )
 {
+
+  //Be clean
+  $url = clean_url($url);
 
   //Pictures
   if( strposa($url, array('.jpg','.png','.jpeg','.gif')) !== FALSE ) {
@@ -2179,7 +2267,7 @@ function set_bucket_redirect($bucket = NULL, $location = NULL) {
 	return(FALSE);
   }
 
-  loggit(3, "Redirected S3 bucket: [$bucket] to [$location].");
+  //loggit(3, "Redirected S3 bucket: [$bucket] to [$location].");
   return(TRUE);
 }
 

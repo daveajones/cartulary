@@ -169,6 +169,9 @@ function feed_exists($url = NULL)
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
+  //Clean the url
+  $url = clean_url($url);
+
   //Look for the url in the feed table
   $sql=$dbh->prepare("SELECT id FROM $table_newsfeed WHERE url=?") or print(mysql_error());
   $sql->bind_param("s", $url) or print(mysql_error());
@@ -842,6 +845,9 @@ function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL)
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
+  //Clean the url
+  $url = clean_url($url);
+
   //Timestamp
   $createdon = time();
 
@@ -950,10 +956,10 @@ function update_feed_avatar($fid = NULL, $url = NULL)
   if( empty($url) ) {
     $url = "";
   } else {
-    $url = trim( htmlspecialchars( $url ) );
+    $url = trim( htmlspecialchars( clean_url($url) ) );
   }
 
-  //Now that we have a good id, put the article into the database
+  //Put the avatar in
   $stmt = "UPDATE $table_newsfeed SET avatarurl=? WHERE id=?";
   $sql=$dbh->prepare($stmt) or print(mysql_error());
   $sql->bind_param("ss", $url,$fid) or print(mysql_error());
@@ -1721,7 +1727,7 @@ function mark_feed_as_updated($fid = NULL)
   $sql->close() or print(mysql_error());
 
   //Log and return
-  loggit(3,"Flagged feed: [$fid] as needing to be scanned.");
+  //loggit(3,"Flagged feed: [$fid] as needing to be scanned.");
   return($updcount);
 }
 
@@ -1944,7 +1950,7 @@ function unmark_outline_feed_to_purge($oid = NULL, $fid = NULL)
 
   //Log and return
   if($updcount < 1) {
-    loggit(2,"Failed to unmark feed: [$fid] to purge for outline: [$oid].");
+    //loggit(2,"Failed to unmark feed: [$fid] to purge for outline: [$oid].");
     return(FALSE);
   } else {
     loggit(1,"Unmarked feed: [$fid] to purge for outline: [$oid].");
@@ -2346,6 +2352,9 @@ function add_pub_feed($url = NULL, $uid = NULL, $title = NULL)
   //Includes
   include get_cfg_var("cartulary_conf").'/includes/env.php';
   $tstamp = time();
+
+  //Clean the url
+  $url = clean_url($url);
 
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
@@ -2899,7 +2908,7 @@ function delete_old_feed_items($fid = NULL)
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
-  $thirtydaysago = time() - 7776000;
+  $thirtydaysago = (time() - ($max_newsfeed_item_age * 86400));
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_nfitem WHERE feedid=? AND `old`=1 AND timeadded < ?";
@@ -3690,6 +3699,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $description = $cleaned['text'];
 
     //Attach extracted media tags as enclosures with correct type
+    if( count($cleaned['media']) > 0) {
     foreach( $cleaned['media'] as $mediatag ) {
       $esize = "";
       if( $mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video' ) {
@@ -3701,6 +3711,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       } else {
         //loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
+    }
     }
 
     //Serialize the enclosure array

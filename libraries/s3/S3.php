@@ -510,6 +510,7 @@ class S3
 	public static function putObject($input, $bucket, $uri, $acl = self::ACL_PRIVATE, $metaHeaders = array(), $requestHeaders = array(), $storageClass = self::STORAGE_CLASS_STANDARD)
 	{
 		if ($input === false) return false;
+		self::$endpoint = S3::__getRegionEndpoint(S3::getBucketLocation($bucket));
 		$rest = new S3Request('PUT', $bucket, $uri, self::$endpoint);
 
 		if (is_string($input)) $input = array(
@@ -1648,6 +1649,49 @@ class S3
 
 
 	/**
+	* Take a region and hand back the proper endpoint for puts
+	*
+	* @internal Used by S3Request
+	* @param string $string Region code string
+	* @return string
+	*/
+	public static function __getRegionEndpoint($string)
+	{
+		loggit(3, "S3: Region in: [$string].");
+		switch($string) {
+			case 'US':
+				return 's3.amazonaws.com';
+				break;
+			case 'us-west-2':
+				return 's3-us-west-2.amazonaws.com';
+				break;
+			case 'us-west-1':
+				return 's3-us-west-1.amazonaws.com';
+				break;
+			case 'EU':
+				return 's3-eu-west-1.amazonaws.com';
+				break;
+			case 'ap-southeast-1':
+				return 's3-ap-southeast-1.amazonaws.com';
+				break;
+			case 'ap-southeast-2':
+				return 's3-ap-southeast-2.amazonaws.com';
+				break;
+			case 'ap-northeast-1':
+				return 's3-ap-northeast-1.amazonaws.com';
+				break;
+			case 'sa-east-1':
+				return 's3-sa-east-1.amazonaws.com';
+				break;
+			default:
+				return 's3-eu-west-1.amazonaws.com';
+				break;
+		}
+		return 's3.amazonaws.com';
+	}
+
+
+	/**
 	* Creates a HMAC-SHA1 hash
 	*
 	* This uses the hash extension if loaded
@@ -1666,6 +1710,7 @@ class S3
 	}
 
 }
+
 
 final class S3Request
 {

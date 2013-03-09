@@ -176,6 +176,8 @@
 <?include "$confroot/$scripts/river.js"?>
 </script>
 
+<a id="jumpTop" title="Jump back to the top of the page." href="#" style="position:fixed; bottom:10px; right:0px;"><img class="icon-jump-top" src="/images/blank.gif"></a>
+
 <!-- Show article modal dialog -->
 <div id="mdlShowArticle" class="modal hide fade">
   <div class="modal-header">
@@ -188,7 +190,9 @@
   </div>
   <div class="modal-footer">
     <center class="arfooter hide">
+      <?if($platform != "mobile"){?>
       <a class="opml" title="OPML Version" href="#"><img class="icon-opml" src="/images/blank.gif" alt="" /> </a>
+      <?}?>
       <a class="print" title="Printer Friendly" href="#"><img class="icon-print" src="/images/blank.gif" alt="" /> </a>
       <a class="rt" title="Send to Microblog" href="#"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
       <a class="link" title="Link to Original" href="#"><img class="icon-hyperlink" src="/images/blank.gif" alt="" /> </a>

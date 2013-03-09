@@ -89,6 +89,14 @@ $(document).ready( function() {
                 $('#imgTwitter').toggleClass('icon-notwitter');
         });
 
+	//Jump to top button
+	$('#scrlTop').click(function () {
+		$('html, body').animate({
+		        scrollTop: '0px'
+	      },
+	      300);
+	      return false;
+	});
 });
 
 

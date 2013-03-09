@@ -90,7 +90,7 @@ $(document).ready( function() {
         });
 
 	//Jump to top button
-	$('#scrlTop').click(function () {
+	$('#jumpTop').click(function () {
 		$('html, body').animate({
 		        scrollTop: '0px'
 	      },

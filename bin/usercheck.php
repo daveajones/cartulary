@@ -39,8 +39,9 @@
       //Reset bad login counter
       badlogin_reset( get_email_from_uid($uid) );
       //Self subscription check
-      $s3sopml = get_s3_url($uid, NULL, $default_social_outline_file_name);
-      $oid = add_social_outline($s3sopml, $uid);
+      //$s3sopml = get_s3_url($uid, NULL, $default_social_outline_file_name);
+      //$oid = add_social_outline($s3sopml, $uid);
+      //echo "Subbing to: $s3sopml\n";
     }
 
   //Remove the lock file

@@ -1004,5 +1004,46 @@ function update_article_static_url($aid = NULL, $uid = NULL, $url = NULL)
 }
 
 
+//_______________________________________________________________________________________
+//Get the static url of an article if there is one
+function get_article_static_url($aid = NULL, $uid = NULL)
+{
+  //Check parameters
+  if($aid == NULL) {
+    loggit(2,"The article id is blank or corrupt: [$aid]");
+    return(FALSE);
+  }
+  if($uid == NULL) {
+    loggit(2,"The user id is blank or corrupt: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Look for the sid in the session table
+  $sql=$dbh->prepare("SELECT staticurl FROM $table_catalog WHERE articleid=? AND userid=?") or print(mysql_error());
+  $sql->bind_param("ss", $aid, $uid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+  //See if the session is valid
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(1,"The article: [$aid] does not exist in the repository.");
+    return(FALSE);
+  }
+  $sql->bind_result($staticurl) or print(mysql_error());
+  $sql->fetch() or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  loggit(1,"Article: [$aid] has static url: [$staticurl] for user: [$uid].");
+  return($staticurl);
+}
+
+
 //########################################################################################
 ?>

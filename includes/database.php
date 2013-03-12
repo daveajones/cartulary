@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 3;
+$cg_database_version = 4;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -33,6 +33,17 @@ $cg_database_updates[2][] = <<<CGDB0006
  INSERT INTO `dbversion` ( `version` ) VALUES ( '3' )
 CGDB0006;
 //----------------------------------------------------------------------------------------------------------------
+
+//Version 3 to 4 -------------------------------------------------------------------------------------------------
+$cg_database_updates[3][] = <<<CGDB0007
+ ALTER TABLE `prefs` ADD `staticarticles` TINYINT NOT NULL DEFAULT '0' COMMENT 'Store a static version of the article?'
+CGDB0007;
+$cg_database_updates[3][] = <<<CGDB0008
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '4' )
+CGDB0008;
+//----------------------------------------------------------------------------------------------------------------
+
+
 ?>
 
 

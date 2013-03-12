@@ -3998,7 +3998,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
-  //Get the items
+  //Assemble query
   $sqltxt = "SELECT $table_nfitem.id,
                     $table_nfitem.title,
                     $table_nfitem.url,
@@ -4032,7 +4032,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
   }
   $sqltxt .= " LIMIT $max";
 
-  //loggit(1, "[$sqltxt]");
+  //Execute the query
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
   $sql->bind_param("ssd", $uid, $uid, $start) or print(mysql_error());
   $sql->execute() or print(mysql_error());
@@ -4226,7 +4226,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 
       //Put the desktop file
       $filename = $default_river_json_file_name;
-      $s3res = putInS3($djsonriver, $filename, $s3info['bucket'].$subpath, $s3info['key'], $s3info['secret'], "application/javascript");
+      $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'].$subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" =>"gzip"));
       if(!$s3res) {
 	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
         //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -4236,7 +4236,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
       }
       //Put the mobile file
       $filename = $default_river_json_mobile_file_name;
-      $s3res = putInS3($mjsonriver, $filename, $s3info['bucket'].$subpath, $s3info['key'], $s3info['secret'], "application/javascript");
+      $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'].$subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" =>"gzip"));
       if(!$s3res) {
 	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
         //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -4796,187 +4796,6 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
 
   loggit(1,"Returning: [$count] items for feed: [$fid]");
   return($items);
-}
-
-
-//_______________________________________________________________________________________
-// ***** under construction ******
-// *****    do not use      ******
-//Build a server-wide rss feed
-function build_server_rss_feed($max = NULL)
-{
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
-  require_once "$confroot/$libraries/s3/S3.php";
-
-  //Get a proper max value
-  if($max == NULL) {
-      $max = $default_max_rss_items;
-  }
-
-  //Get the right timezone
-  date_default_timezone_set('America/Chicago');
-
-  //If the array of posts is being passed in as an argument we don't make this call
-  if( $posts == NULL || !is_array($posts) ) {
-    $posts = get_blog_posts($uid, $max, NULL, $archive);
-  }
-
-  //Get a correct title
-  $title = get_microblog_title($uid);
-
-  //Get the correct link
-  if( $prefs['mblinkhome'] == 0 || empty($prefs['homepagelink']) ) {
-    $feedlink = get_s3_url($uid, NULL, get_microblog_html_filename($uid));
-  } else {
-    $feedlink = $prefs['homepagelink'];
-  }
-
-  //Get the date of the user's earliest blog post
-  $firstpost = get_first_blog_post($uid);
-  if( empty($firstpost) ) {
-    $firstpostDate = date('Y-m-d');
-  } else {
-    $firstpostDate = date('Y-m-d', $firstpost['createdon']);
-  }
-
-  //Get the date of the user's latest blog post
-  if( empty($posts) ) {
-    $lastpostDate = date('Y-m-d');
-  } else {
-    $lastpostDate = date('Y-m-d', $posts[0]['createdon']);
-  }
-
-
-
-  //The feed string
-  $rss = '<?xml version="1.0"?>'."\n  <rss version=\"2.0\" xmlns:microblog=\"http://microblog.reallysimple.org/\" xmlns:sopml=\"$sopmlnamespaceurlv1\">\n    <channel>";
-
-  $rss .= "\n
-      <title>".htmlspecialchars($title)."</title>
-      <link>".htmlspecialchars($feedlink)."</link>
-      <description>$title</description>
-      <language>en-us</language>
-      <pubDate>".date("D, d M Y H:i:s O")."</pubDate>
-      <lastBuildDate>".date("D, d M Y H:i:s O")."</lastBuildDate>
-      <generator>$system_name, v$version</generator>
-      <managingEditor>".get_email_from_uid($uid)." ($username)</managingEditor>";
-  if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {
-      $rss .= "
-      <microblog:archive>
-          <microblog:url>".htmlspecialchars(get_s3_url($uid, "arc"))."/</microblog:url>
-          <microblog:filename>".get_microblog_feed_filename($uid)."</microblog:filename>
-          <microblog:startDay>$firstpostDate</microblog:startDay>
-          <microblog:endDay>$lastpostDate</microblog:endDay>
-      </microblog:archive>";
-  }
-  $rss .= "
-      <microblog:localTime>".date('n/j/Y; g:i:s A')."</microblog:localTime>
-      <cloud domain=\"".$rss_cloud_domain."\" port=\"".$rss_cloud_port."\" path=\"".$rss_cloud_notify_path."\" registerProcedure=\"\" protocol=\"".$rss_cloud_protocol."\" />\n";
-
-  if( !empty($prefs['avatarurl']) ) {
-    $rss .= "      <microblog:avatar>".$prefs['avatarurl']."</microblog:avatar>\n";
-  }
-
-  foreach( $posts as $post ) {
-	if ($post['url'] == "") {
-	  $rsslink = "";
-          $linkfull = "";
-          $guid = "        <guid isPermaLink=\"false\">".$post['id']."</guid>";
-        } else {
-	  if(!empty($post['shorturl'])) {
-		$rssurl = htmlspecialchars($post['shorturl']);
-                $rsslink = "        <link>$rssurl</link>";
-                $guid = "        <guid>$rssurl</guid>";
-                $linkfull = "        <microblog:linkFull>".htmlspecialchars($post['url'])."</microblog:linkFull>";
-          } else {
-                $rssurl = htmlspecialchars($post['url']);
-                $rsslink = "        <link>$rssurl</link>";
-                $guid = "        <guid>$rssurl</guid>";
-          }
-	}
-        if( !empty($post['enclosure']) ) {
-          $enclosures = $post['enclosure'];
-        } else {
-          $enclosures = array();
-	}
-        $tweeted = '';
-        if( $post['tweeted'] == 1 ) {
-                $tweeted = "        <sopml:tweeted>true</sopml:tweeted>\n";
-        }
-
-       $rss .= "
-      <item>\n";
-        if( !empty($post['title']) ) {
-          $rss .= "        <title>".htmlspecialchars(trim($post['title']))."</title>\n";
-        }
-        $rss .= "        <description><![CDATA[".trim($post['content'])."]]></description>
-        <pubDate>".date("D, d M Y H:i:s O", $post['createdon'])."</pubDate>\n";
-        $rss .= $guid."\n";
-        if(!empty($rsslink)) { $rss .= $rsslink."\n"; }
-        if(!empty($linkfull)) { $rss .= $linkfull."\n"; }
-        if( isset($enclosures) ) {
-          if( is_array($enclosures) && count($enclosures) > 0 ) {
-            foreach($enclosures as $enclosure) {
-              $elen = 'length="0"';
-              $etyp = 'type="application/octet-stream"';
-	      if( !empty($enclosure['length']) ) {
-                $elen = 'length="'.$enclosure['length'].'"';
-              }
-	      if( !empty($enclosure['type']) ) {
-                $etyp = 'type="'.$enclosure['type'].'"';
-              }
-              if( !empty($enclosure['url']) ) {
-                $rss .= '        <enclosure url="'.htmlspecialchars(trim($enclosure['url'])).'" '.$elen.' '.$etyp.' />'."\n";
-              }
-            }
-          }
-        }
-	if( !empty($post['sourceurl']) || !empty($post['sourcetitle']) ) {
-          $rss .= '        <source url="'.htmlspecialchars(trim($post['sourceurl'])).'">'.htmlspecialchars(trim($post['sourcetitle'])).'</source>'."\n";
-	}
-      $rss .= "        <author>".get_email_from_uid($uid)."</author>\n";
-      $rss .= $tweeted;
-      $rss .= "      </item>\n";
-  }
-
-  $rss .= "\n    </channel>\n  </rss>";
-
-  //If this user has S3 storage enabled, then do it
-  if( (s3_is_enabled($uid) || sys_s3_is_enabled()) && !$nos3 ) {
-    //First we get all the key info
-    $s3info = get_s3_info($uid);
-
-    //Get the microblog feed file name
-    $filename = get_microblog_feed_filename($uid);
-    $arcpath = '';
-
-    //Was this a request for a monthly archive?
-    if( $archive != FALSE ) {
-      $arcpath = "/arc/".date('Y')."/".date('m')."/".date('d');
-      //loggit(3, "Archive path: [".$arcpath."]");
-    }
-
-    //Put the file
-    $s3res = putInS3($rss, $filename, $s3info['bucket'].$arcpath, $s3info['key'], $s3info['secret'], "application/rss+xml");
-    if(!$s3res) {
-      loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-      //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-    } else {
-      $s3url = get_s3_url($uid, $arcpath, $filename);
-      loggit(1, "Wrote feed to S3 at url: [$s3url].");
-
-      //Ping the rss cloud if this is not an archive AND rsscloud is enabled
-      if($archive == FALSE && $enable_rsscloud == 1) {
-        $resp = httpRequest($rss_cloud_domain, $rss_cloud_port, $rss_cloud_method, $rss_cloud_ping_path, array("url" => $s3url), $rss_cloud_timeout);
-        loggit(1, "Pinged the rss cloud for feed: [$s3url].");
-      }
-    }
-  }
-
-
-  loggit(1, "Built blog rss feed for user: [$username | $uid].");
-  return($rss);
 }
 
 

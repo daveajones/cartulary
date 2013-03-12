@@ -1041,7 +1041,7 @@ function get_s3_regional_dns($location) {
   }
 }
 
-function putInS3($content, $filename, $bucket, $key, $secret, $contenttype = NULL) {
+function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $private = FALSE) {
 
   //Check parameters
   if (empty($content)) {
@@ -1087,10 +1087,10 @@ function putInS3($content, $filename, $bucket, $key, $secret, $contenttype = NUL
   loggit(1, "putInS3(): Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
   //get_s3_bucket_location($key, $secret, $bucket);
 
-  if($contenttype == NULL) {
-    $s3res = $s3->putObjectString($content, $bucket, $subpath.$filename, S3::ACL_PUBLIC_READ);
+  if( $private ) {
+    $s3res = $s3->putObject($content, $bucket, $subpath.$filename, S3::ACL_PRIVATE, array(), $headers);
   } else {
-    $s3res = $s3->putObjectString($content, $bucket, $subpath.$filename, S3::ACL_PUBLIC_READ, array(), $contenttype);
+    $s3res = $s3->putObject($content, $bucket, $subpath.$filename, S3::ACL_PUBLIC_READ, array(), $headers);
   }
   if(!$s3res) {
        	loggit(2, "Could not create S3 file: [$bucket/$subpath$filename].");

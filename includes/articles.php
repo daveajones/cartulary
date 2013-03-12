@@ -933,6 +933,39 @@ function get_cartulary_title($uid = NULL)
 }
 
 
+//Get a printer friendly version of an article
+function make_article_printable( $aid = NULL )
+{
+  //If aid is bad then balk
+  if( empty($aid) ) {
+    loggit(2,"Article id is blank or corrupt: [$aid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Get the article in question
+  $article = get_article($aid);
+
+  //Assemble a printable version
+  $printable = "<head>";
+  $printable .= "<title>".$article['title']." [Printable]</title>";
+  $printable .= "</head>";
+  $printable .= "<body>";
+  $printable .= "<div id=\"divPageArticle\">";
+  $printable .= "  <div id=\"divHeadline\"><h1>".$article['title']."</h1></div>";
+  $printable .= "  <div id=\"divContent\">".$article['content']."</div>";
+  $printable .= "  <div id=\"divCite\"><a href=\"".$article['url']."\">".$article['url']."</a></div>";
+  $printable .= "</div>";
+  $printable .= "</body>";
+  $printable .= "</html>";
+
+
+  //Give back
+  return($printable);
+}
+
 
 //########################################################################################
 ?>

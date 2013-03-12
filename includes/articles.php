@@ -967,5 +967,42 @@ function make_article_printable( $aid = NULL )
 }
 
 
+//_______________________________________________________________________________________
+//Change the static url of an article
+function update_article_static_url($aid = NULL, $uid = NULL, $url = NULL)
+{
+  //Check parameters
+  if($aid == NULL) {
+    loggit(2,"The article id is blank or corrupt: [$aid]");
+    return(FALSE);
+  }
+  if($uid == NULL) {
+    loggit(2,"The user id is blank or corrupt: [$uid]");
+    return(FALSE);
+  }
+  if($url == NULL) {
+    loggit(2,"The article url is blank or corrupt: [$url]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Now that we have a good id, put the article url in the database
+  $stmt = "UPDATE $table_catalog SET url=? WHERE articleid=? AND userid=?";
+  $sql=$dbh->prepare($stmt) or print(mysql_error());
+  $sql->bind_param("sss", $url, $aid, $uid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and return
+  loggit(3,"Changed article: [$aid]'s url to: [$url] for user: [$uid].");
+  return(TRUE);
+}
+
+
 //########################################################################################
 ?>

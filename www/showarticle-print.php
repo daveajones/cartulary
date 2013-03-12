@@ -16,23 +16,7 @@
     exit(0);
   }
 
-  //Get the requested article
-  $article = get_article($aid);
-
   $tree_location = "Show Article";
 ?>
-
 <?include "$confroot/$templates/$template_html_prehead"?>
-<head>
-<title><?echo $article['title']?> [Printable]</title>
-<link rel="stylesheet" type="text/css" href="<?echo $url_print_style?>" />
-</head>
-<body>
-<div id="divPageArticle">
-		<div id="divHeadline"><h1><?echo $article['title']?></h1></div>
-		<div id="divContent"><?echo $article['content'];?></div>
-		<div id="divCite"><a href="<?echo $article['url'];?>"><?echo $article['url'];?></a></div>
-</div>
-</body>
-<?include "$confroot/$templates/$template_html_postbody"?>
-</html>
+<?echo make_article_printable($aid);?>

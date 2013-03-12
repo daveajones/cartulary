@@ -149,6 +149,7 @@
 		<li><input name="shortcart" type="checkbox" <?if ($prefs['shortcart'] == 1) echo "checked ";?>/> I want articles that I cartulize to have their url's shortened also.</li>
 		<li><input name="publicdefault" type="checkbox" <?if ($prefs['publicdefault'] == 1) echo "checked ";?>/> I want my article archive RSS feed to be private.</li>
 		<li><input name="publicopml" type="checkbox" <?if ($prefs['publicopml'] == 1) echo "checked ";?>/> I want my article archive OPML file to be private.</li>
+		<li><input name="staticarticles" type="checkbox" <?if ($prefs['staticarticles'] == 1) echo "checked ";?>/> I want a static version of each article stored in S3.</li>
 	</ul>
 	</div>
 

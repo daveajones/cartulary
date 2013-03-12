@@ -53,6 +53,7 @@ if ( isset($_POST['maxriversizemobile']) ) { $maxriversizemobile = $_POST['maxri
 if ( isset($_POST['timezone']) ) { $timezone = $_POST['timezone']; } else { $timezone = $default_timezone; };
 if ( isset($_POST['fulltextriver']) ) { $fulltextriver = 1; } else { $fulltextriver = 0; };
 if ( isset($_POST['cartinriver']) ) { $cartinriver = 1; } else { $cartinriver = 0; };
+if ( isset($_POST['staticarticles']) ) { $staticarticles = 1; } else { $staticarticles = 0; };
 $jsondata = array();
 $jsondata['prefname'] = "";
 
@@ -541,6 +542,17 @@ if( ($cartinriver < 0) || ($cartinriver > 1) ) {
   exit(1);
 }
 $prefs['cartinriver'] = $cartinriver;
+
+$jsondata['prefname'] = "staticarticles";
+if( ($staticarticles < 0) || ($staticarticles > 1) ) {
+  //Log it
+  loggit(2,"The value for staticarticles pref was not within acceptable range: [$staticarticles]");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "Value of pref is out of range.";
+  echo json_encode($jsondata);
+  exit(1);
+}
+$prefs['staticarticles'] = $staticarticles;
 //--------------------------------------------------------
 //--------------------------------------------------------
 

@@ -992,7 +992,7 @@ function update_article_static_url($aid = NULL, $uid = NULL, $url = NULL)
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
   //Now that we have a good id, put the article url in the database
-  $stmt = "UPDATE $table_catalog SET url=? WHERE articleid=? AND userid=?";
+  $stmt = "UPDATE $table_catalog SET staticurl=? WHERE articleid=? AND userid=?";
   $sql=$dbh->prepare($stmt) or print(mysql_error());
   $sql->bind_param("sss", $url, $aid, $uid) or print(mysql_error());
   $sql->execute() or print(mysql_error());

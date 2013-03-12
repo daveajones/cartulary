@@ -351,6 +351,7 @@ function get_articles($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE)
                                'title' => $atitle,
                                'url' => $aurl,
                                'shorturl' => $ashorturl,
+			       'staticurl' => get_article_static_url($aid, $uid),
                                'createdon' => $acreatedon,
                                'content' => $acontent,
                                'linkedon' => $clinkedon,
@@ -825,6 +826,10 @@ function build_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles =
       $opml .= "
               <outline text=\"".xmlentities(trim(str_replace(array("\r","\n","\t",'&#13;'), '', $article['title'])))."\">
                       <outline text=\"Link to Article\" type=\"link\" url=\"".htmlspecialchars($article['url'])."\" />";
+
+        if( !empty($article['staticurl']) ) {
+	  $opml .= "        <outline text=\"Archived Version\" type=\"link\" url=\"".htmlspecialchars($article['staticurl'])."\" />"."\n";
+	}
 
         if( !empty($article['sourceurl']) || !empty($article['sourcetitle']) ) {
           $opml .= '        <outline text="Source: '.htmlspecialchars(trim($article['sourcetitle'])).'" type="link" url="'.htmlspecialchars(trim($article['sourceurl'])).'" />'."\n";

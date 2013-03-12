@@ -498,21 +498,22 @@ if( $prefs['tweetcart'] == 1 && twitter_is_enabled($uid) ) {
 //Rebuild static files
   $tstart = time();
 
-  //Rebuild static files
-  build_rss_feed($uid, NULL, FALSE);
-  build_opml_feed($uid, NULL, FALSE);
-
   //Store article in S3?
+  $staticurl = "";
   if( $prefs['staticarticles'] == 1 ) {
     $s3info = get_s3_info($g_uid);
     if( $s3info != FALSE ) {
       $targetS3File = time()."_".random_gen(8).".html";
       putInS3(make_article_printable($aid), $targetS3File, $s3info['bucket']."/art", $s3info['key'], $s3info['secret'], "text/html");
-      $s3url = get_s3_url($uid, '/art/', $targetS3File);
-      loggit(3, "Stored article in S3 at location: [$s3url].");
-      update_article_static_url($aid, $uid, $s3url);
+      $staticurl = get_s3_url($uid, '/art/', $targetS3File);
+      loggit(3, "Stored article in S3 at location: [$staticurl].");
+      update_article_static_url($aid, $uid, $staticurl);
     }
   }
+
+  //Rebuild static files
+  build_rss_feed($uid, NULL, FALSE);
+  build_opml_feed($uid, NULL, FALSE);
 
   //Calculate how long it took
   $took = time() - $tstart;
@@ -528,6 +529,7 @@ if( isset($_REQUEST['json']) ) {
                                 'body'        => $slimcontent,
                                 'url'         => $url,
                                 'shorturl'    => $shorturl,
+				'staticurl'   => $staticurl,
                                 'sourceurl'   => $sourceurl,
                                 'sourcetitle' => $sourcetitle
   );

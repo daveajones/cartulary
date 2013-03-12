@@ -2272,4 +2272,43 @@ function set_bucket_redirect($bucket = NULL, $location = NULL) {
 }
 
 
+//_____________________________________________________________________
+// Take an array of objects and build an rss feed from them
+function convert_to_rss( $items = array() )
+{
+
+  //Root object
+  $xml = new SimpleXMLElement('<rss version="2.0"></rss>');
+
+  //Channel
+  $xml->addChild('channel');
+
+  //Channel attributes
+  $xml->channel->addChild('title', 'title');
+  $xml->channel->addChild('link', 'link');
+  $xml->channel->addChild('description', 'description');
+  $xml->channel->addChild('pubDate', 'pubDate');
+
+  //Add the items
+  foreach( $items as $item ) {
+	//Create the item
+	$item = $xml->channel->addChild('item');
+
+	//Add item attributes
+	$item->addChild('title', 'title');
+	$item->addChild('link', 'link');
+	$item->addChild('description', 'description');
+	$item->addChild('pubDate', 'pubDate');
+  }
+
+  //Make the formatting pretty
+  $dom = dom_import_simplexml($xml)->ownerDocument;
+  $dom->formatOutput = true;
+  $feed = $dom->saveXML();
+
+
+  //Give back the feed as a string
+  return($feed);
+}
+
 ?>

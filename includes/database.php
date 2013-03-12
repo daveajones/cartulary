@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 4;
+$cg_database_version = 5;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -43,7 +43,14 @@ $cg_database_updates[3][] = <<<CGDB0008
 CGDB0008;
 //----------------------------------------------------------------------------------------------------------------
 
-
+//Version 4 to 5 -------------------------------------------------------------------------------------------------
+$cg_database_updates[4][] = <<<CGDB0009
+ ALTER TABLE `catalog` ADD `staticurl` VARCHAR( 767 ) NOT NULL COMMENT 'Url of a static version of the article.'
+CGDB0009;
+$cg_database_updates[4][] = <<<CGDB0010
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '5' )
+CGDB0010;
+//----------------------------------------------------------------------------------------------------------------
 ?>
 
 

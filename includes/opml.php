@@ -1599,8 +1599,12 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
       if( $feed['sticky'] == 1 ) {
         $sticky = 'sopml:sticky="true"';
       }
+      $feedtitle = "Untitled Feed";
+      if( !empty($feed['title']) ) {
+	$feedtitle = $feed['title'];
+      }
       $opml .= "
-              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($feed['title']))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($feed['url'])."\" sopml:disposition=\"sub\" sopml:contains=\"mixed\" sopml:attention=\"50\" $sticky $hidden />";
+              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($feedtitle))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($feed['url'])."\" sopml:disposition=\"sub\" sopml:contains=\"mixed\" sopml:attention=\"50\" $sticky $hidden />";
   }
   $opml .= "
           </outline>";

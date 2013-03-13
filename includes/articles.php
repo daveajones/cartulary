@@ -42,7 +42,7 @@ function article_exists($url = NULL)
 
 //_______________________________________________________________________________________
 //Retrieve an article from the repository
-function get_article($id = NULL)
+function get_article($id = NULL, $uid = NULL)
 {
   //Check parameters
   if($id == NULL) {
@@ -80,6 +80,11 @@ function get_article($id = NULL)
   ) or print(mysql_error());
   $sql->fetch() or print(mysql_error());
   $sql->close() or print(mysql_error());
+
+  //If a user id was given, get those details
+  if( !empty($uid) ) {
+    $article['staticurl'] = get_article_static_url($id, $uid);
+  }
 
   loggit(1,"Returning article content for article id: [$id]");
   return($article);

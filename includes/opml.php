@@ -16,7 +16,9 @@ function is_outline($content = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Load the content into a simplexml object
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Look for opml nodes
   $items = array();
@@ -45,7 +47,9 @@ function is_reading_list($content = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Load the content into a simplexml object
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Look for opml nodes with an xmlUrl attribute
   $nodes = $x->xpath('*/outline[@xmlUrl]');
@@ -73,7 +77,9 @@ function is_social_outline($content = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Load the content into a simplexml object
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Look for sopml specific elements
   $namespaces = $x->getDocNamespaces();
@@ -1065,7 +1071,9 @@ function get_outline_items($id = NULL, $max = NULL)
   }
 
   //Parse it
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Put the updated content in the database
   update_outline_content($id, $content);
@@ -1124,7 +1132,9 @@ function get_feeds_from_outline($content = NULL, $max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Parse it
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Grab only nodes that have an xmlUrl attribute
   $feeds = array();
@@ -1165,7 +1175,9 @@ function get_pub_feeds_from_outline($content = NULL, $max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Parse it
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Grab only nodes that have an xmlUrl attribute
   $feeds = array();
@@ -1209,7 +1221,9 @@ function get_avatar_url_from_outline($content = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Parse it
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Get the sopml namespace first so we can work with it
   $namespaces = $x->getDocNamespaces();
@@ -1252,7 +1266,9 @@ function get_canonical_url_from_outline($content = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Parse it
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Get the sopml namespace first so we can work with it
   $namespaces = $x->getDocNamespaces();
@@ -1295,7 +1311,9 @@ function get_title_from_outline($content = NULL, $max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Parse it
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Grab only the title node
   $title = $x->head->title;
@@ -1323,7 +1341,9 @@ function get_ownername_from_outline($content = NULL, $max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Parse it
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Grab only the title node
   $name = $x->head->ownerName;

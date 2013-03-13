@@ -1,47 +1,12 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_cgi_init.php"?>
 <?
-//[!------------SECURITY-------------------------------!]
-
-// Includes
-include get_cfg_var("cartulary_conf").'/includes/env.php';
-include "$confroot/$includes/util.php";
-include "$confroot/$includes/auth.php";
-include "$confroot/$includes/articles.php";
-
 // Json header
 header("Cache-control: no-cache, must-revalidate");
 header("Content-Type: application/json");
 
 // Globals
 $jsondata = array();
-
-//Get the user id from the session id
-// Valid session?
-if(!is_logged_in()) {
-  loggit(2,"User attempted to export articles without being logged in first.");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(0);
-}
-$uid = get_user_id_from_sid(is_logged_in());
-if(empty($uid) || ($uid == FALSE)) {
-  //Log it
-  loggit(2,"Couldn't retrieve a user id for this session: [$sid].");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(1);
-}
-
-//See if the user has activated their account yet
-if(!is_user_active($uid)) {
-  //Log it
-  loggit(2,"User tried to access a page without activating first: [$uid | $sid].");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(1);
-}
 
 //Check that s3 is enabled
 if( !s3_is_enabled($uid) ) {
@@ -53,7 +18,7 @@ if( !s3_is_enabled($uid) ) {
   exit(1);
 }
 
-//Get the feed id to change
+//Get the article list
 if ( isset($_REQUEST['articles']) ) {
   $articles = $_REQUEST['articles'];
 } else {
@@ -71,7 +36,7 @@ $acount = count($articles);
 //Generate an opml file containing the articles selected
 $arlist = array();
 foreach( $articles as $article ) {
-  $arlist[] = get_article($article);
+  $arlist[] = get_article($article, $uid);
 }
 $opml = build_opml_feed($uid, 9999, FALSE, $arlist, TRUE);
 
@@ -79,7 +44,6 @@ $opml = build_opml_feed($uid, 9999, FALSE, $arlist, TRUE);
 $filename = time()."-".$default_opml_export_file_name;
 
 //Put the file in S3
-$prefs = get_user_prefs($uid);
 $s3res = putInS3($opml, $filename, $prefs['s3bucket']."/exp", $prefs['s3key'], $prefs['s3secret'], "text/xml");
 if(!$s3res) {
   loggit(2, "Could not create S3 file: [$filename] for user: [$uid].");

@@ -9,7 +9,7 @@ header("Content-Type: application/json");
 $jsondata = array();
 
 //Check that s3 is enabled
-if( !s3_is_enabled($uid) ) {
+if( !s3_is_enabled($uid) && !sys_s3_is_enabled() ) {
   //Log it
   loggit(2,"User didn't have s3 enabled for article export: [$uid].");
   $jsondata['status'] = "false";
@@ -44,7 +44,8 @@ $opml = build_opml_feed($uid, 9999, FALSE, $arlist, TRUE);
 $filename = time()."-".$default_opml_export_file_name;
 
 //Put the file in S3
-$s3res = putInS3($opml, $filename, $prefs['s3bucket']."/exp", $prefs['s3key'], $prefs['s3secret'], "text/xml");
+$s3info = get_s3_info($uid);
+$s3res = putInS3($opml, $filename, $s3info['bucket']."/exp", $s3info['key'], $s3info['secret'], "text/xml");
 if(!$s3res) {
   loggit(2, "Could not create S3 file: [$filename] for user: [$uid].");
   loggit(3, "Could not create S3 file: [$filename] for user: [$uid].");

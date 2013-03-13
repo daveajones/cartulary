@@ -16,7 +16,9 @@ function is_feed($content = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Load the content into a simplexml object
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
   if( $x === FALSE ) {
     loggit(3,"The content didn't parse correctly.");
     return(FALSE);
@@ -51,7 +53,9 @@ function feed_is_valid($content = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Load the content into a simplexml object
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Look for rss nodes
   foreach($x->channel as $entry) {
@@ -84,7 +88,9 @@ function get_feed_title($content = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Load the content into a simplexml object
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
 
   //Look for a title node in the rss
   foreach($x->channel->title as $entry) {
@@ -3115,7 +3121,9 @@ function get_feed_items($fid = NULL, $max = NULL)
 
   //Parse it
   $tstart = time();
+  libxml_use_internal_errors(true);
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
   //loggit(3, "FEED SCAN: SimpleXML parse load took [".(time() - $tstart)."] seconds.");
 
   //Was there a fatal error during parsing?
@@ -3123,7 +3131,9 @@ function get_feed_items($fid = NULL, $max = NULL)
     loggit(1, "Failed to parse XML for feed: [$fid].  Let's run it through Tidy() and try again.");
     $tidy = new tidy();
     $xr = $tidy->repairString($content, array('output-xml' => true, 'input-xml' => true));
+    libxml_use_internal_errors(true);
     $x = simplexml_load_string($xr, 'SimpleXMLElement', LIBXML_NOCDATA);
+    libxml_clear_errors();
     if(!$x) {
       loggit(1, "Error parsing feed XML for feed: [$fid].  Incrementing error count and skipping feed: [$fid].");
       $stats['checktime'] += (time() - $fstart);

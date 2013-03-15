@@ -156,7 +156,7 @@ if( !empty($url) && $shorturl == FALSE ) {
 $didtweet = FALSE;
 if( isset($_REQUEST['tweet']) ) { $didtweet = TRUE; }
 loggit(1, "Adding post: [$content | $title | $url] for user: [$uid].");
-$pid = add_post($uid, $content, $url, $shorturl, serialize($enclosures), $source, $didtweet, $title, $origin);
+$pid = add_post($uid, $content, $url, $shorturl, serialize($enclosures), $source, $didtweet, $title, NULL, $origin);
 
 //Does the user want his posts tweeted?
 if( isset($_REQUEST['tweet']) && twitter_is_enabled($uid) ) {

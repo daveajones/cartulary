@@ -57,7 +57,7 @@ function get_post($id = NULL)
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT url,title,content FROM $table_post WHERE id=?") or print(mysql_error());
+  $sql=$dbh->prepare("SELECT url,title,content,origin FROM $table_post WHERE id=?") or print(mysql_error());
   $sql->bind_param("s", $id) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->store_result() or print(mysql_error());
@@ -69,7 +69,7 @@ function get_post($id = NULL)
     return(FALSE);
   }
   $post = array();
-  $sql->bind_result($post['url'],$post['title'],$post['content']) or print(mysql_error());
+  $sql->bind_result($post['url'],$post['title'],$post['content'],$post['origin']) or print(mysql_error());
   $sql->fetch() or print(mysql_error());
   $sql->close() or print(mysql_error());
 
@@ -81,7 +81,7 @@ function get_post($id = NULL)
 
 //_______________________________________________________________________________________
 //Add an post to the post repository
-function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, $enclosure = FALSE, $source = FALSE, $twitter = FALSE, $title = "", $timestamp = NULL)
+function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, $enclosure = FALSE, $source = FALSE, $twitter = FALSE, $title = "", $timestamp = NULL, $origin = FALSE)
 {
   //Check parameters
   if($uid == NULL) {
@@ -125,6 +125,12 @@ function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, 
     $createdon = $timestamp;
   }
 
+  //Set the origin
+  if($origin == FALSE) {
+    loggit(3,"The origin is blank or corrupt: [$origin]. Set it to be an empty value.");
+    $origin = "";
+  }
+
   //Did the post go to twitter?
   if($twitter == TRUE) {
     $twitter = 1;
@@ -136,9 +142,9 @@ function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, 
   //$content = xmlentities($content);
 
   //Now that we have a good id, put the post into the database
-  $stmt = "INSERT INTO $table_post (id,url,content,createdon,shorturl,enclosure,sourceurl,sourcetitle,twitter,title) VALUES (?,?,?,?,?,?,?,?,?,?)";
+  $stmt = "INSERT INTO $table_post (id,url,content,createdon,shorturl,enclosure,sourceurl,sourcetitle,twitter,title,origin) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
   $sql=$dbh->prepare($stmt) or loggit(2, "SQL Error: [".$dbh->error."]");
-  $sql->bind_param("ssssssssss", $id,$url,$content,$createdon,$shorturl,$enclosure,$source['url'],$source['title'],$twitter,$title) or loggit(2, "SQL Error: [".$dbh->error."]");
+  $sql->bind_param("sssssssssss", $id, $url, $content, $createdon, $shorturl, $enclosure, $source['url'], $source['title'],$twitter,$title,$origin) or loggit(2, "SQL Error: [".$dbh->error."]");
   loggit(1,"Executing SQL: [".$stmt."]");
   $sql->execute() or loggit(2, "SQL Error: [".$dbh->error."]");
   $sql->close() or loggit(2, "SQL Error: [".$dbh->error."]");
@@ -312,6 +318,7 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
 		    $table_post.sourceurl,
 		    $table_post.sourcetitle,
 		    $table_post.twitter,
+		    $table_post.origin,
                     $table_mbcatalog.linkedon
 	     FROM $table_post,$table_mbcatalog
 	     WHERE $table_mbcatalog.userid=?
@@ -347,7 +354,7 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
     return(array());
   }
 
-  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$aenclosure,$asourceurl,$asourcetitle,$tweeted,$clinkedon) or print(mysql_error());
+  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$aenclosure,$asourceurl,$asourcetitle,$tweeted,$origin,$clinkedon) or print(mysql_error());
 
   $posts = array();
   $count = 0;
@@ -362,7 +369,9 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
 			    'sourceurl' => $asourceurl,
 			    'sourcetitle' => $asourcetitle,
 			    'tweeted' => $tweeted,
-                            'linkedon' => $clinkedon );
+			    'origin' => $origin,
+                            'linkedon' => $clinkedon
+    );
     $count++;
   }
 
@@ -400,6 +409,7 @@ function get_first_blog_post($uid = NULL)
 		    $table_post.sourceurl,
 		    $table_post.sourcetitle,
 		    $table_post.twitter,
+		    $table_post.origin,
                     $table_mbcatalog.linkedon
 	     FROM $table_post,$table_mbcatalog
 	     WHERE $table_mbcatalog.userid=?
@@ -421,7 +431,7 @@ function get_first_blog_post($uid = NULL)
     return(FALSE);
   }
 
-  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$aenclosure,$asourceurl,$asourcetitle,$tweeted,$clinkedon) or print(mysql_error());
+  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$aenclosure,$asourceurl,$asourcetitle,$tweeted,$origin,$clinkedon) or print(mysql_error());
 
   $posts = array();
   $count = 0;
@@ -436,7 +446,9 @@ function get_first_blog_post($uid = NULL)
 			    'sourceurl' => $asourceurl,
 			    'sourcetitle' => $asourcetitle,
 			    'tweeted' => $tweeted,
-                            'linkedon' => $clinkedon );
+			    'origin' => $origin,
+                            'linkedon' => $clinkedon
+    );
     $count++;
   }
 
@@ -652,7 +664,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
 		$rssurl = htmlspecialchars($post['shorturl']);
                 $rsslink = "        <link>$rssurl</link>";
                 $guid = "        <guid>$rssurl</guid>";
-                $linkfull = "        <microblog:linkFull>".htmlspecialchars($post['url'])."</microblog:linkFull>";
+                $linkfull = "        <microblog:linkFull>".htmlspecialchars(trim($post['url']))."</microblog:linkFull>";
           } else {
                 $rssurl = htmlspecialchars($post['url']);
                 $rsslink = "        <link>$rssurl</link>";
@@ -666,8 +678,18 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
 	}
         $tweeted = '';
         if( $post['tweeted'] == 1 ) {
-                $tweeted = "        <sopml:tweeted>true</sopml:tweeted>\n";
+          $tweeted = "        <sopml:tweeted>true</sopml:tweeted>\n";
         }
+        $origin = '';
+        if( !empty($post['origin']) ) {
+          $origin = "        <sopml:origin>".htmlspecialchars(trim($post['origin']))."</sopml:origin>\n";
+        } else {
+	  if( !empty($post['url']) ) {
+                $origin = "        <sopml:origin>".htmlspecialchars(trim($post['url']))."</sopml:origin>\n";
+	  } else {
+                $origin = "        <sopml:origin>".htmlspecialchars(trim($post['id']))."</sopml:origin>\n";
+	  }
+	}
 
        $rss .= "
       <item>\n";
@@ -701,6 +723,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
 	}
       $rss .= "        <author>".get_email_from_uid($uid)." ($username)</author>\n";
       $rss .= $tweeted;
+      $rss .= $origin;
       $rss .= "      </item>\n";
   }
 

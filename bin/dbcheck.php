@@ -11,7 +11,7 @@
 	//See if we need to upgrade
         $resp = get_database_version();
         if( $cg_database_version != $resp ) {
-          echo "The database needs updating.\n";
+          echo "The database is being upgraded. Be patient, this could take a while...\n";
           loggit(3, "The database needs updating.");
 
 	  //Attempt a database upgrade

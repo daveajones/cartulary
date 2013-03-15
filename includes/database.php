@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 5;
+$cg_database_version = 6;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -50,6 +50,15 @@ CGDB0009;
 $cg_database_updates[4][] = <<<CGDB0010
  INSERT INTO `dbversion` ( `version` ) VALUES ( '5' )
 CGDB0010;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 5 to 6 -------------------------------------------------------------------------------------------------
+$cg_database_updates[5][] = <<<CGDB0011
+ ALTER TABLE `nfitems` ADD `threadguid` VARCHAR( 767 ) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT 'The origin guid of this item, if any?'
+CGDB0011;
+$cg_database_updates[5][] = <<<CGDB0012
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '6' )
+CGDB0012;
 //----------------------------------------------------------------------------------------------------------------
 ?>
 

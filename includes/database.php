@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 6;
+$cg_database_version = 7;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -60,6 +60,16 @@ $cg_database_updates[5][] = <<<CGDB0012
  INSERT INTO `dbversion` ( `version` ) VALUES ( '6' )
 CGDB0012;
 //----------------------------------------------------------------------------------------------------------------
+
+//Version 6 to 7 -------------------------------------------------------------------------------------------------
+$cg_database_updates[6][] = <<<CGDB0013
+ ALTER TABLE `microblog` ADD `origin` VARCHAR( 767 ) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT 'Track the origin of each post.'
+CGDB0013;
+$cg_database_updates[6][] = <<<CGDB0014
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '7' )
+CGDB0014;
+//----------------------------------------------------------------------------------------------------------------
+
 ?>
 
 

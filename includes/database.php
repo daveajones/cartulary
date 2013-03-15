@@ -54,7 +54,7 @@ CGDB0010;
 
 //Version 5 to 6 -------------------------------------------------------------------------------------------------
 $cg_database_updates[5][] = <<<CGDB0011
- ALTER TABLE `nfitems` ADD `threadguid` VARCHAR( 767 ) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT 'The origin guid of this item, if any?'
+ ALTER TABLE `nfitems` ADD `origin` VARCHAR( 767 ) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT 'The origin guid of this item, if any?'
 CGDB0011;
 $cg_database_updates[5][] = <<<CGDB0012
  INSERT INTO `dbversion` ( `version` ) VALUES ( '6' )

@@ -75,6 +75,13 @@ if( strlen($url) > 1024 ) {
   exit(1);
 }
 
+//Get the origin
+$jsondata['fieldname'] = "origin";
+if ( isset($_REQUEST['origin']) ) {
+  $origin = $_REQUEST['origin'];
+} else {
+  $origin = FALSE;
+}
 
 //Were there any enclosures?
 if( isset($_REQUEST['enclosure']) ) {
@@ -93,16 +100,6 @@ if( !empty($enclosure) ) {
     );
   }
 }
-/*
-if( !empty($enclosure) && ($s3info != FALSE) ) {
-  loggit(3, "Enclosures incoming: ".print_r($enclosure, TRUE));
-  foreach($enclosure as $encfile) {
-    putFileInS3("$confroot/$spooldir/$uid"."_".$encfile, $encfile, $s3info['bucket']."/enc", $s3info['key'], $s3info['secret']);
-    unlink("$confroot/$spooldir/$uid"."_".$encfile);
-  }
-  loggit(3, "Enclosures outgoing: ".print_r($enclosures, TRUE));
-}
-*/
 if( !empty($_REQUEST['extenclosure']) ) {
   $extenclosures = $_REQUEST['extenclosure'];
   if(!isset($enclosures)) {
@@ -159,7 +156,7 @@ if( !empty($url) && $shorturl == FALSE ) {
 $didtweet = FALSE;
 if( isset($_REQUEST['tweet']) ) { $didtweet = TRUE; }
 loggit(1, "Adding post: [$content | $title | $url] for user: [$uid].");
-$pid = add_post($uid, $content, $url, $shorturl, serialize($enclosures), $source, $didtweet, $title);
+$pid = add_post($uid, $content, $url, $shorturl, serialize($enclosures), $source, $didtweet, $title, $origin);
 
 //Does the user want his posts tweeted?
 if( isset($_REQUEST['tweet']) && twitter_is_enabled($uid) ) {

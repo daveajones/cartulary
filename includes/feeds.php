@@ -3057,6 +3057,12 @@ function get_feed_items($fid = NULL, $max = NULL)
   $fstart = time();
   $url = $feed['url'];
 
+  //Check for bad feeds
+  if( empty($url) ) {
+    loggit(2, "Feed: [$fid] has a blank url: [$url].");
+    return(-1);
+  }
+
   //If a feed has over 100 errors, we fall back to only scanning it once a day
   if( $feed['errors'] > 100 ) {
     if( (time() - $feed['lastcheck']) < 86400 ) {
@@ -3503,7 +3509,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   }
 
   //Now that we have a good id, put the feed item into the database
-  $stmt = "INSERT INTO $table_nfitem (id,feedid,title,url,description,guid,timestamp,timeadded,enclosure,`purge`,sourceurl,sourcetitle,author) VALUES (?,?,?,?,?,?,?,?,?,0,?,?,?)";
+  $stmt = "INSERT INTO $table_nfitem (id,feedid,title,url,description,guid,timestamp,timeadded,enclosure,`purge`,sourceurl,sourcetitle,author,origin) VALUES (?,?,?,?,?,?,?,?,?,0,?,?,?,?)";
   $sql=$dbh->prepare($stmt) or print(mysql_error());
   if($format == "atom") {
     //-----ATOM--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3513,7 +3519,6 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $description = $item->summary;
     if( isset($item->content) ) {
       $description = (string)$item->content;
-      //loggit(3, "DEBUG - ATOM content: [".print_r($item->content, TRUE)."].");
     }
 
     //Find links and enclosures
@@ -3532,8 +3537,6 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                                  'type'   => make_mime_type((string)$item->link[$lcount]->attributes()->href, (string)$item->link[$lcount]->attributes()->type)
           );
         }
-        //loggit(3, "Found an ATOM enclosure: [".print_r($enclosures, true)."].");
-        //loggit(3, "Item struct: [".print_r($item, true)."].");
       }
     }
 
@@ -3544,8 +3547,6 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 	if(strpos($title, 'http:') !== FALSE) {
 		preg_match('/\bhttp\:\/\/([A-Za-z0-9\.\/\+\&\@\~\-\%\?\=\_\#\!]*)/i', $title, $twurl);
 		$linkurl = $twurl[0];
-		//loggit(3, "I think this: [$linkurl] might be the twitter link.");
-		//loggit(3, print_r($twurl, TRUE));
 	}
     }
 
@@ -3558,12 +3559,9 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       $esize = "";
       if( $mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video' ) {
         $esize = check_head_size($mediatag['src']);
-        //loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
       }
       if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
         $enclosures[] = array( 'url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => make_mime_type($mediatag['src'], $mediatag['type']) );
-      } else {
-        //loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
     }
 
@@ -3575,11 +3573,6 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     if( $httploc === FALSE || $httploc > 1 ) {
         $linkurl = '';
     }
-
-    //debug
-    //loggit(3, "NEW ITEM - CLEANED: ".print_r($cleaned, TRUE) );
-    //loggit(3, "NEW ITEM - TEXT: ".print_r($description, TRUE) );
-    //loggit(3, "NEW ITEM - ENCLOSURES: ".print_r($enclosures, TRUE) );
 
     //Does this item have a source tag?
     $sourceurl="";
@@ -3595,15 +3588,17 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $author="";
     if( $item->author->name ) {
     	$author = strip_tags((string)$item->author->name);
-        //loggit(3, "AUTHOR FOUND: ".$author);
     }
+
+    //Is there an origin? Not for ATOM.
+    $origin="";
 
     //Eliminate title if it's just a duplicate of the body
     if( $description == $title ) {
       $title = "";
     }
 
-    $sql->bind_param("ssssssssssss", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author) or print(mysql_error());
+    $sql->bind_param("sssssssssssss", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin) or print(mysql_error());
   } else {
     //-----RSS----------------------------------------------------------------------------------------------------------------------------------------------------
     $linkurl = $item->link;
@@ -3620,13 +3615,10 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                                  'type' => make_mime_type((string)$item->enclosure[$i]->attributes()->url, (string)$item->enclosure[$i]->attributes()->type)
           );
         }
-        //loggit(3, "Found an RSS enclosure: [".print_r($item->enclosure, TRUE)."].");
     }
 
     //Does this item have a media namespace?
     if( isset($namespaces['media']) ) {
-      //loggit(3, "Media namespace found.");
-
       $kids = $item->children($namespaces['media'])->thumbnail;
       $kcount = count($kids);
       $ecount = count($enclosures);
@@ -3635,7 +3627,6 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
           $murl = (string)$kids[$i]->attributes()->url;
           if( !in_array_r($murl, $enclosures) ) {
             $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => make_mime_type((string)$kids[$i]->attributes()->url) );
-            //loggit(3, "Thumbnail(s) found: ".print_r($kids[$i]->attributes(), TRUE));
             $ecount++;
           }
         }
@@ -3649,7 +3640,6 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
           $murl = (string)$kids[$i]->attributes()->url;
           if( !in_array_r($murl, $enclosures) ) {
             $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => make_mime_type((string)$kids[$i]->attributes()->url) );
-            //loggit(3, "Content found: ".print_r($kids[$i]->attributes(), TRUE));
             $ecount++;
           }
         }
@@ -3672,8 +3662,6 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 	if(strpos($title, 'http:') !== FALSE) {
 		preg_match('/\bhttp\:\/\/([A-Za-z0-9\.\/\+\&\@\~\-\%\?\=\_\#\!]*)/i', $title, $twurl);
 		$linkurl = $twurl[0];
-		//loggit(3, "I think this: [$linkurl] might be the twitter link.");
-		//loggit(3, print_r($twurl, TRUE));
 	}
     }
 
@@ -3682,9 +3670,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $sourcetitle="";
     if( $item->source && $item->source->attributes() ) {
 	loggit(3, "SOURCE: ".print_r($item->source, TRUE));
-	//loggit(3, "Item source url: ".$item->source->attributes()->url);
 	$sourceurl = (string)$item->source->attributes()->url;
-	//loggit(3, "Item source title: ".$item->source);
 	$sourcetitle = strip_tags((string)$item->source);
     }
 
@@ -3692,7 +3678,6 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $author="";
     if( $item->author ) {
     	$author = strip_tags((string)$item->author);
-        //loggit(3, "AUTHOR FOUND: ".$author);
     }
 
     //We need a guid, so if the item doesn't have a guid, then build a uniqe id by hashing the whole item
@@ -3714,12 +3699,9 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       $esize = "";
       if( $mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video' ) {
         $esize = check_head_size($mediatag['src']);
-        //loggit(3, "DEBUG ENCLOSURE SIZE: [$esize] for url: [".$mediatag['src']."]");
       }
       if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
         $enclosures[] = array( 'url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => make_mime_type($mediatag['src'], $mediatag['type']) );
-      } else {
-        //loggit(3, "  DISCARDING ENCLOSURE: [$esize] for url: [".$mediatag['src']."]");
       }
     }
     }
@@ -3727,17 +3709,29 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     //Serialize the enclosure array
     $enclosure = serialize($enclosures);
 
-    //debug
-    //loggit(3, "NEW ITEM - CLEANED: ".print_r($cleaned, TRUE) );
-    //loggit(3, "NEW ITEM - TEXT: ".print_r($description, TRUE) );
-    //loggit(3, "NEW ITEM - ENCLOSURES: ".print_r($enclosures, TRUE) );
-
     //Eliminate title if it's just a duplicate of the body
     if( $description == $title ) {
       $title = "";
     }
 
-    $sql->bind_param("ssssssssssss", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author) or print(mysql_error());
+    //Does this item have an origin?
+    $origin="";
+    if( isset($namespaces['sopml']) ) {
+      $sopml = $item->children($namespaces['sopml']);
+      if( isset($sopml->origin) ) {
+        $origin = (string)trim($sopml->origin);
+        loggit(3, "add_feed_item(): sopml:origin found: ".print_r($sopml, TRUE));
+      }
+    }
+    else if( isset($namespaces['microblog']) ) {
+      $microblog = $item->children($namespaces['microblog']);
+      if( isset($microblog->linkFull) ) {
+        $origin = (string)trim($microblog->linkFull);
+        loggit(3, "add_feed_item(): using microblog:linkFull as the origin: ".print_r($microblog, TRUE));
+      }
+    }
+
+    $sql->bind_param("sssssssssssss", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin) or print(mysql_error());
   }
   $sql->execute() or loggit(3, $dbh->error);
   $sql->close() or print(mysql_error());

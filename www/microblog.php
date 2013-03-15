@@ -122,6 +122,13 @@
 		</div>
                 <?}?>
 
+		<!-- Origin box. -->
+                <?if( !empty($origin) ) {?>
+        	<div id="divOrigin">
+		<input name="origin" id="hidOrigin" type="text" value="<?echo $origin?>" />
+		</div>
+                <?}?>
+
 		</div>
 
 		<!-- Enclosure drop zone. -->

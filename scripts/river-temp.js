@@ -134,6 +134,7 @@
 			  {{if item.title}}<input type="hidden" name="title" value="${item.title}" />{{/if}}
 			  {{if item.title || item.description || item.body}}<input type="hidden" name="description" value="${item.title || item.description || item.body}" />{{/if}}
 			  {{if item.permaLink || item.link}}<input type="hidden" name="link" value="${item.permaLink || item.link}" />{{/if}}
+			  {{if item.origin}}<input type="hidden" name="origin" value="${item.origin}" />{{/if}}
 			  {{each(e,enclosure) item.enclosure}}
                             <input type="hidden" name="extenclosure[${e}][url]" value="${enclosure.url}" />
                             <input type="hidden" name="extenclosure[${e}][type]" value="${enclosure.type}" />

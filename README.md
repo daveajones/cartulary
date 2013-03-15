@@ -1,3 +1,17 @@
+What is Cartulary?
+  We call it a digital archiver.  But, you could also call it a social network in a box.
+  It's an RSS reader, RSS aggregator, readability tool, article archiver, microblogger,
+  social graph manager and reading list manager.
+
+  You can publish all of your feeds into a single social outline(OPML) with it, so that
+  other people can easily subscribe to all of your stuff at once.  You can save full
+  text articles into a feed as you read things on the web, then later export them into
+  an OPML file using date ranges and searches.
+
+  It all runs on a standard LAMP stack, and it supports multiple users.  So, if you're
+  a techy person, you can run your own server for all your friends.
+
+
 LICENSE:
   All original code in this package is currently licensend under the CDDL license.
                http://opensource.org/licenses/CDDL-1.0

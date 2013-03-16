@@ -52,7 +52,7 @@ function is_reading_list($content = NULL)
   libxml_clear_errors();
 
   //Look for opml nodes with an xmlUrl attribute
-  $nodes = $x->xpath('*/outline[@xmlUrl]');
+  $nodes = $x->xpath('//outline[@xmlUrl]');
   if (!empty($nodes)) {
     loggit(1, "This content looks like a reading list.");
     return(TRUE);

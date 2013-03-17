@@ -3716,18 +3716,18 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 
     //Does this item have an origin?
     $origin="";
+    if( isset($namespaces['microblog']) ) {
+      $microblog = $item->children($namespaces['microblog']);
+      if( isset($microblog->linkFull) ) {
+        $origin = (string)trim($microblog->linkFull);
+        loggit(3, "add_feed_item(): using microblog:linkFull as the origin: ".print_r($microblog, TRUE));
+      }
+    }
     if( isset($namespaces['sopml']) ) {
       $sopml = $item->children($namespaces['sopml']);
       if( isset($sopml->origin) ) {
         $origin = (string)trim($sopml->origin);
         loggit(3, "add_feed_item(): sopml:origin found: ".print_r($sopml, TRUE));
-      }
-    }
-    else if( isset($namespaces['microblog']) ) {
-      $microblog = $item->children($namespaces['microblog']);
-      if( isset($microblog->linkFull) ) {
-        $origin = (string)trim($microblog->linkFull);
-        loggit(3, "add_feed_item(): using microblog:linkFull as the origin: ".print_r($microblog, TRUE));
       }
     }
 

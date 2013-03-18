@@ -4148,7 +4148,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     if(!empty($origin)) {
 	$river[$fcount]['item'][$icount]['origin'] = $origin;
     } else {
-	$river[$fcount]['item'][$icount]['origin'] = $guid;
+	$river[$fcount]['item'][$icount]['origin'] = $feed['url']."|".$guid;
     }
 
     //Set the sticky bit
@@ -4490,7 +4490,8 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
                     $table_nfitem.description,
                     $table_nfitem.sourceurl,
                     $table_nfitem.sourcetitle,
-		    $table_nfitem.author
+		    $table_nfitem.author,
+		    $table_nfitem.origin
              FROM $table_nfitem
              WHERE $table_nfitem.timeadded > ?
              AND $table_nfitem.`old` = 0";
@@ -4520,7 +4521,7 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
     return(FALSE);
   }
 
-  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$timeadded,$enclosure,$description,$sourceurl,$sourcetitle,$author) or print(mysql_error());
+  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$timeadded,$enclosure,$description,$sourceurl,$sourcetitle,$author,$origin) or print(mysql_error());
 
   $fcount = -1;
   $icount = 0;
@@ -4593,6 +4594,13 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
     }
     if(!empty($sourcetitle)) {
 	$river[$fcount]['item'][$icount]['sourcetitle'] = $sourcetitle;
+    }
+
+    //Is there an origin?
+    if(!empty($origin)) {
+	$river[$fcount]['item'][$icount]['origin'] = $origin;
+    } else {
+	$river[$fcount]['item'][$icount]['origin'] = $feed['url']."|".$guid;
     }
 
     //Are there any enclosures?

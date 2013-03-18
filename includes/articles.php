@@ -643,7 +643,8 @@ function build_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles = 
         <description>".htmlspecialchars($article['content'])."</description>
         <pubDate>".date("D, d M Y H:i:s O", $article['createdon'])."</pubDate>
         <guid>".htmlspecialchars($rssurl)."</guid>
-        <microblog:linkFull>".htmlspecialchars($linkfull)."</microblog:linkFull>";
+        <sopml:origin>".htmlspecialchars($linkfull)."</sopml:origin>
+        <microblog:linkFull>".htmlspecialchars($linkfull)."</microblog:linkFull>\n";
         if( !empty($article['sourceurl']) || !empty($article['sourcetitle']) ) {
           $rss .= '
         <source url="'.htmlspecialchars(trim($article['sourceurl'])).'">'.htmlspecialchars(trim($article['sourcetitle'])).'</source>'."\n";

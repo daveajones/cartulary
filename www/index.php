@@ -1,9 +1,6 @@
 <?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_page_noauth.php"?>
 <?
-  // Includes
-  include "$confroot/$includes/util.php";
-  include "$confroot/$includes/auth.php";
-
   // If this person is already logged in, send them to the start page
   if(is_logged_in()) {
     header("Location: $startpage");

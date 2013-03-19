@@ -780,6 +780,12 @@ function set_feed_item_properties($id = NULL, $uid = NULL, $props = array())
   } else {
     unmark_feed_item_as_hidden($id, $uid);
   }
+  //Fulltext bit?
+  if( isset($props['fulltext']) && $props['fulltext'] == TRUE ) {
+    mark_feed_item_as_fulltext($id, $uid);
+  } else {
+    unmark_feed_item_as_fulltext($id, $uid);
+  }
 
   //loggit(1,"Returning feed item properties for item: [$id]");
   return(TRUE);
@@ -1673,7 +1679,143 @@ function unmark_feed_item_as_hidden($iid = NULL, $uid = NULL)
   $sql->close() or print(mysql_error());
 
   //Log and return
-  loggit(1,"Un-flagged item: [$iid] as hidden for user: [$uid].");
+  loggit(3,"Un-flagged item: [$iid] as hidden for user: [$uid].");
+  return(TRUE);
+}
+
+
+//_______________________________________________________________________________________
+//Sets a feed's fulltext bit to on in the newsfeed catalog
+function mark_feed_as_fulltext($fid = NULL, $uid = NULL)
+{
+  //Check parameters
+  if( empty($fid) ) {
+    loggit(2,"The feed id is blank or corrupt: [$fid]");
+    return(FALSE);
+  }
+  if( empty($uid) ) {
+    loggit(2,"The user id is blank or corrupt: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Now that we have a good id, put the article into the database
+  $stmt = "UPDATE $table_nfcatalog SET `fulltext`=1 WHERE feedid=? AND userid=?";
+  $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
+  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $updcount = $sql->affected_rows or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and return
+  loggit(3,"Flagged feed: [$fid] as fulltext for user: [$uid].");
+  return(TRUE);
+}
+
+
+//_______________________________________________________________________________________
+//Sets a feed's fulltext bit to off in the newsfeed catalog
+function unmark_feed_as_fulltext($fid = NULL, $uid = NULL)
+{
+  //Check parameters
+  if( empty($fid) ) {
+    loggit(2,"The feed id is blank or corrupt: [$fid]");
+    return(FALSE);
+  }
+  if( empty($uid) ) {
+    loggit(2,"The user id is blank or corrupt: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Now that we have a good id, put the article into the database
+  $stmt = "UPDATE $table_nfcatalog SET `fulltext`=0 WHERE feedid=? AND userid=?";
+  $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
+  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $updcount = $sql->affected_rows or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and return
+  loggit(1,"Flagged feed: [$fid] as fulltext for user: [$uid].");
+  return(TRUE);
+}
+
+
+//_______________________________________________________________________________________
+//Sets a feed item's fulltext bit to true
+function mark_feed_item_as_fulltext($iid = NULL, $uid = NULL)
+{
+  //Check parameters
+  if( empty($iid) ) {
+    loggit(2,"The feed item id is blank or corrupt: [$iid]");
+    return(FALSE);
+  }
+  if( empty($uid) ) {
+    loggit(2,"The user id is blank or corrupt: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Now that we have a good id, put the article into the database
+  $stmt = "INSERT INTO $table_nfitemprop (itemid, userid, `fulltext`) VALUES (?,?,1) ON DUPLICATE KEY UPDATE `fulltext`=1";
+  $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
+  $sql->bind_param("ss", $iid, $uid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $updcount = $sql->affected_rows or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and return
+  loggit(3,"FULLTEXT: Flagged item: [$iid] as fulltext for user: [$uid].");
+  return(TRUE);
+}
+
+
+//_______________________________________________________________________________________
+//Sets a feed item's fulltext bit to false
+function unmark_feed_item_as_fulltext($iid = NULL, $uid = NULL)
+{
+  //Check parameters
+  if( empty($iid) ) {
+    loggit(2,"The feed item id is blank or corrupt: [$iid]");
+    return(FALSE);
+  }
+  if( empty($uid) ) {
+    loggit(2,"The user id is blank or corrupt: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Now that we have a good id, put the article into the database
+  $stmt = "UPDATE $table_nfitemprop SET `fulltext`=0 WHERE itemid=? AND userid=?";
+  $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
+  $sql->bind_param("ss", $iid, $uid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $updcount = $sql->affected_rows or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and return
+  loggit(1,"Un-flagged item: [$iid] as fulltext for user: [$uid].");
   return(TRUE);
 }
 
@@ -2219,6 +2361,46 @@ function feed_is_hidden($fid = NULL, $uid = NULL)
 
 
 //_______________________________________________________________________________________
+//Check if a feed is full text for a given user
+function feed_is_fulltext($fid = NULL, $uid = NULL)
+{
+  //Check parameters
+  if(empty($fid)) {
+    loggit(2,"The feed id is blank or corrupt: [$fid]");
+    return(FALSE);
+  }
+  if(empty($uid)) {
+    loggit(2,"The user id is blank or corrupt: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Look for the url in the feed table
+  $sql=$dbh->prepare("SELECT `fulltext` FROM $table_nfcatalog WHERE feedid=? AND userid=? AND `fulltext`=1") or print(mysql_error());
+  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+
+  //See if any rows came back
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    //loggit(3,"The feed: [$fid] is NOT fulltext for user: [$uid].");
+    return(FALSE);
+  }
+  $sql->close() or print(mysql_error());
+
+  //loggit(3,"The feed: [$fid] is fulltext for user: [$uid].");
+  return(TRUE);
+}
+
+
+//_______________________________________________________________________________________
 //Check if a feed is linked to a user
 function feed_is_linked($fid = NULL, $uid = NULL)
 {
@@ -2520,7 +2702,8 @@ function get_feeds($uid = NULL, $max = NULL, $ididx = NULL)
                     $table_nfcatalog.linkedon,
                     $table_nfcatalog.outlineid,
                     $table_nfcatalog.sticky,
-                    $table_nfcatalog.hidden
+                    $table_nfcatalog.hidden,
+		    $table_nfcatalog.`fulltext`
 	     FROM $table_newsfeed,
                   $table_nfcatalog
 	     WHERE $table_nfcatalog.userid=?
@@ -2558,7 +2741,8 @@ function get_feeds($uid = NULL, $max = NULL, $ididx = NULL)
                     $flinkedon,
                     $foid,
                     $fsticky,
-                    $fhidden) or print(mysql_error());
+                    $fhidden,
+                    $ffulltext) or print(mysql_error());
 
   $feeds = array();
   $count = 0;
@@ -2581,7 +2765,8 @@ function get_feeds($uid = NULL, $max = NULL, $ididx = NULL)
                           'linkedon' => $flinkedon,
                           'oid' => $foid,
                           'sticky' => $fsticky,
-                          'hidden' => $fhidden );
+                          'hidden' => $fhidden ,
+			  'fulltext' => $ffulltext);
     $count++;
   }
 
@@ -3736,7 +3921,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   $sql->execute() or loggit(3, $dbh->error);
   $sql->close() or print(mysql_error());
 
-  //Set the items properties per user
+  //Set the item properties per user
   $fusers = get_feed_subscribers($fid);
   if( $fusers != FALSE ) {
     foreach( $fusers as $fuser ) {
@@ -3745,6 +3930,9 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       }
       if( feed_is_hidden($fid, $fuser) ) {
         set_feed_item_properties($id, $fuser, array( 'hidden' => TRUE ));
+      }
+      if( feed_is_fulltext($fid, $fuser) ) {
+        set_feed_item_properties($id, $fuser, array( 'fulltext' => TRUE ));
       }
       mark_river_as_updated($fuser);
     }
@@ -4019,7 +4207,9 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 		    $table_nfitemprop.sticky,
                     $table_nfcatalog.sticky,
 		    $table_nfitemprop.hidden,
-                    $table_nfcatalog.hidden
+                    $table_nfcatalog.hidden,
+		    $table_nfitemprop.fulltext,
+                    $table_nfcatalog.fulltext
              FROM $table_nfitem
 	     LEFT OUTER JOIN $table_nfitemprop ON $table_nfitemprop.itemid = $table_nfitem.id AND $table_nfitemprop.userid=? AND $table_nfitemprop.sticky = 1
 	     INNER JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
@@ -4052,7 +4242,11 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     return(FALSE);
   }
 
-  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$timeadded,$enclosure,$description,$guid,$origin,$sourceurl,$sourcetitle,$author,$sticky,$fsticky,$hidden,$fhidden) or print(mysql_error());
+  $sql->bind_result($id,$title,$url,$timestamp,$feedid,
+                    $timeadded,$enclosure,$description,
+                    $guid,$origin,$sourceurl,$sourcetitle,
+                    $author,$sticky,$fsticky,$hidden,
+                    $fhidden,$fulltext,$ffulltext) or print(mysql_error());
 
   $fcount = -1;
   $icount = 0;
@@ -4086,6 +4280,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 		'feedDescription' => '',
                 'feedSticky' => $fsticky,
 		'feedHidden' => $fhidden,
+		'feedFullText' => $ffulltext,
 		'itemIndex' => $ticount,
 		'whenLastUpdate' => date("D, d M Y H:i:s O", $feed['lastupdate'])
       );
@@ -4109,7 +4304,11 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 
     }
 
+    //Construct item body
     if($prefs['fulltextriver'] == 0) {
+      if( $fulltext == 1 ) {
+        $itembody = $description;
+      } else
       if( strlen($description) > 300 ) {
         $itembody = truncate_text($description, 300)."...";
       } else {
@@ -4159,6 +4358,11 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     //Set the hidden bit
     if($hidden == 1) {
         $river[$fcount]['item'][$icount]['hidden'] = 1;
+    }
+
+    //Set the full text bit
+    if($fulltext == 1) {
+        $river[$fcount]['item'][$icount]['fullText'] = 1;
     }
 
     //Are there any enclosures?

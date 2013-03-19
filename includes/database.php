@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 7;
+$cg_database_version = 9;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -69,6 +69,25 @@ $cg_database_updates[6][] = <<<CGDB0014
  INSERT INTO `dbversion` ( `version` ) VALUES ( '7' )
 CGDB0014;
 //----------------------------------------------------------------------------------------------------------------
+
+//Version 7 to 8 -------------------------------------------------------------------------------------------------
+$cg_database_updates[7][] = <<<CGDB0015
+ ALTER TABLE `nfcatalog` ADD `fulltext` TINYINT NOT NULL DEFAULT '0' COMMENT 'Should this feed be full text in the river?'
+CGDB0015;
+$cg_database_updates[7][] = <<<CGDB0016
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '8' )
+CGDB0016;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 8 to 9 -------------------------------------------------------------------------------------------------
+$cg_database_updates[8][] = <<<CGDB0017
+ ALTER TABLE `nfitemprops` ADD `fulltext` TINYINT NOT NULL DEFAULT '0' COMMENT 'Should this item be full text in the river?'
+CGDB0017;
+$cg_database_updates[8][] = <<<CGDB0018
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '9' )
+CGDB0018;
+//----------------------------------------------------------------------------------------------------------------
+
 
 ?>
 

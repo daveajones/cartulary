@@ -451,6 +451,7 @@ function rebindEverything() {
 	bindUnsubLinks();
         bindStickyButtons();
         bindHiddenButtons();
+	bindFullTextButtons();
 }
 
 function bindUnsubLinks() {
@@ -547,6 +548,43 @@ function bindHiddenButtons() {
                                                 bobj.removeClass('btnFeedNotHidden').addClass('btnFeedHidden');
                                         } else {
                                                 bobj.removeClass('btnFeedHidden').addClass('btnFeedNotHidden');
+                                        }
+                                }
+                        }
+                });
+
+                return false;
+        });
+}
+
+function bindFullTextButtons() {
+        //Bind some new clicks to the fulltext buttons
+        $('.fulltextbutton').click(function() {
+                var bobj = $(this);
+                var cgiurl = $('#cgiUrls').attr("data-setfeedpropscgi");
+                var fid = bobj.parent().parent().attr("data-id");
+                var fulltext = '&unfulltext=true';
+
+                //Set the flags
+                if( bobj.hasClass('btnFeedNotFullText') ) {
+                        fulltext = '&fulltext=true';
+                }
+
+                //Make the call
+                $.ajax({
+                        url:    cgiurl + '?fid=' + fid + fulltext,
+                        type:   "GET",
+                        timeout:        60000,
+                        dataType:       'json',
+                        success:        function(data) {
+                                if(data.status == "false") {
+					showMessage( data.description, data.status, 5 );
+                                } else {
+					showMessage( data.description, data.status, 5 );
+                                        if( fulltext != '&unfulltext=true' ) {
+                                                bobj.removeClass('btnFeedNotFullText').addClass('btnFeedFullText');
+                                        } else {
+                                                bobj.removeClass('btnFeedFullText').addClass('btnFeedNotFullText');
                                         }
                                 }
                         }

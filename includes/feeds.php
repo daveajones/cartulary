@@ -2395,7 +2395,7 @@ function feed_is_fulltext($fid = NULL, $uid = NULL)
   }
   $sql->close() or print(mysql_error());
 
-  //loggit(3,"The feed: [$fid] is fulltext for user: [$uid].");
+  loggit(3,"The feed: [$fid] is fulltext for user: [$uid].");
   return(TRUE);
 }
 
@@ -4208,8 +4208,8 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
                     $table_nfcatalog.sticky,
 		    $table_nfitemprop.hidden,
                     $table_nfcatalog.hidden,
-		    $table_nfitemprop.fulltext,
-                    $table_nfcatalog.fulltext
+		    $table_nfitemprop.`fulltext`,
+                    $table_nfcatalog.`fulltext`
              FROM $table_nfitem
 	     LEFT OUTER JOIN $table_nfitemprop ON $table_nfitemprop.itemid = $table_nfitem.id AND $table_nfitemprop.userid=? AND $table_nfitemprop.sticky = 1
 	     INNER JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid

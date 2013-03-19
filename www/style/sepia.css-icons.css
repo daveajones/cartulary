@@ -42,6 +42,6 @@
 .btnFeedNotSticky { display:inline-block; background:url('/images/glyph/glyphicons_halflings_087_ok.png') 0 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .btnFeedHidden { display:inline-block; background:url('/images/glyph/glyphicons_halflings_105_eye_close.png') 0 4px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .btnFeedNotHidden { display:inline-block; background:url('/images/glyph/glyphicons_halflings_104_eye_open.png') 0 4px no-repeat; width:20px; height:20px; border:none; outline:none; }
-.btnFeedFullText { display:inline-block; background:url('/images/glyph/glyphicons_halflings_050_text-width.png') 0 4px no-repeat; width:20px; height:20px; border:none; outline:none; }
-.btnFeedNotFullText { display:inline-block; background:url('/images/glyph/glyphicons_halflings_049_text-height.png') 0 4px no-repeat; width:20px; height:20px; border:none; outline:none; }
+.btnFeedNotFullText { display:inline-block; background:url('/images/glyph/glyphicons_halflings_050_text-width.png') 0 4px no-repeat; width:20px; height:20px; border:none; outline:none; }
+.btnFeedFullText { display:inline-block; background:url('/images/glyph/glyphicons_halflings_049_text-height.png') 0 4px no-repeat; width:20px; height:20px; border:none; outline:none; }
 

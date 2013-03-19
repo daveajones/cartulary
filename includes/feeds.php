@@ -4199,21 +4199,20 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
                     $table_nfitem.timeadded,
                     $table_nfitem.enclosure,
                     $table_nfitem.description,
-		    $table_nfitem.guid,
-		    $table_nfitem.origin,
+                    $table_nfitem.guid,
+                    $table_nfitem.origin,
                     $table_nfitem.sourceurl,
                     $table_nfitem.sourcetitle,
-		    $table_nfitem.author,
-		    $table_nfitemprop.sticky,
+                    $table_nfitem.author,
+                    $table_nfitemprop.sticky,
                     $table_nfcatalog.sticky,
-		    $table_nfitemprop.hidden,
+                    $table_nfitemprop.hidden,
                     $table_nfcatalog.hidden,
-		    $table_nfitemprop.`fulltext`,
+                    $table_nfitemprop.`fulltext`,
                     $table_nfcatalog.`fulltext`
              FROM $table_nfitem
-	     LEFT OUTER JOIN $table_nfitemprop ON $table_nfitemprop.itemid = $table_nfitem.id AND $table_nfitemprop.userid=?
-                AND ($table_nfitemprop.sticky = 1 OR $table_nfitemprop.`fulltext` = 1 OR $table_nfitemprop.hidden = 1)
-	     INNER JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
+             LEFT OUTER JOIN $table_nfitemprop ON $table_nfitemprop.itemid = $table_nfitem.id AND $table_nfitemprop.userid=? AND $table_nfitemprop.sticky = 1
+             INNER JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
              WHERE $table_nfcatalog.userid=?
              AND ( $table_nfitem.timeadded > ? OR $table_nfitemprop.sticky = 1 )
              AND $table_nfitem.`old` = 0";
@@ -4307,7 +4306,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 
     //Construct item body
     if($prefs['fulltextriver'] == 0) {
-      if( $fulltext == 1 ) {
+      if( $ffulltext == 1 ) {
         $itembody = $description;
       } else
       if( strlen($description) > 300 ) {
@@ -4362,7 +4361,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     }
 
     //Set the full text bit
-    if($fulltext == 1) {
+    if($ffulltext == 1) {
         $river[$fcount]['item'][$icount]['fullText'] = 1;
     }
 

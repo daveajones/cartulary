@@ -4211,7 +4211,8 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 		    $table_nfitemprop.`fulltext`,
                     $table_nfcatalog.`fulltext`
              FROM $table_nfitem
-	     LEFT OUTER JOIN $table_nfitemprop ON $table_nfitemprop.itemid = $table_nfitem.id AND $table_nfitemprop.userid=? AND $table_nfitemprop.sticky = 1
+	     LEFT OUTER JOIN $table_nfitemprop ON $table_nfitemprop.itemid = $table_nfitem.id AND $table_nfitemprop.userid=?
+                AND ($table_nfitemprop.sticky = 1 OR $table_nfitemprop.`fulltext` = 1 OR $table_nfitemprop.hidden = 1)
 	     INNER JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
              WHERE $table_nfcatalog.userid=?
              AND ( $table_nfitem.timeadded > ? OR $table_nfitemprop.sticky = 1 )

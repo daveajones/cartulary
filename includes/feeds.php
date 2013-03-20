@@ -2887,6 +2887,7 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
 }
 
 
+
 //_______________________________________________________________________________________
 //Unlink a feed from a user
 function unlink_feed_from_user($uid = NULL, $fid = NULL)
@@ -3927,15 +3928,17 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   $fusers = get_feed_subscribers($fid);
   if( $fusers != FALSE ) {
     foreach( $fusers as $fuser ) {
+      $fiprops = array( 'sticky' => FALSE, 'hidden' => FALSE, 'fulltext' => FALSE );
       if( feed_is_sticky($fid, $fuser) && $old != TRUE ) {
-        set_feed_item_properties($id, $fuser, array( 'sticky' => TRUE ));
+        $fiprops['sticky'] = TRUE;
       }
       if( feed_is_hidden($fid, $fuser) ) {
-        set_feed_item_properties($id, $fuser, array( 'hidden' => TRUE ));
+        $fiprops['hidden'] = TRUE;
       }
       if( feed_is_fulltext($fid, $fuser) ) {
-        set_feed_item_properties($id, $fuser, array( 'fulltext' => TRUE ));
+        $fiprops['fulltext'] = TRUE;
       }
+      set_feed_item_properties($id, $fuser, $fiprops);
       mark_river_as_updated($fuser);
     }
   }
@@ -5024,6 +5027,21 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
 
   loggit(1,"Returning: [$count] items for feed: [$fid]");
   return($items);
+}
+
+
+//Collapses a river structure based on origin value
+function collapse_river($river)
+{
+  //Check parameters
+  if($river == NULL) {
+    loggit(2,"The river array given is corrupt or blank: [$river]");
+    return(FALSE);
+  }
+
+  $newriver = $river;
+
+  return($newriver);
 }
 
 

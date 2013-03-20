@@ -2810,7 +2810,8 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
                     $table_nfcatalog.linkedon,
                     $table_nfcatalog.outlineid,
                     $table_nfcatalog.sticky,
-                    $table_nfcatalog.hidden
+                    $table_nfcatalog.hidden,
+		    $table_nfcatalog.fulltext
 	     FROM $table_newsfeed,
                   $table_nfcatalog
 	     WHERE $table_nfcatalog.userid=?
@@ -2850,7 +2851,8 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
                     $flinkedon,
                     $foid,
                     $fsticky,
-                    $fhidden) or print(mysql_error());
+                    $fhidden,
+		    $ffulltext) or print(mysql_error());
 
   $feeds = array();
   $count = 0;
@@ -2873,7 +2875,8 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
                           'linkedon' => $flinkedon,
                           'oid' => $foid,
                           'sticky' => $fsticky,
-                          'hidden' => $fhidden );
+                          'hidden' => $fhidden,
+			  'fulltext' => $ffulltext );
     $count++;
   }
 
@@ -2882,7 +2885,6 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
   loggit(1,"Returning: [$count] feeds for user: [$uid] matching query: [$query].");
   return($feeds);
 }
-
 
 
 //_______________________________________________________________________________________

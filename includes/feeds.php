@@ -3904,6 +3904,13 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 
     //Does this item have an origin?
     $origin="";
+    if( isset($namespaces['scripting2']) ) {
+      $scripting2 = $item->children($namespaces['scripting2']);
+      if( isset($scripting2->source) ) {
+        $origin = (string)trim($scripting2->source);
+        loggit(3, "add_feed_item(): using scripting2:source as the origin: ".print_r($scripting2, TRUE));
+      }
+    }
     if( isset($namespaces['microblog']) ) {
       $microblog = $item->children($namespaces['microblog']);
       if( isset($microblog->linkFull) ) {

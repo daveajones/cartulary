@@ -631,7 +631,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
       <managingEditor>".get_email_from_uid($uid)." ($username)</managingEditor>";
   if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {
       $rss .= "
-      <sopml:outline>$sopmlurl</sopml:outline>
+      <sopml:url>$sopmlurl</sopml:url>
       <microblog:archive>
           <microblog:url>".htmlspecialchars(get_s3_url($uid, "arc"))."/</microblog:url>
           <microblog:filename>".get_microblog_feed_filename($uid)."</microblog:filename>

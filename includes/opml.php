@@ -1619,12 +1619,16 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
       if( $feed['sticky'] == 1 ) {
         $sticky = 'sopml:sticky="true"';
       }
+      $fulltext = 'sopml:fulltext="false"';
+      if( $feed['fulltext'] == 1 ) {
+        $fulltext = 'sopml:fulltext="true"';
+      }
       $feedtitle = "Untitled Feed";
       if( !empty($feed['title']) ) {
 	$feedtitle = $feed['title'];
       }
       $opml .= "
-              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($feedtitle))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($feed['url'])."\" sopml:disposition=\"sub\" sopml:contains=\"mixed\" sopml:attention=\"50\" $sticky $hidden />";
+              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($feedtitle))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($feed['url'])."\" sopml:disposition=\"sub\" sopml:contains=\"mixed\" sopml:attention=\"50\" $sticky $hidden $fulltext />";
   }
   $opml .= "
           </outline>";
@@ -1814,6 +1818,39 @@ function get_social_outline_url($uid = NULL)
   $s3url = get_s3_url($uid, '', $filename);
   return($s3url);
 }
+
+
+//_______________________________________________________________________________________
+//Purge outlines from the database that aren't linked to anyone
+function purge_orphaned_outlines($type = NULL)
+{
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Find articles that have no linkage
+  $stmt = "DELETE FROM $table_sopml_outlines WHERE NOT EXISTS ( SELECT * FROM $table_sopml_catalog WHERE $table_sopml_outlines.id = $table_sopml_catalog.oid )";
+
+  //Type selection
+  if( !empty($type) ) {
+    $stmt .= " AND $table_sopml_outlines.type = ?";
+    $sql=$dbh->prepare($stmt) or print(mysql_error());
+    $sql->bind_param("s", $type) or print(mysql_error());
+  } else {
+    $sql=$dbh->prepare($stmt) or print(mysql_error());
+  }
+
+  $sql->execute() or print(mysql_error());
+  $delcount = $sql->affected_rows or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and leave
+  loggit(3,"Deleted: [$delcount] orphaned outlines.");
+  return($delcount);
+}
+
 
 
 //########################################################################################

@@ -17,6 +17,7 @@
   $link = "";
   $shortlink = "";
   $enclosure = "";
+  $origin="";
   if( isset($_REQUEST['description']) ) {
     $description = $_REQUEST['description'];
     //If this is a twitter re-tweet, then prefix it appropriately
@@ -32,6 +33,9 @@
   }
   if( isset($_REQUEST['enclosure']) ) {
     $enclosure = $_REQUEST['enclosure'];
+  }
+  if( isset($_REQUEST['origin']) ) {
+    $origin = $_REQUEST['origin'];
   }
 
   //Check for show all
@@ -125,7 +129,7 @@
 		<!-- Origin box. -->
                 <?if( !empty($origin) ) {?>
         	<div id="divOrigin">
-		<input name="origin" id="hidOrigin" type="text" value="<?echo $origin?>" />
+		<input name="origin" id="hidOrigin" type="hidden" value="<?echo $origin?>" />
 		</div>
                 <?}?>
 

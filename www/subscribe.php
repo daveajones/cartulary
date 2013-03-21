@@ -83,9 +83,9 @@ foreach( $outlines as $ou ) {
         <?if( $feeds[$ofd]['errors'] > 50 ) {?><img title="This feed has had more than 50 errors." class="icon-warning" src="/images/blank.gif" /><?}?>
         <a class="nooverflow feed-title" href="<?echo $feeds[$ofd]['url']?>"><?echo $feeds[$ofd]['title']?></a>
 	<span class="feed-properties">
-	  <button name="sticky" type="button" class="<?echo ($feeds[$ofd]['sticky'] == 1 ? "btnFeedSticky" : "btnFeedNotSticky")?> stickybutton"></button>
-          <button name="hidden" type="button" class="<?echo ($feeds[$ofd]['hidden'] == 1 ? "btnFeedHidden" : "btnFeedNotHidden")?> hiddenbutton"></button>
-          <button name="fulltext" type="button" class="<?echo ($feeds[$ofd]['fulltext'] == 1 ? "btnFeedFullText" : "btnFeedNotFullText")?> fulltextbutton"></button>
+	  <button name="sticky" title="<?echo ($feeds[$ofd]['sticky'] == 0 ? "Make this feed's posts sticky." : "Un-sticky this feed's posts.")?>" type="button" class="<?echo ($feeds[$ofd]['sticky'] == 1 ? "btnFeedSticky" : "btnFeedNotSticky")?> stickybutton"></button>
+          <button name="hidden" title="<?echo ($feeds[$ofd]['hidden'] == 0 ? "Hide this feed's posts." : "Un-hide this feed's posts.")?>" type="button" class="<?echo ($feeds[$ofd]['hidden'] == 1 ? "btnFeedHidden" : "btnFeedNotHidden")?> hiddenbutton"></button>
+          <button name="fulltext" title="<?echo ($feeds[$ofd]['fulltext'] == 0 ? "See the full text of each post." : "Only show a portion of each post.")?>" type="button" class="<?echo ($feeds[$ofd]['fulltext'] == 1 ? "btnFeedFullText" : "btnFeedNotFullText")?> fulltextbutton"></button>
 	</span>
         </li><?
     }
@@ -137,9 +137,9 @@ foreach( $feeds as $fd ) {
     <a class="nooverflow" href="<?echo (empty($fd['link']) ? $fd['url'] : $fd['link'])?>"><?echo (empty($fd['title']) ? $fd['url'] : $fd['title'])?></a>
     <span class="feed-properties">
       <a class="aFeedRaw" href="<?echo $fd['url']?>"><img title="See the raw xml of this feed." class="icon-feed-raw" src="/images/blank.gif" /></a>
-      <button name="sticky" title="Make this feed sticky." type="button" class="<?echo ($fd['sticky'] == 1 ? "btnFeedSticky" : "btnFeedNotSticky")?> stickybutton"></button>
-      <button name="hidden" title="Hide this feed's posts." type="button" class="<?echo ($fd['hidden'] == 1 ? "btnFeedHidden" : "btnFeedNotHidden")?> hiddenbutton"></button>
-      <button name="fulltext" title="See the full text of this feed's posts." type="button" class="<?echo ($fd['fulltext'] == 1 ? "btnFeedFullText" : "btnFeedNotFullText")?> fulltextbutton"></button>
+      <button name="sticky" title="<?echo ($fd['sticky'] == 0 ? "Make this feed's posts sticky." : "Un-sticky this feed's posts.")?>" type="button" class="<?echo ($fd['sticky'] == 1 ? "btnFeedSticky" : "btnFeedNotSticky")?> stickybutton"></button>
+      <button name="hidden" title="<?echo ($fd['hidden'] == 0 ? "Hide this feed's posts." : "Un-hide this feed's posts.")?>" type="button" class="<?echo ($fd['hidden'] == 1 ? "btnFeedHidden" : "btnFeedNotHidden")?> hiddenbutton"></button>
+      <button name="fulltext" title="<?echo ($fd['fulltext'] == 0 ? "See the full text of each post." : "See only a portion of each post.")?>" type="button" class="<?echo ($fd['fulltext'] == 1 ? "btnFeedFullText" : "btnFeedNotFullText")?> fulltextbutton"></button>
     </span>
     </li><?
 }

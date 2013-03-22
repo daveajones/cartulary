@@ -183,6 +183,9 @@ River.methods = (function () {
         	$('.aUnSticky').click(function() {
                 	var bobj = $(this);
                 	var id = bobj.attr("data-id");
+
+			//Get any sticky subitems so we can un-sticky them too
+			var subitems = $('#' + id + ' .subitem.sticky').map(function() { return this.id; }).get();	
 	
                 	//Make the call
                 	$.ajax({
@@ -205,6 +208,22 @@ River.methods = (function () {
 					bobj.remove();
                         	}
                 	});
+
+			//Loop through the sticky subitems and un-sticky them as well
+			for( var i =0 ; i < subitems.length ; i++ ) {
+	                	//Make the call
+        	        	$.ajax({
+                	        	url:    '/cgi/in/unsticky?id=' + subitems[i],
+                        		type:   "GET",
+                        		timeout:        20000,
+	                        	dataType:       'json',
+        	                	success:        function(data) {
+                	                	if(data.status == "false") {
+                        	                        showMessage( data.description, data.status, 5 );
+	                                	}
+                	        	}
+                		});
+			}
 	
                 	return false;
         	});
@@ -358,7 +377,7 @@ River.methods = (function () {
                 	//Set initial size and position based on the current viewport size
                 	$(el).css("max-width", ( (winW + winScLeft) - 120) + "px");
                 	$(el).css("max-width", ( $(el).width() - 30) + "px");
-			$(el).css("top", ((winH - $(el).height()) / 2)  + "px");
+			$(el).css("top", (( (winH - $(el).height()) / 2 ) / 2)  + "px");
 
 			return true;
 		}

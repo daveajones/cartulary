@@ -22,7 +22,7 @@ MAILTO=""
 */15  * * * * root php /opt/cartulary/bin/clean.php
 
 ##: Build main user rivers
-*/1  * * * * root php /opt/cartulary/bin/buildrivers.php
+*/2  * * * * root php /opt/cartulary/bin/buildrivers.php
 
 ##: Build alternate rivers
 */30  * * * * root php /opt/cartulary/bin/buildsysrivers.php

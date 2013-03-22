@@ -244,6 +244,18 @@ a {  color:#059;  }
 .pageContentWrapper.River #footer p {  font-size:0.6875em;  }
 .pageContentWrapper.River #stream .section .header h2 {  float:none; margin-top:0;  }
 .pageContentWrapper.River #stream .section .header .time {  float:none; padding:0; margin-top:0;  }
+/* sub-items */
+.pageContentWrapper.River #stream .section .rivermicrotar { 
+  float:right;
+  max-height:48px;
+  max-width:48px;
+  margin:4px 8px 8px;
+}
+.pageContentWrapper.River #stream .section .subitem { 
+  text-align:right;
+}
+
+
 
 /* ----- Article modal ----- */
 #mdlShowArticle {

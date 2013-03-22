@@ -197,6 +197,16 @@ body {
   margin-bottom:15px;
   padding-bottom:8px;
 }
+/* sub-items */
+.pageContentWrapper.River #stream .section .rivermicrotar { 
+  float:right;
+  max-height:48px;
+  max-width:48px;
+  margin:4px 8px 8px;
+}
+.pageContentWrapper.River #stream .section .subitem { 
+  text-align:right;
+}
 /* ----- Article modal ----- */
 #mdlShowArticle {
   position: fixed;

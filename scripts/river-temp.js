@@ -141,7 +141,7 @@
 	    <!-- Other items that reference this item's origin value. -->
 	    {{if subitem}}<hr style="border-top:solid #bbb 1px;" />{{/if}}
 	    {{each(i,subitem) subitem}}
-		<div class="subitem{{if subitem.sticky}} sticky{{/if}}" id="${subitem.id}">
+		<div class="${item.id} subitem{{if subitem.sticky}} sticky{{/if}}" id="${subitem.id}">
                     {{if subitem.avatarUrl}}<img class="rivermicrotar" src="${subitem.avatarUrl}" alt="" />{{/if}}
 	            {{each(e,enclosure) subitem.enclosure}}
                       {{if River.methods.isAvatar(enclosure.url)}}

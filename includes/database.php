@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 9;
+$cg_database_version = 10;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -88,7 +88,14 @@ $cg_database_updates[8][] = <<<CGDB0018
 CGDB0018;
 //----------------------------------------------------------------------------------------------------------------
 
-
+//Version 9 to 10 -------------------------------------------------------------------------------------------------
+$cg_database_updates[9][] = <<<CGDB0019
+ ALTER TABLE `prefs` ADD `collapseriver` TINYINT NOT NULL DEFAULT '0' COMMENT 'Show duplicate origin items in a threaded view?'
+CGDB0019;
+$cg_database_updates[9][] = <<<CGDB0020
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '10' )
+CGDB0020;
+//----------------------------------------------------------------------------------------------------------------
 ?>
 
 

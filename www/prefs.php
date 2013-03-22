@@ -120,6 +120,7 @@
 		<li><input name="mobilehidebigpics" type="checkbox" <?if ($prefs['mobilehidebigpics'] == 1) echo "checked ";?>/> Hide large image/video enclosures in the river when on mobile.</li>
 		<li><input name="mobilehidepics" type="checkbox" <?if ($prefs['mobilehidepics'] == 1) echo "checked ";?>/> Hide body images/videos in the river when on mobile.</li>
 		<li><input name="fulltextriver" type="checkbox" <?if ($prefs['fulltextriver'] == 1) echo "checked ";?>/> I want to see the full text of each item.</li>
+		<li><input name="collapseriver" type="checkbox" <?if ($prefs['collapseriver'] == 1) echo "checked ";?>/> Collapse similar items into a threaded view.</li>
 	</ul>
 	</div>
 

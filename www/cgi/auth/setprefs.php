@@ -54,6 +54,7 @@ if ( isset($_POST['timezone']) ) { $timezone = $_POST['timezone']; } else { $tim
 if ( isset($_POST['fulltextriver']) ) { $fulltextriver = 1; } else { $fulltextriver = 0; };
 if ( isset($_POST['cartinriver']) ) { $cartinriver = 1; } else { $cartinriver = 0; };
 if ( isset($_POST['staticarticles']) ) { $staticarticles = 1; } else { $staticarticles = 0; };
+if ( isset($_POST['collapseriver']) ) { $collapseriver = 1; } else { $collapseriver = 0; };
 $jsondata = array();
 $jsondata['prefname'] = "";
 
@@ -553,6 +554,17 @@ if( ($staticarticles < 0) || ($staticarticles > 1) ) {
   exit(1);
 }
 $prefs['staticarticles'] = $staticarticles;
+
+$jsondata['prefname'] = "collapseriver";
+if( ($collapseriver < 0) || ($collapseriver > 1) ) {
+  //Log it
+  loggit(2,"The value for collapseriver pref was not within acceptable range: [$staticarticles]");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "Value of pref is out of range.";
+  echo json_encode($jsondata);
+  exit(1);
+}
+$prefs['collapseriver'] = $collapseriver;
 //--------------------------------------------------------
 //--------------------------------------------------------
 
@@ -591,8 +603,17 @@ if( $oldprefs['maxriversize'] != $maxriversize ||
     $oldprefs['maxriversizemobile'] != $maxriversizemobile ||
     $oldprefs['riverhours'] != $riverhours ||
     $oldprefs['fulltextriver'] != $fulltextriver ||
+    $oldprefs['collapseriver'] != $collapseriver ||
     $oldprefs['s3bucket'] != $s3bucket )
-{  build_river_json($uid, NULL, TRUE);  }
+{
+  if( $collapseriver == 0 ) {
+    build_river_json($uid, NULL, TRUE);
+  } else {
+    build_river_json2($uid, NULL, TRUE);
+  }
+}
+
+
 
 //Rebuild static files
 build_blog_rss_feed($uid);

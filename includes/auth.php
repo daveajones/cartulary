@@ -2420,11 +2420,12 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                timezone=?,
                fulltextriver=?,
 	       cartinriver=?,
-               staticarticles=?
+               staticarticles=?,
+	       collapseriver=?
            WHERE uid=?";
 
   $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsddds",
+  $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddds",
                                 $prefs['publicdefault'],
 				$prefs['publicrss'],
 				$prefs['publicopml'],
@@ -2465,6 +2466,7 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                                 $prefs['fulltextriver'],
 				$prefs['cartinriver'],
 				$prefs['staticarticles'],
+				$prefs['collapseriver'],
 				$uid
   ) or print(mysql_error());
   $sql->execute() or print(mysql_error());

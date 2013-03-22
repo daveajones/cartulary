@@ -26,16 +26,16 @@ function is_feed($content = NULL)
 
   //Look for opml nodes
   if( (string)$x->getName() == "rss" ) {
-    loggit(3, "Found a channel element. Looks like an RSS feed.");
+    loggit(1, "Found a channel element. Looks like an RSS feed.");
     return("application/rss+xml");
   }
   if( (string)$x->getName() == "feed" ) {
-    loggit(3, "Found a feed element. Looks like an ATOM feed.");
+    loggit(1, "Found a feed element. Looks like an ATOM feed.");
     return("application/atom+xml");
   }
 
   //None of the tests passed so return FALSE
-  loggit(3,"The content tested was not an xml-based feed.");
+  loggit(1,"The content tested was not an xml-based feed.");
   return(FALSE);
 }
 
@@ -110,7 +110,7 @@ function get_feed_title($content = NULL)
 }
 
 
-//Does the feed contain a microblog:avatar?
+//Does the feed contain a microblog:avatar or sopml:avatar?
 function get_feed_avatar($x = NULL)
 {
   //Check parameters
@@ -134,11 +134,16 @@ function get_feed_avatar($x = NULL)
 
   //Search for an avatar
   $ns_microblog = $x->channel->children($namespaces['microblog']);
-  //loggit(3, "MICROBLOG NS: ".print_r($ns_microblog, true));
   if( isset($ns_microblog->avatar) ) {
     $url = $ns_microblog->avatar;
-    //loggit(3, "MICROBLOG: Avatar url is: [$url].");
-    //Log and leave
+    loggit(1, "The avatar of this feed is at: [$url].");
+    return($url);
+  }
+
+  //Search for an avatar
+  $ns_sopml = $x->channel->children($namespaces['sopml']);
+  if( isset($ns_sopml->avatar) ) {
+    $url = $ns_sopml->avatar;
     loggit(1, "The avatar of this feed is at: [$url].");
     return($url);
   }
@@ -1679,7 +1684,7 @@ function unmark_feed_item_as_hidden($iid = NULL, $uid = NULL)
   $sql->close() or print(mysql_error());
 
   //Log and return
-  loggit(3,"Un-flagged item: [$iid] as hidden for user: [$uid].");
+  loggit(1,"Un-flagged item: [$iid] as hidden for user: [$uid].");
   return(TRUE);
 }
 
@@ -1713,7 +1718,7 @@ function mark_feed_as_fulltext($fid = NULL, $uid = NULL)
   $sql->close() or print(mysql_error());
 
   //Log and return
-  loggit(3,"Flagged feed: [$fid] as fulltext for user: [$uid].");
+  loggit(1,"Flagged feed: [$fid] as fulltext for user: [$uid].");
   return(TRUE);
 }
 
@@ -1781,7 +1786,7 @@ function mark_feed_item_as_fulltext($iid = NULL, $uid = NULL)
   $sql->close() or print(mysql_error());
 
   //Log and return
-  loggit(3,"FULLTEXT: Flagged item: [$iid] as fulltext for user: [$uid].");
+  loggit(1,"FULLTEXT: Flagged item: [$iid] as fulltext for user: [$uid].");
   return(TRUE);
 }
 
@@ -1875,7 +1880,7 @@ function mark_feed_as_updated($fid = NULL)
   $sql->close() or print(mysql_error());
 
   //Log and return
-  //loggit(3,"Flagged feed: [$fid] as needing to be scanned.");
+  loggit(1,"Flagged feed: [$fid] as needing to be scanned.");
   return($updcount);
 }
 
@@ -3904,25 +3909,32 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 
     //Does this item have an origin?
     $origin="";
+    if( isset($namespaces['feedburder']) ) {
+      $feedburner = $item->children($namespaces['feedburner']);
+      if( isset($feedburner->origLink) ) {
+        $origin = (string)trim($feedburner->origLink);
+        loggit(1, "add_feed_item(): using feedburner:origLink as the origin: ".print_r($feedburner, TRUE));
+      }
+    }
     if( isset($namespaces['scripting2']) ) {
       $scripting2 = $item->children($namespaces['scripting2']);
       if( isset($scripting2->source) ) {
         $origin = (string)trim($scripting2->source);
-        loggit(3, "add_feed_item(): using scripting2:source as the origin: ".print_r($scripting2, TRUE));
+        loggit(1, "add_feed_item(): using scripting2:source as the origin: ".print_r($scripting2, TRUE));
       }
     }
     if( isset($namespaces['microblog']) ) {
       $microblog = $item->children($namespaces['microblog']);
       if( isset($microblog->linkFull) ) {
         $origin = (string)trim($microblog->linkFull);
-        loggit(3, "add_feed_item(): using microblog:linkFull as the origin: ".print_r($microblog, TRUE));
+        loggit(1, "add_feed_item(): using microblog:linkFull as the origin: ".print_r($microblog, TRUE));
       }
     }
     if( isset($namespaces['sopml']) ) {
       $sopml = $item->children($namespaces['sopml']);
       if( isset($sopml->origin) ) {
         $origin = (string)trim($sopml->origin);
-        loggit(3, "add_feed_item(): sopml:origin found: ".print_r($sopml, TRUE));
+        loggit(1, "add_feed_item(): sopml:origin found: ".print_r($sopml, TRUE));
       }
     }
 
@@ -4439,7 +4451,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
   //loggit(3, "River hash: NEW: [$newhash]");
 
   if( $pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash) ) {
-    //loggit(3, "User: [$uid]'s river has not changed. No need to publish.");
+    loggit(1, "User: [$uid]'s river has not changed. No need to publish.");
     return($jsonriver);
   }
 
@@ -5037,6 +5049,364 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
 }
 
 
+//_______________________________________________________________________________________
+//Build a json array of feed items that will be the river for this user
+function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = FALSE)
+{
+  //Check parameters
+  if($uid == NULL) {
+    loggit(2,"The user id given is corrupt or blank: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+  require_once "$confroot/$libraries/s3/S3.php";
+  require_once "$confroot/$includes/opml.php";
+
+  loggit(1, "DEBUG: build_river_json2($uid, $max, $force, $mobile)");
+
+  //Get the users prefs
+  $prefs = get_user_prefs($uid);
+  if( !$prefs ) {
+    loggit(2,"Couldn't get prefs for user: [$uid]");
+    return(FALSE);
+  }
+  $start = time() - ($prefs['riverhours'] * 3600);
+  $dmax = $prefs['maxriversize'];
+  $mmax = $prefs['maxriversizemobile'];
+
+  //The river array
+  $river = array();
+  $driver = array();
+  $mriver = array();
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Assemble query
+  $sqltxt = "SELECT $table_nfitem.id,
+                    $table_nfitem.title,
+                    $table_nfitem.url,
+                    $table_nfitem.timestamp,
+                    $table_nfitem.feedid,
+                    $table_nfitem.timeadded,
+                    $table_nfitem.enclosure,
+                    $table_nfitem.description,
+                    $table_nfitem.guid,
+                    $table_nfitem.origin,
+                    $table_nfitem.sourceurl,
+                    $table_nfitem.sourcetitle,
+                    $table_nfitem.author,
+                    $table_nfitemprop.sticky,
+                    $table_nfcatalog.sticky,
+                    $table_nfitemprop.hidden,
+                    $table_nfcatalog.hidden,
+                    $table_nfitemprop.`fulltext`,
+                    $table_nfcatalog.`fulltext`
+             FROM $table_nfitem
+             LEFT OUTER JOIN $table_nfitemprop ON $table_nfitemprop.itemid = $table_nfitem.id AND $table_nfitemprop.userid=? AND $table_nfitemprop.sticky = 1
+             INNER JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
+             WHERE $table_nfcatalog.userid=?
+             AND ( $table_nfitem.timeadded > ? OR $table_nfitemprop.sticky = 1 )
+             AND $table_nfitem.`old` = 0";
+  $sqltxt .= " ORDER BY $table_nfitemprop.sticky DESC, $table_nfitem.timeadded DESC";
+  //loggit(3, $sqltxt);
+
+  //Make sure to set the LIMIT to the higher of the two max values, so we cover both
+  if($max == NULL) {
+    $max = $dmax;
+    if( $mmax > $dmax ) {
+      $max = $mmax;
+    }
+  }
+  $sqltxt .= " LIMIT $max";
+
+  //Execute the query
+  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql->bind_param("ssd", $uid, $uid, $start) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+
+  //See if there were any items returned
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(1,"The user: [$uid] has an empty river.");
+    return(FALSE);
+  }
+
+  $sql->bind_result($id,$title,$url,$timestamp,$feedid,
+                    $timeadded,$enclosure,$description,
+                    $guid,$origin,$sourceurl,$sourcetitle,
+                    $author,$sticky,$fsticky,$hidden,
+                    $fhidden,$fulltext,$ffulltext) or print(mysql_error());
+
+
+  // ----- Begin building the river. -----
+  $origins = array();
+  $forigins = array();
+  $fcount = -1;
+  $icount = 0;
+  $ticount = 0;
+  $drcount = 0;
+  $mrcount = 0;
+  $firstid = "";
+  $lastfeedid = "";
+  $pubdate = time();
+  while($sql->fetch()){
+    $feed = get_feed_info($feedid);
+
+    //Save the time stamp of the first item to use as a pubdate
+    if( $firstid == "" && $sticky != 1 && $hidden != 1 ) {
+      $pubdate = $timeadded;
+      $firstid = $id;
+    }
+
+    //Keep track of which feed we're in along the way
+    if($lastfeedid != $feedid) {
+      //If the last feed was blank then remove it from the array
+      if( $fcount >= 0 && empty($river[$fcount]['item']) ) {
+	array_splice($river, $fcount);
+      } else {
+        $fcount++;
+      }
+      $icount = 0;
+      $lastfeedid = $feedid;
+
+      //Insert a new array that will contain the feed
+      $newfeed = array(
+		'feedId' => $feedid,
+		'feedIndex' => $fcount,
+		'feedUrl' => $feed['url'],
+		'websiteUrl' => $feed['link'],
+		'feedTitle' => $feed['title'],
+		'feedDescription' => '',
+                'feedSticky' => $fsticky,
+		'feedHidden' => $fhidden,
+		'feedFullText' => $ffulltext,
+		'itemIndex' => $ticount,
+		'whenLastUpdate' => date("D, d M Y H:i:s O", $feed['lastupdate'])
+      );
+
+      //Check if this feed is linked to an outline this user subscribes to
+      $oid = get_feed_outline_by_user($feedid, $uid);
+      if($oid != FALSE) {
+ 	$ou = get_outline_info($oid);
+	$newfeed['linkedOutlineId'] = $oid;
+	if( !empty($ou['type']) ) { $newfeed['linkedOutlineType'] = $ou['type']; }
+	if( !empty($ou['title']) ) {  $newfeed['linkedOutlineTitle'] = $ou['title'];  }
+	if( !empty($ou['ownername']) ) {  $newfeed['ownerName'] = $ou['ownername'];  }
+	if( !empty($ou['avatarurl']) ) {  $newfeed['avatarUrl'] = $ou['avatarurl'];  }
+      }
+
+      //Does this feed have an avatar url?
+      if( !empty($feed['avatarurl']) ) {  $newfeed['avatarUrl'] = $feed['avatarurl']; }
+
+      //Start a sub-array in this feed array to hold items
+      $newfeed['item'] = array();
+      $river[$fcount] = $newfeed;
+    }
+    // ----- End Feed section -----
+
+
+    // ----- Start Item section -----
+    //Construct item body
+    if($prefs['fulltextriver'] == 0) {
+      if( $ffulltext == 1 ) {
+        $itembody = $description;
+      } else
+      if( strlen($description) > 300 ) {
+        $itembody = truncate_text($description, 300)."...";
+      } else {
+        $itembody = $description;
+      }
+    } else {
+      $itembody = $description;
+    }
+
+    //Fill in the details of this item
+    $newitem = array(
+		'index' => $ticount,
+	        'body' => $itembody,
+	        'permaLink' => $url,
+		'guid' => $guid,
+		'pubDate' => date("D, d M Y H:i:s O", $timeadded),
+	        'title' => $title,
+	        'link' => $url,
+	        'id' => $id
+    );
+
+    //Is there an author attribution?
+    if(!empty($author)) {
+	$newitem['author'] = $author;
+    }
+
+    //Does this item specify a source attribution?
+    if(!empty($sourceurl)) {
+	$newitem['sourceurl'] = $sourceurl;
+    }
+    if(!empty($sourcetitle)) {
+	$newitem['sourcetitle'] = $sourcetitle;
+    }
+
+    //Set the sticky bit
+    if($sticky == 1) {
+        $newitem['sticky'] = 1;
+    }
+
+    //Set the hidden bit
+    if($hidden == 1) {
+        $newitem['hidden'] = 1;
+    }
+
+    //Set the full text bit
+    if($ffulltext == 1) {
+        $newitem['fullText'] = 1;
+    }
+
+    //Is there an origin?
+    if(!empty($origin)) {
+	$newitem['origin'] = $origin;
+    } else {
+	$newitem['origin'] = $feed['url']."|".$guid;
+    }
+
+    //Are there any enclosures?
+    $enclosures = unserialize($enclosure);
+    if($enclosures != FALSE) {
+	    if( !empty($enclosures) ) {
+		if(!empty($enclosures[0]['url'])){
+		      $newitem['enclosure'] = $enclosures;
+		}
+	    }
+    }
+
+    //We base where to stick the item on the origin.  If the origin of this new item
+    //is the same as the origin of an existing item we've already put into the river
+    //then we insert this new item as a sub-item of that existing one.
+    //If we haven't seen this origin before, then we just put it in as a new standard
+    //river item.
+    $floc = isset($forigins[$newitem['origin']]['feedindex']) ? $forigins[$newitem['origin']]['feedindex'] : FALSE;
+
+    //echo "DEBUG: [$fcount] [".$newitem['origin']."]\n";
+
+    if( $floc !== FALSE ) {
+	$iloc = $forigins[(string)$newitem['origin']]['itemindex'];
+        $newitem['index'] = @count($river[$floc]['item'][$iloc]['subitem']);
+	$newitem['avatarUrl'] = @$newfeed['avatarUrl'];
+	$newitem['feedTitle'] = @$newfeed['feedTitle'];
+	$river[$floc]['item'][$iloc]['subitem'][] = $newitem;
+    } else {
+	$river[$fcount]['item'][$icount] = $newitem;
+	$forigins[(string)$newitem['origin']]['feedindex'] = $fcount;
+	$forigins[(string)$newitem['origin']]['itemindex'] = $icount;
+        $icount++;
+    }
+    // ----- End Item Section -----
+
+    $ticount++;
+
+    //We're building two rivers here.  One for desktop and one for mobile
+    if( $ticount <= $dmax ) {  $driver = $river; $drcount++;  }
+    if( $ticount <= $mmax ) {  $mriver = $river; $mrcount++;  }
+
+  }
+
+  $sql->close() or print(mysql_error());
+
+  //Debugging
+  //echo "-- forigins --------------------------\n";
+  //echo print_r($forigins, TRUE)."\n";
+  //echo "-- origins ---------------------------\n";
+  //echo print_r($origins, TRUE)."\n";
+  //echo "--------------------------------------\n";
+
+  //Encapsulate the river
+  $doutput['updatedFeeds']['updatedFeed'] = $driver;
+  $moutput['updatedFeeds']['updatedFeed'] = $mriver;
+
+  //Add metadata
+  $doutput['metadata'] = array(
+	"docs" => "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html",
+	"whenGMT" => date("D, d M Y H:i:s O", $pubdate),
+	"whenLocal" => date("D, d M Y H:i:s O", $pubdate),
+	"version" => "3",
+	"secs" => "1",
+        "firstId" => $firstid,
+        "lastBuildDate" => time()
+  );
+  $moutput['metadata'] = array(
+	"docs" => "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html",
+	"whenGMT" => date("D, d M Y H:i:s O", $pubdate),
+	"whenLocal" => date("D, d M Y H:i:s O", $pubdate),
+	"version" => "3",
+	"secs" => "1",
+        "firstId" => $firstid,
+        "lastBuildDate" => time()
+  );
+
+  //Json encode the river
+  $djsonriver = "onGetRiverStream(".json_encode($doutput).")";
+  $mjsonriver = "onGetRiverStream(".json_encode($moutput).")";
+
+  //Let's return the river asked for
+  $jsonriver = $djsonriver;
+  if( $mobile == TRUE ) {
+    $jsonriver = $mjsonriver;
+  }
+
+  //Let's be smart about this and not re-publish a river that hasn't changed
+  $pubriver = get_river_info($uid);
+  $newhash = md5(serialize($driver));
+
+  //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
+  //loggit(3, "River hash: NEW: [$newhash]");
+
+  if( $pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash) ) {
+    //loggit(3, "User: [$uid]'s river has not changed. No need to publish.");
+    return($jsonriver);
+  }
+
+  //Put this built river in the database
+  update_river($uid, $doutput, $moutput, $newhash);
+
+  //If we can get some sane S3 credentials then let's go
+  if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {
+      //First we get all the key info
+      $s3info = get_s3_info($uid);
+
+      //Subpath?  Must begin with a slash
+      $subpath = "";
+
+      //Put the desktop file
+      $filename = $default_river_json_file_name;
+      $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'].$subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" =>"gzip"));
+      if(!$s3res) {
+	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+        //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+      } else {
+        $s3url = get_s3_url($uid, $subpath, $filename);
+        loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+      }
+      //Put the mobile file
+      $filename = $default_river_json_mobile_file_name;
+      $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'].$subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" =>"gzip"));
+      if(!$s3res) {
+	loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+        //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+      } else {
+        $s3url = get_s3_url($uid, $subpath, $filename);
+        loggit(1, "Wrote mobile river to S3 at url: [$s3url].");
+      }
+  }
+
+  loggit(1,"Returning: [$drcount] items in user: [$uid]'s desktop river.");
+  loggit(1,"Returning: [$mrcount] items in user: [$uid]'s mobile river.");
+  return($jsonriver);
+}
+
+
 //Collapses a river structure based on origin value
 function collapse_river($river)
 {
@@ -5046,7 +5416,31 @@ function collapse_river($river)
     return(FALSE);
   }
 
-  $newriver = $river;
+  //We will incrementally build a new river
+  $nrindex=0;
+  $nritemindex=0;
+  $feeds = $river['updatedFeeds']['updatedFeed'];
+  $newriver="";
+
+  //Go through each item
+  foreach( $feeds as $feed ) {
+  foreach( $feed['item'] as $item ) {
+	$index = $item['index'];
+	if( isset($item['origin']) ) {
+
+		$result = array_search_ext($newriver, $item['origin']);
+		if($result === FALSE) {
+			//...
+		} else {
+			echo print_r($result, TRUE)."\n";
+		}
+
+	}
+
+  }
+  }
+
+
 
   return($newriver);
 }

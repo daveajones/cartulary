@@ -17,11 +17,21 @@
   	$tstart = time();
   	$users = get_users();
   	echo "Building ".count($users)." rivers.\n\n";
+  	loggit(1, "Building ".count($users)." rivers.");
   	foreach($users as $user) {
+          $prefs = get_user_prefs($user['id']);
 	  if( river_updated($user['id']) ) {
-     	    build_river_json( $user['id'], NULL, TRUE );
+	    if( $prefs['collapseriver'] == 1) {
+     	      build_river_json2( $user['id'], NULL, TRUE );
+	    } else {
+     	      build_river_json( $user['id'], NULL, TRUE );
+	    }
 	  } else {
-     	    build_river_json( $user['id'] );
+	    if( $prefs['collapseriver'] == 1) {
+       	      build_river_json2( $user['id'] );
+	    } else {
+     	      build_river_json( $user['id'] );
+	    }
 	  }
     	  echo "Built river for user: [".$user['id']." | ".$user['name']."].\n";
     	  loggit(1, "Built river for user: [".$user['id']." | ".$user['name']."].");

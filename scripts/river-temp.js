@@ -1,34 +1,21 @@
+    <!-- /*This is the stream header*/ -->
     <div id="stream-header">
-        <!-- <a id="stream-view" href="#">Switch to collapsed view</a> -->
         <div id="stream-updated">
           <span class="river-timestamp">Updated <span class="time">${dateFormat(metadata.whenGMT, 'timeDate')}</span></span>
-          <span class="river-stats">Items: <span id="spnItemCount"></span> <a href="${River.settings.url}">JSON</a>
-            <a id="stream-filter" href="#"><img class="icon-filter" src="/images/blank.gif" alt="" /></a>
-          </span>
+          <span class="river-stats">Items: <span id="spnItemCount"></span> <a href="${River.settings.url}">JSON</a></span>
         </div>
     </div>
 
+
+    <!-- /*This is where new item notification happens*/ -->
     <a id="stream-notice" href="#"></a>
 
-    <div id="stream-filterbox" style="display:none;">
-    <u>River Filter</u><br />
-    <input class="chkOutlineFilterAll" type="checkbox" checked="checked" data-id="all" /> All<br/>
-    <input class="chkOutlineFilter" type="checkbox" checked="checked" data-id=".sopml" /> People<br/>
-    <input class="chkOutlineFilter" type="checkbox" checked="checked" data-id="" /> Non-list<br/>
-    <br/>
-    <?
-       $outlines = get_outlines($uid,$max);
-       foreach($outlines as $outline) {
-         if($outline['type'] != "sopml") {
-         ?><input class="chkOutlineFilter" type="checkbox" checked="checked" data-id=".<?echo $outline['id']?>" /> <?echo $outline['title']?><br/><?
-         }
-       }
-    ?>
-    </div>
 
+    <!-- /*This is the river template*/ -->
     <div id="stream-items">
-
-    {{each(f,feed) updatedFeeds.updatedFeed}}
+   
+      <!-- /*Each feed is parsed*/ -->
+      {{each(f,feed) updatedFeeds.updatedFeed}}
 
         <div class="section{{if linkedOutlineId}} ${linkedOutlineId}{{/if}}{{if feedHidden == 1}} elHidden{{/if}}{{if linkedOutlineType}} ${linkedOutlineType}{{/if}}">
             <div class="header">
@@ -47,10 +34,10 @@
         {{each(i,item) item}}
 
             <div class="article{{if item.sticky}} sticky{{/if}} fulltext" id="${item.id}" data-index="${item.index}">
-                {{if avatarUrl}}{{if i < 1}}<img class="riverminitar" src="${avatarUrl}" src="/images/blank.gif" alt="" />{{/if}}{{/if}}
+                {{if avatarUrl}}{{if i < 1}}<img class="riverminitar" src="${avatarUrl}" alt="" />{{/if}}{{/if}}
                 {{each(e,enclosure) item.enclosure}}
                   {{if River.methods.isAvatar(enclosure.url)}}
-                    <img class="riverminitar" src="${enclosure.url}" src="/images/blank.gif" alt="" title="Enclosure: ${e}."/>
+                    <img class="riverminitar" src="${enclosure.url}" alt="" title="Enclosure: ${e}."/>
                   {{/if}}
                 {{/each}}
                 <div class="header">
@@ -150,7 +137,32 @@
 		    </div>
                     <div class="footclear"></div>
                 </div>
+
+	    <!-- Other items that reference this item's origin value. -->
+	    {{if subitem}}<hr style="border-top:solid #bbb 1px;" />{{/if}}
+	    {{each(i,subitem) subitem}}
+		<div class="subitem">
+                    {{if subitem.avatarUrl}}<img class="rivermicrotar" src="${subitem.avatarUrl}" alt="" />{{/if}}
+	            {{each(e,enclosure) subitem.enclosure}}
+                      {{if River.methods.isAvatar(enclosure.url)}}
+                        <img class="rivermicrotar" src="${enclosure.url}" alt="" title="Enclosure: ${e}."/>
+                      {{/if}}
+                    {{/each}}
+                    {{if subitem.permaLink || subitem.link}}<a class="articlelink" name="${subitem.id}" href="${subitem.permaLink || subitem.link}" rel="external">{{/if}}
+                    {{if subitem.title}}
+                      ${subitem.title}
+                    {{else}}
+                      ${River.methods.newGetText(subitem.body)}
+                    {{/if}}
+                    {{if subitem.permaLink || subitem.link}}</a>{{/if}}
+                    <div class="time">${River.methods.prettyDate(subitem.pubDate)}</div>
+                    {{if subitem.avatarUrl}} {{else}}${subitem.feedTitle}{{/if}}
+		</div>
+		<div class="footclear"></div>           
+	    {{/each}}
+
             </div>
+
 
         {{/each}}
 

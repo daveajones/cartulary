@@ -5120,7 +5120,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
       $max = $mmax;
     }
   }
-  $sqltxt .= " LIMIT $max";
+  //$sqltxt .= " LIMIT $max";
 
   //Execute the query
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
@@ -5308,10 +5308,15 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     $ticount++;
 
     //We're building two rivers here.  One for desktop and one for mobile
-    if( $ticount <= $dmax ) {  $driver = $river; $drcount++;  }
-    if( $ticount <= $mmax ) {  $mriver = $river; $mrcount++;  }
+    //if( $ticount <= $dmax ) {  $driver = $river; $drcount++;  }
+    //if( $ticount <= $mmax ) {  $mriver = $river; $mrcount++;  }
 
+    //Break out if we hit max
+    //if( $ticount >= $max ) { break; }
   }
+
+  $driver = array_slice($river, 0, $dmax);
+  $mriver = array_slice($river, 0, $mmax);
 
   $sql->close() or print(mysql_error());
 

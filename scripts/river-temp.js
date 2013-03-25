@@ -72,15 +72,15 @@
                         {{if River.methods.isImage(enclosure.url, enclosure.type) && (Hidebigpics == false || enclosure.length < 50000) && Hidepics == false && River.methods.isAvatar(enclosure.url) == false}}
                             <a href="${enclosure.url}">
 			    {{if River.methods.countEnclosuresOfType(item.enclosure, 'image') == 2}}
-                              <img class="encpicture2" src="${enclosure.url}" alt="" />
+                              <img class="enclosurepic encpicture2" src="${enclosure.url}" alt="" />
 			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') == 3}}
-                              <img class="encpicture3" src="${enclosure.url}" alt="" />
+                              <img class="enclosurepic encpicture3" src="${enclosure.url}" alt="" />
 			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') == 4}}
-                              <img class="encpicture4" src="${enclosure.url}" alt="" />
+                              <img class="enclosurepic encpicture4" src="${enclosure.url}" alt="" />
 			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') >= 5}}
-                              <img class="encpictures" src="${enclosure.url}" alt="" />
+                              <img class="enclosurepic encpictures" src="${enclosure.url}" alt="" />
 			    {{else}}
-                              <img class="encpicture" src="${enclosure.url}" alt="" />
+                              <img class="enclosurepic encpicture" src="${enclosure.url}" alt="" />
 			    {{/if}}
                             </a>
                         {{else River.methods.isAudio(enclosure.url, enclosure.type)}}
@@ -150,13 +150,17 @@
                     {{/each}}
                     {{if subitem.permaLink || subitem.link}}<a class="articlelink" name="${subitem.id}" href="${subitem.permaLink || subitem.link}" rel="external">{{/if}}
                     {{if subitem.title}}
-                      ${subitem.title}
+		      {{if subitem.title == item.title}}<img class="icon-retweet" src="/images/blank.gif" alt="" />{{else}}
+                        ${subitem.title}
+		      {{/if}}
                     {{else}}
-                      ${River.methods.newGetText(subitem.body)}
+		      {{if subitem.body == item.body}}<img class="icon-retweet" src="/images/blank.gif" alt="" />{{else}}
+                        ${River.methods.newGetText(subitem.body)}
+		      {{/if}}
                     {{/if}}
                     {{if subitem.permaLink || subitem.link}}</a>{{/if}}
                     <div class="time">${River.methods.prettyDate(subitem.pubDate)}</div>
-                    {{if subitem.avatarUrl}} {{else}}${subitem.feedTitle}{{/if}}
+                    {{if subitem.avatarUrl}} {{else}}[from: ${subitem.feedTitle}]{{/if}}
 		</div>
 		<div class="footclear"></div>           
 	    {{/each}}

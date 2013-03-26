@@ -1,14 +1,32 @@
 </div>
 </div>
 
+<!-- JS API Pointers -->
 <div id="cgiUrls" style="display:none;" 
 data-unsubscribe="<?echo $unsubpage?>" 
 data-setfeedpropscgi="<?echo $setfeedpropscgi?>" 
 data-addfeedstolist="<?echo $addfeedstolistcgi?>" 
 data-addfeedstonewlist="<?echo $addfeedstonewlistcgi?>" 
 data-removefeedsfromlist="<?echo $removefeedsfromlistcgi?>"
+data-getsopml="<?echo $getsopmlcgi?>"
 ></div>
 
+</div>
+
+<!-- Global Modals -->
+<!-- Social Outline View/Subscribe -->
+<div id="mdlSocialOutlineView" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 class="sotitle">&nbsp;</h3>
+  </div>
+  <div class="modal-body">
+    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Retrieving. Please wait...<br/><br/></center>
+    <div class="sobody"></div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="primary" aria-hidden="true">Subscribe</button>
+  </div>
 </div>
 
 

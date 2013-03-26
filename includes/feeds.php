@@ -5306,6 +5306,8 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     // ----- End Item Section -----
 
     $ticount++;
+    if( $ticount == $dmax ) {  $dfcut = $fcount;  }
+    if( $ticount == $mmax ) {  $mfcut = $fcount;  }
 
     //We're building two rivers here.  One for desktop and one for mobile
     //if( $ticount <= $dmax ) {  $driver = $river; $drcount++;  }
@@ -5315,8 +5317,8 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     //if( $ticount >= $max ) { break; }
   }
 
-  $driver = array_slice($river, 0, $dmax);
-  $mriver = array_slice($river, 0, $mmax);
+  $driver = array_slice($river, 0, $dfcut);
+  $mriver = array_slice($river, 0, $mfcut);
 
   $sql->close() or print(mysql_error());
 

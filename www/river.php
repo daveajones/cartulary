@@ -159,7 +159,9 @@
     	$outlines = get_outlines($uid, $max);
     	foreach($outlines as $ou) {
       	  if($ou['type'] == "sopml") {
-      	    ?><img class="minitar" src="<?echo (!empty($ou['avatarurl']) ? $ou['avatarurl'] : $default_avatar_url)?>" alt="" /><?
+      	    ?><a class="sopmllink" href="#mdlSocialOutlineView" data-toggle="modal" label="View Social Outline" data-href="<?echo $ou['url']?>"><?
+              ?><img class="minitar" src="<?echo (!empty($ou['avatarurl']) ? $ou['avatarurl'] : $default_avatar_url)?>" alt="" /><?
+            ?></a><?
       	  }
     	}
   	?>

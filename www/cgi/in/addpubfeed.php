@@ -1,53 +1,13 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_cgi_init.php"?>
 <?
-//[!------------SECURITY-------------------------------!]
-
-// Includes
-include get_cfg_var("cartulary_conf").'/includes/env.php';
-include "$confroot/$includes/util.php";
-include "$confroot/$includes/auth.php";
-include "$confroot/$includes/feeds.php";
-include "$confroot/$includes/opml.php";
-include "$confroot/$includes/posts.php";
-include "$confroot/$includes/articles.php";
-
 // Json header
 header("Cache-control: no-cache, must-revalidate");
 header("Content-Type: application/json");
 
-// Get the input
-//if ( isset($_POST['newpref']) ) { $newpref = $_POST['newpref']; } else { $newpref = ""; };
 $jsondata = array();
 $jsondata['fieldname'] = "";
 
-
-//Get the user id from the session id
-// Valid session?
-if(!is_logged_in()) {
-  loggit(2,"User attempted to delete an article without being logged in first.");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(0);
-}
-$uid = get_user_id_from_sid(is_logged_in());
-if(empty($uid) || ($uid == FALSE)) {
-  //Log it
-  loggit(2,"Couldn't retrieve a user id for this session: [$sid].");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(1);
-}
-
-//See if the user has activated their account yet
-if(!is_user_active($uid)) {
-  //Log it
-  loggit(2,"User tried to access a page without activating first: [$uid | $sid].");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(1);
-}
 
 //Get the url of the feed
 $jsondata['fieldname'] = "url";
@@ -71,7 +31,8 @@ if( strlen($url) > 254 ) {
   exit(1);
 }
 //Is the feed even valid?
-$content = @file_get_contents($url);
+$url = get_final_url($url);
+$content = fetchUrl($url);
 if( $content == FALSE ) {
   //Log it
   loggit(2,"Getting this url failed: [$url]");
@@ -94,8 +55,11 @@ if( !feed_is_valid($content) ) {
 //Get the feed title
 $title = get_feed_title($content);
 
+//Get the feed link
+$link = get_feed_link($content);
+
 //Add this pub feed to the pub feed table
-add_pub_feed($url, $uid, $title);
+add_pub_feed($url, $uid, $title, $link);
 
 //Re-build social outline
 build_social_outline($uid);

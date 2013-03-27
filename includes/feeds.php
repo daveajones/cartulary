@@ -94,13 +94,13 @@ function get_feed_title($content = NULL)
 
   //Look for a title node in the rss
   foreach($x->channel->title as $entry) {
-    loggit(1, "Found a title node: [$entry].");
+    loggit(3, "Found a title node: [$entry].");
     return((string)$entry);
   }
 
   //Look for atom nodes
   foreach($x->title as $entry) {
-    loggit(1, "Found a title node: [$entry].");
+    loggit(3, "Found a title node: [$entry].");
     return((string)$entry);
   }
 
@@ -130,13 +130,19 @@ function get_feed_link($content = NULL)
   //Look for a link node in the rss
   foreach($x->channel->link as $entry) {
     loggit(1, "Found a link node: [$entry].");
-    return((string)$entry);
+    $link = (string)$entry;
+    if( !empty($link) ) {
+      return($link);
+    }
   }
 
   //Look for atom nodes
   foreach($x->link as $entry) {
     loggit(1, "Found a link node: [$entry].");
-    return((string)$entry);
+    $link = (string)$entry['href'];
+    if( !empty($link) ) {
+      return($link);
+    }
   }
 
   //None of the tests passed so return FALSE
@@ -984,6 +990,52 @@ function update_feed_title($fid = NULL, $title = NULL)
 
   //Log and return
   loggit(1,"Changed feed:[$fid]'s title to: [$title].");
+  return(TRUE);
+}
+
+
+//_______________________________________________________________________________________
+//Change a pub feed for a user
+function update_pub_feed($uid = NULL, $url = NULL, $title = NULL, $link = NULL)
+{
+  //Check parameters
+  if($uid == NULL) {
+    loggit(2,"The user id is blank or corrupt: [$uid]");
+    return(FALSE);
+  }
+  if($url == NULL) {
+    loggit(2,"The feed url is blank or corrupt: [$url]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Deal with blank feed props
+  if( empty($title) ) {
+    $title = "Untitled Feed";
+  } else {
+    $title = trim( htmlspecialchars( $title ) );
+  }
+  //Deal with blank feed props
+  if( empty($link) ) {
+    $link = "";
+  } else {
+    $link = trim( $link );
+  }
+
+  //Now that we have a good id, put the article into the database
+  $stmt = "UPDATE $table_sopml_feed SET title=?,link=? WHERE userid=? AND url=?";
+  $sql=$dbh->prepare($stmt) or print(mysql_error());
+  $sql->bind_param("ssss", $title,$link,$uid,$url) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and return
+  loggit(3, "Changed pub feed:[$url]'s title to: [$title] and link to: [$link].");
   return(TRUE);
 }
 

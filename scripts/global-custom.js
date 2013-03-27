@@ -325,3 +325,70 @@ Date.prototype.format = function (mask, utc) {
 
 })(jQuery,'smartresize');
 
+
+//Get padding size for an element
+function getVerticalPadding(el) {
+	var pt = parseInt($(el).css("padding-top").replace("px", ""));
+        var pb = parseInt($(el).css("padding-bottom").replace("px", ""));
+
+        return(pt + pb);
+}
+
+
+//Get margin size for an element
+function getVerticalMargins(el) {
+        var mt = parseInt($(el).css("margin-top").replace("px", ""));
+        var mb = parseInt($(el).css("margin-bottom").replace("px", ""));
+
+        return(mt + mb);
+}
+
+
+//Adjust the size of a cartulized article modal to fill the screen better
+function sizeArticleModal(el, loading) {
+	<?if($g_platform != "mobile"){?>
+	var winH = $(window).height();
+        var winW = $(window).width();  
+	var winScLeft = $(window).scrollLeft();
+
+	//Set left position
+        $(el).css("left", ( (winW - $(el).width() ) / 2 ) + winScLeft + "px");
+
+	if(loading == true) {
+		//Reset height params so it looks compact while grabbing data	
+                $(el).css("height", "");  
+                $(el).css("max-height", "");  
+                $(el).css("height", "");
+                $(el).css("max-height", "");
+	        $(el + ' .modal-body').css('max-height', "");
+        	$(el + ' .modal-body').css('height', "");    
+
+                //Set initial size and position based on the current viewport size
+                $(el).css("max-width", ( (winW + winScLeft) - 120) + "px");
+                $(el).css("max-width", ( $(el).width() - 30) + "px");
+		$(el).css("top", (( (winH - $(el).height()) / 2 ) / 2)  + "px");
+
+		return true;
+	}
+
+	//Size the modal elements according to the current viewport
+	var exPad = getVerticalPadding(el) + getVerticalPadding(el + ' .modal-body') + getVerticalPadding(el + ' .modal-body');
+        $(el).css('max-height', winH - exPad + "px");  
+        $(el).css('height', winH - exPad + "px");  
+
+        var modH = $(el).outerHeight(true);
+        var modW = $(el).outerWidth(true);
+        var hfSize = $(el + ' .modal-header').outerHeight(true) + $(el + ' .modal-footer').outerHeight(true);    
+
+        $(el).css("top", (winH - modH) / 2 );
+        $(el + ' .modal-body').css('max-height', (modH - hfSize - exPad - 5) + "px" );
+        $(el + ' .modal-body').css('height', (modH - hfSize - exPad - 5) + "px" );    
+
+
+	$(window).smartresize(function(){
+		sizeArticleModal(el, false);
+	});
+
+	<?}?>			
+	return true;
+}

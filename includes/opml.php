@@ -1111,7 +1111,7 @@ function get_feeds_from_outline($content = NULL, $max = NULL)
 
 //_______________________________________________________________________________________
 //Get and parse out the pub feeds from a social outline
-function get_pub_feeds_from_outline($content = NULL, $max = NULL)
+function get_pub_feeds_from_outline($content = NULL, $max = NULL, $withattr = FALSE)
 {
   //Check params
   if($content == NULL) {
@@ -1139,7 +1139,13 @@ function get_pub_feeds_from_outline($content = NULL, $max = NULL)
   $count = 0;
   foreach($nodes as $entry) {
       $feedurl = (string)$entry->attributes()->xmlUrl;
-      $feeds[$count] = $feedurl;
+      if( $withattr == FALSE ) {
+        $feeds[$count] = $feedurl;
+      } else {
+        $feedtext = (string)$entry->attributes()->text;
+        $feedhtml = (string)$entry->attributes()->htmlUrl;
+        $feeds[$count] = array( 'url' => $feedurl, 'text' => $feedtext, 'html' => $feedhtml );
+      }
       loggit(3, "Feed: [$feedurl] is published by this outline.");
       $count++;
   }
@@ -1490,6 +1496,7 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
   	$sopmlurl = get_s3_url($uid, NULL, $default_social_outline_file_name);
   	$carturl = get_s3_url($uid, NULL, get_cartulary_feed_filename($uid));
   	$blogurl = get_s3_url($uid, NULL, get_microblog_feed_filename($uid));
+        $bloghtml = get_s3_url($uid, NULL, get_microblog_html_filename($uid));
   } else {
   	$sopmlurl = $mysopml.'?uid='.$uid;
   	$carturl = $articlespage.'-rss?uid='.$uid;
@@ -1541,7 +1548,7 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
   $opml .= "
           <outline text=\"My Stuff\">";
   $opml .= "
-              <outline text=\"$mbtitle\" description=\"$mbtitle\" type=\"rss\" xmlUrl=\"$blogurl\" sopml:disposition=\"pub\" sopml:contains=\"mixed\" />";
+              <outline text=\"$mbtitle\" description=\"$mbtitle\" type=\"rss\" xmlUrl=\"$blogurl\" htmlUrl=\"$bloghtml\" sopml:disposition=\"pub\" sopml:contains=\"mixed\" />";
   if($prefs['publicdefault'] != 1) {
     $opml .= "
               <outline text=\"$catitle\" description=\"$catitle\" type=\"rss\" xmlUrl=\"$carturl\" sopml:disposition=\"pub\" sopml:contains=\"html\" />";
@@ -1549,7 +1556,7 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
   if( $pubfeeds != FALSE ) {
     foreach( $pubfeeds as $pubfeed ) {
       $opml .= "
-              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($pubfeed['title']))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($pubfeed['url'])."\" sopml:disposition=\"pub\" sopml:contains=\"mixed\" sopml:attention=\"50\" />";
+              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($pubfeed['title']))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($pubfeed['url'])."\" htmlUrl=\"".htmlspecialchars($pubfeed['link'])."\" sopml:disposition=\"pub\" sopml:contains=\"mixed\" />";
     }
   }
   $opml .= "

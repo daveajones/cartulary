@@ -34,7 +34,11 @@
         {{each(i,item) item}}
 
             <div class="article{{if item.sticky}} sticky{{/if}} fulltext" id="${item.id}" data-index="${item.index}">
-                {{if avatarUrl}}{{if i < 1}}<img class="riverminitar" src="${avatarUrl}" alt="" />{{/if}}{{/if}}
+                {{if avatarUrl}}{{if i < 1}}
+			{{if linkedOutlineUrl}}<a class="sopmllink" href="#mdlSocialOutlineView" label="View Social Outline" data-href="${linkedOutlineUrl}">{{/if}}
+			<img class="riverminitar" src="${avatarUrl}" alt="" />
+			{{if linkedOutlineUrl}}</a>{{/if}}
+		{{/if}}{{/if}}
                 {{each(e,enclosure) item.enclosure}}
                   {{if River.methods.isAvatar(enclosure.url)}}
                     <img class="riverminitar" src="${enclosure.url}" alt="" title="Enclosure: ${e}."/>

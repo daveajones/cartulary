@@ -4316,6 +4316,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
 	$river[$fcount]['linkedOutlineId'] = $oid;
 	if( !empty($ou['type']) ) { $river[$fcount]['linkedOutlineType'] = $ou['type']; }
 	if( !empty($ou['title']) ) {  $river[$fcount]['linkedOutlineTitle'] = $ou['title'];  }
+	if( !empty($ou['url']) ) {  $river[$fcount]['linkedOutlineUrl'] = $ou['url'];  }
 	if( !empty($ou['ownername']) ) {  $river[$fcount]['ownerName'] = $ou['ownername'];  }
 	if( !empty($ou['avatarurl']) ) {  $river[$fcount]['avatarUrl'] = $ou['avatarurl'];  }
       }
@@ -5196,6 +5197,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
 	$newfeed['linkedOutlineId'] = $oid;
 	if( !empty($ou['type']) ) { $newfeed['linkedOutlineType'] = $ou['type']; }
 	if( !empty($ou['title']) ) {  $newfeed['linkedOutlineTitle'] = $ou['title'];  }
+	if( !empty($ou['url']) ) {  $river[$fcount]['linkedOutlineUrl'] = $ou['url'];  }
 	if( !empty($ou['ownername']) ) {  $newfeed['ownerName'] = $ou['ownername'];  }
 	if( !empty($ou['avatarurl']) ) {  $newfeed['avatarUrl'] = $ou['avatarurl'];  }
       }

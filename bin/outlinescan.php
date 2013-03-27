@@ -121,6 +121,26 @@
 
   }
 
+
+  //Flip through all of the pub feeds and update them
+  $users = get_users();
+  foreach( $users as $u ) {
+    $user = $u['id'];
+    $feeds = get_pub_feeds($user);
+    foreach( $feeds as $feed ) {
+      $content = fetchUrl(get_final_url($feed['url']));
+      if( $content != FALSE ) {
+        $title = get_feed_title($content);
+        $link = get_feed_link($content);
+        if( $title != $feed['title'] || $link != $feed['link'] ) {
+          update_pub_feed($user, $feed['url'], $title, $link);
+          loggit(3, "DEBUG: Updating pub feed: [".$feed['url']."] for user: [$user] with title: [$title] and link: [$link].");
+        }
+      }
+    }
+  }
+
+
   //Remove the lock file
   cronHelper::unlock();
   }

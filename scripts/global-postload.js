@@ -69,4 +69,68 @@ $(document).ready( function () {
                }
         });
 
+
+        //Ajaxify the social outline links
+        $('.sopmllink').click(function() {
+                        var aobj = $(this);
+                        var href = aobj.attr("data-href");
+	                var cgiurl = $('#cgiUrls').attr("data-getsopml");
+
+                        $('#mdlSocialOutlineView .modal-header').hide();
+                        $('#mdlSocialOutlineView .modal-body .sobody').hide();
+                        $('#mdlSocialOutlineView .modal-footer').hide();
+                        $('#mdlSocialOutlineView .soraw').empty();
+                        $('#mdlSocialOutlineView .soname').empty();
+                        $('#mdlSocialOutlineView .soavatar').attr('src', '/images/blank.gif');
+                        $('#mdlSocialOutlineView .sopubfeeds').empty();
+                        $('#mdlSocialOutlineView .spinner').show();
+
+                        //sizeArticleModal('#mdlSocialOutlineView', true);
+                        $('#mdlSocialOutlineView').modal('show');
+                        $.ajax({
+                                url:      cgiurl + '?url=' + href,
+                                type:     "GET",
+                                dataType: 'json',
+                                timeout:  30000,
+                                success:  function(data) {
+                                                $('#mdlSocialOutlineView .spinner').hide();
+                                                if(data.status == "false") {
+                                                        $('#mdlSocialOutlineView .sotitle').append(data.title);
+                                                        $('#mdlSocialOutlineView .sobody').append(data.description);
+                                                } else {
+                                                        //sizeArticleModal('#mdlSocialOutlineView', false);
+							//Set the raw feed link
+                                                        //$('#mdlSocialOutlineView .soraw').append('<a href="' + data.url + '">Raw Outline</a>');
+							//Set the name
+                                                        $('#mdlSocialOutlineView .soname').append(data.ownername);
+							//Set the avatar
+							if( data.avatarurl == '' ) {
+								data.avatarurl = '/images/noavatar.png';
+							}
+                                                        $('#mdlSocialOutlineView .soavatar').attr('src', data.avatarurl);
+							//Display the pub feeds list
+							for( var i = 0 ; i < data.feeds.pub.length ; i++ ) {
+								$('#mdlSocialOutlineView .sopubfeeds').append('<li><a href="' + data.feeds.pub[i].url + '"><img class="icon-feed-raw" src="/images/blank.gif" alt="" /></a><a href="' + data.feeds.pub[i].html + '">' + data.feeds.pub[i].text + '</a></li>');
+							}
+							//Display some recent activity for this user
+							$('#mdlSocialOutlineView .soactivity').append('');
+
+                                                        $('#mdlSocialOutlineView .sofooter .link').attr('href', data.url);
+                                                        $('#mdlSocialOutlineView .sofooter').show();
+                                                }
+                                                $('#mdlSocialOutlineView .modal-header').show();
+                                                $('#mdlSocialOutlineView .modal-body .sobody').show();
+                                                //$('#mdlSocialOutlineView .modal-footer').show();		
+                                        },
+                                error:  function(x, t, m) {
+                                                $('#mdlSocialOutlineView .modal-header').show();
+                                                //$('#mdlSocialOutlineView .modal-footer').show();
+                                                $('#mdlSocialOutlineView .spinner').hide();
+                                                $('#mdlSocialOutlineView .sotitle').append('');
+                                                $('#mdlSocialOutlineView .sobody').append('<p>Error communicating with server. Connection problem?</p>');
+                                }
+                        });
+                        return false;
+        });
+
 });

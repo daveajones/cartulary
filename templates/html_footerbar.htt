@@ -13,25 +13,60 @@ data-getsopml="<?echo $getsopmlcgi?>"
 
 </div>
 
+
 <!-- Global Modals -->
 <!-- Social Outline View/Subscribe -->
 <div id="mdlSocialOutlineView" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 class="sotitle">&nbsp;</h3>
+    <h3 class="soname">&nbsp;</h3>
   </div>
   <div class="modal-body">
     <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Retrieving. Please wait...<br/><br/></center>
-    <div class="sobody"></div>
+    <div class="sobody">
+      <span class="sonameblock">
+        <img class="soavatar riverminitar" src="/images/blank.gif" alt="" />
+        <span class="soraw"></span>
+      </span>
+      <span class="sofeedblock">
+        <h4 class="sopubfeedheader">Published Feeds:</h4>
+        <ul class="sopubfeeds"></ul>
+      </span>
+      <div class="soactivity"></div>
+    </div>
   </div>
   <div class="modal-footer">
-    <button type="button" class="primary" aria-hidden="true">Subscribe</button>
+    <button type="button" class="primary sosubscribe" aria-hidden="true">Subscribe</button>
   </div>
 </div>
+<!-- Social Outline View/Subscribe -->
+
+<!-- Show article modal dialog -->
+<div id="mdlShowArticle" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 class="artitle">&nbsp;</h3>
+  </div>
+  <div class="modal-body">
+    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Cartulizing. Please wait...<br/><br/></center>
+    <div class="arbody"></div>
+  </div>
+  <div class="modal-footer">
+    <center class="arfooter hide">
+      <?if($platform != "mobile"){?>
+      <a class="opml" title="OPML Version" href="#"><img class="icon-opml" src="/images/blank.gif" alt="" /> </a>
+      <?}?>
+      <a class="print" title="Printer Friendly" href="#"><img class="icon-print" src="/images/blank.gif" alt="" /> </a>
+      <a class="rt" title="Send to Microblog" href="#"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
+      <a class="link" title="Link to Original" href="#"><img class="icon-hyperlink" src="/images/blank.gif" alt="" /> </a>
+    </center>
+  </div>
+</div>
+<!-- Show article modal dialog -->
+<!-- Global Modals -->
 
 
 <!-- End-of-body content -->
-
 <script>
 <?include "$confroot/$scripts/global-postload.js"?>
 </script>

@@ -38,12 +38,12 @@ if( !is_social_outline($content) ) {
 }
 
 //Get the name of this person
-$jsondata['data']['title'] = get_title_from_outline($content);
-$jsondata['data']['ownername'] = get_ownername_from_outline($content);
-$jsondata['data']['avatarurl'] = get_avatar_url_from_outline($content);
-$jsondata['data']['url'] = get_canonical_url_from_outline($content);
-$jsondata['data']['feeds']['pub'] = get_pub_feeds_from_outline($content);
-$jsondata['data']['feeds']['sub'] = get_feeds_from_outline($content);
+$jsondata['title'] = (string)get_title_from_outline($content);
+$jsondata['ownername'] = (string)get_ownername_from_outline($content);
+$jsondata['avatarurl'] = (string)get_avatar_url_from_outline($content);
+$jsondata['url'] = (string)get_canonical_url_from_outline($content);
+$jsondata['feeds']['pub'] = get_pub_feeds_from_outline($content);
+//$jsondata['data']['feeds']['sub'] = get_feeds_from_outline($content);
 
 
 //--------------------------------------------------------------------------------

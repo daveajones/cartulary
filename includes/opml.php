@@ -248,59 +248,6 @@ function get_outline_subscribers($oid = NULL)
 
 
 //_______________________________________________________________________________________
-//Return an array of outline id's that link to a given feed
-/*
-function get_linked_outlines_for_feed_by_user($fid = NULL, $uid = NULL)
-{
-  //Check parameters
-  if( empty($fid) ) {
-    loggit(2,"The feed id is blank or corrupt: [$fid]");
-    return(FALSE);
-  }
-  if( empty($uid) ) {
-    loggit(2,"The user id is blank or corrupt: [$uid]");
-    return(FALSE);
-  }
-
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
-
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
-
-  //Do the query
-  $sql=$dbh->prepare("SELECT outlineid FROM $table_nfcatalog WHERE userid=? AND feedid=?") or print(mysql_error());
-  $sql->bind_param("s", $oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
-
-  //See if there are any subscribers to this feed
-  if($sql->num_rows() < 1) {
-    $sql->close()
-      or print(mysql_error());
-    loggit(2,"Outline: [$oid] has no subscribers.");
-    return(FALSE);
-  }
-
-  $sql->bind_result($uid) or print(mysql_error());
-
-  $users = array();
-  $count = 0;
-  while($sql->fetch()) {
-    $users[$count] = $uid;
-    $count++;
-  }
-  $subcount = count($users);
-
-  $sql->close() or print(mysql_error());
-
-  loggit(1,"Returning an array of: [$subcount] user id's for outline: [$oid].");
-  return($users);
-}
-*/
-
-
-//_______________________________________________________________________________________
 //See how many items are in the database for a given feed
 function get_outline_item_count($oid = NULL)
 {
@@ -391,7 +338,8 @@ function get_outline_info($id = NULL)
   $sql->fetch() or print(mysql_error());
   $sql->close() or print(mysql_error());
 
-  //loggit(1,"Returning info for outline: [$id]");
+  //loggit(3,"Returning info for outline: [$id]");
+  //loggit(3,"Returning url for outline: [".$outline['url']."]");
   return($outline);
 }
 
@@ -1190,7 +1138,7 @@ function get_pub_feeds_from_outline($content = NULL, $max = NULL)
   //Run through each node and get the url into an array
   $count = 0;
   foreach($nodes as $entry) {
-      $feedurl = $entry->attributes()->xmlUrl;
+      $feedurl = (string)$entry->attributes()->xmlUrl;
       $feeds[$count] = $feedurl;
       loggit(3, "Feed: [$feedurl] is published by this outline.");
       $count++;
@@ -1239,7 +1187,7 @@ function get_avatar_url_from_outline($content = NULL)
   $ns_sopml = $x->head->children($namespaces['sopml']);
   //loggit(3, print_r($ns_sopml, true));
   if( isset($ns_sopml->avatar) ) {
-    $url = $ns_sopml->avatar;
+    $url = (string)$ns_sopml->avatar;
     loggit(1, "SOPML: Avatar url is: [$url].");
     //Log and leave
     loggit(1, "The avatar of this outline is at: [$url].");
@@ -1284,7 +1232,7 @@ function get_canonical_url_from_outline($content = NULL)
   $ns_sopml = $x->head->children($namespaces['sopml']);
   //loggit(3, print_r($ns_sopml, true));
   if( isset($ns_sopml->url) ) {
-    $url = $ns_sopml->url;
+    $url = (string)$ns_sopml->url;
     loggit(1, "SOPML: Link url is: [$url].");
     //Log and leave
     loggit(1, "The canonical url of this outline is at: [$url].");
@@ -1316,7 +1264,7 @@ function get_title_from_outline($content = NULL, $max = NULL)
   libxml_clear_errors();
 
   //Grab only the title node
-  $title = $x->head->title;
+  $title = (string)$x->head->title;
   if (empty($title)) {
     loggit(2, "This outline content didn't have a title element in it's head.");
     return(FALSE);
@@ -1346,7 +1294,7 @@ function get_ownername_from_outline($content = NULL, $max = NULL)
   libxml_clear_errors();
 
   //Grab only the title node
-  $name = $x->head->ownerName;
+  $name = (string)$x->head->ownerName;
   if (empty($name)) {
     loggit(2, "This outline content didn't have an ownername element in it's head.");
     return(FALSE);
@@ -1573,6 +1521,7 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
         <dateModified>".date("D, d M Y H:i:s O", time())."</dateModified>
         <ownerName>".get_user_name_from_uid($uid)."</ownerName>
         <ownerId>".$uid."</ownerId>
+        <sopml:server>".$system_fqdn."</sopml:server>
         <sopml:guid>".$cg_main_serverguid."::".$uid."</sopml:guid>
         <sopml:luid>".$uid."</sopml:luid>
         <sopml:url>".$sopmlurl."</sopml:url>

@@ -56,6 +56,25 @@ body {  background:#4d4d4d;  }
 }
 .ui-datepicker-trigger { margin-top:-3px; margin-left:2px; }
 .ui-datepicker-next {  float: right;  }
+#mdlSocialOutlineView .soavatar {
+  max-width:128px;
+  max-height:128px;
+  margin-right:10px;
+}
+#mdlSocialOutlineView .sopubfeeds {
+  list-style:none;
+}
+#mdlSocialOutlineView .sofeedblock {
+  float:left;
+}
+#mdlSocialOutlineView .sonameblock {
+  float:left;
+}
+#mdlSocialOutlineView .soactivity {
+  clear:both;
+  border-top: solid #ddd 1px;
+  margin:10px auto 10px;
+}
 /* --------------------------------------------------- */
 
 

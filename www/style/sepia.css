@@ -63,6 +63,25 @@ a {  color:#059;  }
   margin-left:2px;
 }
 .ui-datepicker-next {  float: right;  }
+#mdlSocialOutlineView .soavatar {
+  max-width:128px;
+  max-height:128px;
+  margin-right:10px;
+}
+#mdlSocialOutlineView .sofeedblock {
+  float:left;
+}
+#mdlSocialOutlineView .sopubfeeds {
+  list-style:none;
+}
+#mdlSocialOutlineView .sonameblock {
+  float:left;
+}
+#mdlSocialOutlineView .soactivity {
+  clear:both;
+  border-top: solid #ddd 1px;
+  margin:10px auto 10px;
+}
 /* --------------------------------------------------- */
 
 

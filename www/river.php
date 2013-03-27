@@ -159,7 +159,7 @@
     	$outlines = get_outlines($uid, $max);
     	foreach($outlines as $ou) {
       	  if($ou['type'] == "sopml") {
-      	    ?><a class="sopmllink" href="#mdlSocialOutlineView" data-toggle="modal" label="View Social Outline" data-href="<?echo $ou['url']?>"><?
+      	    ?><a class="sopmllink" href="#mdlSocialOutlineView" label="View Social Outline" data-href="<?echo $ou['url']?>"><?
               ?><img class="minitar" src="<?echo (!empty($ou['avatarurl']) ? $ou['avatarurl'] : $default_avatar_url)?>" alt="" /><?
             ?></a><?
       	  }
@@ -179,29 +179,6 @@
 </script>
 
 <a id="jumpTop" title="Jump back to the top of the page." href="#" style="position:fixed; bottom:10px; right:0px;"><img class="icon-jump-top" src="/images/blank.gif"></a>
-
-<!-- Show article modal dialog -->
-<div id="mdlShowArticle" class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 class="artitle">&nbsp;</h3>
-  </div>
-  <div class="modal-body">
-    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Cartulizing. Please wait...<br/><br/></center>
-    <div class="arbody"></div>
-  </div>
-  <div class="modal-footer">
-    <center class="arfooter hide">
-      <?if($platform != "mobile"){?>
-      <a class="opml" title="OPML Version" href="#"><img class="icon-opml" src="/images/blank.gif" alt="" /> </a>
-      <?}?>
-      <a class="print" title="Printer Friendly" href="#"><img class="icon-print" src="/images/blank.gif" alt="" /> </a>
-      <a class="rt" title="Send to Microblog" href="#"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
-      <a class="link" title="Link to Original" href="#"><img class="icon-hyperlink" src="/images/blank.gif" alt="" /> </a>
-    </center>
-  </div>
-</div>
-<!-- Show article modal dialog -->
 
 
 <?//--- Include the footer bar html fragments -----------?>

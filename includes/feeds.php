@@ -2526,7 +2526,7 @@ function link_feed_to_user($fid = NULL, $uid = NULL)
 
 //_______________________________________________________________________________________
 //Add a pub feed to an sopml outline
-function add_pub_feed($url = NULL, $uid = NULL, $title = NULL)
+function add_pub_feed($url = NULL, $uid = NULL, $title = NULL, $link = NULL)
 {
   //Check parameters
   if($url == NULL) {
@@ -2541,6 +2541,10 @@ function add_pub_feed($url = NULL, $uid = NULL, $title = NULL)
     loggit(2,"The feed title is blank or corrupt: [$title]. Setting to untitled.");
     $title = "Untitled feed.";
   }
+  if($link == NULL) {
+    loggit(2,"The feed link is blank or corrupt: [$link]. Setting to empty.");
+    $link = "";
+  }
 
   //Includes
   include get_cfg_var("cartulary_conf").'/includes/env.php';
@@ -2553,9 +2557,9 @@ function add_pub_feed($url = NULL, $uid = NULL, $title = NULL)
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
   //Link the article to the user
-  $stmt = "INSERT INTO $table_sopml_feed (userid,url,linkedon,title) VALUES (?,?,?,?)";
+  $stmt = "INSERT INTO $table_sopml_feed (userid,url,linkedon,title,link) VALUES (?,?,?,?,?)";
   $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ssss", $uid,$url,$tstamp,$title) or print(mysql_error());
+  $sql->bind_param("sssss", $uid,$url,$tstamp,$title,$link) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->close() or print(mysql_error());
 

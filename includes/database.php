@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 10;
+$cg_database_version = 11;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -95,6 +95,15 @@ CGDB0019;
 $cg_database_updates[9][] = <<<CGDB0020
  INSERT INTO `dbversion` ( `version` ) VALUES ( '10' )
 CGDB0020;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 10 to 11 -------------------------------------------------------------------------------------------------
+$cg_database_updates[10][] = <<<CGDB0021
+ ALTER TABLE `sopmlfeeds` ADD `link` VARCHAR( 700 ) NOT NULL COMMENT 'The feed link element.'
+CGDB0021;
+$cg_database_updates[10][] = <<<CGDB0022
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '11' )
+CGDB0022;
 //----------------------------------------------------------------------------------------------------------------
 ?>
 

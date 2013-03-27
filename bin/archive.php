@@ -17,7 +17,7 @@
     //For each user that has S3 enabled, build the current monthly archives
     foreach( $users as $user ) {
       $uid = $user['id'];
-      if( s3_is_enabled($uid) ) {
+      if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {
 	//Build the cartulary archive
         build_rss_feed($uid, 9999, TRUE);
         build_opml_feed($uid, 9999, TRUE);

@@ -464,7 +464,7 @@ function get_pub_feeds($uid = NULL)
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT userid,url,linkedon,title FROM $table_sopml_feed WHERE userid=?") or print(mysql_error());
+  $sql=$dbh->prepare("SELECT userid,url,linkedon,title,link FROM $table_sopml_feed WHERE userid=?") or print(mysql_error());
   $sql->bind_param("s", $uid) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->store_result() or print(mysql_error());
@@ -477,11 +477,11 @@ function get_pub_feeds($uid = NULL)
   }
 
   //Put stuff in an array and send back
-  $sql->bind_result($userid,$url,$linkedon,$title) or print(mysql_error());
+  $sql->bind_result($userid,$url,$linkedon,$title,$link) or print(mysql_error());
   $feeds = array();
   $count = 0;
   while($sql->fetch()){
-    $feeds[$count] = array( 'userid' => $userid, 'url' => $url, 'linkedon' => $linkedon, 'title' => $title );
+    $feeds[$count] = array( 'userid' => $userid, 'url' => $url, 'linkedon' => $linkedon, 'title' => $title, 'link' => $link );
     $count++;
   }
 

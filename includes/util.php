@@ -1999,7 +1999,7 @@ function get_user_response()
 function chop_extension( $file = NULL )
 {
   $info = pathinfo($file);
-  $file_name = basename($file, '.'.$info['extension']);
+  $file_name = @basename($file, '.'.$info['extension']);
 
   return($file_name);
 }
@@ -2310,5 +2310,23 @@ function convert_to_rss( $items = array() )
   //Give back the feed as a string
   return($feed);
 }
+
+
+//http://www.php.net/manual/vote-note.php?id=69826&page=function.array-search&vote=up
+//Search a multi-dimensional array and return info about it if found
+function array_search_ext($arr, $search, $exact = true, $trav_keys = null)
+{
+  if(!is_array($arr) || !$search || ($trav_keys && !is_array($trav_keys))) return false;
+  $res_arr = array();
+  foreach($arr as $key => $val)
+  {
+    $used_keys = $trav_keys ? array_merge($trav_keys, array($key)) : array($key);
+    if(($key === $search) || (!$exact && (strpos(strtolower($key), strtolower($search)) !== false))) $res_arr[] = array('type' => "key", 'hit' => $key, 'keys' => $used_keys, 'val' => $val);
+    if(is_array($val) && ($children_res = array_search_ext($val, $search, $exact, $used_keys))) $res_arr = array_merge($res_arr, $children_res);
+    else if(($val === $search) || (!$exact && (strpos(strtolower($val), strtolower($search)) !== false))) $res_arr[] = array('type' => "val", 'hit' => $val, 'keys' => $used_keys, 'val' => $val);
+  }
+  return $res_arr ? $res_arr : false;
+}
+
 
 ?>

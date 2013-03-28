@@ -93,6 +93,22 @@
 		}
 	    	echo "    Outline: [".$outline['title']."] had $newcount new feeds.\n";
 
+                //Check for a server declaration
+		if($outline['type'] == "sopml") {
+			$server = get_server_address_from_outline(get_outline_content($outline['id']));
+			if( !empty($server) ) {
+                                $server = trim($server, '/');
+				$serverinfo = fetchUrl('http://'.$server.$getserverinfocgi.'?addr='.$system_fqdn.'&guid='.$cg_main_serverguid);
+				if( $serverinfo != FALSE ) {
+					$serverinfo = json_decode($serverinfo, TRUE);
+					loggit(3, print_r($serverinfo, TRUE));
+					$serverguid = $serverinfo['guid'];
+					if( !empty($serverguid) ) {
+						update_server_address($serverinfo['guid'], $server);
+					}
+				}
+			}
+		}
 	}
 
 	//If outline was a local list
@@ -104,9 +120,6 @@
 	$delcount = purge_outline_feeds($outline['id']);
     	echo "    $delcount old feeds purged from outline: [".$outline['title']."].\n";
     	echo "\n";
-        //if($delcount > 0) {
-	//	$ouchange = TRUE;
-        //}
 
     } else {
 	loggit(1, "No subscribers for: [".$outline['title']."]. Skipping.");

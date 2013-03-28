@@ -1558,6 +1558,12 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
     $catitle = "What $username is reading.";
   }
 
+  //What should the server declaration be?
+  if( !empty($s3_sys_server_redirect_bucket) && !empty($cg_external_ip_reflector_url) ) {
+    $serverdec = $s3_sys_server_redirect_bucket;
+  } else {
+    $serverdec = $system_fqdn;
+  }
 
   //The feed string
   $opml = '<?xml version="1.0" encoding="ISO-8859-1"?>'."\n";
@@ -1571,7 +1577,7 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
         <dateModified>".date("D, d M Y H:i:s O", time())."</dateModified>
         <ownerName>".get_user_name_from_uid($uid)."</ownerName>
         <ownerId>".$uid."</ownerId>
-        <sopml:server>".$system_fqdn."</sopml:server>
+        <sopml:server>".$serverdec."</sopml:server>
         <sopml:guid>".$cg_main_serverguid."::".$uid."</sopml:guid>
         <sopml:luid>".$uid."</sopml:luid>
         <sopml:url>".$sopmlurl."</sopml:url>

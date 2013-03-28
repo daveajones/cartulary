@@ -87,8 +87,8 @@ body {  background:#4d4d4d;  }
 #mdlShowArticle .modal-body .arbody p {
   background-color: #FBF0D9;
   font-family: "CreteRoundRegular", serif;
-  font-size: 85%;
-  line-height: 110%;
+  font-size: 110%;
+  line-height: 120%;
   word-spacing: 0.02em;
   letter-spacing: 0.02em;
   color: #5F4B32;

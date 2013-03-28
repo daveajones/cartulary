@@ -305,7 +305,7 @@ River.methods = (function () {
                       	$('#mdlShowArticle .modal-header').hide();
                       	$('#mdlShowArticle .modal-footer').hide();
 
-			sizeArticleModal('#mdlShowArticle', true);
+			modalFullHeight('#mdlShowArticle', true);
                 	$('#mdlShowArticle').modal('show');
                 	$.ajax({
                         	url:      href + '&json=true',
@@ -320,7 +320,7 @@ River.methods = (function () {
                                                 	$('#mdlShowArticle .artitle').append(data.article.title);
                                                 	$('#mdlShowArticle .arbody').append(data.article.body);
                                         	} else {
-							sizeArticleModal('#mdlShowArticle', false);
+							modalFullHeight('#mdlShowArticle', false);
                                                 	$('#mdlShowArticle .artitle').append(data.article.title);
                                                 	$('#mdlShowArticle .arbody').append(data.article.body);
                                                 	$('#mdlShowArticle .arfooter .opml').attr('href', "<?echo $showarticlepage?>-opml?aid=" + data.article.id);

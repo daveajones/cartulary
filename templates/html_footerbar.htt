@@ -32,10 +32,14 @@ data-getsopml="<?echo $getsopmlcgi?>"
         <h4 class="sopubfeedheader">Published Feeds:</h4>
         <ul class="sopubfeeds"></ul>
       </span>
-      <div class="soactivity"></div>
+      <div class="soactivity">
+        <h4 class="sorecentactivity">Recent Activity:</h4>
+        <ul class="sorecentitems"></ul>
+      </div>
     </div>
   </div>
   <div class="modal-footer">
+    <div class="soserver">Server: <a class="serverlink" href="#"></a></div>
     <button type="button" class="primary sosubscribe" aria-hidden="true">Subscribe</button>
   </div>
 </div>

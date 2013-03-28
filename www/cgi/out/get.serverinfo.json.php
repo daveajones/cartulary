@@ -7,7 +7,23 @@ header("Content-Type: application/json");
 $jsondata = array();
 //--------------------------------------------------------------------------------
 
+//The requestor must at least declare its address and guid
+if( isset($_REQUEST['addr']) && !empty($_REQUEST['addr']) ) {
+  $raddr = $_REQUEST['addr'];
+} else {
+  loggit(3, "Server info request didn't provide it's own address.");
+  return(0);
+}
+if( isset($_REQUEST['guid']) && !empty($_REQUEST['guid']) ) {
+  $rguid = $_REQUEST['guid'];
+} else {
+  loggit(3, "Server info request didn't provide it's own guid.");
+  return(0);
+}
+
 //Echo current server info
+loggit(3, "Server info request from: [$raddr | $rguid].");
+$jsondata['addr'] = $system_fqdn;
 $jsondata['guid'] = $cg_main_serverguid;
 
 //--------------------------------------------------------------------------------

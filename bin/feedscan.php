@@ -57,9 +57,9 @@
     echo "    Feed: [".$feed['title']."] has: [$subcount] subscribers.\n";
 
     //Let's not scan while these other scripts are in process
-    for( $i=1 ; file_exists("$confroot/$run/outlinescan.php.lock") && $i < 9 ; $i++ ) {
-      loggit(1, "FEEDSCAN: Sleeping($i) while outlinescan is running.");
-      sleep(5);
+    for( $i=1 ; file_exists("$confroot/$run/outlinescan.php.lock") && $i < 10 ; $i++ ) {
+      loggit(3, "FEEDSCAN: Sleeping($i) while outlinescan is running.");
+      sleep(6);
     }
 
     if($subcount > 0) {

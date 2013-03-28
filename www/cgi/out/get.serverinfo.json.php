@@ -21,9 +21,17 @@ if( isset($_REQUEST['guid']) && !empty($_REQUEST['guid']) ) {
   return(0);
 }
 
+//What should the server declaration be?
+if( !empty($s3_sys_server_redirect_bucket) && !empty($cg_external_ip_reflector_url) ) {
+  $serverdec = $s3_sys_server_redirect_bucket;
+} else {
+  $serverdec = $system_fqdn;
+}
+
+
 //Echo current server info
 loggit(3, "Server info request from: [$raddr | $rguid].");
-$jsondata['addr'] = $system_fqdn;
+$jsondata['addr'] = $serverdec;
 $jsondata['guid'] = $cg_main_serverguid;
 
 //--------------------------------------------------------------------------------

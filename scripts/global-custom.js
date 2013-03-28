@@ -2,6 +2,7 @@ var systemUrl = '<?echo $system_fqdn?>';
 var platform = '<?echo $platform?>';
 var msgtimer;
 
+//Convert links found in twitter messages into the target link of the message
 function sanitize_twitter(divStream) {
 $(divStream + ' a').each( function() {
     var alobj = $(this);
@@ -345,7 +346,7 @@ function getVerticalMargins(el) {
 
 
 //Adjust the size of a cartulized article modal to fill the screen better
-function sizeArticleModal(el, loading) {
+function modalFullHeight(el, loading) {
 	<?if($g_platform != "mobile"){?>
 	var winH = $(window).height();
         var winW = $(window).width();  
@@ -386,7 +387,7 @@ function sizeArticleModal(el, loading) {
 
 
 	$(window).smartresize(function(){
-		sizeArticleModal(el, false);
+		modalFullHeight(el, false);
 	});
 
 	<?}?>			

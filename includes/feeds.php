@@ -1450,6 +1450,39 @@ function increment_feed_error_count($fid = NULL)
 
 
 //_______________________________________________________________________________________
+//Set the feed error count on this feed to a given value
+function set_feed_error_count($fid = NULL, $count = NULL)
+{
+  //Check parameters
+  if(empty($fid)) {
+    loggit(2,"The feed id is blank or corrupt: [$fid]");
+    return(FALSE);
+  }
+  if($count == NULL) {
+    loggit(2,"The error count is blank or corrupt: [$count]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Now that we have a good id, put the article into the database
+  $stmt = "UPDATE $table_newsfeed SET errors=? WHERE id=?";
+  $sql=$dbh->prepare($stmt) or print(mysql_error());
+  $sql->bind_param("ds", $count, $fid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and return
+  loggit(1,"Set error count for feed:[$fid] to: [$count].");
+  return(TRUE);
+}
+
+
+//_______________________________________________________________________________________
 //Reset feed error count to zero
 function reset_feed_error_count($fid = NULL)
 {
@@ -3384,24 +3417,24 @@ function get_feed_items($fid = NULL, $max = NULL)
 
   //If a feed has over 100 errors or last new item was more than a month ago
   //we fall back to only scanning it once a day
-  if( $feed['errors'] > 100 ) {
+  if( $feed['errors'] >= 100 ) {
     if( (time() - $feed['lastcheck']) < 86400 ) {
       loggit(2, "Feed: [$url] is over the error limit.  Skipping for 24 hours.");
       $stats['checktime'] += (time() - $fstart);
       set_feed_stats($fid, $stats);
       return(-1);
     } else {
-      loggit(2, "DEBUG: Doing once per day check on error-prone feed: [$url].");
+      loggit(1, "Doing once per day check on error-prone feed: [$url].");
     }
   }
-  if( $feed['lastupdate'] < (time() - (86400 * 28)) ) {
-    if( (time() - $feed['lastcheck']) < 86400 ) {
+  if( (time() - $feed['lastupdate']) > (86400 * 28) ) {
+    if( (time() - $feed['lastcheck']) < 86400 && !empty($feed['lastupdate']) ) {
       loggit(2, "Feed: [$url] hasn't updated in a month.  Skipping for 24 hours.");
       $stats['checktime'] += (time() - $fstart);
       set_feed_stats($fid, $stats);
       return(-1);
     } else {
-      loggit(2, "DEBUG: Doing once per day check on infrequently updated feed: [$url].");
+      loggit(3, "DEBUG: Doing once per day check on infrequently updated feed: [$url].");
     }
   }
 
@@ -3458,7 +3491,7 @@ function get_feed_items($fid = NULL, $max = NULL)
   //Is the feed any good?
   if( !feed_is_valid($content) ) {
       loggit(3, "Feed: [$fid] doesn't seem to be a known feed format. Skip it.");
-      increment_feed_error_count($fid);
+      set_feed_error_count($fid, 100);
       return(-1);
   }
 

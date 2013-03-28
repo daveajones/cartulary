@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 11;
+$cg_database_version = 12;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -104,6 +104,22 @@ CGDB0021;
 $cg_database_updates[10][] = <<<CGDB0022
  INSERT INTO `dbversion` ( `version` ) VALUES ( '11' )
 CGDB0022;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 11 to 12 -------------------------------------------------------------------------------------------------
+$cg_database_updates[11][] = <<<CGDB0023
+ CREATE TABLE IF NOT EXISTS `servers` (
+  `guid` varchar(64) NOT NULL DEFAULT '' COMMENT 'A globally unique guid.',
+  `address` varchar(255) NOT NULL DEFAULT '' COMMENT 'When it was applied.',
+  PRIMARY KEY (`guid`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='A list of known sopml servers.'
+CGDB0023;
+$cg_database_updates[11][] = <<<CGDB0024
+ ALTER TABLE `servers` CHANGE `guid` `guid` VARCHAR( 64 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '' COMMENT 'A globally unique guid.'
+CGDB0024;
+$cg_database_updates[11][] = <<<CGDB0025
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '12' )
+CGDB0025;
 //----------------------------------------------------------------------------------------------------------------
 ?>
 

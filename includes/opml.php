@@ -1207,6 +1207,49 @@ function get_avatar_url_from_outline($content = NULL)
 
 
 //_______________________________________________________________________________________
+//Get and parse out the server address from an outline
+function get_server_address_from_outline($content = NULL)
+{
+  //Check params
+  if($content == NULL) {
+    loggit(2,"The outline content is blank or corrupt: [$content]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Parse it
+  libxml_use_internal_errors(true);
+  $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
+
+  //Get the sopml namespace first so we can work with it
+  $namespaces = $x->getDocNamespaces();
+
+  //If no sopml ns exists then bail
+  if( !isset($namespaces['sopml']) ) {
+    loggit(1, "This outline doesn't have an SOPML namespace.");
+    return(FALSE);
+  }
+
+  //Search for a server
+  $ns_sopml = $x->head->children($namespaces['sopml']);
+  if( isset($ns_sopml->server) ) {
+    $addr = (string)$ns_sopml->server;
+    loggit(3, "SOPML: Server addr is: [$addr].");
+    //Log and leave
+    loggit(1, "The server of this outline is at: [$addr].");
+    return($addr);
+  }
+
+  //Child namespace was empty so no server found
+  loggit(1, "This outline content didn't have a server element.");
+  return(FALSE);
+}
+
+
+//_______________________________________________________________________________________
 //Get and parse out the canonical url from a social outline
 function get_canonical_url_from_outline($content = NULL)
 {

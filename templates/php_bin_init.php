@@ -10,6 +10,7 @@
   require_once "$confroot/$includes/opml.php";
   require_once "$confroot/$includes/posts.php";
   require_once "$confroot/$includes/articles.php";
+  require_once "$confroot/$includes/net.php";
 
   //Set the right timezone
   date_default_timezone_set($default_timezone);

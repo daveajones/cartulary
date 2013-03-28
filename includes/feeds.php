@@ -110,6 +110,41 @@ function get_feed_title($content = NULL)
 }
 
 
+//Get the description element of a feed from it's content
+function get_feed_description($content = NULL)
+{
+  //Check parameters
+  if($content == NULL) {
+    loggit(2,"The content of the feed is blank or corrupt: [$content]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Load the content into a simplexml object
+  libxml_use_internal_errors(true);
+  $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
+
+  //Look for a title node in the rss
+  foreach($x->channel->description as $entry) {
+    loggit(3, "Found a description node: [$entry].");
+    return((string)$entry);
+  }
+
+  //Look for atom nodes
+  foreach($x->subtitle as $entry) {
+    loggit(3, "Found a subtitle(description) node: [$entry].");
+    return((string)$entry);
+  }
+
+  //None of the tests passed so return FALSE
+  loggit(1,"Could not find a description/subtitle for this feed.");
+  return(FALSE);
+}
+
+
 //Get the link of a feed from it's content
 function get_feed_link($content = NULL)
 {

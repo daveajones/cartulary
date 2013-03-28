@@ -79,7 +79,7 @@ $(document).ready( function () {
                         $('#mdlSocialOutlineView .modal-header').hide();
                         $('#mdlSocialOutlineView .modal-body .sobody').hide();
                         $('#mdlSocialOutlineView .modal-footer').hide();
-                        $('#mdlSocialOutlineView .soraw').empty();
+                        $('#mdlSocialOutlineView .soserver .serverlink').empty();
                         $('#mdlSocialOutlineView .soname').empty();
                         $('#mdlSocialOutlineView .soavatar').attr('src', '/images/blank.gif');
                         $('#mdlSocialOutlineView .sopubfeeds').empty();
@@ -99,8 +99,9 @@ $(document).ready( function () {
                                                         $('#mdlSocialOutlineView .sobody').append(data.description);
                                                 } else {
                                                         modalFullHeight('#mdlSocialOutlineView', false);
-							//Set the raw feed link
-                                                        //$('#mdlSocialOutlineView .soraw').append('<a href="' + data.url + '">Raw Outline</a>');
+							//Set the server link
+                                                        $('#mdlSocialOutlineView .soserver .serverlink').append(data.server);
+                                                        $('#mdlSocialOutlineView .soserver .serverlink').attr('href', 'http://' + data.server);
 							//Set the name
                                                         $('#mdlSocialOutlineView .soname').append(data.ownername);
 							//Set the avatar
@@ -120,7 +121,7 @@ $(document).ready( function () {
                                                 }
                                                 $('#mdlSocialOutlineView .modal-header').show();
                                                 $('#mdlSocialOutlineView .modal-body .sobody').show();
-                                                //$('#mdlSocialOutlineView .modal-footer').show();		
+                                                $('#mdlSocialOutlineView .modal-footer').show();		
                                         },
                                 error:  function(x, t, m) {
                                                 $('#mdlSocialOutlineView .modal-header').show();

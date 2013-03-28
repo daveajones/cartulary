@@ -58,19 +58,90 @@ body {
 }
 .ui-datepicker-trigger { margin-top:-3px; margin-left:2px; }
 .ui-datepicker-next {  float: right;  }
-#mdlSocialOutlineView .soavatar {
-  max-width:128px;
-  max-height:128px;
-  margin-right:10px;
+/* --------------------------------------------------- */
+
+
+
+/* --------------------------------------------------- */
+/* ----- Modals ----- */
+/* ----- Show Article modal ----- */
+#mdlShowArticle {
+  position: fixed;
+  top:0;
+  right:0;
+  left:0;
+  bottom:0;
+  margin: 0;
+  background-color: #FBF0D9;
+  color: #5F4B32;
+  padding: 15px;
 }
-#mdlSocialOutlineView .sopubfeeds {
-  list-style:none;
+#mdlShowArticle .modal-header {
+  border-bottom:solid #ccc 1px;
+  min-height:30px;
+  max-height:22%;
+}
+#mdlShowArticle .modal-header .artitle {
+  background-color: #FBF0D9;
+  font-family: "CreteRoundRegular", serif;
+  color: #5F4B32;
+}
+#mdlShowArticle .modal-body .arbody,
+#mdlShowArticle .modal-body .arbody p {
+  background-color: #FBF0D9;
+  font-family: "CreteRoundRegular", serif;
+  font-size: 85%;
+  line-height: 110%;
+  word-spacing: 0.02em;
+  letter-spacing: 0.02em;
+  color: #5F4B32;
+}
+#mdlShowArticle .modal-body .arbody p {
+  margin-bottom:1.5em;
+}
+#mdlShowArticle .modal-footer {
+  background-color: #FBF0D9;
+  border-top:solid #ccc 1px;
+  max-height:40px;
+}
+#mdlShowArticle .modal-body .arbody img {
+  float:left;
+  margin:8px;
+  max-width:40%;
+}
+/* ----- Social Outline View modal ----- */
+#mdlSocialOutlineView {
+  position: fixed;
+  top:0;
+  right:0;
+  left:0;
+  bottom:0;
+  margin: 0;
+  padding: 15px;
+}
+#mdlSocialOutlineView .soavatar {
+  max-width:64px;
+  max-height:64px;
+  margin-right:10px;
 }
 #mdlSocialOutlineView .sofeedblock {
   float:left;
 }
+#mdlSocialOutlineView .sopubfeeds {
+  list-style:none;
+}
 #mdlSocialOutlineView .sonameblock {
   float:left;
+}
+#mdlSocialOutlineView .modal-footer {
+  clear:both;
+  max-height:20px;
+}
+#mdlSocialOutlineView .soserver {
+  float:left;
+}
+#mdlSocialOutlineView .sosubscribe {
+  float:right;
 }
 #mdlSocialOutlineView .soactivity {
   clear:both;
@@ -225,51 +296,6 @@ body {
 }
 .pageContentWrapper.River #stream .section .subitem { 
   text-align:right;
-}
-/* ----- Article modal ----- */
-#mdlShowArticle {
-  position: fixed;
-  top:0;
-  right:0;
-  left:0;
-  bottom:0;
-  margin: 0;
-  background-color: #FBF0D9;
-  color: #5F4B32;
-  padding: 15px;
-}
-#mdlShowArticle .modal-header {
-  border-bottom:solid #ccc 1px;
-  min-height:30px;
-  max-height:22%;
-}
-#mdlShowArticle .modal-header .artitle {
-  background-color: #FBF0D9;
-  font-family: "CreteRoundRegular", serif;
-  color: #5F4B32;
-}
-#mdlShowArticle .modal-body .arbody,
-#mdlShowArticle .modal-body .arbody p {
-  background-color: #FBF0D9;
-  font-family: "CreteRoundRegular", serif;
-  font-size: 100%;
-  line-height: 120%;
-  word-spacing: 0.02em;
-  letter-spacing: 0.02em;
-  color: #5F4B32;
-}
-#mdlShowArticle .modal-body .arbody p {
-  margin-bottom:1.5em;
-}
-#mdlShowArticle .modal-footer {
-  background-color: #FBF0D9;
-  border-top:solid #ccc 1px;
-  max-height:40px;
-}
-#mdlShowArticle .modal-body .arbody img {
-  float:left;
-  margin:8px;
-  max-width:40%;
 }
 /* --------------------------------------------------- */
 

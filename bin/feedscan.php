@@ -4,12 +4,6 @@
   //Let's not run twice
   if(($pid = cronHelper::lock()) !== FALSE) {
 
-  //Let's not scan while other scripts are in process
-  if( file_exists("$confroot/$run/backup.php.lock") ) {
-    cronHelper::unlock();
-    loggit(1, "FEEDSCAN: Backup is in progress, so skipping this scan.");
-    exit(0);
-  }
 
   //Track the river scan time
   $tstart = time();
@@ -63,7 +57,7 @@
     }
 
     if($subcount > 0) {
-      	loggit(1, "Checking feed: [ $ccount | ".$feed['title']." | ".$feed['url']."].");
+      	loggit(3, "Checking feed: [ $ccount | ".$feed['title']." | ".$feed['url']."].");
     	$result = get_feed_items($feed['id']);
     	if($result == -1) {
         	loggit(2, "Error getting items for feed: [".$feed['title']." | ".$feed['url']."]");
@@ -90,6 +84,7 @@
     }
 
     echo "      It took ".(time() - $fstart)." seconds to scan this feed.\n";
+    loggit(3, "It took [".(time() - $fstart)."] seconds to scan this feed.");
     echo "\n";
 
     //We stop scanning if this scan has taken longer than expected

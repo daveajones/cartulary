@@ -4,12 +4,6 @@
   //Let's not run twice
   if(($pid = cronHelper::lock()) !== FALSE) {
 
-  //Let's not scan while other scripts are in process
-  if( file_exists("$confroot/$run/backup.php.lock") ) {
-    cronHelper::unlock();
-    loggit(1, "OUTLINESCAN: Backup is in progress, so skipping this scan.");
-    exit(0);
-  }
 
   //Globals and flags
   $ouchange = FALSE;
@@ -122,7 +116,7 @@
   }
 
 
-  //Flip through all of the pub feeds and update them
+  //Flip through all of the user pub feeds and update them
   $users = get_users();
   foreach( $users as $u ) {
     $user = $u['id'];

@@ -20,7 +20,7 @@ function is_feed($content = NULL)
   $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
   libxml_clear_errors();
   if( $x === FALSE ) {
-    loggit(3,"The content didn't parse correctly.");
+    loggit(1,"The content didn't parse correctly.");
     return(FALSE);
   }
 
@@ -94,13 +94,13 @@ function get_feed_title($content = NULL)
 
   //Look for a title node in the rss
   foreach($x->channel->title as $entry) {
-    loggit(3, "Found a title node: [$entry].");
+    loggit(1, "Found a title node: [$entry].");
     return((string)$entry);
   }
 
   //Look for atom nodes
   foreach($x->title as $entry) {
-    loggit(3, "Found a title node: [$entry].");
+    loggit(1, "Found a title node: [$entry].");
     return((string)$entry);
   }
 
@@ -1070,7 +1070,7 @@ function update_pub_feed($uid = NULL, $url = NULL, $title = NULL, $link = NULL)
   $sql->close() or print(mysql_error());
 
   //Log and return
-  loggit(3, "Changed pub feed:[$url]'s title to: [$title] and link to: [$link].");
+  loggit(1, "Changed pub feed:[$url]'s title to: [$title] and link to: [$link].");
   return(TRUE);
 }
 
@@ -2522,7 +2522,7 @@ function feed_is_fulltext($fid = NULL, $uid = NULL)
   }
   $sql->close() or print(mysql_error());
 
-  loggit(3,"The feed: [$fid] is fulltext for user: [$uid].");
+  loggit(1,"The feed: [$fid] is fulltext for user: [$uid].");
   return(TRUE);
 }
 
@@ -3376,13 +3376,14 @@ function get_feed_items($fid = NULL, $max = NULL)
   $fstart = time();
   $url = $feed['url'];
 
-  //Check for bad feeds
+  //Check for bad feed url
   if( empty($url) ) {
     loggit(2, "Feed: [$fid] has a blank url: [$url].");
     return(-1);
   }
 
-  //If a feed has over 100 errors, we fall back to only scanning it once a day
+  //If a feed has over 100 errors or last new item was more than a month ago
+  //we fall back to only scanning it once a day
   if( $feed['errors'] > 100 ) {
     if( (time() - $feed['lastcheck']) < 86400 ) {
       loggit(2, "Feed: [$url] is over the error limit.  Skipping for 24 hours.");
@@ -3391,6 +3392,16 @@ function get_feed_items($fid = NULL, $max = NULL)
       return(-1);
     } else {
       loggit(2, "DEBUG: Doing once per day check on error-prone feed: [$url].");
+    }
+  }
+  if( $feed['lastupdate'] < (time() - (86400 * 28)) ) {
+    if( (time() - $feed['lastcheck']) < 86400 ) {
+      loggit(2, "Feed: [$url] hasn't updated in a month.  Skipping for 24 hours.");
+      $stats['checktime'] += (time() - $fstart);
+      set_feed_stats($fid, $stats);
+      return(-1);
+    } else {
+      loggit(2, "DEBUG: Doing once per day check on infrequently updated feed: [$url].");
     }
   }
 
@@ -3443,6 +3454,13 @@ function get_feed_items($fid = NULL, $max = NULL)
     return(-1);
   }
   update_feed_content($fid, $content);
+
+  //Is the feed any good?
+  if( !feed_is_valid($content) ) {
+      loggit(3, "Feed: [$fid] doesn't seem to be a known feed format. Skip it.");
+      increment_feed_error_count($fid);
+      return(-1);
+  }
 
   //Parse it
   $tstart = time();
@@ -3988,7 +4006,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $sourceurl="";
     $sourcetitle="";
     if( $item->source && $item->source->attributes() ) {
-	loggit(3, "SOURCE: ".print_r($item->source, TRUE));
+	//loggit(3, "SOURCE: ".print_r($item->source, TRUE));
 	$sourceurl = (string)$item->source->attributes()->url;
 	$sourcetitle = strip_tags((string)$item->source);
     }

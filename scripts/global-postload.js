@@ -85,7 +85,7 @@ $(document).ready( function () {
                         $('#mdlSocialOutlineView .sopubfeeds').empty();
                         $('#mdlSocialOutlineView .spinner').show();
 
-                        //sizeArticleModal('#mdlSocialOutlineView', true);
+                        modalFullHeight('#mdlSocialOutlineView', true);
                         $('#mdlSocialOutlineView').modal('show');
                         $.ajax({
                                 url:      cgiurl + '?url=' + href,
@@ -98,7 +98,7 @@ $(document).ready( function () {
                                                         $('#mdlSocialOutlineView .sotitle').append(data.title);
                                                         $('#mdlSocialOutlineView .sobody').append(data.description);
                                                 } else {
-                                                        //sizeArticleModal('#mdlSocialOutlineView', false);
+                                                        modalFullHeight('#mdlSocialOutlineView', false);
 							//Set the raw feed link
                                                         //$('#mdlSocialOutlineView .soraw').append('<a href="' + data.url + '">Raw Outline</a>');
 							//Set the name

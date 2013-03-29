@@ -19,6 +19,7 @@
 
         <div class="section{{if linkedOutlineId}} ${linkedOutlineId}{{/if}}{{if feedHidden == 1}} elHidden{{/if}}{{if linkedOutlineType}} ${linkedOutlineType}{{/if}}">
             <div class="header">
+		<a class="jumpTop pull-right" title="Jump back to the top of the page." href="#"><img class="icon-jumptop" src="/images/blank.gif"></a>
                 <?if( $cg_terror == 1) {?><div class="pull-right"><button class="btn btn-mini btn-danger" onclick="javascript:alert('Nice job douchebag!');">Report this post<br/>as terrorism.</button></div><?}?>
                 <h2>
                     <span class="header-tools">

@@ -1,6 +1,6 @@
 /*Bootstrap overrides*/
 .icon-align-left { background:url('/images/glyph/glyphicons_110_align_left@2x.png') 0 7px no-repeat; width:60px; height:60px; border:0; margin-right:8px; }
-.icon-jump-top { background:url('/images/glyph/glyphicons_218_jump_top.png') 0 7px no-repeat; width:30px; height:30px; border:0; margin-right:8px; }
+.icon-jumptop { background:url('/images/glyph/glyphicons_369_collapse_top-trans.png') 7px 3px no-repeat; width:30px; height:30px; border:0; }
 .icon-print { background:url('/images/glyph/glyphicons_015_print@2x.png') 3px 3px no-repeat; width:60px; height:60px; border:0; margin-right:8px; }
 .icon-book { background:url('/images/glyph/glyphicons_071_book@2x.png') 6px 6px no-repeat; width:60px; height:60px; border:0; margin-right:8px; }
 .icon-book-small { background:url('/images/glyph/glyphicons_halflings_042_book@2x.png') 5px 0px no-repeat; width:40px; height:40px; border:0; outline:none; }

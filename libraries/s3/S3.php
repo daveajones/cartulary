@@ -1657,7 +1657,7 @@ class S3
 	*/
 	public static function __getRegionEndpoint($string)
 	{
-		loggit(3, "S3: Region in: [$string].");
+		//loggit(3, "S3: Region in: [$string].");
 		switch($string) {
 			case 'US':
 				return 's3.amazonaws.com';

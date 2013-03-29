@@ -178,8 +178,6 @@
 <?include "$confroot/$scripts/river.js"?>
 </script>
 
-<a id="jumpTop" title="Jump back to the top of the page." href="#" style="position:fixed; bottom:10px; right:0px;"><img class="icon-jump-top" src="/images/blank.gif"></a>
-
 
 <?//--- Include the footer bar html fragments -----------?>
 <?include "$confroot/$templates/$template_html_footerbar"?>

@@ -8,6 +8,7 @@
 <!-- Bootstrap -->
 <script type="text/javascript" src="/script/bootstrap.min.js"></script>
 <!-- Other -->
+<script type="text/javascript" src="/script/keymaster.min.js"></script>
 <!-- Global custom -->
 <script>
 <?include "$confroot/$scripts/global-custom.js"?>

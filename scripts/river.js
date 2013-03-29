@@ -150,9 +150,10 @@ River.generate = (function () {
             $stream.find('#' + marker).addClass('last-old');
         }
         River.methods.bindStickyLinks();
-        River.methods.bindFeedStickyLinks();
         River.methods.bindSubscribeLinks();
         River.methods.bindCartLinks();
+        //Jump to top button
+        $('.jumpTop').click(function () { $('html, body').animate({ scrollTop: '0px' }, 300); return false; });
     };
     
     // expand stream items

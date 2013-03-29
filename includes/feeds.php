@@ -5252,7 +5252,15 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     loggit(2,"Couldn't get prefs for user: [$uid]");
     return(FALSE);
   }
-  $start = time() - ($prefs['riverhours'] * 3600);
+
+  //For a good collapsed river, you really need at least 24 hours of data to work with
+  //If the user has their riverhours set below 24, we just use 24 the non-collapsed
+  //river is unaffected by this
+  if( $prefs['riverhours'] < 24 ) {
+    $start = time() - (24 * 3600);
+  }
+    $start = time() - ($prefs['riverhours'] * 3600);
+  }
   $dmax = $prefs['maxriversize'];
   $mmax = $prefs['maxriversizemobile'];
 

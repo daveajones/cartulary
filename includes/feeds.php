@@ -3427,6 +3427,7 @@ function get_feed_items($fid = NULL, $max = NULL)
       loggit(1, "Doing once per day check on error-prone feed: [$url].");
     }
   }
+  /*
   if( (time() - $feed['lastupdate']) > (86400 * 28) ) {
     if( (time() - $feed['lastcheck']) < 86400 && !empty($feed['lastupdate']) ) {
       loggit(2, "Feed: [$url] hasn't updated in a month.  Skipping for 24 hours.");
@@ -3437,6 +3438,7 @@ function get_feed_items($fid = NULL, $max = NULL)
       loggit(3, "DEBUG: Doing once per day check on infrequently updated feed: [$url].");
     }
   }
+  */
 
   //Do we need to re-register?
   if( !empty($feed['rsscloudregurl']) && ((time() - $feed['rsscloudlastreg']) > 86400 || $feed['rsscloudlastreg'] == '') && $enable_rsscloud == 1 ) {

@@ -153,7 +153,10 @@ River.generate = (function () {
         River.methods.bindSubscribeLinks();
         River.methods.bindCartLinks();
         //Jump to top button
-        $('.jumpTop').click(function () { $('html, body').animate({ scrollTop: '0px' }, 300); return false; });
+        $('.jumpTop').click(function () {
+		$('html, body').animate({ scrollTop: '0px' }, 300); 
+		return false;
+	});
     };
     
     // expand stream items

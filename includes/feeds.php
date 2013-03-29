@@ -5496,8 +5496,16 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     //if( $ticount >= $max ) { break; }
   }
 
-  $driver = array_slice($river, 0, $dfcut);
-  $mriver = array_slice($river, 0, $mfcut);
+  if( isset($dfcut) ) {
+    $driver = array_slice($river, 0, $dfcut);
+  } else {
+    $driver = $river;
+  }
+  if( isset($mfcut) ) {
+    $mriver = array_slice($river, 0, $mfcut);
+  } else {
+    $mriver = $river;
+  }
 
   $sql->close() or print(mysql_error());
 

@@ -5258,7 +5258,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
   //river is unaffected by this
   if( $prefs['riverhours'] < 24 ) {
     $start = time() - (24 * 3600);
-  }
+  } else {
     $start = time() - ($prefs['riverhours'] * 3600);
   }
   $dmax = $prefs['maxriversize'];

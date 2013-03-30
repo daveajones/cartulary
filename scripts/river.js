@@ -213,6 +213,9 @@ River.methods = (function () {
 					  $('#' + id).remove();
 					}
 					bobj.remove();
+	
+					//Target the next article after this one goes away
+					focusFirstVisibleArticle();
                         	}
                 	});
 
@@ -302,6 +305,7 @@ River.methods = (function () {
                         	$('#frm'+ frmid).submit();
                         	return false;
                 	});
+			focusThisArticle(frmid);
 	
                 	$('#mdlShowArticle .artitle').empty();
                 	$('#mdlShowArticle .arbody').empty();

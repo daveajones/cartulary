@@ -348,6 +348,9 @@ a {  color:#059;  }
 .pageContentWrapper.River #stream .section .subitem { 
   text-align:right;
 }
+.pageContentWrapper.River #stream-items .activeItem { 
+  border-left:solid yellow 3px;
+}
 /* --------------------------------------------------- */
 
 

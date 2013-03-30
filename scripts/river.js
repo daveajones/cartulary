@@ -157,6 +157,9 @@ River.generate = (function () {
 		$('html, body').animate({ scrollTop: '0px' }, 300); 
 		return false;
 	});
+	<?if($g_platform != "mobile"){?>
+	focusFirstVisibleArticle();
+	<?}?>
     };
     
     // expand stream items

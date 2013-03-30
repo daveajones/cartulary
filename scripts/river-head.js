@@ -24,6 +24,11 @@
 
 
 	//River navigation functions
+	function focusThisArticle(elid) {
+		$("#stream-items div.article.activeItem").removeClass("activeItem");				
+		$("#stream-items div.article#"+elid).addClass("activeItem");
+		return false;
+	}
 	function focusFirstVisibleArticle() {
 		$("#stream-items div.article").each(function(index) {
 			if( $(document).scrollTop() < $(this).offset().top ) {

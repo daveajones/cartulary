@@ -1,3 +1,4 @@
+<!--
 $(document).ready( function() {
         var lastChecked = null;
 	var $chkboxes = $('.exparticle');
@@ -29,7 +30,7 @@ $(document).ready( function() {
                 	if(data.status == "false") {
 			        showMessage( data.description, data.status, 5 );
                         } else {
-			        showMessage( data.description +  ' <a href="' + data.url + '">Link</a>', data.status, 60 );
+			        showMessage( data.description +  ' <a href="' + data.url + '">Open</a> or <a href="http://127.0.0.1:5337/opmlEditor/editOutlineButton/open?root='+ data.url +'&title=Export">Edit</a>', data.status, 60 );
         	        }
         	}
 	});
@@ -81,3 +82,4 @@ $(document).ready( function() {
 		$('#end-date').prop('disabled', false);
 	});
 });
+-->

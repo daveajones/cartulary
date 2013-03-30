@@ -92,41 +92,46 @@ $(document).ready( function() {
 
 
 	//Keyboard shortcuts
-	key('down', function() {
-		$("#stream-items div.section").each(function(index) {
-			if( $(document).scrollTop() < $(this).offset().top ) {
-				$('html, body').animate( { scrollTop: ($("#stream-items div.section:eq("+(index + 1)+")").offset().top - 3) }, 300); 
-				return false;
-			}
-		});
+	key('t', function() {		//----- Target the first visible article
+		focusFirstVisibleArticle();
 		return false;
         });
-	key('up', function() {
-		$("#stream-items div.section").each(function(index) {
-			if( $(document).scrollTop() < $(this).offset().top ) {
-				$('html, body').animate( { scrollTop: ($("#stream-items div.section:eq("+(index - 1)+")").offset().top - 3) }, 300); 
-				return false;
-			}
-		});
+	key('down', function() {	//----- Jump to next section
+		focusNextSection();
 		return false;
         });
-	key('right', function() {
-		$("#stream-items div.article").each(function(index) {
-			if( $(document).scrollTop() < $(this).offset().top ) {
-				$('html, body').animate( { scrollTop: ($("#stream-items div.article:eq("+(index + 1)+")").offset().top - 1) }, 300); 
-				return false;
-			}
-		});
+	key('up', function() {		//----- Jump to previous section
+		focusPreviousSection();
 		return false;
         });
-	key('left', function() {
-		$("#stream-items div.article").each(function(index) {
-			if( $(document).scrollTop() < $(this).offset().top ) {
-				$('html, body').animate( { scrollTop: ($("#stream-items div.article:eq("+(index - 1)+")").offset().top - 1) }, 300); 
-				return false;
-			}
-		});
+	key('right', function() {	//----- Jump to next article
+		focusNextArticle();
 		return false;
+        });
+	key('left', function() {	//----- Jump to previous article
+		focusPreviousArticle();
+		return false;
+        });
+	key('u', function() {		//----- Un-sticky the currently targeted item
+		if( $("#stream-items div.article.activeItem").hasClass("sticky") ) {
+			$("#stream-items div.article.activeItem .aUnSticky").trigger('click');
+			focusNextArticle();
+		}
+		return false;
+        });
+	key('c', function() {		//----- Cartulize the currently targeted item
+		$("#stream-items div.article.activeItem .cartlink").trigger('click');
+		return false;
+        });
+	key('m', function() {		//----- Microblog the currently targeted item
+		$("#stream-items div.article.activeItem .rtlink").trigger('click');
+		return false;
+        });
+	key('o', function() {		//----- Open original link of the currently targeted item
+		if( $("#stream-items div.article.activeItem .header a.articlelink").length > 0 ) {
+			window.open($("#stream-items div.article.activeItem .header a.articlelink").attr('href'));
+		}
+                return false;
         });
 });
 

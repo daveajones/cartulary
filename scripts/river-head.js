@@ -22,6 +22,64 @@
                 $('#txtSaySomething').switchClass('bigSaySomething', 'smallSaySomething', 300);
         }
 
+
+	//River navigation functions
+	function focusFirstVisibleArticle() {
+		$("#stream-items div.article").each(function(index) {
+			if( $(document).scrollTop() < $(this).offset().top ) {
+				$("#stream-items div.article.activeItem").removeClass("activeItem");				
+				$(this).addClass("activeItem");
+				return false;
+			}
+		});
+		return false;
+	}
+	function focusPreviousSection() {
+		$("#stream-items div.section").each(function(index) {
+			if( $(document).scrollTop() < $(this).offset().top ) {
+				$('html, body').animate( { scrollTop: ($("#stream-items div.section:eq("+(index - 1)+")").offset().top - 3) }, 300); 
+				$("#stream-items div.section div.article.activeItem").removeClass("activeItem");				
+				$("#stream-items div.section:eq("+(index - 1)+") div.article:eq(0)").addClass("activeItem");
+				return false;
+			}
+		});
+		return false;
+	}
+	function focusNextSection() {
+		$("#stream-items div.section").each(function(index) {
+			if( $(document).scrollTop() < $(this).offset().top ) {
+				$('html, body').animate( { scrollTop: ($("#stream-items div.section:eq("+(index + 1)+")").offset().top - 3) }, 300); 
+				$("#stream-items div.section div.article.activeItem").removeClass("activeItem");				
+				$("#stream-items div.section:eq("+(index + 1)+") div.article:eq(0)").addClass("activeItem");
+				return false;
+			}
+		});
+		return false;
+	}
+        function focusPreviousArticle() {
+		$("#stream-items div.article").each(function(index) {
+			if( $(document).scrollTop() < $(this).offset().top ) {
+				$('html, body').animate( { scrollTop: ($("#stream-items div.article:eq("+(index - 1)+")").offset().top - 3) }, 300); 
+				$("#stream-items div.article.activeItem").removeClass("activeItem");				
+				$("#stream-items div.article:eq("+(index - 1)+")").addClass("activeItem");
+				return false;
+			}
+		});
+		return false;
+	}
+	function focusNextArticle() {
+		$("#stream-items div.article").each(function(index) {
+			if( $(document).scrollTop() < $(this).offset().top ) {
+				$('html, body').animate( { scrollTop: ($("#stream-items div.article:eq("+(index + 1)+")").offset().top - 3) }, 300); 
+				$("#stream-items div.article.activeItem").removeClass("activeItem");				
+				$("#stream-items div.article:eq("+(index + 1)+")").addClass("activeItem");
+				return false;
+			}
+		});
+		return false;
+	}
+
+
         // River stuff
         <?if($platform == "mobile") {?>
 	var jsonRiverData = <?echo get_river_as_json($uid, TRUE)?>;

@@ -115,7 +115,6 @@ $(document).ready( function() {
 	key('u', function() {		//----- Un-sticky the currently targeted item
 		if( $("#stream-items div.article.activeItem").hasClass("sticky") ) {
 			$("#stream-items div.article.activeItem .aUnSticky").trigger('click');
-			focusNextArticle();
 		}
 		return false;
         });

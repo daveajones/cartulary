@@ -383,7 +383,7 @@ function get_outline_content($id = NULL)
 
 //_______________________________________________________________________________________
 //Add an outline to the database
-function add_outline($url = NULL, $uid = NULL)
+function add_outline($url = NULL, $uid = NULL, $type = '')
 {
   //Check parameters
   if($url == NULL) {
@@ -404,9 +404,9 @@ function add_outline($url = NULL, $uid = NULL)
   $oid = outline_exists($url);
   if($oid == FALSE) {
     //Now that we have a good id, put the outline into the database
-    $stmt = "INSERT INTO $table_sopml_outlines (id,url) VALUES (?,?)";
+    $stmt = "INSERT INTO $table_sopml_outlines (id,url,type) VALUES (?,?,?)";
     $sql=$dbh->prepare($stmt) or print(mysql_error());
-    $sql->bind_param("ss", $id,$url) or print(mysql_error());
+    $sql->bind_param("sss", $id,$url,$type) or print(mysql_error());
     $sql->execute() or print(mysql_error());
     $sql->close() or print(mysql_error());
   } else {

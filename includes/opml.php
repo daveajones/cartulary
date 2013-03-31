@@ -570,6 +570,43 @@ function update_outline_title($id = NULL, $title = NULL)
   return(TRUE);
 }
 
+
+//_______________________________________________________________________________________
+//Change the type of an outline
+function update_outline_type($id = NULL, $type = NULL)
+{
+  //Check parameters
+  if($id == NULL) {
+    loggit(2,"The outline id is blank or corrupt: [$id]");
+    return(FALSE);
+  }
+  if($type == NULL) {
+    loggit(2,"The outline type is blank or corrupt: [$title]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Clean the title
+  $type = trim($type);
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Now that we have a good id, put the article into the database
+  $stmt = "UPDATE $table_sopml_outlines SET type=? WHERE id=?";
+  $sql=$dbh->prepare($stmt) or print(mysql_error());
+  $sql->bind_param("ss", $type,$id) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and return
+  loggit(1,"Updated type to: [$type] for outline: [$id].");
+  return(TRUE);
+}
+
+
 //_______________________________________________________________________________________
 //Change the owner name of an outline
 function update_outline_ownername($id = NULL, $name = NULL)

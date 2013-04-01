@@ -170,6 +170,50 @@ function outline_exists_by_id($id = NULL)
 
 
 //_______________________________________________________________________________________
+//Check if an outline item already exists
+function outline_item_exists($oid = NULL, $item = NULL)
+{
+  //Check parameters
+  if($oid == NULL) {
+    loggit(2,"The outline id is blank or corrupt: [$oid]");
+    return(FALSE);
+  }
+  if($item == NULL) {
+    loggit(2,"The outline item is blank or corrupt: [$item]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Text content of the item
+  $content = (string)$item->attributes()->text;
+
+  //Look for the url in the feed table
+  $sql=$dbh->prepare("SELECT id,content FROM $table_sopml_outlineitems WHERE oid=? AND conthash=?") or print(mysql_error());
+  $sql->bind_param("ss", $oid, md5($content)) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+  //See if any rows came back
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(1,"The outline item does not exist in the repository.");
+    return(FALSE);
+  }
+  $sql->bind_result($iid,$content) or print(mysql_error());
+  $sql->fetch() or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  loggit(3,"The outline item: [$iid | $content] already exists.");
+  return(TRUE);
+}
+
+
+//_______________________________________________________________________________________
 //See how many subscribers an outline has
 function get_outline_subscriber_count($oid = NULL)
 {
@@ -275,6 +319,46 @@ function get_outline_item_count($oid = NULL)
 
   loggit(1,"The outline: [$oid] has: [$itemcount] items.");
   return($itemcount);
+}
+
+
+//_______________________________________________________________________________________
+//Get the items for a particular outline
+function get_items_by_outline_id($oid = NULL)
+{
+  //Check parameters
+  if($oid == NULL) {
+    loggit(2,"The outline id is blank or corrupt: [$oid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Look for the url in the feed table
+  $sql=$dbh->prepare("SELECT id,content,attributes,timeadded FROM $table_sopml_items WHERE oid=?") or print(mysql_error());
+  $sql->bind_param("s", $oid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+
+  $sql->bind_result($iid,$content,$attributes,$timeadded) or print(mysql_error());
+
+  $items = array();
+  $count = 0;
+  while($sql->fetch()) {
+    $items[$count] = array( 'id' => $iid, 'content' => $content, 'attributes' => $attributes, 'timeadded' => $timeadded );
+    $count++;
+  }
+  $subcount = count($items);
+
+
+  $sql->close() or print(mysql_error());
+
+  loggit(1,"Returning: [$itemcount] items for outline: [$oid].");
+  return($items);
 }
 
 
@@ -1087,7 +1171,8 @@ function get_outline_items($id = NULL, $max = NULL)
   //Put all of the items in an array
   $items = array();
   $count = 0;
-  foreach($x->body->outline as $entry) {
+  $nodes = $x->xpath('//outline');
+  foreach($nodes as $entry) {
       $items[$count] = $entry;
       add_outline_item($id, $entry);
       $count++;
@@ -1891,6 +1976,66 @@ function purge_orphaned_outlines($type = NULL)
   //Log and leave
   loggit(3,"Deleted: [$delcount] orphaned outlines.");
   return($delcount);
+}
+
+
+//_______________________________________________________________________________________
+//Set the purge flag on all of an outline's items
+function mark_all_outline_items_to_purge($oid = NULL)
+{
+  //Check parameters
+  if( empty($oid) ) {
+    loggit(2,"The outline id is blank or corrupt: [$oid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Database call
+  $stmt = "UPDATE $table_sopml_outlineitems SET `purge`=1 WHERE oid=?";
+  $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
+  $sql->bind_param("s", $oid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $updcount = $sql->affected_rows or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and return
+  loggit(1,"Marked: [$updcount] items in outline:[$oid] to purge.");
+  return($updcount);
+}
+
+
+//_______________________________________________________________________________________
+//Un-set the purge flag on all of an outline's items
+function unmark_all_outline_items_to_purge($oid = NULL)
+{
+  //Check parameters
+  if( empty($oid) ) {
+    loggit(2,"The outline id is blank or corrupt: [$oid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Update all the items
+  $stmt = "UPDATE $table_sopml_outlineitems SET `purge`=0 WHERE oid=?";
+  $sql=$dbh->prepare($stmt) or print(mysql_error());
+  $sql->bind_param("s",$oid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $updcount = $sql->affected_rows or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Log and return
+  loggit(1,"Un-marked: [$updcount] items in outline:[$oid] to purge.");
+  return($updcount);
 }
 
 

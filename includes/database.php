@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 12;
+$cg_database_version = 13;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -120,6 +120,16 @@ CGDB0024;
 $cg_database_updates[11][] = <<<CGDB0025
  INSERT INTO `dbversion` ( `version` ) VALUES ( '12' )
 CGDB0025;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 12 to 13 -------------------------------------------------------------------------------------------------
+$cg_database_updates[12][] = <<<CGDB0026
+ ALTER TABLE `sopmlitems` ADD `position` INT NOT NULL DEFAULT '0' COMMENT 'The item''s position in the document.',
+ ADD `level` INT NOT NULL DEFAULT '0' COMMENT 'The item''s indentation level.'
+CGDB0026;
+$cg_database_updates[12][] = <<<CGDB0027
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '13' )
+CGDB0027;
 //----------------------------------------------------------------------------------------------------------------
 ?>
 

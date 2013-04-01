@@ -125,7 +125,8 @@ CGDB0025;
 //Version 12 to 13 -------------------------------------------------------------------------------------------------
 $cg_database_updates[12][] = <<<CGDB0026
  ALTER TABLE `sopmlitems` ADD `position` INT NOT NULL DEFAULT '0' COMMENT 'The item''s position in the document.',
- ADD `level` INT NOT NULL DEFAULT '0' COMMENT 'The item''s indentation level.'
+ ADD `level` INT NOT NULL DEFAULT '0' COMMENT 'The item''s indentation level.',
+ ADD `purge` TINYINT NOT NULL DEFAULT '0' COMMENT 'Is this item no longer in the outline?'
 CGDB0026;
 $cg_database_updates[12][] = <<<CGDB0027
  INSERT INTO `dbversion` ( `version` ) VALUES ( '13' )

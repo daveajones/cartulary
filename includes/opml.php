@@ -1188,6 +1188,7 @@ function get_outline_items($id = NULL, $max = NULL)
   return($items);
 }
 
+
 //_______________________________________________________________________________________
 //Get and parse out the content of an outline
 function get_feeds_from_outline($content = NULL, $max = NULL)
@@ -1755,7 +1756,7 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
 	$feedtitle = $feed['title'];
       }
       $opml .= "
-              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($feedtitle))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($feed['url'])."\" sopml:disposition=\"sub\" sopml:contains=\"mixed\" sopml:attention=\"50\" $sticky $hidden $fulltext />";
+              <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', xmlentities($feedtitle))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($feed['url'])."\" sopml:disposition=\"sub\" sopml:contains=\"mixed\" sopml:attention=\"50\" $sticky $hidden $fulltext />";
   }
   $opml .= "
           </outline>";
@@ -2036,6 +2037,70 @@ function unmark_all_outline_items_to_purge($oid = NULL)
   //Log and return
   loggit(1,"Un-marked: [$updcount] items in outline:[$oid] to purge.");
   return($updcount);
+}
+
+
+//_______________________________________________________________________________________
+//Recursive function for parsing an entire outline structure
+function displayChildrenRecursive($x = NULL, $indent = 0, $line = 0)
+{
+
+  foreach($x->children() as $child) {
+    $text = (string)$child->attributes()->text;
+    $attr = (string)$child->attributes();
+
+    echo str_repeat('-',$indent)."> [".(string)$child->attributes()->text."][$line][$indent]\n";
+    $line = displayChildrenRecursive($child, $indent+1, $line+1);
+  }
+
+  return($line);
+}
+
+
+//_______________________________________________________________________________________
+//Convert an opml document to html
+function convert_opml_to_html($content = NULL, $max = NULL)
+{
+  //Check params
+  if($content == NULL) {
+    loggit(2,"The opml content is blank or corrupt: [$content]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Parse it
+  libxml_use_internal_errors(true);
+  $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+  libxml_clear_errors();
+
+  //Roll through all of the outline nodes
+  $nodes = $x->xpath('//outline');
+  if( empty($nodes) ) {
+    loggit(3, "This opml document is blank.");
+    return(-2);
+  }
+
+  //Run through each node and convert it to an html element
+  $count = 0;
+  $html = "";
+  foreach($nodes as $entry) {
+      loggit(3, "DEBUG: ".print_r($entry, TRUE));
+
+      $text = (string)$entry->attributes()->text;
+      $name = (string)$entry->attributes()->name;
+      $link = (string)$entry->attributes()->url;
+      $type = (string)$entry->attributes()->type;
+
+      $html .= "<span>[$text]</span><br/>\n";
+
+      $count++;
+  }
+
+  //Log and leave
+  loggit(3,"Got [$count] items from the opml document.");
+  return($html);
 }
 
 

@@ -77,26 +77,26 @@
                         {{if River.methods.isImage(enclosure.url, enclosure.type) && (Hidebigpics == false || enclosure.length < 50000) && Hidepics == false && River.methods.isAvatar(enclosure.url) == false}}
                             <a href="${enclosure.url}">
 			    {{if River.methods.countEnclosuresOfType(item.enclosure, 'image') == 2}}
-                              <img class="enclosurepic encpicture2" src="${enclosure.url}" alt="" />
+                              <img class="encobj enclosurepic encpicture2" src="${enclosure.url}" data-type="${enclosure.type}" data-length="${enclosure.length}" alt="" />
 			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') == 3}}
-                              <img class="enclosurepic encpicture3" src="${enclosure.url}" alt="" />
+                              <img class="encobj enclosurepic encpicture3" src="${enclosure.url}" data-type="${enclosure.type}" data-length="${enclosure.length}" alt="" />
 			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') == 4}}
-                              <img class="enclosurepic encpicture4" src="${enclosure.url}" alt="" />
+                              <img class="encobj enclosurepic encpicture4" src="${enclosure.url}" data-type="${enclosure.type}" data-length="${enclosure.length}" alt="" />
 			    {{else River.methods.countEnclosuresOfType(item.enclosure, 'image') >= 5}}
-                              <img class="enclosurepic encpictures" src="${enclosure.url}" alt="" />
+                              <img class="encobj enclosurepic encpictures" src="${enclosure.url}" data-type="${enclosure.type}" data-length="${enclosure.length}" alt="" />
 			    {{else}}
-                              <img class="enclosurepic encpicture" src="${enclosure.url}" alt="" />
+                              <img class="encobj enclosurepic encpicture" src="${enclosure.url}" data-type="${enclosure.type}" data-length="${enclosure.length}" alt="" />
 			    {{/if}}
                             </a>
                         {{else River.methods.isAudio(enclosure.url, enclosure.type)}}
-                            <audio class="encaudio" src="${enclosure.url}" preload="metadata" controls></audio>
+                            <audio class="encobj encaudio" src="${enclosure.url}" preload="metadata" controls data-type="${enclosure.type}" data-length="${enclosure.length}"></audio>
                             <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
                         {{else River.methods.isVideo(enclosure.url, enclosure.type) && Hidepics == false}}
-                            <video class="encvideo" src="${enclosure.url}" preload="metadata" controls></video>
+                            <video class="encobj encvideo" src="${enclosure.url}" preload="metadata" controls data-type="${enclosure.type}" data-length="${enclosure.length}"></video>
                             <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
 			<?if( $device != "iphone" && $device != "ipad" ) {?>
                         {{else River.methods.isIframe(enclosure.url, enclosure.type) && Hidepics == false}}
-                            <iframe class="enciframe" src="${enclosure.url}" frameborder="0" allowfullscreen></iframe>
+                            <iframe class="encobj enciframe" src="${enclosure.url}" data-type="${enclosure.type}" data-length="${enclosure.length}" frameborder="0" allowfullscreen></iframe>
 			<?}?>
                         {{/if}}
 		    {{/each}}
@@ -106,7 +106,12 @@
 		    <div class="actionwrap">
                     <div class="time">
                       ${River.methods.prettyDate(item.pubDate)}
-                      {{if item.sourceurl}}<span class="source"> via: <a href="${item.sourceurl}">${item.sourcetitle}</a> | <a class="aSubscribe" data-sourceurl="${encodeURIComponent(item.sourceurl)}" href="#">Subscribe</a></span>{{/if}}
+                      {{if item.sourceurl}}
+                        <span class="source"> via: <a href="${item.sourceurl}">${item.sourcetitle}</a> | <a class="aSubscribe" data-sourceurl="${encodeURIComponent(item.sourceurl)}" href="#">Subscribe</a></span>
+		      {{else}}
+                        <span class="source hide"> via: <a href="${feedUrl}">${feedTitle}</a></span>
+                      {{/if}}
+                      {{if item.origin}}<span class="origin hide">${item.origin}</span>{{/if}}
                     </div>
                     <div class="actions">
                         <?if( $g_prefs['riverheadlinecart'] != 1 ) {?>
@@ -119,10 +124,12 @@
 
                         <?if(!empty($prefs['linkblog'])) {?>
 			  <div><a href="<?echo $prefs['linkblog']?>/?description=${encodeURIComponent(item.title)}&link=${encodeURIComponent(item.link)}" rel="external nofollow" target="_blank">RT</a></div>
+			<?} else if( $g_platform != "mobile" ) {?>
+			  <a class="mblink rtgo" href="#" data-id="${item.id}"><img class="icon-retweet" src="/images/blank.gif" alt="" /></a>
 			<?} else {?>
                           <div class="rtriverform">
 			  <form id="frm${item.id}" action="<?echo $microblogpage?>" method="post" target"_new">
-			  <a class="rtlink" href="#" onclick="javascript:document.getElementById('frm${item.id}').submit();return false;"><img class="icon-retweet" src="/images/blank.gif" alt="" /></a>
+			  <a class="rtlink rtgo" href="#" onclick="javascript:document.getElementById('frm${item.id}').submit();return false;"><img class="icon-retweet" src="/images/blank.gif" alt="" /></a>
 			  {{if item.title}}<input type="hidden" name="title" value="${item.title}" />{{/if}}
 			  {{if item.title || item.description || item.body}}<input type="hidden" name="description" value="${item.title || item.description || item.body}" />{{/if}}
 			  {{if item.permaLink || item.link}}<input type="hidden" name="link" value="${item.permaLink || item.link}" />{{/if}}

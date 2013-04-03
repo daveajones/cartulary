@@ -80,6 +80,7 @@
 <?if($platform != "mobile") {?>
 <div id="stream-sidebar-left">
 <div id="divMe" style="float:left;">
+  <a href="#" class="pull-right" onclick="javascript:newMicroblogPostWindow();return false;"><img class="icon-balloon" src="/images/blank.gif" alt="" /></a>
   <h3>My Posts</h3>
   <br/>
   <div id="divMicroblogWidget"><script id="scrMicroblogWidget" src="<?echo $s3widget?>?ts=<?echo time()?>"></script></div>

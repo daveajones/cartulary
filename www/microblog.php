@@ -138,7 +138,7 @@
 		<!-- Enclosure drop zone. -->
                 <?if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {?>
 		<div id="divEnclosures" class="dropzone">
-			<input type="hidden" name="datestamp" value="<?echo $datestamp?>" />
+			<input type="hidden" name="datestamp" class="datestamp" value="<?echo $datestamp?>" />
 			<div id="queue"><span id="spnQueueText">Drop file(s) here...</span></div>
 		</div>
 
@@ -210,9 +210,6 @@
 
 <?//--- Include the footer bar html fragments -----------?>
 <?include "$confroot/$templates/$template_html_footerbar"?>
-<script>
-<?include "$confroot/$scripts/microblog-upload.js"?>
-</script>
 <script>
 <?include "$confroot/$scripts/microblog.js"?>
 </script>

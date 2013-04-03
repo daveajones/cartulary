@@ -152,6 +152,7 @@ River.generate = (function () {
         River.methods.bindStickyLinks();
         River.methods.bindSubscribeLinks();
         River.methods.bindCartLinks();
+	River.methods.bindMicroblogLinks();
         //Jump to top button
         $('.jumpTop').click(function () {
 		$('html, body').animate({ scrollTop: '0px' }, 300); 
@@ -298,14 +299,15 @@ River.methods = (function () {
         	$('.cartlink').click(function() {
                 	var aobj = $(this);
                 	var href = aobj.attr("data-href");
+                	var id = aobj.attr("data-id");
 	
                 	$('#mdlShowArticle .arfooter').hide();
-                	var frmid = aobj.attr("data-id");
                 	$('#mdlShowArticle .arfooter .rt').click(function() {
-                        	$('#frm'+ frmid).submit();
+	                	$('#mdlShowArticle').modal('hide');
+                        	$('#stream-items .article#' + id + ' .rtgo').trigger('click');
                         	return false;
                 	});
-			focusThisArticle(frmid);
+			focusThisArticle(id);
 	
                 	$('#mdlShowArticle .artitle').empty();
                 	$('#mdlShowArticle .arbody').empty();
@@ -349,6 +351,22 @@ River.methods = (function () {
                         	}
                 	});
                 	return false;
+        	});
+        	return true;
+	}
+
+
+	//Ajaxify the MB links
+	function _bindMicroblogLinks() {
+        	$('.mblink').unbind('click');
+        	$('.mblink').click(function() {
+			var modal = '#mdlMicroblogPost';
+                	var aobj = $(this);
+                	var id = aobj.attr("data-id");
+
+			newMicroblogPostWindow('#stream-items .article#' + id);
+			focusThisArticle(id);
+			return false;
         	});
         	return true;
 	}
@@ -670,6 +688,7 @@ River.methods = (function () {
         bindFeedStickyLinks : _bindFeedStickyLinks,
         bindSubscribeLinks : _bindSubscribeLinks,
 	bindCartLinks : _bindCartLinks,
+	bindMicroblogLinks : _bindMicroblogLinks,
         convertYoutube : _convertYoutube,
 	isAvatar : _isAvatar,
         urlNotRelative : _urlNotRelative,

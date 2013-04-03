@@ -9,12 +9,104 @@ data-addfeedstolist="<?echo $addfeedstolistcgi?>"
 data-addfeedstonewlist="<?echo $addfeedstonewlistcgi?>" 
 data-removefeedsfromlist="<?echo $removefeedsfromlistcgi?>"
 data-getsopml="<?echo $getsopmlcgi?>"
+data-blogpostcgi="<?echo $blogpostcgi?>"
 ></div>
 
 </div>
 
 
 <!-- Global Modals -->
+
+<!-- Microblog Post -->
+<div id="mdlMicroblogPost" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 class="title">Microblog Post</h3>
+  </div>
+  <div class="modal-body">
+    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Posting. Please wait...<br/><br/></center>
+    <div class="blogpost">
+        <form class="mbpostform" name="blogpost" method="post" action="<?echo $blogpostcgi?>">
+    	<fieldset>
+      	<div class="control-group">
+        	<!-- Description -->
+        	<div class="bpdescription">
+          	<textarea name="content" placeholder="Lay your thing down here..."></textarea>
+        	</div>
+	
+		<!-- Attach files button -->
+                <?if( (s3_is_enabled($uid) || sys_s3_is_enabled()) && ($device != "ipad" && $device != "iphone" && $device != "wphone") ) {?>
+                <a class="pull-right" id="btnAttachFile" title="Attach enclosures."><img class="icon-attach" src="/images/blank.gif" alt="" /></a>
+                <?}?>
+
+		<!-- Title -->
+        	<div class="bptitle">
+	  	<img class="icon-text-height" src="/images/blank.gif" title="Title of Post" /><input name="title" type="text" placeholder="Title your post..." value="" />
+		</div>
+	
+		<!-- Link -->
+        	<div class="bplink">
+	  	<img class="icon-hyperlink-small" src="/images/blank.gif" title="External Link" /><input name="link" type="text" placeholder="Paste a link here..." value="" />
+		</div>
+	
+		<!-- Short link -->
+        	<div class="bpshortlink hide">
+	  	<img class="icon-hyperlink-small" src="/images/blank.gif" title="Shortened Link" /><input name="shortlink" type="text" value="" />
+		</div>
+
+		<!-- Origin -->
+        	<div class="bporigin hide">
+	  	<input name="origin" type="text" value="" />
+		</div>
+
+		<!-- Source -->
+        	<div class="bpsource hide">
+	  	<input class="bpsourceurl" name="source[url]" type="text" value="" />
+	  	<input class="bpsourcetitle" name="source[title]" type="text" value="" />
+		</div>
+
+                <!-- Enclosure drop zone. -->
+                <?if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {?>
+                <div id="divEnclosures" class="dropzone hide">
+                        <input type="hidden" name="datestamp" class="datestamp" value="" />
+                        <div id="queue"><span id="spnQueueText">Drop file(s) here...</span></div>
+                </div>
+
+                <!-- Uploadify controls. -->
+                <div id="divUpload">
+                        <?if($device=="android") {?>
+                        <input type="file" name="file_mobile" id="file_mobile" />
+                        <?} else {?>
+                        You can drag and drop files into this page to attach them.<br/>
+                        Or you can
+                        <input type="file" name="file_upload" id="file_upload" /> ... then ... <a id="aUploadTrigger" href="#"">Upload Them</a> if they don't upload automatically.
+                        <?}?>
+                </div>
+                <?}?>
+
+		<!-- External Enclosures -->
+        	<div class="bpextenc hide">
+  		  <h4>External Enclosures:</h4>
+		  <ul></ul>
+		</div>
+
+		<!-- Tweet toggle -->
+		<?if( twitter_is_enabled($g_uid) ) {?><input class="tweetcheck hide" name="tweet" type="checkbox" /><?}?>
+      	</div>
+    	</fieldset>
+        </form>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <?if( twitter_is_enabled($g_uid) ) {?>
+    <span class="tweeters"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt="" /><span class="warntweet hide">Tweet will be truncated...</span></span>
+    <?}?>
+    <button type="button" class="btn btn-primary mbsubmit pull-right" aria-hidden="true">Post It!</button>
+  </div>
+</div>
+<!-- Microblog Post -->
+
+
 <!-- Social Outline View/Subscribe -->
 <div id="mdlSocialOutlineView" class="modal hide fade">
   <div class="modal-header">
@@ -71,6 +163,9 @@ data-getsopml="<?echo $getsopmlcgi?>"
 
 
 <!-- End-of-body content -->
+<script>
+<?include "$confroot/$scripts/upload.js"?>
+</script>
 <script>
 <?include "$confroot/$scripts/global-postload.js"?>
 </script>

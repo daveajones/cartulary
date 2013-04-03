@@ -134,4 +134,15 @@ $(document).ready( function () {
                         return false;
         });
 
+
+        //Keyboard shortcuts
+        key('ctrl+m', function() {           //----- Spawn a new microblog post modal
+		<?if( $section == "Microblog" ) {?>
+		alert("Stop it. That'd be silly.");
+		<?}else{?>
+                newMicroblogPostWindow();
+		<?}?>
+                return false;
+        });
+
 });

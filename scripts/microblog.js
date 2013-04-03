@@ -55,11 +55,6 @@ function getShortTitle(contentString) {
     return(shortContent);
 }
 
-//Unhide the enclosure section
-function showEnclosures() {
-	$('#divEnclosures').show();
-}
-
 $(document).ready( function() {
 		var linkExtraction = true;
 
@@ -89,29 +84,6 @@ $(document).ready( function() {
                 	}
                 	return false;
         	});
-
-		$('#fileMobile').change(function() {
-			$('#divEnclosures').show();
-			$('#divEnclosures #spnQueueText').text('File selected: ' + $('#fileMobile').val());
-		});
-
-		//The enclosure attachment button click handler
-		$('#btnAttachFile').bind('click', function() {
-			$('#divUpload').show();
-		});
-
-		//Start an enclosure upload
-                <?if( $device != "android" ) {?>
-		$('#aUploadTrigger').bind('click', function() {
-			$('#divEnclosures').show();
-			$('#file_upload').uploadifive('upload');
-		});
-                <?}?>
-
-		//Attach removers to extra elements
-		$('.aRemoveListItem').click(function() {
-			$(this).parent('li').remove();
-		});
 
 		//Set up the twitter check-box, img interaction
 	        $('#imgTweet').bind('click', function() {

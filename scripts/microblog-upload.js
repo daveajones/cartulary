@@ -9,7 +9,7 @@ $(function() {
         'uploadScript' : '/cgi/in/upload',
         'simUploadLimit'   : 1,
         'formData'     : {
-            'datestamp'  : '<?echo $datestamp?>'
+            'datestamp'  : gDatestamp
 	},
 	'onSelect'     : function(queue) {
             $('#divEnclosures').show();

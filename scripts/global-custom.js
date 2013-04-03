@@ -1,5 +1,7 @@
 var systemUrl = '<?echo $system_fqdn?>';
 var platform = '<?echo $platform?>';
+var gDatestamp = '<?echo date('YmdHis')?>';
+
 var msgtimer;
 
 //Convert links found in twitter messages into the target link of the message
@@ -393,3 +395,136 @@ function modalFullHeight(el, loading) {
 	<?}?>			
 	return true;
 }
+
+
+//Spawn a microblog post box
+function newMicroblogPostWindow(riveritem) {
+        var modal = '#mdlMicroblogPost';
+	var riveritem  = (typeof riveritem === "undefined") ? false : riveritem;
+
+	//Set the description
+	$(modal + ' .bpdescription textarea').val("");
+	if( riveritem != false ) {
+		$(modal + ' .bpdescription textarea').val( $(riveritem + ' .header').text().trim() );
+	}
+
+	//Zero out the title
+	$(modal + ' .bptitle input').val("");
+
+	//Set the link
+	$(modal + ' .bplink input').val("");
+	if( riveritem != false ) {
+		$(modal + ' .bplink input').val( $(riveritem + ' .header a.articlelink').attr('href').trim() );
+	}
+
+	//Set the short link
+	$(modal + ' .bpshortlink input').val("");
+
+	//Set the source
+	$(modal + ' .bpsourceurl').val("");
+	$(modal + ' .bpsourcetitle').val("");
+	if( riveritem != false ) {
+		$(modal + ' .bpsourceurl').val( $(riveritem + ' .footer span.source a').attr('href').trim() );
+		$(modal + ' .bpsourcetitle').val( $(riveritem + ' .footer span.source a').text().trim() );
+	}
+
+	//Set the origin
+	$(modal + ' .bporigin input').val("");
+	if( riveritem != false ) {
+		$(modal + ' .bporigin input').val( $(riveritem + ' .footer span.origin').text().trim() );
+	}
+
+	//Set external enclosures
+        $(modal + ' .bpextenc').hide();
+	$(modal + ' .bpextenc ul').empty();
+	if( riveritem != false ) {
+	var encount = 0;
+	$(riveritem + ' .enclosureview .encobj').each(function() {
+		$(modal + ' .bpextenc ul').append('<li></li>');
+		$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<a href="#" class="delete"><img class="icon-remove-small" src="/images/blank.gif" /></a>');
+		if( $(this).hasClass('enclosurepic') ) {
+			$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure" src="' + $(this).attr("src") + '" />');
+		}
+		if( $(this).hasClass('encaudio') ) {
+			$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure icon-audio-enclosure" src="/images/blank.gif" alt="" />');
+		}
+		if( $(this).hasClass('encvideo') ) {
+			$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure icon-video-enclosure" src="/images/blank.gif" alt="" />');
+		}
+		if( $(this).hasClass('enciframe') ) {
+			$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure icon-iframe-enclosure" src="/images/blank.gif" alt="" />');
+		}
+		$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<input type="text" name="extenclosure[' + encount + '][url]" value="' + $(this).attr("src") + '" />');
+		$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<input type="text" class="hide" name="extenclosure[' + encount + '][type]" value="' + $(this).attr("data-type") + '" />');
+		$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<input type="text" class="hide" name="extenclosure[' + encount + '][length]" value="' + $(this).attr("data-length") + '" />');
+		$(modal + ' .bpextenc ul li:eq(' + encount + ') a.delete').click(function() {
+			$(this).parent().remove();
+			if( $(modal + ' .bpextenc ul li').length == 0 ) {  $(modal + ' .bpextenc').hide();  }
+			return false;
+		});
+
+		encount++;
+	});
+	if( encount > 0 ) {  $(modal + ' .bpextenc').show();  }
+	}
+
+	//Clear the upload queue
+        $(modal + ' #divEnclosures').hide();
+        $(modal + ' #divUpload').hide();
+        <?if($device=="android") {?>
+        $(modal + ' #fileMobile').replaceWith($(modal + ' #fileMobile').clone(true));
+        <?} else {?>
+        $(modal + ' #file_upload').uploadifive('clearQueue');
+        <?}?>
+
+
+	//Show the modal	
+        $(modal).modal('show');
+	modalFullHeight(modal, false);
+
+        //Ajaxify the form
+        $(modal + ' .mbpostform').ajaxForm({
+                <?if($device=="android") {?>dataType:       'html',<?
+                } else {?>dataType:       'json',<?}?>
+                cache:          false,
+                clearForm:      true,
+                resetForm:      true,
+                timeout:        60000,
+                beforeSubmit:   function() {
+                        $(modal + ' .spinner').show();
+                        $(modal + ' input,textarea,button').attr("disabled", true);
+                },
+                success:        function(data) {
+                        if(data.status == "false") {
+                                showMessage( data.description, data.status, 5 );
+                        } else {
+                                showMessage( "Post Successful!", data.status, 5 );
+                        }
+                        $(modal + ' .spinner').hide();
+                        $(modal + ' input,textarea,button').attr("disabled", false);
+                        $(modal).modal('hide');
+			reloadMicroblogWidget();
+                },
+                error:          function(x, t, m) {
+                        showMessage( "Error: " + m + "(" + t + ")", false, 60 );
+                        $(modal + ' input,textarea,button').attr("disabled", false);
+                }
+        });
+        $(modal + ' .mbsubmit').click(function() {
+                $(modal + ' .mbpostform').submit();
+                return false;
+        });	
+
+	//Set the twitter toggle
+	$(modal + ' .tweeticon').removeClass('icon-twitter').addClass('icon-notwitter');
+	$(modal + ' .tweetcheck').prop('checked', false);
+        $(modal + ' .tweeticon').bind('click', function() {
+                $(modal + ' .tweetcheck').prop('checked', !$(modal + ' .tweetcheck').prop('checked'));
+                $(modal + ' .tweeticon').toggleClass('icon-twitter');
+                $(modal + ' .tweeticon').toggleClass('icon-notwitter');
+        });
+
+	
+	return false;
+}
+

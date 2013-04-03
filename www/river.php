@@ -96,7 +96,8 @@
 <?if($platform != "mobile" && $platform != "tablet") {?>
 <div id="stream-sidebar-right">
         <div id="divMyFeeds" class="pull-right" style="float:right;">
-	        <h3><u>My Feeds</u></h3>
+	        <h3>My Feeds</h3>
+		<br/>
 	        <ul id="ulMyStuff">
         		<li><a href="<?echo $s3sopml?>">My Social Outline</a></li>
 	                <li><a href="<?echo $s3blogfeed?>"><?echo get_microblog_title($uid)?></a></li>
@@ -124,7 +125,8 @@
 	</div>
 
 	<div id="divBuddies" class="pull-right" style="float:right;">
-  	<h3><u>Following</u></h3>
+  	<h3>Following</h3>
+	<br/>
   	<?
     	$outlines = get_outlines($uid, $max);
     	foreach($outlines as $ou) {

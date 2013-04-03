@@ -79,41 +79,11 @@
 
 <?if($platform != "mobile") {?>
 <div id="stream-sidebar-left">
-  <div id="divMe" style="float:left;">
-    <h3><u>Quick Blog</u></h3>
-    <div id="divSaySomething">
-      <form id="frmSaySomething" name="blogpost" action="/cgi/in/blogpost" method="POST"<?if($device=="android") {?> enctype="multipart/form-data"<?}?>>
-      <fieldset>
-      <div class="control-group">
-
-      <!-- Universal post text box. -->
-      <div id="divSaySomethingText">
-        <textarea name="content" id="txtSaySomething" placeholder="Lay your thing down here..." class="smallSaySomething"></textarea>
-      </div>
-
-      <!-- The submit button box. -->
-      <div id="divSaySomethingSubmit">
-        <!-- Granular prefs this post. -->
-	<?if( twitter_is_enabled($uid) ) {?>
-	<div class="quickTweet">
-          <input style="display:none;" id="chkTwitter" name="tweet" type="checkbox" />
-          <span id="spnTwitter" >
-            <img id="imgTwitter" class="icon-notwitter" title="Post to Twitter also?" src="/images/blank.gif" alt="" />
-            <span id="spnTweetWarning">Tweet will be truncated...</span>
-          </span>
-	</div>
-        <?}?>
-
-        <input id="btnSaySomething" name="btnsaysomething" class="btn-primary" value="Post It!" type="submit" />
-        <img id="imgSpinner" src="/images/spinner.gif" alt="" />
-      </div>
-    </div>
-    </fieldset>
-    </form>
-  </div>
-
+<div id="divMe" style="float:left;">
+  <h3>My Posts</h3>
+  <br/>
   <div id="divMicroblogWidget"><script id="scrMicroblogWidget" src="<?echo $s3widget?>?ts=<?echo time()?>"></script></div>
-  </div>
+</div>
 </div>
 <?}?>
 

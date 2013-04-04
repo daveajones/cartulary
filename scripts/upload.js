@@ -35,7 +35,7 @@ $(function() {
 	              $(this).parent().append('<a href="' + jdata.url + '" title="Click to embiggen."><img class="imgenclosure" src="' + jdata.url + '" alt="" /></a>');
 		      $(this).parent().children('span.fileinfo').hide();
                 }
-                $(this).html('Link: <a href="' + jdata.url + '" title="Click to embiggen.">' + jdata.url + '</a>');
+                $(this).html('<a href="' + jdata.url + '" title="Click to embiggen.">Link to File.</a>');
                 $(this).parent().append('<input type="hidden" class="postenclosure" data-filename="' + file.name + '" name="enclosure[]" />');
                 $(this).parent().children('input').val(data);
 		

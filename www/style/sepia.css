@@ -146,6 +146,8 @@ a {  color:#059;  }
   float:left;
 }
 #mdlSocialOutlineView .modal-footer {
+  background-color: #FBF0D9;
+  color: #5F4B32;
   clear:both;
   max-height:20px;
 }

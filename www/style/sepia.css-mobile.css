@@ -135,6 +135,8 @@ body {  background:#4d4d4d;  }
 #mdlSocialOutlineView .modal-footer {
   clear:both;
   max-height:20px;
+  background-color: #FBF0D9;
+  color: #5F4B32;
 }
 #mdlSocialOutlineView .soserver {
   float:left;

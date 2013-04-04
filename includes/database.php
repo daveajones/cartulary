@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 13;
+$cg_database_version = 14;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -132,6 +132,23 @@ $cg_database_updates[12][] = <<<CGDB0027
  INSERT INTO `dbversion` ( `version` ) VALUES ( '13' )
 CGDB0027;
 //----------------------------------------------------------------------------------------------------------------
+
+//Version 13 to 14 -------------------------------------------------------------------------------------------------
+$cg_database_updates[13][] = <<<CGDB0028
+ ALTER TABLE `prefs` CHANGE `publicdefault` `publicdefault` TINYINT( 4 ) NOT NULL DEFAULT '1' COMMENT 'Should articles be public by default?',
+ CHANGE `maxlist` `maxlist` INT( 11 ) NOT NULL DEFAULT '20' COMMENT 'Max number of entries to show by default.',
+ CHANGE `riverhours` `riverhours` INT( 11 ) NOT NULL DEFAULT '30' COMMENT 'Range of hours to display in river',
+ CHANGE `maxriversize` `maxriversize` INT( 11 ) NOT NULL DEFAULT '125' COMMENT 'Maximum number of river items.',
+ CHANGE `maxriversizemobile` `maxriversizemobile` INT( 11 ) NOT NULL DEFAULT '75' COMMENT 'Maximum number of river items on mobile.',
+ CHANGE `cartinriver` `cartinriver` TINYINT( 4 ) NOT NULL DEFAULT '1' COMMENT 'Show cartulized articles in a modal.',
+ CHANGE `collapseriver` `collapseriver` TINYINT( 4 ) NOT NULL DEFAULT '1' COMMENT 'Show duplicate origin items in a threaded view?'
+CGDB0028;
+$cg_database_updates[13][] = <<<CGDB0029
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '14' )
+CGDB0029;
+//----------------------------------------------------------------------------------------------------------------
+
+
 ?>
 
 

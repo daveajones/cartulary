@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/script/jquery-ui-1.8.21.custom.min.js"></script>
 <script type="text/javascript" src="/script/jquery.tmpl.min.js"></script>
 <script type="text/javascript" src="/script/jquery.masonry.min.js"></script>
+<script type="text/javascript" src="/script/jquery.debouncedresize.js"></script>
 <!-- Bootstrap -->
 <script type="text/javascript" src="/script/bootstrap.min.js"></script>
 <!-- Other -->

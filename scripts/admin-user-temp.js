@@ -24,7 +24,7 @@
         <img class="minitar" src="${user.avatarurl}" alt="" />
       {{/if}}
       {{if user.sopml != false}}
-        <a href="${user.sopmlurl}">${user.name}</a>
+        <a title="Last Login: ${prettyDate(user.lastlogin * 1000)}" href="${user.sopmlurl}">${user.name}</a>
       {{else}}
         ${user.name}
       {{/if}}

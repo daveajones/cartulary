@@ -301,34 +301,6 @@ Date.prototype.format = function (mask, utc) {
 };
 
 
-// debouncing function from John Hann
-// http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
-(function($,sr){
-  var debounce = function (func, threshold, execAsap) {
-      var timeout;
-
-      return function debounced () {
-          var obj = this, args = arguments;
-          function delayed () {
-              if (!execAsap)
-                  func.apply(obj, args);
-              timeout = null;
-          };
-
-          if (timeout)
-              clearTimeout(timeout);
-          else if (execAsap)
-              func.apply(obj, args);
-
-          timeout = setTimeout(delayed, threshold || 100);
-      };
-  }
-  // smartresize 
-  jQuery.fn[sr] = function(fn){  return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr); };
-
-})(jQuery,'smartresize');
-
-
 //Get padding size for an element
 function getVerticalPadding(el) {
 	var pt = parseInt($(el).css("padding-top").replace("px", ""));
@@ -375,7 +347,7 @@ function modalFullHeight(el, loading) {
 	}
 
 	//Size the modal elements according to the current viewport
-	var exPad = getVerticalPadding(el) + getVerticalPadding(el + ' .modal-body') + getVerticalPadding(el + ' .modal-body');
+	var exPad = getVerticalPadding(el) + getVerticalPadding(el + ' .modal-body') + getVerticalPadding(el + ' .modal-footer')  + getVerticalPadding(el + ' .modal-header');
         $(el).css('max-height', winH - exPad + "px");  
         $(el).css('height', winH - exPad + "px");  
 
@@ -387,11 +359,14 @@ function modalFullHeight(el, loading) {
         $(el + ' .modal-body').css('max-height', (modH - hfSize - exPad - 5) + "px" );
         $(el + ' .modal-body').css('height', (modH - hfSize - exPad - 5) + "px" );    
 
+	alert("body height: [" + (modH - hfSize - exPad - 5) + "px]");
 
-	$(window).smartresize(function(){
+	//When the window resizes, we should resize the modal
+	$(window).off('debouncedresize');
+	$(window).on('debouncedresize', function( event ){
 		modalFullHeight(el, false);
 	});
-
+	
 	<?}?>			
 	return true;
 }

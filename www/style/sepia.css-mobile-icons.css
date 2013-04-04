@@ -36,6 +36,10 @@
 .icon-delete { background:url('/images/glyph/glyphicons_197_remove.png') 0 0 no-repeat; width:30px; height:30px; border:0; }
 .icon-reset { display:inline-block; background:url('/images/glyph/glyphicons_081_refresh.png') 0 0 no-repeat; width: 30px; height:30px; border:none;  outline:none; }
 .icon-collapse-up { display:inline-block; background:url('/images/glyph/glyphicons_halflings_159_collapse-top@2x.png') 0 0 no-repeat; width: 40px; height:40px; border:none;  outline:none; }
+.icon-audio-enclosure { background:url('/images/glyph/glyphicons_017_music.png') 0 3px no-repeat; width:30px; height:30px; border:0; }
+.icon-video-enclosure { background:url('/images/glyph/glyphicons_008_film.png') 0 3px no-repeat; width:30px; height:30px; border:0; }
+.icon-iframe-enclosure { background:url('/images/glyph/glyphicons_340_globe.png') 0 3px no-repeat; width:30px; height:30px; border:0; }
+.icon-balloon { background:url('/images/glyph/glyphicons_309_comments.png') 0 3px no-repeat; width:30px; height:30px; border:0; }
 .btnFeedSticky { display:inline-block; background:url('/images/glyph/glyphicons_halflings_083_circle_ok.png') 0 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .btnFeedNotSticky { display:inline-block; background:url('/images/glyph/glyphicons_halflings_087_ok.png') 0 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .btnFeedHidden { display:inline-block; background:url('/images/glyph/glyphicons_halflings_105_eye_close.png') 0 4px no-repeat; width:20px; height:20px; border:none; outline:none; }

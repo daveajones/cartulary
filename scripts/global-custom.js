@@ -326,6 +326,8 @@ function modalFullHeight(el, loading) {
         var winW = $(window).width();  
 	var winScLeft = $(window).scrollLeft();
 
+	$(el).show();
+
 	//Set left position
         $(el).css("left", ( (winW - $(el).width() ) / 2 ) + winScLeft + "px");
 
@@ -347,7 +349,7 @@ function modalFullHeight(el, loading) {
 	}
 
 	//Size the modal elements according to the current viewport
-	var exPad = getVerticalPadding(el) + getVerticalPadding(el + ' .modal-body') + getVerticalPadding(el + ' .modal-footer')  + getVerticalPadding(el + ' .modal-header');
+	var exPad = getVerticalPadding(el) + getVerticalPadding(el + ' .modal-body') + getVerticalPadding(el + ' .modal-header');
         $(el).css('max-height', winH - exPad + "px");  
         $(el).css('height', winH - exPad + "px");  
 
@@ -380,6 +382,7 @@ function modalFullHeight(el, loading) {
 function newMicroblogPostWindow(riveritem) {
         var modal = '#mdlMicroblogPost';
 	var riveritem  = (typeof riveritem === "undefined") ? false : riveritem;
+	var compact = true;
 
 	//Set the description
 	$(modal + ' .bpdescription textarea').val("");
@@ -444,7 +447,7 @@ function newMicroblogPostWindow(riveritem) {
 
 		encount++;
 	});
-	if( encount > 0 ) {  $(modal + ' .bpextenc').show();  }
+	if( encount > 0 ) {  compact = false; $(modal + ' .bpextenc').show();  }
 	}
 
 	//Clear the upload queue
@@ -459,7 +462,7 @@ function newMicroblogPostWindow(riveritem) {
 
 	//Show the modal	
         $(modal).modal('show');
-	modalFullHeight(modal, false);
+        modalFullHeight(modal, compact);
 
         //Ajaxify the form
         $(modal + ' .mbpostform').ajaxForm({

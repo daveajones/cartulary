@@ -79,7 +79,7 @@ a {  color:#059;  }
   background-color: #FBF0D9;
   color: #5F4B32;
   max-height:90%;
-  padding: 15px;
+  padding:15px;
 }
 #mdlShowArticle .modal-header {
   border-bottom:solid #ccc 1px;
@@ -111,6 +111,7 @@ a {  color:#059;  }
   background-color: #FBF0D9;
   border-top:solid #ccc 1px;
   max-height:20px;
+  height:20px;
 }
 #mdlShowArticle .modal-body .arbody img {
   float:left;
@@ -165,10 +166,10 @@ a {  color:#059;  }
   top:20px;
   right:0;
   left:0;
-  margin: 0;
+  margin:0;
   width:700px;
   max-height:90%;
-  padding: 15px;
+  padding:15px;
   background-color: #FBF0D9;
   color: #5F4B32;
 }
@@ -178,7 +179,7 @@ a {  color:#059;  }
 #mdlMicroblogPost .modal-body .bpdescription textarea {
   font-size:140%;
   line-height:150%;
-  width:660px;
+  width:630px;
   height:160px;
 }
 #mdlMicroblogPost .modal-body .bptitle input,
@@ -285,6 +286,7 @@ a {  color:#059;  }
 }
 #mdlMicroblogPost .modal-footer {
   clear:both;
+  height:20px;
   max-height:20px;
   background-color: #FBF0D9;
   color: #5F4B32;

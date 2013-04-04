@@ -83,6 +83,7 @@ $(document).ready( function() {
 		<?if( $section != "Microblog" ) {?>
 		$('body').on('dragenter', function() {
 			if( $('#mdlMicroblogPost').is(':visible') ) {
+				modalFullHeight('#mdlMicroblogPost', false);
 				showEnclosures();
 			}
 		});

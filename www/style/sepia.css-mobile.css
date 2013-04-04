@@ -165,7 +165,6 @@ body {  background:#4d4d4d;  }
 #mdlMicroblogPost .modal-body .bpdescription textarea {
   font-size:140%;
   line-height:150%;
-  width:660px;
   height:160px;
 }
 #mdlMicroblogPost .modal-body .bptitle input,

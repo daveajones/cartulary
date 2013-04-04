@@ -359,14 +359,18 @@ function modalFullHeight(el, loading) {
         $(el + ' .modal-body').css('max-height', (modH - hfSize - exPad - 5) + "px" );
         $(el + ' .modal-body').css('height', (modH - hfSize - exPad - 5) + "px" );    
 
-	alert("body height: [" + (modH - hfSize - exPad - 5) + "px]");
-
 	//When the window resizes, we should resize the modal
 	$(window).off('debouncedresize');
 	$(window).on('debouncedresize', function( event ){
 		modalFullHeight(el, false);
 	});
-	
+
+	//When modal closes we should un-hook from the window resize event
+	$(el).on('hidden', function () {
+		$(window).off('debouncedresize');	    		
+	});
+
+
 	<?}?>			
 	return true;
 }
@@ -499,7 +503,7 @@ function newMicroblogPostWindow(riveritem) {
                 $(modal + ' .tweeticon').toggleClass('icon-notwitter');
         });
 
-	
+
 	return false;
 }
 

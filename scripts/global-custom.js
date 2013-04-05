@@ -508,6 +508,9 @@ function newMicroblogPostWindow(riveritem) {
                 $(modal + ' .tweeticon').toggleClass('icon-notwitter');
         });
 
+	//Set focus to the textarea
+	$(modal + ' .bpdescription textarea').focus();
+	
 
 	return false;
 }

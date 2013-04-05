@@ -500,6 +500,7 @@ function newMicroblogPostWindow(riveritem) {
 	//Set the twitter toggle
 	$(modal + ' .tweeticon').removeClass('icon-twitter').addClass('icon-notwitter');
 	$(modal + ' .tweetcheck').prop('checked', false);
+        $(modal + ' .tweeticon').unbind('click');
         $(modal + ' .tweeticon').bind('click', function() {
                 $(modal + ' .tweetcheck').prop('checked', !$(modal + ' .tweetcheck').prop('checked'));
                 $(modal + ' .tweeticon').toggleClass('icon-twitter');

@@ -123,7 +123,7 @@ $(document).ready( function() {
 		return false;
         });
 	key('m', function() {		//----- Microblog the currently targeted item
-		$("#mdlShowArticle").hide();
+		$("#mdlShowArticle").modal('hide');
 		$("#stream-items div.article.activeItem .rtgo").trigger('click');
 		return false;
         });

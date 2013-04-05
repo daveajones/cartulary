@@ -492,6 +492,7 @@ function newMicroblogPostWindow(riveritem) {
                         $(modal + ' input,textarea,button').attr("disabled", false);
                 }
         });
+	$(modal + ' .mbsubmit').unbind('click');
         $(modal + ' .mbsubmit').click(function() {
                 $(modal + ' .mbpostform').submit();
                 return false;

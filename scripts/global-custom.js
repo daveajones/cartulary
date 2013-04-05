@@ -492,7 +492,6 @@ function newMicroblogPostWindow(riveritem) {
                         $(modal + ' input,textarea,button').attr("disabled", false);
                 }
         });
-	$(modal + ' .mbsubmit').unbind('click');
         $(modal + ' .mbsubmit').click(function() {
                 $(modal + ' .mbpostform').submit();
                 return false;
@@ -501,7 +500,6 @@ function newMicroblogPostWindow(riveritem) {
 	//Set the twitter toggle
 	$(modal + ' .tweeticon').removeClass('icon-twitter').addClass('icon-notwitter');
 	$(modal + ' .tweetcheck').prop('checked', false);
-        $(modal + ' .tweeticon').unbind('click');
         $(modal + ' .tweeticon').bind('click', function() {
                 $(modal + ' .tweetcheck').prop('checked', !$(modal + ' .tweetcheck').prop('checked'));
                 $(modal + ' .tweeticon').toggleClass('icon-twitter');
@@ -514,7 +512,6 @@ function newMicroblogPostWindow(riveritem) {
 
 	//Track text length
         $(modal + ' .mbcharcount').text( $(modal + ' .bpdescription textarea').val().length );	
-	$(modal + ' .bpdescription textarea').unbind('keyup');
 	$(modal + ' .bpdescription textarea').bind('keyup', function() {
 		var cc = $(modal + ' .bpdescription textarea').val().length;
 		$(modal + ' .mbcharcount').text( cc );
@@ -525,6 +522,14 @@ function newMicroblogPostWindow(riveritem) {
 			$(modal + ' .mbcharcount').removeClass('msgwarn');
 		}
 	});
+
+	//When modal closes we should clean up
+	$(modal).on('hidden', function () {
+		$(modal + ' .mbsubmit').unbind('click');
+	        $(modal + ' .tweeticon').unbind('click');
+		$(modal + ' .bpdescription textarea').unbind('keyup');
+	});
+
 
 
 	return false;

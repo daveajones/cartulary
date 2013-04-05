@@ -297,60 +297,13 @@ River.methods = (function () {
 	function _bindCartLinks() {
         	$('.cartlink').unbind('click');
         	$('.cartlink').click(function() {
+			var modal = '#mdlShowArticle';
                 	var aobj = $(this);
-                	var href = aobj.attr("data-href");
                 	var id = aobj.attr("data-id");
 	
-                	$('#mdlShowArticle .arfooter').hide();
-                	$('#mdlShowArticle .arfooter .rt').click(function() {
-	                	$('#mdlShowArticle').modal('hide');
-                        	$('#stream-items .article#' + id + ' .rtgo').trigger('click');
-                        	return false;
-                	});
+			showArticleWindow('#stream-items .article#' + id);
 			focusThisArticle(id);
-	
-                	$('#mdlShowArticle .artitle').empty();
-                	$('#mdlShowArticle .arbody').empty();
-                	$('#mdlShowArticle .arfooter .opml').attr('href', "#");
-                	$('#mdlShowArticle .arfooter .print').attr('href', "#");
-                	$('#mdlShowArticle .arfooter .link').attr('href', "#");
-                	$('#mdlShowArticle .spinner').show();
-                      	$('#mdlShowArticle .modal-header').hide();
-                      	$('#mdlShowArticle .modal-footer').hide();
-
-			modalFullHeight('#mdlShowArticle', true);
-                	$('#mdlShowArticle').modal('show');
-                	$.ajax({
-                        	url:      href + '&json=true',
-                        	type:     "GET",
-                        	dataType: 'json',
-                        	timeout:  30000,
-                        	success:  function(data) {
-			                      	$('#mdlShowArticle .modal-header').show();
-                      				$('#mdlShowArticle .modal-footer').show();
-                                        	$('#mdlShowArticle .spinner').hide();
-                                        	if(data.status == "false") {
-                                                	$('#mdlShowArticle .artitle').append(data.article.title);
-                                                	$('#mdlShowArticle .arbody').append(data.article.body);
-                                        	} else {
-							modalFullHeight('#mdlShowArticle', false);
-                                                	$('#mdlShowArticle .artitle').append(data.article.title);
-                                                	$('#mdlShowArticle .arbody').append(data.article.body);
-                                                	$('#mdlShowArticle .arfooter .opml').attr('href', "<?echo $showarticlepage?>-opml?aid=" + data.article.id);
-                                                	$('#mdlShowArticle .arfooter .print').attr('href', "<?echo $showarticlepage?>-print?aid=" + data.article.id);
-                                                	$('#mdlShowArticle .arfooter .link').attr('href', data.article.url);
-                                                	$('#mdlShowArticle .arfooter').show();
-                                        	}
-                                  	},
-                        	error:  function(x, t, m) {
-			                      	$('#mdlShowArticle .modal-header').show();
-                      				$('#mdlShowArticle .modal-footer').show();
-                                        	$('#mdlShowArticle .spinner').hide();
-                                        	$('#mdlShowArticle .artitle').append('');
-                                        	$('#mdlShowArticle .arbody').append('<p>Error communicating with server. Connection problem?</p>');
-                        	}
-                	});
-                	return false;
+			return false;
         	});
         	return true;
 	}

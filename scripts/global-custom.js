@@ -535,3 +535,68 @@ function newMicroblogPostWindow(riveritem) {
 	return false;
 }
 
+
+//Open a modal with an article displayed in it
+function showArticleWindow(riveritem) {
+        var modal = '#mdlShowArticle';
+	var href = $(riveritem + ' .footer a.cartlink').attr('data-href').trim();
+	var compact = true;
+
+        $(modal + ' .arfooter').hide();
+        $(modal + ' .arfooter .rt').click(function() {
+	        $(modal).modal('hide');
+                $(riveritem + ' .rtgo').trigger('click');
+                return false;
+        });
+
+        $(modal + ' .artitle').empty();
+        $(modal + ' .arbody').empty();
+        $(modal + ' .arfooter .opml').attr('href', "#");
+        $(modal + ' .arfooter .print').attr('href', "#");
+        $(modal + ' .arfooter .link').attr('href', "#");
+        $(modal + ' .spinner').show();
+        $(modal + ' .modal-header').hide();
+        $(modal + ' .modal-footer').hide();
+
+	modalFullHeight(modal, true);
+        $(modal).modal('show');
+        $.ajax({
+                url:      href + '&json=true',
+                type:     "GET",
+                dataType: 'json',
+                timeout:  30000,
+                success:  function(data) {
+			        $(modal + ' .modal-header').show();
+                      		$(modal + ' .modal-footer').show();
+                                $(modal + ' .spinner').hide();
+                                if(data.status == "false") {
+                                        $(modal + ' .artitle').append(data.article.title);
+                                        $(modal + ' .arbody').append(data.article.body);
+                                } else {
+					modalFullHeight(modal, false);
+                                        $(modal + ' .artitle').append(data.article.title);
+                                        $(modal + ' .arbody').append(data.article.body);
+                                        $(modal + ' .arfooter .opml').attr('href', "<?echo $showarticlepage?>-opml?aid=" + data.article.id);
+                                        $(modal + ' .arfooter .print').attr('href', "<?echo $showarticlepage?>-print?aid=" + data.article.id);
+                                        $(modal + ' .arfooter .link').attr('href', data.article.url);
+                                        $(modal + ' .arfooter').show();
+                                }
+                        },
+                error:  function(x, t, m) {
+			        $(modal + ' .modal-header').show();
+                      		$(modal + ' .modal-footer').show();
+                                $(modal + ' .spinner').hide();
+                                $(modal + ' .artitle').append('');
+                                $(modal + ' .arbody').append('<p>Error communicating with server. Connection problem?</p>');
+                }
+        });
+
+	//When modal closes we should clean up
+	$(modal).on('hidden', function () {
+	        $(modal + ' .arfooter .rt').unbind('click');
+	});
+
+
+
+        return false;
+}

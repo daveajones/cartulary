@@ -506,11 +506,26 @@ function newMicroblogPostWindow(riveritem) {
                 $(modal + ' .tweetcheck').prop('checked', !$(modal + ' .tweetcheck').prop('checked'));
                 $(modal + ' .tweeticon').toggleClass('icon-twitter');
                 $(modal + ' .tweeticon').toggleClass('icon-notwitter');
+		$(modal + ' .bpdescription textarea').trigger('keyup');
         });
 
 	//Set focus to the textarea
 	$(modal + ' .bpdescription textarea').focus();
-	
+
+	//Track text length
+        $(modal + ' .mbcharcount').text( $(modal + ' .bpdescription textarea').val().length );	
+	$(modal + ' .bpdescription textarea').unbind('keyup');
+	$(modal + ' .bpdescription textarea').bind('keyup', function() {
+		var cc = $(modal + ' .bpdescription textarea').val().length;
+		$(modal + ' .mbcharcount').text( cc );
+		if( $(modal + ' .tweeticon').hasClass('icon-twitter') && cc > 138 ) {
+			$(modal + ' .mbcharcount').addClass('msgwarn');
+			$(modal + ' .mbcharcount').text( cc + ' - Twitter will truncate this message.' );
+		} else {
+			$(modal + ' .mbcharcount').removeClass('msgwarn');
+		}
+	});
+
 
 	return false;
 }

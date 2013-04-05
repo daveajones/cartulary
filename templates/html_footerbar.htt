@@ -98,6 +98,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
     </div>
   </div>
   <div class="modal-footer">
+    <span style="float:left;">Length: <span class="mbcharcount"></span></span>
     <?if( twitter_is_enabled($g_uid) ) {?>
     <span class="tweeters"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt="" /><span class="warntweet hide">Tweet will be truncated...</span></span>
     <?}?>

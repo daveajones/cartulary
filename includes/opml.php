@@ -1731,11 +1731,9 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
     $opml .= "
               <outline text=\"$catitle\" description=\"$catitle\" type=\"rss\" xmlUrl=\"$carturl\" sopml:disposition=\"pub\" sopml:contains=\"html\" />";
   }
-  if( $pubfeeds != FALSE ) {
-    foreach( $pubfeeds as $pubfeed ) {
-      $opml .= "
+  foreach( $pubfeeds as $pubfeed ) {
+    $opml .= "
               <outline text=\"".htmlspecialchars(trim(str_replace("\n", '', htmlentities($pubfeed['title']))))."\" type=\"rss\" description=\"\" xmlUrl=\"".htmlspecialchars($pubfeed['url'])."\" htmlUrl=\"".htmlspecialchars($pubfeed['link'])."\" sopml:disposition=\"pub\" sopml:contains=\"mixed\" />";
-    }
   }
   $opml .= "
           </outline>";

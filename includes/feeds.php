@@ -58,13 +58,13 @@ function feed_is_valid($content = NULL)
   libxml_clear_errors();
 
   //Look for rss nodes
-  foreach($x->channel as $entry) {
+  if( isset($x->channel) ) {
     loggit(1, "Found a channel node. This content looks like RSS.");
     return(TRUE);
   }
 
   //Look for atom nodes
-  foreach($x->entry as $entry) {
+  if( isset($x->entry) ) {
     loggit(1, "Found and entry node. This content looks like ATOM.");
     return(TRUE);
   }
@@ -93,15 +93,19 @@ function get_feed_title($content = NULL)
   libxml_clear_errors();
 
   //Look for a title node in the rss
+  if(isset($x->channel->title)) {
   foreach($x->channel->title as $entry) {
     loggit(1, "Found a title node: [$entry].");
     return((string)$entry);
   }
+  }
 
   //Look for atom nodes
+  if(isset($x->title)) {
   foreach($x->title as $entry) {
     loggit(1, "Found a title node: [$entry].");
     return((string)$entry);
+  }
   }
 
   //None of the tests passed so return FALSE
@@ -549,7 +553,7 @@ function get_pub_feeds($uid = NULL)
   $subcount = $sql->num_rows();
   if($subcount < 1) {
     loggit(1, "No pub feeds found for user: [$uid].");
-    return(FALSE);
+    return(array());
   }
 
   //Put stuff in an array and send back
@@ -3415,6 +3419,7 @@ function get_feed_items($fid = NULL, $max = NULL)
     return(-1);
   }
 
+/*
   //If a feed has over 100 errors or last new item was more than a month ago
   //we fall back to only scanning it once a day
   if( $feed['errors'] >= 100 ) {
@@ -3427,7 +3432,6 @@ function get_feed_items($fid = NULL, $max = NULL)
       loggit(1, "Doing once per day check on error-prone feed: [$url].");
     }
   }
-  /*
   if( (time() - $feed['lastupdate']) > (86400 * 28) ) {
     if( (time() - $feed['lastcheck']) < 86400 && !empty($feed['lastupdate']) ) {
       loggit(2, "Feed: [$url] hasn't updated in a month.  Skipping for 24 hours.");
@@ -3438,7 +3442,7 @@ function get_feed_items($fid = NULL, $max = NULL)
       loggit(3, "DEBUG: Doing once per day check on infrequently updated feed: [$url].");
     }
   }
-  */
+*/
 
   //Do we need to re-register?
   if( !empty($feed['rsscloudregurl']) && ((time() - $feed['rsscloudlastreg']) > 86400 || $feed['rsscloudlastreg'] == '') && $enable_rsscloud == 1 ) {
@@ -3648,7 +3652,7 @@ function get_feed_items($fid = NULL, $max = NULL)
 
 //_______________________________________________________________________________________
 //Retrieve a list of all the feeds in the database
-function get_all_feeds($max = NULL)
+function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
 {
   //Includes
   include get_cfg_var("cartulary_conf").'/includes/env.php';
@@ -3656,8 +3660,24 @@ function get_all_feeds($max = NULL)
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
+  //Get a month ago timestamp
+  $monthago = (time() - (28 * 86400));
+
   //Get all feeds with a low error count
-  $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed WHERE errors < 10 ORDER BY $table_newsfeed.lastcheck ASC";
+  $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed";
+
+  //Include high error feeds?
+  if( $witherrors == FALSE ) {
+    $sqltxt .= " WHERE errors < 10";
+  }
+
+  //Include old feeds?
+  if( $withold == FALSE ) {
+    $sqltxt .= " AND lastupdate > $monthago";
+  }
+
+  //Sort by last check time
+  $sqltxt .= " ORDER BY $table_newsfeed.lastcheck ASC";
 
   if($max != NULL) {
     $sqltxt .= " LIMIT $max";
@@ -3687,7 +3707,7 @@ function get_all_feeds($max = NULL)
 
   $sql->close() or print(mysql_error());
 
-  //loggit(1,"Returning: [$count] feeds in the system.");
+  loggit(1,"Returning: [$count] feeds in the system.");
   return($feeds);
 }
 
@@ -3733,7 +3753,56 @@ function get_error_feeds($max = NULL)
 
   $sql->close() or print(mysql_error());
 
-  //loggit(1,"Returning: [$count] feeds in the system.");
+  loggit(1,"Returning: [$count] high error feeds in the system.");
+  return($feeds);
+}
+
+
+//_______________________________________________________________________________________
+//Retrieve a list of all the feeds with lastupdate times older than a month
+function get_old_feeds($max = NULL)
+{
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Get a month ago timestamp
+  $monthago = (time() - (28 * 86400));
+
+  //Get feeds with an old update stamp
+  $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed WHERE lastupdate < $monthago AND errors < 10";
+
+  if($max != NULL) {
+    $sqltxt .= " LIMIT $max";
+  }
+
+  //loggit(1, "[$sqltxt]");
+  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+
+  //See if there were any feeds for this criteria
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(2,"There are no old feeds in the system.");
+    return(FALSE);
+  }
+
+  $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or print(mysql_error());
+
+  $feeds = array();
+  $count = 0;
+  while($sql->fetch()){
+    $feeds[$count] = array( 'id' => $fid, 'title' => $ftitle, 'url' => $furl, 'createdon' => $fcreatedon );
+    $count++;
+  }
+
+  $sql->close() or print(mysql_error());
+
+  loggit(1,"Returning: [$count] old feeds in the system.");
   return($feeds);
 }
 

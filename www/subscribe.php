@@ -164,9 +164,9 @@ foreach( $outlines as $ou ) {
       foreach($ou['feeds'] as $ofd) {
 	?><li data-id="<?echo $ofd?>" class="nooverflow" style="color:black;">
         <input type="checkbox" class="selector" />
-        <?if( $feeds[$ofd]['errors'] > 50 ) {?><img title="This feed has had more than 50 errors." class="icon-warning" src="/images/blank.gif" /><?}?>
-        <a href="<?echo (empty($feeds[$ofd]['link']) ? $feeds[$ofd]['url'] : $feeds[$ofd]['link'])?>">
-        <?echo (empty($feeds[$ofd]['title']) ? $feeds[$ofd]['url'] : $feeds[$ofd]['title'])?></a></li><?
+        <?if( @$feeds[$ofd]['errors'] > 50 ) {?><img title="This feed has had more than 50 errors." class="icon-warning" src="/images/blank.gif" /><?}?>
+        <a href="<?echo (@empty($feeds[$ofd]['link']) ? @$feeds[$ofd]['url'] : @$feeds[$ofd]['link'])?>">
+        <?echo (@empty($feeds[$ofd]['title']) ? @$feeds[$ofd]['url'] : @$feeds[$ofd]['title'])?></a></li><?
       }
       ?>
       </ul>

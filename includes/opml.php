@@ -1166,6 +1166,12 @@ function get_outline_items($id = NULL, $max = NULL)
     update_outline_link($id, $ocu);
   }
 
+  //Update the outline owner name
+  $oon= get_ownername_from_outline($content);
+  if($oon != FALSE) {
+    update_outline_ownername($id, $oon);
+  }
+
   //Parse out the outline items
 
   //Put all of the items in an array

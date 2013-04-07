@@ -81,7 +81,7 @@ foreach( $outlines as $ou ) {
     foreach($ou['feeds'] as $ofd) {
 	?><li data-id="<?echo $ofd?>">
         <?if( $feeds[$ofd]['errors'] > 50 ) {?><img title="This feed has had more than 50 errors." class="icon-warning" src="/images/blank.gif" /><?}?>
-        <a class="nooverflow feed-title" href="<?echo $feeds[$ofd]['url']?>"><?echo $feeds[$ofd]['title']?></a>
+        <a class="nooverflow feed-title" href="<?echo (empty($feeds[$ofd]['link']) ? $feeds[$ofd]['url'] : $feeds[$ofd]['link'])?>"><?echo (empty($feeds[$ofd]['title']) ? $feeds[$ofd]['url'] : $feeds[$ofd]['title'])?></a>
 	<span class="feed-properties">
 	  <button name="sticky" title="<?echo ($feeds[$ofd]['sticky'] == 0 ? "Make this feed's posts sticky." : "Un-sticky this feed's posts.")?>" type="button" class="<?echo ($feeds[$ofd]['sticky'] == 1 ? "btnFeedSticky" : "btnFeedNotSticky")?> stickybutton"></button>
           <button name="hidden" title="<?echo ($feeds[$ofd]['hidden'] == 0 ? "Hide this feed's posts." : "Un-hide this feed's posts.")?>" type="button" class="<?echo ($feeds[$ofd]['hidden'] == 1 ? "btnFeedHidden" : "btnFeedNotHidden")?> hiddenbutton"></button>

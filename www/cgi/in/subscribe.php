@@ -1,54 +1,14 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_cgi_init.php"?>
 <?
-//[!------------SECURITY-------------------------------!]
-
-// Includes
-include get_cfg_var("cartulary_conf").'/includes/env.php';
-include "$confroot/$includes/util.php";
-include "$confroot/$includes/auth.php";
-include "$confroot/$includes/feeds.php";
-include "$confroot/$includes/opml.php";
-
 // Json header
 header("Cache-control: no-cache, must-revalidate");
 if( !isset($_REQUEST['dig']) ) {
   header("Content-Type: application/json");
 }
-
-// Get the input
-//if ( isset($_POST['newpref']) ) { $newpref = $_POST['newpref']; } else { $newpref = ""; };
 $jsondata = array();
 $jsondata['fieldname'] = "";
 
-loggit(3, "DEBUG: ".print_r($_REQUEST['url'], TRUE));
-
-//Get the user id from the session id
-// Valid session?
-if(!is_logged_in()) {
-  loggit(2,"User attempted to delete an article without being logged in first.");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(0);
-}
-$uid = get_user_id_from_sid(is_logged_in());
-if(empty($uid) || ($uid == FALSE)) {
-  //Log it
-  loggit(2,"Couldn't retrieve a user id for this session: [$sid].");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(1);
-}
-
-//See if the user has activated their account yet
-if(!is_user_active($uid)) {
-  //Log it
-  loggit(2,"User tried to access a page without activating first: [$uid | $sid].");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(1);
-}
 
 //Check if this is a file upload
 if( isset($_FILES['fileopml']) && $_FILES['fileopml']['size'] > 0 ) {
@@ -178,12 +138,9 @@ if(is_outline($content)) {
 
     //Add each feed from the social outline and tie it to this outline
     $count = 0;
-    $getitems = TRUE;
     foreach($feeds as $feed) {
-      if($count > 5) {
-        $getitems = FALSE;
-      }
-      $fid = add_feed($feed, $uid, $getitems, $oid);
+      $fid = add_feed($feed, $uid, FALSE, $oid);
+      mark_feed_as_updated($fid);
       loggit(1, "Added feed: [$feed] from a social outline subscription.");
       $count++;
     }
@@ -219,7 +176,7 @@ if(is_outline($content)) {
     //Add this outline and link it to this user
     $oid = add_outline($url, $uid);
 
-    //Update the feed title
+    //Update the outline title
     $otitle = get_title_from_outline($content);
     if($otitle == FALSE) {
       $otitle = "Untitled Outline";
@@ -231,12 +188,9 @@ if(is_outline($content)) {
 
     //Add each feed from the reading list and tie it to this outline
     $count = 0;
-    $getitems = TRUE;
     foreach($feeds as $feed) {
-      if($count > 5) {
-        $getitems = FALSE;
-      }
-      $fid = add_feed($feed, $uid, $getitems, $oid);
+      $fid = add_feed($feed, $uid, FALSE, $oid);
+      mark_feed_as_updated($fid);
       loggit(1, "Added feed: [$feed] from a reading list subscription.");
       $count++;
     }
@@ -259,8 +213,23 @@ if(is_outline($content)) {
   //-------------------------------------------------------------------
 
   //It must be a plain old outline ----------------------------------------
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Not supporting plain OPML outlines yet.";
+  //
+  //Add this outline and link it to this user
+  $oid = add_outline($url, $uid, "opml");
+
+  //Update the outline title
+  $otitle = get_title_from_outline($content);
+  if($otitle == FALSE) {
+    $otitle = "Untitled Outline";
+  }
+  update_outline_title($oid, $otitle);
+
+  //Update the outline content
+  update_outline_content($oid, $content);
+
+
+  $jsondata['status'] = "true";
+  $jsondata['description'] = "Subscribed to $otitle.";
   echo json_encode($jsondata);
   exit(1);
   //-------------------------------------------------------------------
@@ -287,7 +256,8 @@ if( feed_is_linked_by_url($url, $uid) ) {
 }
 
 //Add the feed for this user
-$fid = add_feed($url, $uid, TRUE);
+$fid = add_feed($url, $uid, FALSE);
+mark_feed_as_updated($fid);
 loggit(1, "Added feed: [$url] to the database.");
 
 //Rebuild the users river

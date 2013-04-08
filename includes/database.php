@@ -153,8 +153,11 @@ $cg_database_updates[14][] = <<<CGDB0030
  ALTER TABLE `nfitems` ADD `media` TINYINT NOT NULL DEFAULT '0' COMMENT 'Does this item contain attached media?'
 CGDB0030;
 $cg_database_updates[14][] = <<<CGDB0031
- INSERT INTO `dbversion` ( `version` ) VALUES ( '15' )
+ UPDATE `nfitems` SET media = 1 WHERE OCTET_LENGTH( enclosure ) > 10
 CGDB0031;
+$cg_database_updates[14][] = <<<CGDB0032
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '15' )
+CGDB0032;
 //----------------------------------------------------------------------------------------------------------------
 
 

@@ -3928,7 +3928,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   }
 
   //Now that we have a good id, put the feed item into the database
-  $stmt = "INSERT INTO $table_nfitem (id,feedid,title,url,description,guid,timestamp,timeadded,enclosure,`purge`,sourceurl,sourcetitle,author,origin,media) VALUES (?,?,?,?,?,?,?,?,?,0,?,?,?,?)";
+  $stmt = "INSERT INTO $table_nfitem (id,feedid,title,url,description,guid,timestamp,timeadded,enclosure,`purge`,sourceurl,sourcetitle,author,origin,media) VALUES (?,?,?,?,?,?,?,?,?,0,?,?,?,?,?)";
   $sql=$dbh->prepare($stmt) or print(mysql_error());
   if($format == "atom") {
     //-----ATOM--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4019,7 +4019,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       $title = "";
     }
 
-    $sql->bind_param("sssssssssssss", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
+    $sql->bind_param("sssssssssssssd", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
   } else {
     //-----RSS----------------------------------------------------------------------------------------------------------------------------------------------------
     $linkurl = $item->link;
@@ -4170,7 +4170,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       }
     }
 
-    $sql->bind_param("sssssssssssss", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
+    $sql->bind_param("sssssssssssssd", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
   }
   $sql->execute() or loggit(3, $dbh->error);
   $sql->close() or print(mysql_error());
@@ -5735,7 +5735,7 @@ function get_feed_items_with_enclosures($uid = NULL, $max = NULL)
                     $table_nfitem.origin,
                     $table_nfitem.author
              FROM $table_nfitem
-             INNER JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
+             LEFT JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
              WHERE $table_nfcatalog.userid=?
              AND $table_nfitem.media = 1
              ORDER BY $table_nfitem.timeadded DESC";

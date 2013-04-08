@@ -4191,6 +4191,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   $sql->execute() or loggit(3, $dbh->error);
   $sql->close() or print(mysql_error());
 
+
   //Set the item properties per user
   $fusers = get_feed_subscribers($fid);
   if( $fusers != FALSE ) {
@@ -4211,7 +4212,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   }
 
   //Log and return
-  //loggit(1,"Put a new feed item: [$id] in for feed: [$fid].");
+  loggit(3,"Put a new feed item: [$id] in for feed: [$fid].");
   return($id);
 }
 
@@ -4965,6 +4966,7 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
                     $table_nfitem.timeadded,
                     $table_nfitem.enclosure,
                     $table_nfitem.description,
+                    $table_nfitem.guid,
                     $table_nfitem.sourceurl,
                     $table_nfitem.sourcetitle,
 		    $table_nfitem.author,
@@ -4998,7 +5000,7 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
     return(FALSE);
   }
 
-  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$timeadded,$enclosure,$description,$sourceurl,$sourcetitle,$author,$origin) or print(mysql_error());
+  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$timeadded,$enclosure,$description,$guid,$sourceurl,$sourcetitle,$author,$origin) or print(mysql_error());
 
   $fcount = -1;
   $icount = 0;
@@ -5010,6 +5012,9 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
   $pubdate = time();
   while($sql->fetch()){
     $feed = get_feed_info($feedid);
+
+    //Let's not put the admin log feed in the public river
+    if( strpos($feed['url'], '/adminlog-rss') !== FALSE ) {  continue;  }
 
     //Save the time stamp of the first item to use as a pubdate
     if( $firstid == "" ) {

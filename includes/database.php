@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 14;
+$cg_database_version = 15;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -146,6 +146,15 @@ CGDB0028;
 $cg_database_updates[13][] = <<<CGDB0029
  INSERT INTO `dbversion` ( `version` ) VALUES ( '14' )
 CGDB0029;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 14 to 15 -------------------------------------------------------------------------------------------------
+$cg_database_updates[14][] = <<<CGDB0030
+ ALTER TABLE `nfitems` ADD `media` TINYINT NOT NULL DEFAULT '0' COMMENT 'Does this item contain attached media?'
+CGDB0030;
+$cg_database_updates[14][] = <<<CGDB0031
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '15' )
+CGDB0031;
 //----------------------------------------------------------------------------------------------------------------
 
 

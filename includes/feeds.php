@@ -3419,31 +3419,6 @@ function get_feed_items($fid = NULL, $max = NULL)
     return(-1);
   }
 
-/*
-  //If a feed has over 100 errors or last new item was more than a month ago
-  //we fall back to only scanning it once a day
-  if( $feed['errors'] >= 100 ) {
-    if( (time() - $feed['lastcheck']) < 86400 ) {
-      loggit(2, "Feed: [$url] is over the error limit.  Skipping for 24 hours.");
-      $stats['checktime'] += (time() - $fstart);
-      set_feed_stats($fid, $stats);
-      return(-1);
-    } else {
-      loggit(1, "Doing once per day check on error-prone feed: [$url].");
-    }
-  }
-  if( (time() - $feed['lastupdate']) > (86400 * 28) ) {
-    if( (time() - $feed['lastcheck']) < 86400 && !empty($feed['lastupdate']) ) {
-      loggit(2, "Feed: [$url] hasn't updated in a month.  Skipping for 24 hours.");
-      $stats['checktime'] += (time() - $fstart);
-      set_feed_stats($fid, $stats);
-      return(-1);
-    } else {
-      loggit(3, "DEBUG: Doing once per day check on infrequently updated feed: [$url].");
-    }
-  }
-*/
-
   //Do we need to re-register?
   if( !empty($feed['rsscloudregurl']) && ((time() - $feed['rsscloudlastreg']) > 86400 || $feed['rsscloudlastreg'] == '') && $enable_rsscloud == 1 ) {
     $rcregurl = parse_url($feed['rsscloudregurl']);
@@ -3927,6 +3902,9 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   //Timestamp
   $timeadded = time();
 
+  //Contains media?
+  $media = 0;
+
   //Each item needs a unique id
   $id = random_gen(128);
   $old = FALSE;
@@ -3950,7 +3928,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   }
 
   //Now that we have a good id, put the feed item into the database
-  $stmt = "INSERT INTO $table_nfitem (id,feedid,title,url,description,guid,timestamp,timeadded,enclosure,`purge`,sourceurl,sourcetitle,author,origin) VALUES (?,?,?,?,?,?,?,?,?,0,?,?,?,?)";
+  $stmt = "INSERT INTO $table_nfitem (id,feedid,title,url,description,guid,timestamp,timeadded,enclosure,`purge`,sourceurl,sourcetitle,author,origin,media) VALUES (?,?,?,?,?,?,?,?,?,0,?,?,?,?)";
   $sql=$dbh->prepare($stmt) or print(mysql_error());
   if($format == "atom") {
     //-----ATOM--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3977,6 +3955,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 			         'length' => 0 + (string)$item->link[$lcount]->attributes()->length,
                                  'type'   => make_mime_type((string)$item->link[$lcount]->attributes()->href, (string)$item->link[$lcount]->attributes()->type)
           );
+	  $media = 1;
         }
       }
     }
@@ -4003,6 +3982,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       }
       if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
         $enclosures[] = array( 'url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => make_mime_type($mediatag['src'], $mediatag['type']) );
+        $media = 1;
       }
     }
 
@@ -4039,7 +4019,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       $title = "";
     }
 
-    $sql->bind_param("sssssssssssss", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin) or print(mysql_error());
+    $sql->bind_param("sssssssssssss", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
   } else {
     //-----RSS----------------------------------------------------------------------------------------------------------------------------------------------------
     $linkurl = $item->link;
@@ -4055,6 +4035,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 			         'length' => 0 + (string)$item->enclosure[$i]->attributes()->length,
                                  'type' => make_mime_type((string)$item->enclosure[$i]->attributes()->url, (string)$item->enclosure[$i]->attributes()->type)
           );
+          $media = 1;
         }
     }
 
@@ -4069,6 +4050,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
           if( !in_array_r($murl, $enclosures) ) {
             $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => make_mime_type((string)$kids[$i]->attributes()->url) );
             $ecount++;
+            $media = 1;
           }
         }
       }
@@ -4082,6 +4064,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
           if( !in_array_r($murl, $enclosures) ) {
             $enclosures[$ecount] = array( 'url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => make_mime_type((string)$kids[$i]->attributes()->url) );
             $ecount++;
+            $media = 1;
           }
         }
       }
@@ -4143,6 +4126,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       }
       if( (empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) ) {
         $enclosures[] = array( 'url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => make_mime_type($mediatag['src'], $mediatag['type']) );
+        $media = 1;
       }
     }
     }
@@ -4186,7 +4170,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       }
     }
 
-    $sql->bind_param("sssssssssssss", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin) or print(mysql_error());
+    $sql->bind_param("sssssssssssss", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
   }
   $sql->execute() or loggit(3, $dbh->error);
   $sql->close() or print(mysql_error());
@@ -5721,6 +5705,94 @@ function collapse_river($river)
 
 
   return($newriver);
+}
+
+
+//_______________________________________________________________________________________
+//Retrieve the feed items that have media in them
+function get_feed_items_with_enclosures($uid = NULL, $max = NULL)
+{
+  //Check parameters
+  if( empty($uid) ) {
+    loggit(2,"The user id is corrupt or blank: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Run the query
+  $sqltxt = "SELECT $table_nfitem.url,
+                    $table_nfitem.description,
+                    $table_nfitem.timestamp,
+                    $table_nfitem.enclosure,
+                    $table_nfitem.title,
+                    $table_nfitem.sourceurl,
+                    $table_nfitem.sourcetitle,
+                    $table_nfitem.origin,
+                    $table_nfitem.author
+             FROM $table_nfitem
+             INNER JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
+             WHERE $table_nfcatalog.userid=?
+             AND $table_nfitem.media = 1
+             ORDER BY $table_nfitem.timeadded DESC";
+
+  if($max != NULL) {
+    $sqltxt .= " LIMIT $max";
+  } else {
+    $sqltxt .= " LIMIT $default_max_list";
+  }
+
+  //loggit(3, "[$sqltxt]");
+  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql->bind_param("s", $uid) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+
+  //See if there were any items returned
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(1,"No feed items returned for: [$fid].");
+    return(array());
+  }
+
+  $sql->bind_result($aurl,
+                    $adescription,
+                    $atimestamp,
+                    $aenclosure,
+                    $atitle,
+                    $asourceurl,
+                    $asourcetitle,
+		    $aorigin,
+                    $aauthor
+  ) or print(mysql_error());
+
+  $items = array();
+  $count = 0;
+  while($sql->fetch()){
+    $items[$count] = array( 'url' => $aurl,
+                            'title' => $atitle,
+                            'description' => $adescription,
+                            'timestamp' => $atimestamp,
+			    'enclosure' => unserialize($aenclosure),
+			    'sourceurl' => $asourceurl,
+			    'sourcetitle' => $asourcetitle,
+			    'origin' => $aorigin,
+                            'author' => $aauthor
+    );
+    $count++;
+  }
+
+  $sql->close() or print(mysql_error());
+
+  //loggit(3, print_r($items, TRUE));
+
+  loggit(1,"Returning: [$count] items.");
+  return($items);
 }
 
 

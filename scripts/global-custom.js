@@ -111,12 +111,14 @@ function isBlank(str) {
 //Is this object an image?
 function isImage(url, type) {
 	var type = (typeof type === "undefined") ? false : type;
-
-        if ( type.indexOf(systemUrl) == -1 && type.indexOf('image') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.jpg') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.jpeg') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.png') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.gif') != -1 && url.indexOf('http') == 0 ) { return true; }
+	
+	if( type ) {
+	        if( type.indexOf(systemUrl) == -1 && type.indexOf('image') != -1 && url.indexOf('http') == 0 ) { return true; }
+	}
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.jpg') != -1 && url.indexOf('http') == 0 ) { return true; }
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.jpeg') != -1 && url.indexOf('http') == 0 ) { return true; }
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.png') != -1 && url.indexOf('http') == 0 ) { return true; }
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.gif') != -1 && url.indexOf('http') == 0 ) { return true; }
         
         return false;
 };
@@ -125,11 +127,13 @@ function isImage(url, type) {
 function isVideo(url, type) {
 	var type = (typeof type === "undefined") ? false : type;
 
-        if ( type.indexOf(systemUrl) == -1 && type.indexOf('video') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.m4v') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.mp4') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.avi') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.mov') != -1 && url.indexOf('http') == 0 ) { return true; }
+	if( type ) {
+	        if( type.indexOf(systemUrl) == -1 && type.indexOf('video') != -1 && url.indexOf('http') == 0 ) { return true; }
+	}
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.m4v') != -1 && url.indexOf('http') == 0 ) { return true; }
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.mp4') != -1 && url.indexOf('http') == 0 ) { return true; }
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.avi') != -1 && url.indexOf('http') == 0 ) { return true; }
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.mov') != -1 && url.indexOf('http') == 0 ) { return true; }
         
         return false;
 };
@@ -138,12 +142,14 @@ function isVideo(url, type) {
 function isAudio(url, type) {
 	var type = (typeof type === "undefined") ? false : type;
 
-        if ( type.indexOf(systemUrl) == -1 && type.indexOf('audio') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.mp3') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.m4a') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.wav') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.ogg') != -1 && url.indexOf('http') == 0 ) { return true; }
-        if ( url.indexOf(systemUrl) == -1 && url.indexOf('.wmv') != -1 && url.indexOf('http') == 0 ) { return true; }
+	if( type ) {
+	        if( type.indexOf(systemUrl) == -1 && type.indexOf('audio') != -1 && url.indexOf('http') == 0 ) { return true; }
+	}
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.mp3') != -1 && url.indexOf('http') == 0 ) { return true; }
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.m4a') != -1 && url.indexOf('http') == 0 ) { return true; }
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.wav') != -1 && url.indexOf('http') == 0 ) { return true; }
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.ogg') != -1 && url.indexOf('http') == 0 ) { return true; }
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('.wmv') != -1 && url.indexOf('http') == 0 ) { return true; }
         
         return false;
 };

@@ -17,9 +17,9 @@
 		<div class="nav-collapse">
 			<ul class="nav">
 			<li <?if($section == "River"){echo "class='active'";}?>><a href="<?echo $newsriverpage?>">Home</a></li>
-			<!-- <li <?if($section == "River"){echo "class='active'";}?>><a href="<?echo $newsriverpage.'-beta'?>">[Beta]</a></li> -->
 			<li <?if($section == "Microblog"){echo "class='active'";}?>><a href="<?echo $microblogpage?>">Microblog</a></li>
   			<li <?if($section == "Articles"){echo "class='active'";}?>><a href="<?echo $articlespage?>">Articles</a></li>
+			<li <?if($section == "Media"){echo "class='active'";}?>><a href="<?echo $mediapage?>">Media</a></li>
 			<li <?if($section == "Subscribe"){echo "class='active'";}?>><a href="<?echo $subscribepage?>">Subscribe</a></li>
 
 	                <li>

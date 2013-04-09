@@ -555,6 +555,9 @@ function showArticleWindow(riveritem) {
 
         $(modal + ' .arfooter').hide();
         $(modal + ' .arfooter .rt').click(function() {
+		$(modal + ' .arbody img').each(function() {
+			$(riveritem + ' .enclosureview').append('<img class="encobj enclosurepic hide" src="' + $(this).attr('src') + '" />');
+		});
 	        $(modal).modal('hide');
                 $(riveritem + ' .rtgo').trigger('click');
                 return false;

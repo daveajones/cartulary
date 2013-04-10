@@ -3950,13 +3950,31 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       }
       //Enclosures are links also
       if($item->link[$lcount]['rel'] == "enclosure") {
-        if( !in_array_r((string)$item->link[$lcount]->attributes()->href, $enclosures) ) {
-          $enclosures[] = array( 'url'    => (string)$item->link[$lcount]->attributes()->href,
-			         'length' => 0 + (string)$item->link[$lcount]->attributes()->length,
-                                 'type'   => make_mime_type((string)$item->link[$lcount]->attributes()->href, (string)$item->link[$lcount]->attributes()->type)
-          );
-	  $media = 1;
-        }
+        $esize = "";
+	$esrc = "";
+
+	//Some stupid ass feeds use src instead of href. HuffPo!
+        if( isset($item->link[$lcount]->attributes()->src) ) {  $esrc = (string)$item->link[$lcount]->attributes()->src;  }
+        if( isset($item->link[$lcount]->attributes()->href) ) {  $esrc = (string)$item->link[$lcount]->attributes()->href;  }
+
+	//If we couldn't get a decent url don't go any further
+	if( !empty($esrc) && str_pos($esrc, 'http') !== FALSE ) {
+	  //If a length is given then use it
+          if( isset($item->link[$lcount]->attributes()->length) ) {
+  	    $esize = (string)$item->link[$lcount]->attributes()->length;
+	  //Otherwise, do a head size check over http
+          } else {
+            $esize = check_head_size($esrc);
+          }
+	  //If it's not duplicate, add it
+          if( !in_array_r($esrc, $enclosures) ) {
+            $enclosures[] = array( 'url'    => $esrc,
+	  		           'length' => 0 + $esize,
+                                   'type'   => make_mime_type($esrc, (string)$item->link[$lcount]->attributes()->type)
+            );
+	    $media = 1;
+          }
+	}
       }
     }
 
@@ -4019,7 +4037,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       $title = "";
     }
 
-    $sql->bind_param("sssssssssssssd", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
+    $sql->bind_param("ssssssddsssssd", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
   } else {
     //-----RSS----------------------------------------------------------------------------------------------------------------------------------------------------
     $linkurl = $item->link;
@@ -4170,7 +4188,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       }
     }
 
-    $sql->bind_param("sssssssssssssd", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
+    $sql->bind_param("ssssssddsssssd", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
   }
   $sql->execute() or loggit(3, $dbh->error);
   $sql->close() or print(mysql_error());
@@ -5710,7 +5728,7 @@ function collapse_river($river)
 
 //_______________________________________________________________________________________
 //Retrieve the feed items that have media in them
-function get_feed_items_with_enclosures($uid = NULL, $max = NULL)
+function get_feed_items_with_enclosures($uid = NULL, $max = NULL, $time = NULL)
 {
   //Check parameters
   if( empty($uid) ) {
@@ -5725,9 +5743,11 @@ function get_feed_items_with_enclosures($uid = NULL, $max = NULL)
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
   //Run the query
-  $sqltxt = "SELECT $table_nfitem.url,
+  $sqltxt = "SELECT $table_nfitem.id,
+		    $table_nfitem.url,
                     $table_nfitem.description,
                     $table_nfitem.timestamp,
+                    $table_nfitem.timeadded,
                     $table_nfitem.enclosure,
                     $table_nfitem.title,
                     $table_nfitem.sourceurl,
@@ -5737,8 +5757,13 @@ function get_feed_items_with_enclosures($uid = NULL, $max = NULL)
              FROM $table_nfitem
              LEFT JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
              WHERE $table_nfcatalog.userid=?
-             AND $table_nfitem.media = 1
-             ORDER BY $table_nfitem.timeadded DESC";
+             AND $table_nfitem.media = 1";
+
+  if( !empty($time) ) {
+    $sqltxt .= " AND $table_nfitem.timeadded > $time";
+  }
+
+  $sqltxt .= " ORDER BY $table_nfitem.timeadded DESC";
 
   if($max != NULL) {
     $sqltxt .= " LIMIT $max";
@@ -5760,9 +5785,11 @@ function get_feed_items_with_enclosures($uid = NULL, $max = NULL)
     return(array());
   }
 
-  $sql->bind_result($aurl,
+  $sql->bind_result($aid,
+		    $aurl,
                     $adescription,
                     $atimestamp,
+                    $atimeadded,
                     $aenclosure,
                     $atitle,
                     $asourceurl,
@@ -5774,10 +5801,12 @@ function get_feed_items_with_enclosures($uid = NULL, $max = NULL)
   $items = array();
   $count = 0;
   while($sql->fetch()){
-    $items[$count] = array( 'url' => $aurl,
+    $items[$count] = array( 'id' => $aid,
+                            'url' => $aurl,
                             'title' => $atitle,
                             'description' => $adescription,
                             'timestamp' => $atimestamp,
+                            'timeadded' => $atimeadded,
 			    'enclosure' => unserialize($aenclosure),
 			    'sourceurl' => $asourceurl,
 			    'sourcetitle' => $asourcetitle,

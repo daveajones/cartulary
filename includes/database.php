@@ -156,8 +156,14 @@ $cg_database_updates[14][] = <<<CGDB0031
  UPDATE `nfitems` SET media = 1 WHERE OCTET_LENGTH( enclosure ) > 10
 CGDB0031;
 $cg_database_updates[14][] = <<<CGDB0032
- INSERT INTO `dbversion` ( `version` ) VALUES ( '15' )
+ ALTER TABLE `nfitems` MODIFY column timeadded int(11);
 CGDB0032;
+$cg_database_updates[14][] = <<<CGDB0033
+ ALTER TABLE `nfitems` MODIFY column timestamp int(11);
+CGDB0033;
+$cg_database_updates[14][] = <<<CGDB0034
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '15' )
+CGDB0034;
 //----------------------------------------------------------------------------------------------------------------
 
 

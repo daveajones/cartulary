@@ -168,7 +168,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
     <h3 class="sbtitle">&nbsp;</h3>
   </div>
   <div class="modal-body">
-    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Cartulizing. Please wait...<br/><br/></center>
+    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Loading image. Please wait...<br/><br/></center>
     <div class="sbbody"></div>
   </div>
   <div class="modal-footer">

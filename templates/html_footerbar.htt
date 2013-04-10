@@ -160,6 +160,25 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
   </div>
 </div>
 <!-- Show article modal dialog -->
+
+<!-- Media display shadow box modal -->
+<div id="mdlMediaShadowbox" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 class="sbtitle">&nbsp;</h3>
+  </div>
+  <div class="modal-body">
+    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Cartulizing. Please wait...<br/><br/></center>
+    <div class="sbbody"></div>
+  </div>
+  <div class="modal-footer">
+    <center class="sbfooter hide">
+      <a class="rt" title="Send to Microblog" href="#"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
+    </center>
+  </div>
+</div>
+<!-- Media display shadow box modal -->
+
 <!-- Global Modals -->
 
 

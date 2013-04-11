@@ -2881,16 +2881,19 @@ function sys_flag_is_set($flag = NULL)
 
 //_______________________________________________________________________________________
 //Set a flag value in the flags table
-function set_sys_flag($flag = NULL, $flagval = NULL)
+function set_sys_flag($flag = NULL, $flagval = NULL, $setby = NULL)
 {
   //Check parameters
   if( empty($flag) ) {
     loggit(2,"The flag name is blank or corrupt: [$flag]");
     return(FALSE);
   }
-  if( empty($flagval) ) {
+  if( $flagval == NULL ) {
     loggit(2,"The flag value is blank or corrupt: [$flagval]");
     return(FALSE);
+  }
+  if( empty($setby) ) {
+    $setby = 'sys';
   }
 
   //Includes
@@ -2903,9 +2906,9 @@ function set_sys_flag($flag = NULL, $flagval = NULL)
   $tstamp = time();
 
   //Look for the url in the feed table
-  $stmt = "INSERT INTO $table_flag (name,value,timeset,setby) VALUES(?,?,?,'sys') ON DUPLICATE KEY UPDATE value=?";
+  $stmt = "INSERT INTO $table_flag (name,value,timeset,setby) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE value=?,timeset=?,setby=?";
   $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sdsd", $flag, $flagval, $tstamp, $flagval) or print(mysql_error());
+  $sql->bind_param("sdssdds", $flag, $flagval, $tstamp, $setby, $flagval, $tstamp, $setby) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->close() or print(mysql_error());
 

@@ -2917,4 +2917,35 @@ function set_sys_flag($flag = NULL, $flagval = NULL, $setby = NULL)
 }
 
 
+//_______________________________________________________________________________________
+//Remove a flag in the flags table
+function delete_sys_flag($flag = NULL)
+{
+  //Check parameters
+  if( empty($flag) ) {
+    loggit(2,"The flag name is blank or corrupt: [$flag]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Timestamp
+  $tstamp = time();
+
+  //Look for the url in the feed table
+  $stmt = "DELETE FROM $table_flag WHERE name=?";
+  $sql = $dbh->prepare($stmt) or print(mysql_error());
+  $sql->bind_param("s", $flag) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  loggit(3,"Deleted flag: [$flag].");
+  return(TRUE);
+}
+
+
 ?>

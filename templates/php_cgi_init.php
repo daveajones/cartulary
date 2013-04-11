@@ -11,6 +11,19 @@
   require_once "$confroot/$includes/posts.php";
   require_once "$confroot/$includes/articles.php";
 
+  //Is a database upgrade in progress?
+  if( sys_flag_is_set($CG_FLAG_DBUPDATE) ) {
+    loggit(2,"Blocked a CGI operation during database upgrade.");
+    // Json header
+    header("Cache-control: no-cache, must-revalidate");
+    header("Content-Type: application/json");
+    $jsondata = array();
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "A database upgrade is in progress.  Please try again in 5 minutes.";
+    echo json_encode($jsondata);
+    exit(0);
+  }
+
   // Valid session?  If not, get lost
   if(!is_logged_in()) {
     header("Location: $loginpage");

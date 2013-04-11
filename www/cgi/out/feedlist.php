@@ -1,19 +1,7 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_cgi_init.php"?>
 <?
-// Includes
-include get_cfg_var("cartulary_conf").'/includes/env.php';
-include "$confroot/$includes/util.php";
-include "$confroot/$includes/auth.php";
-include "$confroot/$includes/feeds.php";
-include "$confroot/$includes/opml.php";
-
-// Valid session?
-if(!is_logged_in()) {
-  loggit(2,"A non-authenticated user tried to see the feed list.");
-  exit(0);
-}
-
 // Json header
-//header("Content-Type: text/plain");
 header("Cache-control: no-cache, must-revalidate");
 header("Content-Type: application/json");
 

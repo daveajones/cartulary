@@ -22,7 +22,8 @@ function loadPostList(elDiv, elTemplate) {
               <?}?>
 		
           } else {
-              $(elDiv).append("<p>Error retrieving JSON data: [" + data.description + "]</p>");
+	      $(elDiv).empty();
+              $(elDiv).append("<center class='well'>Error retrieving JSON data: [" + data.description + "]</center>");
           }
       });
 

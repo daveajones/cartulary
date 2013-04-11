@@ -4,8 +4,6 @@
 // Json header
 header("Cache-control: no-cache, must-revalidate");
 header("Content-Type: application/json");
-
-// Globals
 $jsondata = array();
 
 //Get the feed id to change

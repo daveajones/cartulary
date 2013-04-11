@@ -1,51 +1,11 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_cgi_init.php"?>
 <?
-//[!------------SECURITY-------------------------------!]
-
-// Includes
-include get_cfg_var("cartulary_conf").'/includes/env.php';
-include "$confroot/$includes/util.php";
-include "$confroot/$includes/auth.php";
-include "$confroot/$includes/feeds.php";
-include "$confroot/$includes/opml.php";
-
 // Json header
 header("Cache-control: no-cache, must-revalidate");
 header("Content-Type: application/json");
-
-// Get the input
-//if ( isset($_POST['newpref']) ) { $newpref = $_POST['newpref']; } else { $newpref = ""; };
 $jsondata = array();
 $jsondata['fieldname'] = "";
-
-
-//Get the user id from the session id
-// Valid session?
-if(!is_logged_in()) {
-  loggit(2,"User attempted to delete a feed without being logged in first.");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(0);
-}
-$uid = get_user_id_from_sid(is_logged_in());
-if(empty($uid) || ($uid == FALSE)) {
-  //Log it
-  loggit(2,"Couldn't retrieve a user id for this session: [$sid].");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(1);
-}
-
-//See if the user has activated their account yet
-if(!is_user_active($uid)) {
-  //Log it
-  loggit(2,"User tried to access a page without activating first: [$uid | $sid].");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Access denied.";
-  echo json_encode($jsondata);
-  exit(1);
-}
 
 //Get the id of the item being unsubscribed
 $jsondata['fieldname'] = "fid";
@@ -66,13 +26,6 @@ if( !is_array($id) && outline_exists_by_id($id) ) {
   //Log it
   loggit(3,"Id: [$id] refers to an outline.");
   $outline = get_outline_info($id);
-  //if( $outline['type'] != 'sopml' ) {
-  //  //Run through and unlink all the feeds from this outline
-  //  $feeds = get_feeds_by_outline_id($id);
-  //  foreach($feeds as $feed) {
-  //    unlink_feed_from_outline($feed, $id);
-  //  }
-  //}
   unlink_outline_from_user($id, $uid);
   $jsondata['status'] = "true";
   $jsondata['description'] = "Outline unsubscribed.";
@@ -90,9 +43,6 @@ if( is_array($id) ) {
   //Unlink this feed
   unlink_feed_from_user($uid, $id);
 }
-
-//Rebuild the users river
-//update_river($uid, build_river($uid));
 
 
 //Log it

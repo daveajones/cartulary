@@ -1,7 +1,6 @@
 <?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
-<?include "$confroot/$templates/php_cgi_init.php"?>
+<?include "$confroot/$templates/php_cgi_init_with_followup.php"?>
 <?
-
 // Get the input
 $jsondata = array();
 $jsondata['fieldname'] = "";

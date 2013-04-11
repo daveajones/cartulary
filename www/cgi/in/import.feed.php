@@ -32,7 +32,7 @@ if ( isset($_REQUEST['url']) && !empty($_REQUEST['url']) ) {
 $fid = add_feed($url, NULL, FALSE);
 
 //Now get as many items as possible
-if( get_feed_items($fid, 9999) < 0 ) {
+if( get_feed_items($fid, 99999) < 0 ) {
   //Log it
   loggit(2, "There was an error parsing the feed. Make sure it's valid.");
   $jsondata['status'] = "false";

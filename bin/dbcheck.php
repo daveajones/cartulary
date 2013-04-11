@@ -5,6 +5,9 @@
   //Let's not run twice
   if(($pid = cronHelper::lock()) !== FALSE) {
 
+	//Set the database update flag
+        set_sys_flag($CG_FLAG_DBUPDATE, 1);
+
 	//Timing
 	$tstart = time();
 
@@ -39,6 +42,9 @@
         loggit(3, "It took: [$took] seconds to check the database.");
 
 	echo "\n";
+
+	//Set the database update flag
+        delete_sys_flag($CG_FLAG_DBUPDATE);
 
         //Release the lock
         cronHelper::unlock();

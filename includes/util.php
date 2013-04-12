@@ -169,15 +169,15 @@ function get_system_message($id = NULL, $type = NULL)
 }
 
 function array_ereg_search($val, $array) {
-      
+
   $i = 0;
   $return = array();
-         
+
   foreach($array as $v) {
     if(preg_match("/$val/i", serialize($v)) > 0) $return[] = $i;
     $i++;
   }
-         
+
   return $return;
 }
 
@@ -277,9 +277,10 @@ function extract_media($html) {
         }
       }
 
-      //Ignore feed broker services
+      //Ignore junk
       if( strpos($src, 'feedsportal.com') !== FALSE ) {  continue;  }
       if( strpos($src, 'feedburner.com') !== FALSE ) {  continue;  }
+      if( strpos($src, 'jw-share-this') !== FALSE ) {  continue;  }
 
       //See if this is an external url that we've never seen before
       if( strpos($src, 'http') === 0 && !in_array_r($src, $media_tags) ) {
@@ -702,7 +703,7 @@ function check_head_lastmod($url, $timeout = 5){
 }
 
 //Do a HEAD request on a url to see what the Last-Modified time is
-function check_head_size($url, $timeout = 5){
+function check_head_size($url, $timeout = 3){
 
   //Check parameters
   if($url == NULL) {
@@ -723,15 +724,18 @@ function check_head_size($url, $timeout = 5){
     //stop it from outputting stuff to stdout
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, $timeout );
-    curl_setopt( $curl, CURLOPT_TIMEOUT, 30 );
+    curl_setopt( $curl, CURLOPT_TIMEOUT, $timeout );
+
+    loggit(3, "CURL: Head check on: [$url]");
 
     $result = curl_exec($curl);
 
     $info = curl_getinfo($curl);
 
-    if ($info['download_content_length'] != -1) { //otherwise unknown
+    if( $info['download_content_length'] != -1 ) { //otherwise unknown
       return($info['download_content_length']);
     } else {
+      //loggit(3, "CURL: ".print_r($info, TRUE));
       return('');
     }
 

@@ -12,20 +12,29 @@
   $action = "";
   if( in_array("error", $argv) ) {
     $action = "error";
+    //add_admin_log_item("Scanned error feeds.", "Aggregator");
     loggit(3, "Doing an error feed scan.");
+  }
+  if( in_array("old", $argv) ) {
+    $action = "old";
+    //add_admin_log_item("Scanned old feeds.", "Aggregator");
+    loggit(3, "Doing an old feed scan.");
   }
 
   //Get the feed list
   if( $action == "error" ) {
     $feeds = get_error_feeds();
+  } else
+  if( $action == "old" ) {
+    $feeds = get_old_feeds();
   } else {
     $feeds = get_all_feeds();
   }
   $totalfeeds = count($feeds);
   $totaltime = $totalfeeds * 3;
 
-  //Only scan the oldest 33% of feeds per scan
-  if( $action == "error" ) {
+  //Only scan the oldest 33% of feeds on non-error/old passes
+  if( $action == "error" || $action == "old" ) {
     $scancount = $totalfeeds;
   } else {
     $scancount = round( ($totalfeeds * .33) + 1 );
@@ -57,10 +66,10 @@
     }
 
     if($subcount > 0) {
-      	loggit(3, "Checking feed: [ $ccount | ".$feed['title']." | ".$feed['url']."].");
+      	loggit(1, "Checking feed: [ $ccount | ".$feed['title']." | ".$feed['url']."].");
     	$result = get_feed_items($feed['id']);
     	if($result == -1) {
-        	loggit(2, "Error getting items for feed: [".$feed['title']." | ".$feed['url']."]");
+        	loggit(1, "Error getting items for feed: [".$feed['title']." | ".$feed['url']."]");
         	echo "    Error getting items for feed: [".$feed['title']." | ".$feed['url']."]\n";
     	} else if ($result == -2) {
 	      	loggit(1, "Feed: [".$feed['title']." | ".$feed['url']."] has no items.");
@@ -69,7 +78,7 @@
 	      	loggit(1, "Feed: [".$feed['title']." | ".$feed['url']."] is current.");
       		echo "    Feed is current.\n";
     	} else {
-	      	loggit(1, "Feed: [".$feed['title']." | ".$feed['url']."] updated.");
+	      	loggit(3, "Feed: [".$feed['title']." | ".$feed['url']."] updated.");
 	      	echo "    Feed updated.\n";
 		$ncount++;
                 $newitems += $result;
@@ -84,7 +93,7 @@
     }
 
     echo "      It took ".(time() - $fstart)." seconds to scan this feed.\n";
-    loggit(3, "It took [".(time() - $fstart)."] seconds to scan this feed.");
+    loggit(1, "It took [".(time() - $fstart)."] seconds to scan this feed.");
     echo "\n";
 
     //We stop scanning if this scan has taken longer than expected

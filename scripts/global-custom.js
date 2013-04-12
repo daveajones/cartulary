@@ -1,8 +1,30 @@
 var systemUrl = '<?echo $system_fqdn?>';
 var platform = '<?echo $platform?>';
 var gDatestamp = '<?echo date('YmdHis')?>';
-
 var msgtimer;
+
+
+//http://stackoverflow.com/questions/4652734/return-html-from-a-user-selection/4652824#4652824
+//Get html of selected text
+function getSelectionHtml() {
+    var html = "";
+    if (typeof window.getSelection != "undefined") {
+        var sel = window.getSelection();
+        if (sel.rangeCount) {
+            var container = document.createElement("div");
+            for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                container.appendChild(sel.getRangeAt(i).cloneContents());
+            }
+            html = container.innerHTML;
+        }
+    } else if (typeof document.selection != "undefined") {
+        if (document.selection.type == "Text") {
+            html = document.selection.createRange().htmlText;
+        }
+    }
+    return html;
+}
+
 
 //Convert links found in twitter messages into the target link of the message
 function sanitize_twitter(divStream) {
@@ -150,6 +172,19 @@ function isAudio(url, type) {
         if( url.indexOf(systemUrl) == -1 && url.indexOf('.wav') != -1 && url.indexOf('http') == 0 ) { return true; }
         if( url.indexOf(systemUrl) == -1 && url.indexOf('.ogg') != -1 && url.indexOf('http') == 0 ) { return true; }
         if( url.indexOf(systemUrl) == -1 && url.indexOf('.wmv') != -1 && url.indexOf('http') == 0 ) { return true; }
+        
+        return false;
+};
+
+//Is it html content?
+function isHtml(url, type) {
+	var type = (typeof type === "undefined") ? false : type;
+
+	if( type ) {
+	        if( type.indexOf(systemUrl) == -1 && type.indexOf('html') != -1 && url.indexOf('http') == 0 ) { return true; }
+	}
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('youtube') != -1 && url.indexOf('http') == 0 ) { return true; }
+        if( url.indexOf(systemUrl) == -1 && url.indexOf('vimeo') != -1 && url.indexOf('http') == 0 ) { return true; }
         
         return false;
 };
@@ -403,8 +438,11 @@ function newMicroblogPostWindow(riveritem) {
 
 	//Set the description
 	$(modal + ' .bpdescription textarea').val("");
+	$(modal + ' .bpdescription textarea').val( getSelectionHtml() );
 	if( riveritem != false ) {
-		$(modal + ' .bpdescription textarea').val( $(riveritem + ' .header').text().trim() );
+		if( $(modal + ' .bpdescription textarea').val() == "") {
+			$(modal + ' .bpdescription textarea').val( $(riveritem + ' .header').text().trim() );
+		}
 	}
 
 	//Zero out the title
@@ -614,6 +652,42 @@ function showArticleWindow(riveritem) {
 	//When modal closes we should clean up
 	$(modal).on('hidden', function () {
 	        $(modal + ' .arfooter .rt').unbind('click');
+	});
+
+
+
+        return false;
+}
+
+
+//Open a modal to display a large sized image in a shadow box
+function openMediaShadowbox(imgtag) {
+        var modal = '#mdlMediaShadowbox';
+	var href = imgtag.attr('src');
+	var compact = false;
+
+	//Prep the modal
+        $(modal + ' .sbtitle').empty();
+        $(modal + ' .sbbody').empty();
+        $(modal + ' .spinner').hide();
+        $(modal + ' .modal-footer').hide();
+
+	//Set the image
+	$(modal + ' .sbbody').append('<img class="media" src="' + href + '" alt="" />');
+
+	//Size the modal
+	modalFullHeight(modal, compact);
+
+	//Size the image
+	$(modal + ' .sbbody img').css("max-width", ($(modal + ' .modal-body').width() - 10) + "px");
+	$(modal + ' .sbbody img').css("max-height", ($(modal + ' .modal-body').height() - 10) + "px");
+
+	//Reveal the modal
+        $(modal).modal('show');
+
+	//When modal closes we should clean up
+	$(modal).on('hidden', function () {
+	        //$(modal + ' .arfooter .rt').unbind('click');
 	});
 
 

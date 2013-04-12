@@ -800,8 +800,8 @@ function build_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles =
     $dateCreated = date("D, d M Y H:i:s O");
     $dateModified = date("D, d M Y H:i:s O");
   } else {
-    $dateCreated = $articles[0]['createdon'];
-    $dateModified = $articles[0]['createdon'];
+    $dateCreated = date("D, d M Y H:i:s O", $articles[0]['createdon']);
+    $dateModified = date("D, d M Y H:i:s O", $articles[0]['createdon']);
   }
 
   //The feed string

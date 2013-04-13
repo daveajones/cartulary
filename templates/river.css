@@ -957,7 +957,7 @@ img.avatarheader {  float:right; max-height: 64px;  }
   display:block;
   clear:both;
   margin:20px auto 10px;
-  max-width: 500px;
+  max-width: 100%;
 }
 .pageContentWrapper.River #stream .section .encpicture2 {
   display:inline-block;

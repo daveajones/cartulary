@@ -81,6 +81,7 @@
 		    ?>
 		    </select>
                 </li>
+		<li class="privacy"><input name="hideme" type="checkbox" <?if ($prefs['hideme'] == 1) echo "checked ";?>/> I don't want to be found in directory searches..</li>
 	</ul>
 	</div>
 	</div>

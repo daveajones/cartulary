@@ -68,6 +68,7 @@ a {  color:#059;  }
 
 /* --------------------------------------------------- */
 /* ----- Modals ----- */
+.modal-backdrop,.modal-backdrop.fade.in{opacity:0.9;filter:alpha(opacity=90);}
 /* ----- Show Article modal ----- */
 #mdlShowArticle {
   position: fixed;
@@ -298,7 +299,36 @@ a {  color:#059;  }
   margin-right:10px;
   height:64px;
 }
-
+/* ----- Media Shadowbox modal ----- */
+#mdlMediaShadowbox {
+  position: fixed;
+  top:20px;
+  right:0;
+  left:0;
+  margin: 0;
+  width:700px;
+  background-color:#333;
+  color: #ddd;
+  max-height:90%;
+  padding:15px;
+}
+#mdlMediaShadowbox .modal-body .media {
+  display:block;
+  margin-left:auto;
+  margin-right:auto;
+}
+#mdlMediaShadowbox .modal-header {
+  background-color:#333;
+  color: #ddd;
+  border:none;
+}
+#mdlMediaShadowbox .modal-footer {
+  background-color:#333;
+  color: #ddd;
+  border-top:solid #444 1px;
+  max-height:20px;
+  height:20px;
+}
 /* --------------------------------------------------- */
 
 
@@ -1199,6 +1229,12 @@ a {  color:#059;  }
           border-radius: 4px;
 }
 .pageContentWrapper.Prefs #divPrefs #divPref input.urlinput {  width:95%;  }
+.pageContentWrapper.Prefs #divPrefs .divPrefPane ul li {  margin-bottom:3px;  }
+.pageContentWrapper.Prefs #divPrefs .divPrefPane ul li.privacy:before {
+  content: " ! ";
+  font-weight:bold;
+  color: red;
+}
 /* --------------------------------------------------- */
 
 

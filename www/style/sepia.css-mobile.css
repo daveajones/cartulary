@@ -1032,6 +1032,12 @@ body {  background:#4d4d4d;  }
           border-radius: 4px;
 }
 .pageContentWrapper.Prefs #divPrefs input.urlinput {  width:95%;  }
+.pageContentWrapper.Prefs #divPrefs .divPrefPane ul li {  margin-bottom:3px;  }
+.pageContentWrapper.Prefs #divPrefs .divPrefPane ul li.privacy:before {
+  content: " ! ";
+  font-weight:bold;
+  color: red;
+}
 /* --------------------------------------------------- */
 
 

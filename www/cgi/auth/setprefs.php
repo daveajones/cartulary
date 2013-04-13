@@ -55,6 +55,7 @@ if ( isset($_POST['fulltextriver']) ) { $fulltextriver = 1; } else { $fulltextri
 if ( isset($_POST['cartinriver']) ) { $cartinriver = 1; } else { $cartinriver = 0; };
 if ( isset($_POST['staticarticles']) ) { $staticarticles = 1; } else { $staticarticles = 0; };
 if ( isset($_POST['collapseriver']) ) { $collapseriver = 1; } else { $collapseriver = 0; };
+if ( isset($_POST['hideme']) ) { $hideme = 1; } else { $hideme = 0; };
 $jsondata = array();
 $jsondata['prefname'] = "";
 
@@ -558,13 +559,24 @@ $prefs['staticarticles'] = $staticarticles;
 $jsondata['prefname'] = "collapseriver";
 if( ($collapseriver < 0) || ($collapseriver > 1) ) {
   //Log it
-  loggit(2,"The value for collapseriver pref was not within acceptable range: [$staticarticles]");
+  loggit(2,"The value for collapseriver pref was not within acceptable range: [$collapseriver]");
   $jsondata['status'] = "false";
   $jsondata['description'] = "Value of pref is out of range.";
   echo json_encode($jsondata);
   exit(1);
 }
 $prefs['collapseriver'] = $collapseriver;
+
+$jsondata['prefname'] = "hideme";
+if( ($hideme < 0) || ($hideme > 1) ) {
+  //Log it
+  loggit(2,"The value for hideme pref was not within acceptable range: [$hideme]");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "Value of pref is out of range.";
+  echo json_encode($jsondata);
+  exit(1);
+}
+$prefs['hideme'] = $hideme;
 //--------------------------------------------------------
 //--------------------------------------------------------
 

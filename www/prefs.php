@@ -178,7 +178,7 @@
 
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefTwitter"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
-	<h2>Twitter <small>(Create app <a href="https://dev.twitter.com/apps/new">here</a>.)</small></h2>
+	<h2>Twitter <small>(Create app <a href="https://dev.twitter.com/apps/new">here</a>. Instructions <a href="https://groups.google.com/d/msg/sopml/fbMd0cWPzRk/84mMoDM4BEsJ">here</a>.)</small></h2>
 	<ul>
         	<div class="control-group">
 			<li>My Twitter oAuth consumer key is <input name="twitterkey" type="text" value="<?echo $prefs['twitterkey']?>" /></li>

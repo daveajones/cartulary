@@ -281,6 +281,7 @@ function extract_media($html) {
       if( strpos($src, 'feedsportal.com') !== FALSE ) {  continue;  }
       if( strpos($src, 'feedburner.com') !== FALSE ) {  continue;  }
       if( strpos($src, 'jw-share-this') !== FALSE ) {  continue;  }
+      if( strpos($src, 'add-to-any') !== FALSE ) {  continue;  }
 
       //See if this is an external url that we've never seen before
       if( strpos($src, 'http') === 0 && !in_array_r($src, $media_tags) ) {

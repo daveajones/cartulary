@@ -99,7 +99,7 @@
 	if( !empty($server) ) {
 	        $server = trim($server, '/');
 		if( !isset($servcheck[$server]) ) {
-			$serverinfo = fetchUrl('http://'.$server.$getserverinfocgi.'?addr='.$system_fqdn.'&guid='.$cg_main_serverguid);
+			$serverinfo = fetchUrl(trim(get_final_url('http://'.$server), '/').$getserverinfocgi.'?addr='.$system_fqdn.'&guid='.$cg_main_serverguid);
 			if( $serverinfo != FALSE ) {
 				$serverinfo = json_decode($serverinfo, TRUE);
 				loggit(3, print_r($serverinfo, TRUE));

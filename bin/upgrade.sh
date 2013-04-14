@@ -9,6 +9,11 @@ if [ "$UID" -ne "$ROOT_UID" ] ; then
 	exit 1
 fi
 
+##: Is this a dev upgrade?
+BRANCH="master"
+if [ $# -gt 0 ] ; then
+	BRANCH="$1"
+fi
 
 ##: Get a datestamp
 BAKDATE=`date +'%Y%m%d%s'`
@@ -22,14 +27,14 @@ echo
 echo '############################################################'
 echo '##----------------------------------------------------------'
 echo '##                                                          '
-echo '##  Grabbing the current release.                           '
+echo "##  Grabbing the current $BRANCH release.                   "
 echo '##                                                          '
 echo '##----------------------------------------------------------'
 echo '############################################################'
 echo
-rm master.zip
-wget https://github.com/daveajones/cartulary/archive/master.zip
-unzip master.zip
+rm $BRANCH.zip
+wget https://github.com/daveajones/cartulary/archive/$BRANCH.zip
+unzip $BRANCH.zip
 
 ##: Stop cron
 stop cron
@@ -41,7 +46,7 @@ killall php
 tar -zcvf ~/cartulary-bak-$BAKDATE.tar.gz /opt/cartulary
 
 ##: Get into the repo folder
-cd cartulary-master
+cd cartulary-$BRANCH
 
 ##: Backup newuser sub list
 cp /opt/cartulary/www/newuser.opml /tmp
@@ -69,8 +74,8 @@ cp /tmp/newuser.opml /opt/cartulary/www
 cd ..
 
 ##: Kill it
-rm -rf cartulary-master/
-rm master.zip
+rm -rf cartulary-$BRANCH/
+rm $BRANCH.zip
 
 ##: Run confcheck
 clear

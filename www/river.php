@@ -70,7 +70,6 @@
 </div>
 
 
-
 <!-- Page header and title area -->
 <div class="row " id="divRiverBeta">
 	<div id="divRiverStreamWrapper" class="span12">
@@ -81,7 +80,8 @@
 <div id="stream-sidebar-left">
 <div id="divMe" style="float:left;">
   <a href="#" class="pull-right" onclick="javascript:newMicroblogPostWindow();return false;"><img class="icon-balloon" src="/images/blank.gif" alt="" /></a>
-  <h3>My Posts</h3>
+  <b>My Posts</b>
+  <br/>
   <br/>
   <div id="divMicroblogWidget"><script id="scrMicroblogWidget" src="<?echo $s3widget?>?ts=<?echo time()?>"></script></div>
 </div>
@@ -97,7 +97,8 @@
 <?if($platform != "mobile" && $platform != "tablet") {?>
 <div id="stream-sidebar-right">
         <div id="divMyFeeds" class="pull-right" style="float:right;">
-	        <h3>My Feeds</h3>
+	        <b>My Feeds</b>
+		<br/>
 		<br/>
 	        <ul id="ulMyStuff">
         		<li><a href="<?echo $s3sopml?>">My Social Outline</a></li>
@@ -124,7 +125,8 @@
 	</div>
 
 	<div id="divBuddies" class="pull-right" style="float:right;">
-  	<h3>Following</h3>
+  	<b>Following</b>
+	<br/>
 	<br/>
   	<?
     	$outlines = get_outlines($uid, $max);

@@ -39,7 +39,7 @@
                         <li <?if($section == "Admin-feed"){echo "class='active'";}?>><a href="<?echo $adminpage?>.feed">Feed Admin</a></li>
                         <?}?>
 			</ul>           
-			<a class="sysname pull-right" href="<?echo $cg_productsite?>"><?echo $system_name?> v<?echo $version?></a>
+			<a class="sysname pull-right" href="<?echo $cg_productsite?>">v<?echo $version?></a>
 		</div>
 	</div>
 </div>
@@ -65,7 +65,6 @@
 </div>
 </div>
 <?}?>
-
 
 
 <!-- Profile Header -->

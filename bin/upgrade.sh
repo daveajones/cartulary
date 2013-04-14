@@ -9,7 +9,7 @@ if [ "$UID" -ne "$ROOT_UID" ] ; then
 	exit 1
 fi
 
-##: Is this a dev upgrade?
+##: Which branch to upgrade from?
 BRANCH="master"
 if [ $# -gt 0 ] ; then
 	BRANCH="$1"

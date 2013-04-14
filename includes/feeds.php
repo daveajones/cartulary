@@ -167,6 +167,7 @@ function get_feed_link($content = NULL)
   libxml_clear_errors();
 
   //Look for a link node in the rss
+  if( isset($x->channel->link) ) {
   foreach($x->channel->link as $entry) {
     loggit(1, "Found a link node: [$entry].");
     $link = (string)$entry;
@@ -174,14 +175,17 @@ function get_feed_link($content = NULL)
       return($link);
     }
   }
+  }
 
   //Look for atom nodes
+  if( isset($x->link) ) {
   foreach($x->link as $entry) {
     loggit(1, "Found a link node: [$entry].");
     $link = (string)$entry['href'];
     if( !empty($link) ) {
       return($link);
     }
+  }
   }
 
   //None of the tests passed so return FALSE
@@ -3964,7 +3968,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   	    $esize = (string)$item->link[$lcount]->attributes()->length;
 	  //Otherwise, do a head size check over http
           } else {
-            $esize = check_head_size($esrc);
+            //$esize = check_head_size($esrc);
           }
 	  //If it's not duplicate, add it
           if( !in_array_r($esrc, $enclosures) ) {
@@ -5728,7 +5732,7 @@ function collapse_river($river)
 
 //_______________________________________________________________________________________
 //Retrieve the feed items that have media in them
-function get_feed_items_with_enclosures($uid = NULL, $max = NULL, $time = NULL)
+function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL, $start = NULL)
 {
   //Check parameters
   if( empty($uid) ) {
@@ -5742,38 +5746,38 @@ function get_feed_items_with_enclosures($uid = NULL, $max = NULL, $time = NULL)
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
+  //Set up max limit
+  if( empty($max) ) {
+    $max = $default_max_list;
+  }
+
+  //Set up start time
+  if( empty($tstart) ) {
+    $tstart = time() - 86400;
+  }
+
   //Run the query
-  $sqltxt = "SELECT $table_nfitem.id,
-		    $table_nfitem.url,
-                    $table_nfitem.description,
-                    $table_nfitem.timestamp,
-                    $table_nfitem.timeadded,
-                    $table_nfitem.enclosure,
-                    $table_nfitem.title,
-                    $table_nfitem.sourceurl,
-                    $table_nfitem.sourcetitle,
-                    $table_nfitem.origin,
-                    $table_nfitem.author
-             FROM $table_nfitem
-             LEFT JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
+  $subsql = "SELECT * FROM $table_nfitem WHERE media = 1 AND `old` = 0 AND timeadded > ? ORDER BY timeadded DESC";
+  $sqltxt = "SELECT id,
+                    url,
+                    description,
+                    timestamp,
+                    timeadded,
+                    enclosure,
+                    title,
+                    sourceurl,
+                    sourcetitle,
+                    origin,
+                    author
+             FROM ($subsql) as tsub
+             LEFT JOIN $table_nfcatalog ON $table_nfcatalog.feedid = tsub.feedid
              WHERE $table_nfcatalog.userid=?
-             AND $table_nfitem.media = 1";
+	     LIMIT ?,?";
 
-  if( !empty($time) ) {
-    $sqltxt .= " AND $table_nfitem.timeadded > $time";
-  }
 
-  $sqltxt .= " ORDER BY $table_nfitem.timeadded DESC";
-
-  if($max != NULL) {
-    $sqltxt .= " LIMIT $max";
-  } else {
-    $sqltxt .= " LIMIT $default_max_list";
-  }
-
-  //loggit(3, "[$sqltxt]");
+  loggit(3, "[$sqltxt]");
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
+  $sql->bind_param("dsdd", $tstart, $uid, $start, $max) or loggit(2, $sql->error);
   $sql->execute() or print(mysql_error());
   $sql->store_result() or print(mysql_error());
 

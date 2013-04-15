@@ -6,7 +6,7 @@
 
 <!-- Menu bar -->
 <div id="divMainMenu" class="row">
-<div class="navbar navbar-inverse">
+<div class="navbar navbar-inverse <?if($g_platform != "mobile"){?>navbar-fixed-top<?}?>">
 	<div class="navbar-inner">
 		<a class="brand" href="<?echo $startpage?>"><?echo $system_name?></a>
 		<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">

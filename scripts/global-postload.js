@@ -7,6 +7,8 @@ $(document).ready( function () {
                 cache:          false,
                 timeout:        30000,
                 beforeSubmit:   function() {
+			//Close any open searches
+			$('#divSearchResultsHook').popover('hide');
 			//Don't try to process empty queries
                         if( $('#navsearchq').val() == '' ) {
                                 return(false);

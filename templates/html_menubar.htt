@@ -6,6 +6,7 @@
 
 <!-- Menu bar -->
 <div id="divMainMenu" class="row">
+<div id="divSearchResultsHook"></div>
 <div class="navbar navbar-inverse <?if($g_platform != "mobile"){?>navbar-fixed-top<?}?>">
 	<div class="navbar-inner">
 		<a class="brand" href="<?echo $startpage?>"><?echo $system_name?></a>
@@ -27,7 +28,7 @@
 			    <input id="navsearchs" type="hidden" name="s" value="<?echo $section?>" />
 	                    <input id="navsearchq" type="text" class="search-query span3" name="q" placeholder="Search" /> <img id="navSpinner" src="/images/spinner.gif" alt="" />
 	                  </form>
-		          <div id="divNavSearchResults"></div>
+			  <div id="divNavSearchResults"></div>
                         </li>
 
 			<? if( $platform == "mobile" || $platform == "tablet" ) {?>

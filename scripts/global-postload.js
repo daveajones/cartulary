@@ -32,18 +32,12 @@ $(document).ready( function () {
 				if( results.length < 1 ) {
         		                $('#divNavSearchResults').append('<p>No Results</p>');
 				} else {
-	                                //Put the results in a list, inside a hidden div
-                        	        //$('#divNavSearchResults').append('<ul>');
-                                	//for( i = 0 ; i < results.length ; i++ ) {
-	                                //        $('#divNavSearchResults').append('<li><a href="' + results[i]['url'] + '">' + results[i]['title'] + '</a></li>');
-        	                        //}
-                	                //$('#divNavSearchResults').append('</ul>');
                                         $('#search-template').tmpl(data).appendTo('#divNavSearchResults');
 				}
                         }
 
                         //Initialize the popover with the contents of the hidden div
-                        $('#navsearch').data('popover', null).popover({
+                        $('#divSearchResultsHook').data('popover', null).popover({
                                 animation:true,
                                 html:true,
                                 placement:'bottom',
@@ -54,17 +48,18 @@ $(document).ready( function () {
                         });
 
 			//Show the popover
-                        $('#navsearch').popover('show');
+                        $('#divSearchResultsHook').popover('show');
 			$('.btnCloseSearchResults').click( function() {
-				$('#navsearch').popover('hide');
+				$('#divSearchResultsHook').popover('hide');
 			});
 					//After the results are appended, call a post-search function if one is defined
                                         if( typeof searchPostLoad == 'function' ) {
 						searchPostLoad();
 					}
 
-                        //Unlock the search box and hide the spinner
+                        //Unlock the search box, hide the spinner and collapse the navbar
                         $('#navSpinner').hide();
+                        $('#divMainMenu .navbar .btn-navbar').trigger('click');
                         $('#navsearchq').attr("disabled", false);
                }
         });

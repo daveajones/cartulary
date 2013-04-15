@@ -337,7 +337,7 @@ a {  color:#059;  }
 /* ----- Navbar ----- */
 #divMainMenu .navbar {  margin-top:10px;  }
 #divSearchMenu .navbar {  margin-top:5px;  }
-#divMainMenu .navbar a.sysname {  color:#999;  }
+#divMainMenu .navbar a.sysname {  color:#777; padding:2px; font-size: 12px;  }
 .btnCloseSearchResults {  float:right;  }
 .popSearchResults {
   height:400px;
@@ -353,7 +353,7 @@ a {  color:#059;  }
 
 /* --------------------------------------------------- */
 /* ----- Header ----- */
-#divProfileHeader {  float:right;  }
+#divProfileHeader {  float:right;  margin-top:20px;  margin-right:2px;  }
 #divProfileHeader img.avatarheader {  max-height: 64px;  }
 #divPageTitle {
   color: #222;
@@ -1052,6 +1052,7 @@ a {  color:#059;  }
   color:black;
   font-size:110%;
   min-height:30px;
+  min-width:200px;
 }
 .pageContentWrapper.Subscribe #divSubscriptions .liManagedList a { color:white; }
 .pageContentWrapper.Subscribe #divSubscriptions .liManagedList .ulListFeeds {

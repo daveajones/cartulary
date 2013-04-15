@@ -492,8 +492,8 @@ function newMicroblogPostWindow(riveritem) {
 			$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure icon-iframe-enclosure" src="/images/blank.gif" alt="" />');
 		}
 		$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<input type="text" name="extenclosure[' + encount + '][url]" value="' + $(this).attr("src") + '" />');
-		$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<input type="text" class="hide" name="extenclosure[' + encount + '][type]" value="' + $(this).attr("data-type") + '" />');
-		$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<input type="text" class="hide" name="extenclosure[' + encount + '][length]" value="' + $(this).attr("data-length") + '" />');
+		$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<input type="hidden" name="extenclosure[' + encount + '][type]" value="' + $(this).attr("data-type") + '" />');
+		$(modal + ' .bpextenc ul li:eq(' + encount + ')').append('<input type="hidden" name="extenclosure[' + encount + '][length]" value="' + $(this).attr("data-length") + '" />');
 		$(modal + ' .bpextenc ul li:eq(' + encount + ') a.delete').click(function() {
 			$(this).parent().remove();
 			if( $(modal + ' .bpextenc ul li').length == 0 ) {  $(modal + ' .bpextenc').hide();  }

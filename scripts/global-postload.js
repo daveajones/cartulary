@@ -50,7 +50,7 @@ $(document).ready( function () {
                                 trigger:'manual',
                                 title:'Search Results for "<span class="popoverquery">' + data.query + '</span>" <button class="close btnCloseSearchResults">&times;</button>',
                                 content: function(ele) { return $('#divNavSearchResults').html(); },
-				template: '<div class="popover <?echo $section?>-searchpop"><div class="arrow"></div><div class="popover-inner popSearchResults"><h4 class="popover-title"></h4><div class="popover-content"><p></p></div></div></div>'
+				template: '<div class="popover searchpop <?echo $section?>-searchpop"><div class="arrow"></div><div class="popover-inner popSearchResults"><h4 class="popover-title"></h4><div class="popover-content"><p></p></div></div></div>'
                         });
 
 			//Show the popover

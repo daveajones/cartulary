@@ -138,7 +138,7 @@
 		<!-- Enclosure drop zone. -->
                 <?if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {?>
 		<div id="divEnclosures" class="dropzone">
-			<input type="hide" name="datestamp" class="datestamp" value="<?echo $datestamp?>" />
+			<input type="hidden" name="datestamp" class="datestamp" value="<?echo $datestamp?>" />
 			<div id="queue"><span id="spnQueueText">Drop file(s) here...</span></div>
 		</div>
 

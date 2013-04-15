@@ -21,7 +21,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 <div id="mdlMicroblogPost" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 class="title">Microblog Post</h3>
+    <h4 class="title">Microblog Post</h4>
   </div>
   <div class="modal-body">
     <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Posting. Please wait...<br/><br/></center>
@@ -50,17 +50,17 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 		</div>
 	
 		<!-- Short link -->
-        	<div class="bpshortlink hide">
+        	<div class="bpshortlink hidden">
 	  	<img class="icon-hyperlink-small" src="/images/blank.gif" title="Shortened Link" /><input name="shortlink" type="text" value="" />
 		</div>
 
 		<!-- Origin -->
-        	<div class="bporigin hide">
+        	<div class="bporigin hidden">
 	  	<input name="origin" type="text" value="" />
 		</div>
 
 		<!-- Source -->
-        	<div class="bpsource hide">
+        	<div class="bpsource hidden">
 	  	<input class="bpsourceurl" name="source[url]" type="text" value="" />
 	  	<input class="bpsourcetitle" name="source[title]" type="text" value="" />
 		</div>
@@ -100,7 +100,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
   <div class="modal-footer">
     <span style="float:left;">Length: <span class="mbcharcount"></span></span>
     <?if( twitter_is_enabled($g_uid) ) {?>
-    <span class="tweeters"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt="" /><span class="warntweet hide">Tweet will be truncated...</span></span>
+    <span class="tweeters"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt="" /><span class="warntweet hidden">Tweet will be truncated...</span></span>
     <?}?>
     <button type="button" class="btn btn-primary mbsubmit pull-right" aria-hidden="true">Post It!</button>
   </div>
@@ -112,7 +112,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 <div id="mdlSocialOutlineView" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 class="soname">&nbsp;</h3>
+    <h4 class="soname">&nbsp;</h4>
   </div>
   <div class="modal-body">
     <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Retrieving. Please wait...<br/><br/></center>
@@ -142,7 +142,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 <div id="mdlShowArticle" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 class="artitle">&nbsp;</h3>
+    <h4 class="artitle">&nbsp;</h4>
   </div>
   <div class="modal-body">
     <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Cartulizing. Please wait...<br/><br/></center>
@@ -165,14 +165,14 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 <div id="mdlMediaShadowbox" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 class="sbtitle">&nbsp;</h3>
+    <h4 class="artitle">&nbsp;</h4>
   </div>
   <div class="modal-body">
     <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Loading image. Please wait...<br/><br/></center>
     <div class="sbbody"></div>
   </div>
   <div class="modal-footer">
-    <center class="sbfooter hide">
+    <center class="sbfooter hidden">
       <a class="rt" title="Send to Microblog" href="#"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
     </center>
   </div>

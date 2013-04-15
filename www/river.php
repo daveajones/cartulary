@@ -80,9 +80,7 @@
 <div id="stream-sidebar-left">
 <div id="divMe" style="float:left;">
   <a href="#" class="pull-right" onclick="javascript:newMicroblogPostWindow();return false;"><img class="icon-balloon" src="/images/blank.gif" alt="" /></a>
-  <b>My Posts</b>
-  <br/>
-  <br/>
+  <h4>My Posts</h4>
   <div id="divMicroblogWidget"><script id="scrMicroblogWidget" src="<?echo $s3widget?>?ts=<?echo time()?>"></script></div>
 </div>
 </div>
@@ -97,9 +95,7 @@
 <?if($platform != "mobile" && $platform != "tablet") {?>
 <div id="stream-sidebar-right">
         <div id="divMyFeeds" class="pull-right" style="float:right;">
-	        <b>My Feeds</b>
-		<br/>
-		<br/>
+	        <h4>My Feeds</h4>
 	        <ul id="ulMyStuff">
         		<li><a href="<?echo $s3sopml?>">My Social Outline</a></li>
 	                <li><a href="<?echo $s3blogfeed?>"><?echo get_microblog_title($uid)?></a></li>
@@ -125,9 +121,7 @@
 	</div>
 
 	<div id="divBuddies" class="pull-right" style="float:right;">
-  	<b>Following</b>
-	<br/>
-	<br/>
+  	<h4>Following</h4>
   	<?
     	$outlines = get_outlines($uid, $max);
     	foreach($outlines as $ou) {

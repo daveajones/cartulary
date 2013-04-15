@@ -39,7 +39,7 @@
 
 <div class="row" id="divPageArticle">
 	<div id="article">
-		<div id="headline"><h1><?echo $article['title']?></h1></div>
+		<div id="headline"><h3><?echo $article['title']?></h3></div>
 		<?if(!empty($article['sourceurl'])) {?>
                 <div id="source">Source: <a href="<?echo $article['sourceurl']?>"><?echo $article['sourcetitle']?></a></div>
 		<?}?>

@@ -51,7 +51,7 @@
 		  <input id="txtUsername" name="email" class="txtinput required" type="text" />
 		<label class="lblLoginLabel" id="lblPassword" for="txtPassword"><h2>Password:</h2></label>
                   <input id="txtPassword" name="password" class="txtinput required password" type="password" />
-		<br/><input id="submit" name="submit" class="btn btn-large" type="submit" value="Login" />
+		<br/><input id="submit" name="submit" class="btn pull-right" type="submit" value="Login" />
 	    </form>
 	</div>
     </div>

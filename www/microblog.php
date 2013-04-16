@@ -129,7 +129,7 @@
 		<!-- Origin box. -->
                 <?if( !empty($origin) ) {?>
         	<div id="divOrigin">
-		<input name="origin" id="hidOrigin" type="hide" value="<?echo $origin?>" />
+		<input name="origin" id="hidOrigin" type="hidden" value="<?echo $origin?>" />
 		</div>
                 <?}?>
 

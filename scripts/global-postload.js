@@ -34,22 +34,24 @@ $(document).ready( function () {
 				} else {
                                         $('#search-template').tmpl(data).appendTo('.searchbar .body');
 				}
+
+				//Show the results
+				$('.searchbar .head h4 small').empty().append('(' + data.query + ')');
+                	        $('.searchbar').show();
+				$('.searchbar .head .btnCloseSearchResults').unbind('click');
+				$('.searchbar .head .btnCloseSearchResults').click( function() {
+					$('.searchbar').hide();
+        	                        $('.searchbar .body').empty();
+				});
                         }
 
-			//Show the popover
-                        $('#divMainMenu .navbar .btn-navbar').trigger('click');
-			$('.searchbar .head h4 small').empty().append('(' + data.query + ')');
-                        $('.searchbar').show();
-			$('.searchbar .head .btnCloseSearchResults').click( function() {
-				$('.searchbar').hide();
-                                $('.searchbar .body').empty();
-			});
-					//After the results are appended, call a post-search function if one is defined
-                                        if( typeof searchPostLoad == 'function' ) {
-						searchPostLoad();
-					}
+			//After the results are appended, call a post-search function if one is defined
+                        if( typeof searchPostLoad == 'function' ) {
+				searchPostLoad();
+			}
 
                         //Unlock the search box, hide the spinner and collapse the navbar
+                        $('#divMainMenu .navbar .btn-navbar').trigger('click');
                         $('#navSpinner').hide();
                         $('#navsearchq').attr("disabled", false);
                }

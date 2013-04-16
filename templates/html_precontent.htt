@@ -1,0 +1,4 @@
+<!-- Two empty divs for search and notifications -->
+<div class="row noticebar well hide"></div>
+<div class="row searchresults well hide"></div>
+

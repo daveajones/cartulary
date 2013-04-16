@@ -66,15 +66,14 @@
 
 <!-- Page header and title area -->
 <div class="row page-header" id="divPageTitle">
-        <h1><?echo get_user_name_from_uid($uid)?></h1>
+  <h1><?echo get_user_name_from_uid($uid)?></h1>
 </div>
 
+<?//--- Include the logo and menu bar html fragments --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
 
-<!-- Page header and title area -->
 <div class="row " id="divRiverBeta">
-	<div id="divRiverStreamWrapper" class="span12">
-
-	</div>
+  <div id="divRiverStreamWrapper" class="span12"></div>
 
 <?if($platform != "mobile") {?>
 <div id="stream-sidebar-left">

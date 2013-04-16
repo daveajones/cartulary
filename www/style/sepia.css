@@ -36,10 +36,11 @@
 /* ----- Body and other major elements ----- */
 body > .container {
   width:90%;
+  margin-top:40px;
   margin-left:auto;
   margin-right:auto;
 }
-a {  color:#059;  }
+a {  color:#057;  }
 .pageContentWrapper .statline {  text-align:right;  }
 .pageContentWrapper .statline > ul, .pageContentWrapper .statline > ul > li {
   list-style:none;
@@ -48,6 +49,14 @@ a {  color:#059;  }
 }
 /* --------------------------------------------------- */
 
+
+/* --------------------------------------------------- */
+/* ----- Search ----- */
+div.searchbar {
+  background-color: #FBF0D9;
+  color: #5F4B32;
+}
+/* --------------------------------------------------- */
 
 
 /* --------------------------------------------------- */
@@ -89,7 +98,7 @@ a {  color:#059;  }
 }
 #mdlShowArticle .modal-header .artitle {
   background-color: #FBF0D9;
-  font-family: "CreteRoundRegular", serif;
+  font-family: "CreteRoundRegular", Georgia, serif;
   color: #5F4B32;
   font-size: 140%;
   line-height: 150%;
@@ -97,7 +106,7 @@ a {  color:#059;  }
 #mdlShowArticle .modal-body .arbody,
 #mdlShowArticle .modal-body .arbody p {
   background-color: #FBF0D9;
-  font-family: "CreteRoundRegular", serif;
+  font-family: "CreteRoundRegular", Georgia, serif;
   font-size: 110%;
   line-height: 130%;
   word-spacing: 0.02em;
@@ -339,6 +348,10 @@ a {  color:#059;  }
 #divSearchMenu .navbar {  margin-top:5px;  }
 #divMainMenu .navbar a.sysname {  color:#777; padding:2px; font-size: 12px;  }
 .btnCloseSearchResults {  float:right;  }
+.searchpop {
+  width:600px;
+  min-width:600px;
+}
 .popSearchResults {
   height:400px;
   width:600px;
@@ -400,7 +413,9 @@ a {  color:#059;  }
   word-break:hyphenate;
 }
 .pageContentWrapper.River #stream .section .article h3 {
-  font-size:120%;
+  font-size:110%;
+  line-height:130%;
+  white-space:normal;
   margin:4px 0 4px;
 }
 .pageContentWrapper.River #stream .section .article .description {
@@ -542,7 +557,7 @@ a {  color:#059;  }
           border-radius: 4px;
 }
 .pageContentWrapper.Articles #divPageArticle #article {
-  font-family: "CreteRoundRegular", serif;
+  font-family: "CreteRoundRegular", Georgia, serif;
   font-size: 130%;
   line-height: 150%;
   background-color: #FBF0D9;
@@ -560,9 +575,9 @@ a {  color:#059;  }
   margin-bottom:20px;
 }
 .pageContentWrapper.Articles #divPageArticle #article #content p {
-  font-family: "CreteRoundRegular", serif;
+  font-family: "CreteRoundRegular", Georgia, serif;
   font-size: 18px;
-  line-height: 20px;
+  line-height: 22px;
   margin-bottom: 20px;
 }
 .pageContentWrapper.Articles #divPageArticle #article #content img {  max-width:500px;  }
@@ -731,7 +746,7 @@ a {  color:#059;  }
   list-style:none;
 }
 .pageContentWrapper.Microblog #divPostList li {
-  font-family: "CreteRoundRegular", serif;
+  font-family: "CreteRoundRegular", Georgia, serif;
   padding:10px;
   margin-bottom:20px;
   background-color:#ddd;
@@ -781,7 +796,7 @@ a {  color:#059;  }
 #mdlFeedImport #btnFeedImportSubmit {  margin-left:8px;  }
 /* ----------------------------------------------------------------------- testing ----------------------------------------------------------------------------- */
 .pageContentWrapper.Microblog #divBlogPost input, textarea {
-  font-family: "CreteRoundRegular", serif;
+  font-family: "CreteRoundRegular", Georgia, serif;
   line-height
 }
 .pageContentWrapper.Microblog #divBlogPost #divPostIt input {  font-size:120%;  }
@@ -802,7 +817,7 @@ a {  color:#059;  }
   float:left;
   margin:10px;
   width:310px;
-  font-family: "CreteRoundRegular", serif;
+  font-family: "CreteRoundRegular", Georgia, serif;
   font-size: 130%;
   line-height: 130%;
   word-wrap:break-word;

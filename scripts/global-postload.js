@@ -7,8 +7,6 @@ $(document).ready( function () {
                 cache:          false,
                 timeout:        30000,
                 beforeSubmit:   function() {
-			//Close any open searches
-			$('#divSearchResultsHook').popover('hide');
 			//Don't try to process empty queries
                         if( $('#navsearchq').val() == '' ) {
                                 return(false);
@@ -18,41 +16,33 @@ $(document).ready( function () {
                         $('#navSpinner').show();
                         $('#navsearchq').attr("disabled", true);
 			//Set a default content in case no results are returned.
-                        $('#divNavSearchResults').append('<p>No Results</p>');
+                        $('.searchbar .body').append('<p>No Results</p>');
                 },
                 success:        function(data) {
 			//If an error occured on the backend, give a warning message
                         if(data.status == "false") {
                                 showMessage( data.description, data.status, 5 );
 				data.query = '';
-                                $('#divNavSearchResults').empty();
-                                $('#divNavSearchResults').append('<center><p>Error during search: ' + data.description + '</p></center>');
+                                $('.searchbar .body').empty();
+                                $('.searchbar .body').append('<center><p>Error during search: ' + data.description + '</p></center>');
                         } else {
 				//If we got a blank result, then say so
         	                var results = data.data;
-                	        $('#divNavSearchResults').empty();
+                	        $('.searchbar .body').empty();
 				if( results.length < 1 ) {
-        		                $('#divNavSearchResults').append('<p>No Results</p>');
+        		                $('.searchbar .body').append('<p>No Results</p>');
 				} else {
-                                        $('#search-template').tmpl(data).appendTo('#divNavSearchResults');
+                                        $('#search-template').tmpl(data).appendTo('.searchbar .body');
 				}
                         }
 
-                        //Initialize the popover with the contents of the hidden div
-                        $('#divSearchResultsHook').data('popover', null).popover({
-                                animation:true,
-                                html:true,
-                                placement:'bottom',
-                                trigger:'manual',
-                                title:'Search Results for "<span class="popoverquery">' + data.query + '</span>" <button class="close btnCloseSearchResults">&times;</button>',
-                                content: function(ele) { return $('#divNavSearchResults').html(); },
-				template: '<div class="popover searchpop <?echo $section?>-searchpop"><div class="arrow"></div><div class="popover-inner popSearchResults"><h4 class="popover-title"></h4><div class="popover-content"><p></p></div></div></div>'
-                        });
-
 			//Show the popover
-                        $('#divSearchResultsHook').popover('show');
-			$('.btnCloseSearchResults').click( function() {
-				$('#divSearchResultsHook').popover('hide');
+                        $('#divMainMenu .navbar .btn-navbar').trigger('click');
+			$('.searchbar .head h4 small').empty().append('(' + data.query + ')');
+                        $('.searchbar').show();
+			$('.searchbar .head .btnCloseSearchResults').click( function() {
+				$('.searchbar').hide();
+                                $('.searchbar .body').empty();
 			});
 					//After the results are appended, call a post-search function if one is defined
                                         if( typeof searchPostLoad == 'function' ) {
@@ -61,7 +51,6 @@ $(document).ready( function () {
 
                         //Unlock the search box, hide the spinner and collapse the navbar
                         $('#navSpinner').hide();
-                        $('#divMainMenu .navbar .btn-navbar').trigger('click');
                         $('#navsearchq').attr("disabled", false);
                }
         });

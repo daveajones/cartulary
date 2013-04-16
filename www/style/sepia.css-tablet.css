@@ -37,6 +37,7 @@
 body {
   background:#4d4d4d url(../images/bg-body.jpg) repeat top left;
 }
+a {  color: #057;  }
 #divPageTitle {  display:none;  }
 .pageContentWrapper .statline {  text-align:right;  }
 .pageContentWrapper .statline > ul, .pageContentWrapper .statline > ul > li {
@@ -46,6 +47,14 @@ body {
 }
 /* --------------------------------------------------- */
 
+
+/* --------------------------------------------------- */
+/* ----- Search ----- */
+div.searchbar {
+  background-color: #FBF0D9;
+  color: #5F4B32;
+}
+/* --------------------------------------------------- */
 
 
 /* --------------------------------------------------- */
@@ -419,7 +428,11 @@ body {
 .pageContentWrapper.River #stream .section {  margin-top:1em;  }
 .pageContentWrapper.River #stream .section .header h2 {  float:none; margin-top:0;  }
 .pageContentWrapper.River #stream .section .header .time {  float:none; padding:0; margin-top:0;  }
-.pageContentWrapper.River #stream .article h3 {  font-size:0.875em;  }
+.pageContentWrapper.River #stream .article h3 {
+  font-size:0.875em;
+  line-height:130%;
+  whitespace:normal;
+}
 .pageContentWrapper.River #stream .article .description {  font-size:0.8125em;  }
 .pageContentWrapper.River #stream .section .article .byline {
   font-size: 80%;

@@ -6,6 +6,7 @@
 .icon-book-small { background:url('/images/glyph/glyphicons_halflings_042_book.png') 0px 5px no-repeat; width:20px; height:20px; border:0; outline:none; }
 .icon-remove { background:url('/images/glyph/glyphicons_197_remove.png') 3px 3px no-repeat; width:30px; height:30px; border:0; margin-right:8px; }
 .icon-remove-1 { display:inline-block; background:url('/images/glyph/glyphicons_halflings_086_remove.png') 3px 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
+.icon-close { display:inline-block; background:url('/images/glyph/glyphicons_207_remove_2.png') 0px 0px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .icon-remove-small { display:inline-block; background:url('/images/glyph/glyphicons_halflings_086_remove.png') 3px 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .icon-share { background:url('/images/glyph/glyphicons_222_share.png') 6px 6px no-repeat; width:60px; height:60px; border:0; margin-right:8px; }
 .icon-rss { display:inline-block; background:url('/images/glyph/glyphicons_397_rss.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }

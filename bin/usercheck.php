@@ -17,7 +17,7 @@
 
 	//Let's subscribe this user to the default subscription list, just to get
         //some feeds and an outline in the system
-        $oid = add_outline('http://localhost'.$default_subscription_list_url, $newadmin);
+        $oid = add_outline('http://localhost'.$default_subscription_list_url, $newadmin, 'list');
       }
     }
 

@@ -3652,7 +3652,7 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
 
   //Include old feeds?
   if( $withold == FALSE ) {
-    $sqltxt .= " AND lastupdate > $monthago";
+    $sqltxt .= " AND (lastupdate > $monthago OR lastcheck = '')";
   }
 
   //Sort by last check time

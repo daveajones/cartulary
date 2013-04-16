@@ -32,7 +32,7 @@
 <div class="row" id="divPrefs">
 <div id="divPrefsInner">
 	<div id="divBookmarklets">
-	<h2>Bookmarklets</h2>
+	<h3>Bookmarklets</h3>
 	<ul>
 		<li id="liCartBookmarklet"><a id="aCartBookmarklet" href="<?echo trim(sprintf($bookmarklet_url, $system_url))?>">Cartulize</a></li>
 		<li id="liBlogBookmarklet"><a id="aBlogBookmarklet" href="<?echo trim(sprintf($bookmarklet_blog_url, $system_url))?>">Microblog</a></li>
@@ -44,7 +44,7 @@
         <div id="divSetpw" class="control-group">
 	<form name="setpw" id="frmSetpw" method="POST" action="/cgi/auth/setpassword">
 	<fieldset>
-	<h2>Change Password</h2>
+	<h3>Change Password</h3>
 	<ul>
 	 	<li>Password: <input name="password1" class="urlinput" type="text" value="" /></li>
 		<li>Confirm: <input name="password2" class="urlinput" type="text" value="" /></li>
@@ -64,7 +64,7 @@
 
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefMe"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
-	<h2>Me</h2>
+	<h3>Me</h3>
 	<ul>
         <div class="control-group">
 		<li>My name is: <input name="myname" class="urlinput" type="text" value="<?echo $username?>" /></li>
@@ -91,7 +91,7 @@
 
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefAmazon"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
-	<h2>Amazon S3</h2>
+	<h3>Amazon S3</h3>
 	<ul>
         	<div class="control-group">
 			<li>My Amazon S3 key is <input name="s3key" type="text" value="<?echo $prefs['s3key']?>" /></li>
@@ -114,7 +114,7 @@
 
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefRiver"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
-	<h2>River</h2>
+	<h3>River</h3>
 	<ul>
 		<li>I want: <input id="riverhours" class="hourinput" name="riverhours" type="text" value="<?echo $prefs['riverhours']?>" /> hours worth of items listed in my river.</li>
 		<li>But, never show more than: <input class="hourinput" name="maxriversize" type="text" value="<?echo $prefs['maxriversize']?>" /> items at a time.</li>
@@ -130,7 +130,7 @@
 
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefMicroblog"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
-	<h2>Microblog</h2>
+	<h3>Microblog</h3>
 	<ul>
 		<li>My microblog title should be: <input name="microblogtitle" class="urlinput" type="text" value="<?echo $prefs['microblogtitle']?>" /></li>
 		<li>I want my microblog filename to be: <input id="mbfilename" name="mbfilename" type="text" value="<?echo $prefs['mbfilename']?>" /></li>
@@ -139,28 +139,28 @@
 			<li>I'd rather use an external linkblog located at: <input name="linkblog" class="urlinput" type="text" value="<?echo $prefs['linkblog']?>" /> (url)</li>
 		</div>
 		<li><input name="mblinkhome" type="checkbox" <?if ($prefs['mblinkhome'] == 1) echo "checked ";?>/> I want my microblog RSS link element to point to my homepage.</li>
-		<li><input name="publicrss" type="checkbox" <?if ($prefs['publicrss'] == 1) echo "checked ";?>/> I want my microblog RSS feed to be private.</li>
+		<li class="privacy"><input name="publicrss" type="checkbox" <?if ($prefs['publicrss'] == 1) echo "checked ";?>/> I want my microblog RSS feed to be private.</li>
 		<li><input name="mbreturnhome" type="checkbox" <?if ($prefs['mbreturnhome'] == 1) echo "checked ";?>/> I want to go back to the home page after posting.</li>
 	</ul>
 	</div>
 
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefArticles"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
-	<h2>Articles</h2>
+	<h3>Articles</h3>
 	<ul>
 		<li>My article archive title should be: <input name="cartularytitle" class="urlinput" type="text" value="<?echo $prefs['cartularytitle']?>" /></li>
 		<li>I want my article archive feed filename to be: <input id="cartfilename" name="cartfilename" type="text" value="<?echo $prefs['cartfilename']?>" /></li>
 		<li><input name="tweetcart" type="checkbox" <?if ($prefs['tweetcart'] == 1) echo "checked ";?>/> I want the articles I save to be tweeted.</li>
 		<li><input name="shortcart" type="checkbox" <?if ($prefs['shortcart'] == 1) echo "checked ";?>/> I want articles that I cartulize to have their url's shortened also.</li>
-		<li><input name="publicdefault" type="checkbox" <?if ($prefs['publicdefault'] == 1) echo "checked ";?>/> I want my article archive RSS feed to be private.</li>
-		<li><input name="publicopml" type="checkbox" <?if ($prefs['publicopml'] == 1) echo "checked ";?>/> I want my article archive OPML file to be private.</li>
+		<li class="privacy"><input name="publicdefault" type="checkbox" <?if ($prefs['publicdefault'] == 1) echo "checked ";?>/> I want my article archive RSS feed to be private.</li>
+		<li class="privacy"><input name="publicopml" type="checkbox" <?if ($prefs['publicopml'] == 1) echo "checked ";?>/> I want my article archive OPML file to be private.</li>
 		<li><input name="staticarticles" type="checkbox" <?if ($prefs['staticarticles'] == 1) echo "checked ";?>/> I want a static version of each article stored in S3.</li>
 	</ul>
 	</div>
 
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefLinks"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
-	<h2>Links</h2>
+	<h3>Links</h3>
 	<ul>
 		<li><input name="sourceurlrt" type="checkbox" <?if ($prefs['sourceurlrt'] == 1) echo "checked ";?>/> I want RT links to use the original source url.</li>
 		<li><input name="sourceurlrss" type="checkbox" <?if ($prefs['sourceurlrss'] == 1) echo "checked ";?>/> I want RSS feed links to point to the original source url.</li>
@@ -169,7 +169,7 @@
 
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefStyle"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
-	<h2>Style</h2>
+	<h3>Style</h3>
 	<ul>
 	        <div class="control-group">
 			<li>I want to override the default style with the stylesheet located at this url: <input name="stylesheet" type="text" value="<?echo $prefs['stylesheet']?>" /></li>
@@ -182,7 +182,7 @@
 
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefTwitter"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
-	<h2>Twitter <small>(Create app <a href="https://dev.twitter.com/apps/new">here</a>. Instructions <a href="https://groups.google.com/d/msg/sopml/fbMd0cWPzRk/84mMoDM4BEsJ">here</a>.)</small></h2>
+	<h3>Twitter <small>(Create app <a href="https://dev.twitter.com/apps/new">here</a>. Instructions <a href="https://groups.google.com/d/msg/sopml/fbMd0cWPzRk/84mMoDM4BEsJ">here</a>.)</small></h3>
 	<ul>
         	<div class="control-group">
 			<li>My Twitter oAuth consumer key is <input name="twitterkey" type="text" value="<?echo $prefs['twitterkey']?>" /></li>
@@ -201,7 +201,7 @@
 
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefShortener"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
-	<h2>Url Shortener</h2>
+	<h3>Url Shortener</h3>
 	<ul>
 	        <div class="control-group">
 			<li>My shortening service is called with this url: <input name="urlshortener" type="text" value="<?echo $prefs['urlshortener']?>" /> (use %@ for the url variable)</li>

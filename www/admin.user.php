@@ -40,7 +40,7 @@
                           <input id="email" name="userEmail" type="text" class="required email" />
 			</div>
                         <div class="divCreateSubmit">
-                          <img class="spinner" src="/images/spinner.gif" alt="" /><input class="btn-primary" id="createSubmit" name="createSubmit" type="submit" value="Create" />
+                          <img class="spinner" src="/images/spinner.gif" alt="" /><input class="btn btn-primary" id="createSubmit" name="createSubmit" type="submit" value="Create" />
 			</div>
                   </form>
                 </div>

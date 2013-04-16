@@ -898,8 +898,6 @@ div.searchbar {
 }
 .pageContentWrapper.Articles #date-line #btnSubmitDates {
   float:left;
-  min-width:50px;
-  min-height:50px;
 }
 .pageContentWrapper.Articles #divArticles {
   position:relative;

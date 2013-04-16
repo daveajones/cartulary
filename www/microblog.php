@@ -96,7 +96,7 @@
 
 			<div id="divPostIt">
         		        <span id="spnCharCount"></span>
-		                <input id="btnSubmit" name="submitbtn" class="btn btn-primary btn-large" type="submit" value="Post It!" /> <img id="imgSpinner" alt="" src="/images/spinner.gif" />
+		                <input id="btnSubmit" name="submitbtn" class="btn btn-primary" type="submit" value="Post It!" /> <img id="imgSpinner" alt="" src="/images/spinner.gif" />
 			</div>
                 </div>
 
@@ -220,13 +220,15 @@
 <div id="mdlFeedImport" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>Enter the url of the RSS feed to import:</h3>
+    <h4>Enter the url of the RSS feed to import:</h4>
   </div>
   <div class="modal-body">
     <br/>
     <form id="frmFeedImport" name="feedimport" action="/cgi/in/import.feed" method="POST">
+      <div class="form-horizontal">
       URL: <input type="text" id="txtFeedImportUrl" class="urlinput" name="url" />
-      <input id="btnFeedImportSubmit" class="btn-primary" name="btnFeedImportSubmit" type="submit" value="Import" />
+      <input id="btnFeedImportSubmit" class="btn btn-primary" name="btnFeedImportSubmit" type="submit" value="Import" />
+      </div>
     </form>
     <div id="divWaitMessage" class="hide pagination-centered"><img id="imgSpinner" alt="" src="/images/spinner.gif" /> This could take a while. Please wait...</div>
   </div>

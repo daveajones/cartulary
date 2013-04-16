@@ -112,8 +112,10 @@
 	        </ul>
                 <div id="divAddPubFeed">
 	                <form id="frmAddPubFeed" name="feedadd" action="<?echo $addpubfeedcgi?>" method="POST">
+				<div class="form-horizontal">
         	                <input id="txtPubFeedUrl" type="text" name="url" placeholder="Paste your feed url here..." />
-                                <input id="btnPubFeedSubmit" name="submit" class="btn-primary" type="submit" value="+" />
+                                <input id="btnPubFeedSubmit" name="submitbtn" class="btn btn-primary" type="submit" value="+" />
+				</div>
                                 <img id="imgPubFeedSpinner" class="imgSpinner" src="/images/spinner.gif" alt="" />
                         </form>
                 </div>

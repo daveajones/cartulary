@@ -43,7 +43,7 @@
           Bad Logins: <input id="txtEditUserBadLogins_${user.id}" class="txtEditUser" name="txtEditUserBadLogins" type="text" value="${user.badlogins}" /><br/>
           Activated: <input id="txtEditUserActivated_${user.id}" class="chkEditUser" name="txtEditUserActivated" type="checkbox" {{if user.active == 1}}checked{{/if}} /><br/>
           Admin: <input id="chkEditUserAdmin_${user.id}" class="chkEditUser" name="chkEditUserAdmin" type="checkbox" {{if user.admin == 1}}checked{{/if}} /><br/>
-          <img class="spinner" src="/images/spinner.gif" alt="" /><input id="btnEditUserSubmit_${user.id}" class="btn-primary" name="btnEditUserSubmit" type="submit" value="Apply Changes" />
+          <img class="spinner" src="/images/spinner.gif" alt="" /><input id="btnEditUserSubmit_${user.id}" class="btn btn-primary" name="btnEditUserSubmit" type="submit" value="Apply Changes" />
         </form>
       </td>
     </tr>

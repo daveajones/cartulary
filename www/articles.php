@@ -77,7 +77,7 @@
               End: <input id="end-date" name="dend" class="txtDatePicker" type="text" disabled value="<?echo $dend?>" />
             </div>
 	    </div>
-            <input id="btnSubmitDates" type="submit" class="btn-primary" name="submitdateget" value="Get" />
+            <input id="btnSubmitDates" type="submit" class="btn btn-primary" name="submitdateget" value="Get" />
           </fieldset>
 	</form>
         </div>

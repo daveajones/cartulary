@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 15;
+$cg_database_version = 16;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -164,6 +164,15 @@ CGDB0033;
 $cg_database_updates[14][] = <<<CGDB0034
  INSERT INTO `dbversion` ( `version` ) VALUES ( '15' )
 CGDB0034;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 15 to 16 -------------------------------------------------------------------------------------------------
+$cg_database_updates[15][] = <<<CGDB0035
+ ALTER TABLE `prefs` ADD `hideme` TINYINT NOT NULL DEFAULT '0' COMMENT 'Hide this user from directory searches?'
+CGDB0035;
+$cg_database_updates[15][] = <<<CGDB0036
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '16' )
+CGDB0036;
 //----------------------------------------------------------------------------------------------------------------
 
 

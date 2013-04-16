@@ -92,6 +92,47 @@ function get_article($id = NULL, $uid = NULL)
 
 
 //_______________________________________________________________________________________
+//Retrieve an article's text analysis from the repository
+function get_article_analysis($id = NULL)
+{
+  //Check parameters
+  if($id == NULL) {
+    loggit(2,"The article id given is corrupt or blank: [$id]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Look for the sid in the session table
+  $sql=$dbh->prepare("SELECT analysis FROM $table_article WHERE id=?") or print(mysql_error());
+  $sql->bind_param("s", $id) or print(mysql_error());
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+  //See if the session is valid
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(2,"Failed to retrieve article content for article id: [$id]");
+    return(FALSE);
+  }
+  $sql->bind_result($analysis) or print(mysql_error());
+  $sql->fetch() or print(mysql_error());
+  $sql->close() or print(mysql_error());
+
+  //Put the analysis text into an array
+  $analarray = explode(',', $analysis);
+
+
+  loggit(1,"Returning article analysis for article id: [$id]");
+  return($analarray);
+}
+
+
+//_______________________________________________________________________________________
 //Retrieve a random article from the article table
 function get_random_article()
 {

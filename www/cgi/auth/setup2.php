@@ -148,10 +148,8 @@ if(is_outline($content)) {
     $count = 0;
     $getitems = TRUE;
     foreach($feeds as $feed) {
-      if($count > 5) {
-        $getitems = FALSE;
-      }
-      $fid = add_feed($feed, $uid, $getitems, $oid);
+      $fid = add_feed($feed, $uid, FALSE, $oid);
+      mark_feed_as_updated($fid);
       loggit(1, "Added feed: [$feed] from a social outline subscription.");
       $count++;
     }
@@ -203,10 +201,8 @@ if(is_outline($content)) {
     $count = 0;
     $getitems = TRUE;
     foreach($feeds as $feed) {
-      if($count > 5) {
-        $getitems = FALSE;
-      }
-      $fid = add_feed($feed, $uid, $getitems, $oid);
+      $fid = add_feed($feed, $uid, FALSE, $oid);
+      mark_feed_as_updated($fid);
       loggit(1, "Added feed: [$feed] from a reading list subscription.");
       $count++;
     }

@@ -2,9 +2,6 @@
 <?include "$confroot/$templates/php_page_init.php"?>
 <?include "$confroot/$templates/php_page_admin.php"?>
 <?
-  //Get all the users in the system
-  $users = get_users();
-
   $section = "Admin-user";
   $tree_location = "User Administration";
 ?>
@@ -26,6 +23,9 @@
 <div class="row page-header" id="divPageTitle">
 	<h1><?echo $tree_location?></h1>
 </div>
+
+<?//--- Stuff between the title and content --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
 
 <div class="row" id="divAdmin">
 		<div class="" id="divUserCreate">

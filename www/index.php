@@ -44,6 +44,9 @@
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar_preauth"?>
 
+<?//--- Stuff between the title and content --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
+
     <div id="divLoginFrame">
 	<div id="divLoginInner">
 	    <form id="loginForm" action="/cgi/auth/login" method="post">

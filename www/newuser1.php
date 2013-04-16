@@ -53,7 +53,6 @@
 $(document).ready( function() {
                 $('#frmPrefs').ajaxForm({
                         dataType:       'json',
-			timeout:	60000,
                         success:        function(data) {
                                 $('#divPref .control-group').removeClass('error');
                                 if(data.status == "false") {
@@ -87,6 +86,9 @@ $(document).ready( function() {
 <div class="row page-header" id="divPageTitle">
 	<h1><?echo get_user_name_from_uid($uid)?><small><span id="message"></span></small></h1>
 </div>
+
+<?//--- Stuff between the title and content --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
 
 <div class="row" id="divNewUser1">
 

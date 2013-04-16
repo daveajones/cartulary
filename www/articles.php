@@ -60,6 +60,9 @@
         </h1>
 </div>
 
+<?//--- Stuff between the title and content --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
+
 <div class="statline"><ul><li><a class="showall"><a href="?max=0"> Show all </a></li><?if($platform == "mobile") {?><li><a class="showdatepicker" href="#">Date Range</a></li><?}?></ul></div>
 <div class="row" id="divArticleList">
 

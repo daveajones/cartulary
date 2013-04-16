@@ -25,6 +25,9 @@
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar_preauth"?>
 
+<?//--- Stuff between the title and content --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
+
 <div class="row" id="divErrorPage">
 
   <h3><center>An error was encountered: <span style="color:#b00;">"<?echo $message?>"</span></center></h3>

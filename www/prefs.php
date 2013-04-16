@@ -26,6 +26,9 @@
 	<h1><?echo $tree_location?></h1>
 </div>
 
+<?//--- Stuff between the title and content --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
+
 <div class="row" id="divPrefs">
 <div id="divPrefsInner">
 	<div id="divBookmarklets">

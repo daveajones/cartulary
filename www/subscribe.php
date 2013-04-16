@@ -28,17 +28,13 @@
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar"?>
 
-
-<!-- ----- Page header:Start ----- -->
 <div class="row page-header" id="divPageTitle">
   <h1><?echo $tree_location?></h1>
 </div>
-<!-- ----- Page header:Stop  ----- -->
 
+<?//--- Stuff between the title and content --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
 
-<!-- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -->
-<!-- ----- Subscribe Form:Start ----- -->
-<!-- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -->
 <div class="row" id="divSubscribe">
   <form id="frmSubscribe" name="subscribe" action="<?echo $subscribecgi?>" method="POST">
   <fieldset>

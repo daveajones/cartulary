@@ -31,6 +31,9 @@
 	<h1><?echo $tree_location?> <small>(<?echo $feedcount?> feeds.)</small></h1>
 </div>
 
+<?//--- Stuff between the title and content --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
+
 <div class="row" id="divAdmin">
 
 		<div id="divFeedAdmin">

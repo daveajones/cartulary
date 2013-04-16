@@ -66,13 +66,12 @@
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar"?>
 
-
-<!-- ----- Page header:Start ----- -->
 <div class="row page-header" id="divPageTitle">
   <h1>Today's Media</h1>
 </div>
-<!-- ----- Page header:Stop  ----- -->
 
+<?//--- Stuff between the title and content --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
 
 <div class="row" id="divMedia"></div>
 

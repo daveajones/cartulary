@@ -69,7 +69,7 @@
   <h1><?echo get_user_name_from_uid($uid)?></h1>
 </div>
 
-<?//--- Include the logo and menu bar html fragments --?>
+<?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
 
 <div class="row " id="divRiverBeta">

@@ -21,17 +21,13 @@
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar"?>
 
-
-<!-- ----- Page header:Start ----- -->
 <div class="row page-header" id="divPageTitle">
   <h1><?echo $tree_location?></h1>
 </div>
-<!-- ----- Page header:Stop  ----- -->
 
+<?//--- Stuff between the title and content --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
 
-<!-- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -->
-<!-- ----- Subscribe Form:Start ----- -->
-<!-- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -->
 <div class="row" id="divFeedFinder">
 <?
 $urltype="";
@@ -39,6 +35,7 @@ if( isset($_REQUEST['url']) ) {
 	//Can we get an alternate link from the html at this url?
 	$url = trim($_REQUEST['url']);
         $url = get_final_url($url);
+	loggit(3, "Subscribe bookmarklet: [$url]");
         $content = fetchUrl($url);
         if( ($ftype = is_feed($content)) != FALSE ) {
 	  loggit(3, "DEBUG: Url itself is a feed.");

@@ -14,5 +14,4 @@
 
   $tree_location = "Admin Log Feed";
 ?>
-<?echo build_admin_log_rss_feed($max)?>
-
+<?print( build_admin_log_rss_feed($max));?>

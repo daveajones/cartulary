@@ -76,9 +76,11 @@
 <?include "$confroot/$templates/$template_html_menubar"?>
 
 <div class="row page-header" id="divPageTitle">
-	<h1><?echo $tree_location?><small><span id="message"></span></small>
-        </h1>
+	<h1><?echo $tree_location?><small><span id="message"></span></small></h1>
 </div>
+
+<?//--- Stuff between the title and content --?>
+<?include "$confroot/$templates/$template_html_precontent"?>
 
 <div class="row" id="divBlogPost">
 	<div class="blogPostWrapper">

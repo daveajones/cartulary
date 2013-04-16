@@ -3417,6 +3417,11 @@ function get_feed_items($fid = NULL, $max = NULL)
   $fstart = time();
   $url = $feed['url'];
 
+  //Only get the first few entries if this is a new feed
+  if( empty($feed['lastcheck']) ) {
+    $max = $default_new_subscription_item_count;
+  }
+
   //Check for bad feed url
   if( empty($url) ) {
     loggit(2, "Feed: [$fid] has a blank url: [$url].");

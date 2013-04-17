@@ -53,8 +53,16 @@ a {  color:#057;  }
 /* --------------------------------------------------- */
 /* ----- Search ----- */
 div.searchbar {
+  z-index:10;
+  max-width:900px;
+  top:50px;
+  left:50px;
+  position:absolute;
   background-color: #FBF0D9;
   color: #5F4B32;
+  -moz-box-shadow: 0px 0px 15px #222;
+  -webkit-box-shadow: 0px 0px 15px #222;
+  box-shadow: 0px 0px 15px #222;
 }
 /* --------------------------------------------------- */
 

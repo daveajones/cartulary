@@ -4,6 +4,7 @@ var gDatestamp = '<?echo date('YmdHis')?>';
 var msgtimer;
 
 
+
 //http://stackoverflow.com/questions/4652734/return-html-from-a-user-selection/4652824#4652824
 //Get html of selected text
 function getSelectionHtml() {
@@ -652,6 +653,8 @@ function showArticleWindow(riveritem) {
 	//When modal closes we should clean up
 	$(modal).on('hidden', function () {
 	        $(modal + ' .arfooter .rt').unbind('click');
+	        $(modal + ' .artitle').empty();
+        	$(modal + ' .arbody').empty();
 	});
 
 

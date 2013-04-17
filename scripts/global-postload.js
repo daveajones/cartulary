@@ -35,6 +35,9 @@ $(document).ready( function () {
                                         $('#search-template').tmpl(data).appendTo('.searchbar .body');
 				}
 
+				//Position the search results box to where we're at now
+				$('.searchbar').css('top', $('.navbar').offset().top + 60 + 'px');
+
 				//Show the results
 				$('.searchbar .head h4 small').empty().append('(' + data.query + ')');
                 	        $('.searchbar').show();
@@ -42,6 +45,7 @@ $(document).ready( function () {
 				$('.searchbar .head .btnCloseSearchResults').click( function() {
 					$('.searchbar').hide();
         	                        $('.searchbar .body').empty();
+					return false;
 				});
                         }
 
@@ -130,6 +134,11 @@ $(document).ready( function () {
 		<?}else{?>
                 newMicroblogPostWindow();
 		<?}?>
+                return false;
+        });
+
+        key('ctrl+s', function() {           //----- Focus search box
+                $('#navsearchq').focus();
                 return false;
         });
 

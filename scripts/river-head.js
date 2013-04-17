@@ -42,7 +42,7 @@
 	function focusPreviousSection() {
 		$("#stream-items div.section").each(function(index) {
 			if( $(document).scrollTop() < $(this).offset().top ) {
-				$('html, body').animate( { scrollTop: ($("#stream-items div.section:eq("+(index - 1)+")").offset().top - 3) }, 300); 
+				$('html, body').animate( { scrollTop: ($("#stream-items div.section:eq("+(index - 1)+")").offset().top - 43) }, 300); 
 				$("#stream-items div.section div.article.activeItem").removeClass("activeItem");				
 				$("#stream-items div.section:eq("+(index - 1)+") div.article:eq(0)").addClass("activeItem");
 				return false;
@@ -53,7 +53,7 @@
 	function focusNextSection() {
 		$("#stream-items div.section").each(function(index) {
 			if( $(document).scrollTop() < $(this).offset().top ) {
-				$('html, body').animate( { scrollTop: ($("#stream-items div.section:eq("+(index + 1)+")").offset().top - 3) }, 300); 
+				$('html, body').animate( { scrollTop: ($("#stream-items div.section:eq("+(index + 1)+")").offset().top - 43) }, 300); 
 				$("#stream-items div.section div.article.activeItem").removeClass("activeItem");				
 				$("#stream-items div.section:eq("+(index + 1)+") div.article:eq(0)").addClass("activeItem");
 				return false;
@@ -64,7 +64,7 @@
         function focusPreviousArticle() {
 		$("#stream-items div.article").each(function(index) {
 			if( $(document).scrollTop() < $(this).offset().top ) {
-				$('html, body').animate( { scrollTop: ($("#stream-items div.article:eq("+(index - 1)+")").offset().top - 3) }, 300); 
+				$('html, body').animate( { scrollTop: ($("#stream-items div.article:eq("+(index - 1)+")").offset().top - 33) }, 300); 
 				$("#stream-items div.article.activeItem").removeClass("activeItem");				
 				$("#stream-items div.article:eq("+(index - 1)+")").addClass("activeItem");
 				return false;
@@ -75,7 +75,7 @@
 	function focusNextArticle() {
 		$("#stream-items div.article").each(function(index) {
 			if( $(document).scrollTop() < $(this).offset().top ) {
-				$('html, body').animate( { scrollTop: ($("#stream-items div.article:eq("+(index + 1)+")").offset().top - 3) }, 300); 
+				$('html, body').animate( { scrollTop: ($("#stream-items div.article:eq("+(index + 1)+")").offset().top - 33) }, 300); 
 				$("#stream-items div.article.activeItem").removeClass("activeItem");				
 				$("#stream-items div.article:eq("+(index + 1)+")").addClass("activeItem");
 				return false;

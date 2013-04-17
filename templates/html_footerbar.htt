@@ -18,7 +18,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 <!-- Global Modals -->
 
 <!-- Microblog Post -->
-<div id="mdlMicroblogPost" class="modal hide fade">
+<div id="mdlMicroblogPost" class="modal hide fade" tabindex="-1">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h4 class="title">Microblog Post</h4>
@@ -109,7 +109,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 
 
 <!-- Social Outline View/Subscribe -->
-<div id="mdlSocialOutlineView" class="modal hide fade">
+<div id="mdlSocialOutlineView" class="modal hide fade" tabindex="-1">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h4 class="soname">&nbsp;</h4>
@@ -139,7 +139,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 <!-- Social Outline View/Subscribe -->
 
 <!-- Show article modal dialog -->
-<div id="mdlShowArticle" class="modal hide fade">
+<div id="mdlShowArticle" class="modal hide fade" tabindex="-1">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h4 class="artitle">&nbsp;</h4>
@@ -162,7 +162,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 <!-- Show article modal dialog -->
 
 <!-- Media display shadow box modal -->
-<div id="mdlMediaShadowbox" class="modal hide fade">
+<div id="mdlMediaShadowbox" class="modal hide fade" tabindex="-1">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h4 class="artitle">&nbsp;</h4>

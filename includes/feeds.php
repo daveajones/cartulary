@@ -965,7 +965,7 @@ function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL)
     //Now that we have a good id, put the article into the database
     $stmt = "INSERT INTO $table_newsfeed (id,url,createdon) VALUES (?,?,?)";
     $sql=$dbh->prepare($stmt) or print(mysql_error());
-    $sql->bind_param("sss", $id,$url,$createdon) or print(mysql_error());
+    $sql->bind_param("ssd", $id,$url,$createdon) or print(mysql_error());
     $sql->execute() or print(mysql_error());
     $sql->close() or print(mysql_error());
   } else {
@@ -1418,7 +1418,7 @@ function update_feed_lastupdate($fid = NULL, $time = NULL)
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET lastupdate=? WHERE id=?";
   $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $time,$fid) or print(mysql_error());
+  $sql->bind_param("ds", $time,$fid) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->close() or print(mysql_error());
 
@@ -1542,7 +1542,7 @@ function update_feed_lastcheck($fid = NULL, $time = NULL)
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET lastcheck=? WHERE id=?";
   $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $time,$fid) or print(mysql_error());
+  $sql->bind_param("ds", $time,$fid) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->close() or print(mysql_error());
 
@@ -2439,7 +2439,7 @@ function update_feed_lastmod($fid = NULL, $lastmod = NULL)
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET lastmod=? WHERE id=?";
   $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $lastmod,$fid) or print(mysql_error());
+  $sql->bind_param("ds", $lastmod,$fid) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->close() or print(mysql_error());
 
@@ -3657,7 +3657,7 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
 
   //Include old feeds?
   if( $withold == FALSE ) {
-    $sqltxt .= " AND (lastupdate > $monthago OR lastcheck = '')";
+    $sqltxt .= " AND (lastupdate > $monthago OR lastcheck = 0)";
   }
 
   //Sort by last check time
@@ -3794,7 +3794,7 @@ function get_old_feeds($max = NULL)
 
 //_______________________________________________________________________________________
 //Retrieve a list of all the feeds in the database with their stats
-function get_all_feeds_with_stats($max = NULL)
+function get_all_feeds_with_stats($max = 50)
 {
   //Includes
   include get_cfg_var("cartulary_conf").'/includes/env.php';
@@ -3803,16 +3803,22 @@ function get_all_feeds_with_stats($max = NULL)
   $dbh=new mysqli_Extended($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
   //Look for the
-  $sqltxt = "SELECT *
+  $sqltxt = "SELECT $table_newsfeed.id,
+                    $table_newsfeed.url,
+                    $table_newsfeed.title,
+                    $table_newsfeed.lastcheck,
+                    $table_newsfeed.lastupdate,
+                    $table_newsfeed.createdon,
+                    $table_newsfeed.errors,
+                    $table_feedstats.avgnewinterval,
+                    $table_feedstats.avgchecktime,
+		    $table_feedstats.avgnewitems,
+		    $table_feedstats.subscribers
              FROM $table_newsfeed
 	     LEFT JOIN $table_feedstats ON $table_newsfeed.id = $table_feedstats.id
              ORDER BY $table_feedstats.subscribers DESC";
 
-  if($max != NULL) {
-    $sqltxt .= " LIMIT $max";
-  }
 
-  //loggit(1, "[$sqltxt]");
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
   $sql->execute() or print(mysql_error());
   $sql->store_result() or print(mysql_error());
@@ -3825,10 +3831,35 @@ function get_all_feeds_with_stats($max = NULL)
     return(FALSE);
   }
 
+  $sql->bind_result($fid,
+                    $furl,
+                    $ftitle,
+	            $flastcheck,
+                    $flastupdate,
+                    $fcreatedon,
+                    $ferrors,
+                    $savgnewinterval,
+                    $savgchecktime,
+                    $savgnewitems,
+                    $ssubscribers
+  ) or print(mysql_error());
+
   $feeds = array();
   $count = 0;
-  while($feedrow = $sql->fetch_assoc()){
-    $feeds[$count] = $feedrow;
+  while($sql->fetch()){
+    $feeds[$count] = array(
+                    'id'             => $fid,
+                    'url'            => $furl,
+                    'title'          => $ftitle,
+	            'lastcheck'      => $flastcheck,
+                    'lastupdate'     => $flastupdate,
+                    'createdon'      => $fcreatedon,
+                    'errors'         => $ferrors,
+                    'avgnewinterval' => $savgnewinterval,
+                    'avgchecktime'   => $savgchecktime,
+                    'avgnewitems'    => $savgnewitems,
+                    'subscribers'    => $ssubscribers
+    );
     $count++;
   }
 

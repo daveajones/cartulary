@@ -1,9 +1,15 @@
 $(document).ready(function() {
       //Populate the user management section
-      loadUserManage('#divUserManage', '#manageusers-template'); 
-   
-      //Ajaxify the create user form
-      ajaxFormCreateUser('#frmCreateUser');
+      if( $('#divUserManage').length > 0 ) {
+	      loadUserManage('#divUserManage', '#manageusers-template'); 
+	      //Ajaxify the create user form
+	      ajaxFormCreateUser('#frmCreateUser');
+      }
+
+      //Populate the user management section
+      if( $('#divFeedManage').length > 0 ) {
+	      loadFeedManage('#divFeedManage', '#managefeeds-template'); 
+      }  
 });
 
 function loadUserManage(elDiv, elTemplate) {
@@ -25,6 +31,25 @@ function loadUserManage(elDiv, elTemplate) {
       return(true);
 }
 
+function loadFeedManage(elDiv, elTemplate) {
+      $(elDiv).empty();
+      $(elDiv).append('<center><p>Loading feed list...</p><img src="/images/spinner.gif" alt="" /></center>');
+      $.getJSON("/cgi/fc/list.feeds.json", function(data) {
+          if(data.status == "true") {
+              $(elDiv).empty();
+              $(elTemplate).tmpl(data.data).appendTo(elDiv);
+              bindDeleteFeed('.aDeleteFeed');
+	      bindResetFeed('.aResetFeed');
+              //bindEditUser('.aEditUser');
+	      //ajaxFormEditUser('.frmEditUser');
+          } else {
+              $(elDiv).append("<p>Error retrieving JSON data: [" + data.description + "]</p>");
+	  }
+      });
+
+      return(true);
+}
+
 function bindDeleteUser(elDeleteLink) {
     $(elDeleteLink).click(function() {
         var userId = $(this).attr("id");
@@ -37,6 +62,25 @@ function bindDeleteUser(elDeleteLink) {
                 loadUserManage('#divUserManage', '#manageusers-template'); 
             }
         });
+	return(false);
+    });
+
+    return(true);
+}
+
+function bindDeleteFeed(elDeleteLink) {
+    $(elDeleteLink).click(function() {
+        var feedId = $(this).attr("id");
+        var feedName = $(this).parent().parent().attr("data-name");
+        if( confirm("Do you really want to delete '" + feedName + "'?") == false ) return false;
+        $.getJSON("/cgi/fc/delete.feed?feedId="+feedId, function(data) {
+            showMessage( data.description, data.status, 7 );
+            if(data.status == "true") {
+                $('#tr_feed_' + data.feedid).css({"text-decoration":"line-through"});
+                loadFeedManage('#divFeedManage', '#managefeeds-template'); 
+            }
+        });
+	return(false);
     });
 
     return(true);
@@ -50,6 +94,21 @@ function bindResetUser(elResetLink) {
         $.getJSON("/cgi/fc/reset.user?userId="+userId, function(data) {
             showMessage( data.description, data.status, 999 );
         });
+	return(false);
+    });
+
+    return(true);
+}
+
+function bindResetFeed(elResetLink) {
+    $(elResetLink).click(function() {
+        var feedId = $(this).attr("id");
+        var feedName = $(this).parent().parent().attr("data-name");
+        if( confirm("Force a re-scan of " + feedName + "?") == false ) return false;
+        $.getJSON("/cgi/fc/mark.feed.updated?feedId="+feedId, function(data) {
+            showMessage( data.description, data.status, 7 );
+        });
+	return(false);
     });
 
     return(true);
@@ -66,6 +125,7 @@ function bindEditUser(elEditLink) {
             $('#tr_' + editId).removeClass('cellFocus');
         }
         $('#tr_' + userId).toggleClass('cellFocus');
+	return(false);
     });
 
     return(true);

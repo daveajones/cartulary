@@ -679,7 +679,7 @@ function check_head_lastmod($url, $timeout = 5){
 
   curl_setopt($curl, CURLOPT_URL,$url);
     //don't fetch the actual page, you only want headers
-    curl_setopt($curl, CURLOPT_NOBODY, true);
+    //curl_setopt($curl, CURLOPT_NOBODY, true);
     curl_setopt($curl, CURLOPT_HEADER, true);
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
@@ -695,9 +695,10 @@ function check_head_lastmod($url, $timeout = 5){
 
     $info = curl_getinfo($curl);
 
-    if ($info['filetime'] != -1) { //otherwise unknown
+    if($info['filetime'] != -1) { //otherwise unknown
       return($info['filetime']);
     } else {
+      loggit(3, "Unknown Last-Modified time returned during head check.");
       return(FALSE);
     }
 
@@ -718,7 +719,7 @@ function check_head_size($url, $timeout = 3){
 
   curl_setopt($curl, CURLOPT_URL,$url);
     //don't fetch the actual page, you only want headers
-    curl_setopt($curl, CURLOPT_NOBODY, true);
+    //curl_setopt($curl, CURLOPT_NOBODY, true);
     curl_setopt($curl, CURLOPT_HEADER, true);
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_MAXREDIRS, 10);

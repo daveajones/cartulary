@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 16;
+$cg_database_version = 17;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -173,6 +173,24 @@ CGDB0035;
 $cg_database_updates[15][] = <<<CGDB0036
  INSERT INTO `dbversion` ( `version` ) VALUES ( '16' )
 CGDB0036;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 16 to 17 -------------------------------------------------------------------------------------------------
+$cg_database_updates[16][] = <<<CGDB0037
+ ALTER TABLE `newsfeeds` CHANGE  `lastcheck`  `lastcheck` INT NOT NULL COMMENT  'Last time this feed was scanned.'
+CGDB0037;
+$cg_database_updates[16][] = <<<CGDB0038
+ ALTER TABLE `newsfeeds` CHANGE  `lastupdate`  `lastupdate` INT NOT NULL COMMENT  'Last time the feed had a new item.'
+CGDB0038;
+$cg_database_updates[16][] = <<<CGDB0039
+ ALTER TABLE `newsfeeds` CHANGE  `createdon`  `createdon` INT NOT NULL COMMENT  'When did the feed enter the system.'
+CGDB0039;
+$cg_database_updates[16][] = <<<CGDB0040
+ ALTER TABLE `newsfeeds` CHANGE  `lastmod`  `lastmod` INT NOT NULL COMMENT  'Last modified time in head check.'
+CGDB0040;
+$cg_database_updates[16][] = <<<CGDB0041
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '17' )
+CGDB0041;
 //----------------------------------------------------------------------------------------------------------------
 
 

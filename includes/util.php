@@ -2335,4 +2335,166 @@ function array_search_ext($arr, $search, $exact = true, $trav_keys = null)
 }
 
 
+function parse_search_query($inq = NULL, $section = NULL)
+{
+  //Punt if the query is blank
+  if( empty($inq) ) {
+    loggit(2, "The search query was blank: [$inq].");
+    return(FALSE);
+  }
+
+  //Clean input
+  $inq = trim($inq);
+
+  //Get started with an empty array
+  $psearch = array(
+    'section' => '',
+    'like'    => array(),
+    'not'     => array(),
+    'flat'    => ''
+  );
+
+  //Is there a section prefix embedded in the search?
+  $str = preg_replace('/"[^"]*"/s', '', $inq);	//Strip out quoted text
+  $col = stripos($str, ":"); 			//Look for the position of a colon
+  if( $col === FALSE ) {
+    if( empty($section) ) {
+      loggit(3, "No section found in query and none passed to search parser.");
+    } else {
+      $psearch['section'] = $section;
+    }
+  } else {
+    $psearch['section'] = trim( substr($str, 0, $col) );
+    //Strip off the section part
+    $inq = substr($inq, $col+1);
+  }
+  $psearch['section'] = strtolower($psearch['section']);
+
+  //Search terms
+  $str = trim(preg_replace('/\s+/', ' ', $inq));	//Strip repetative whitespace
+  preg_match_all('/(-?"[^"]*")/', $str, $qterms);
+  $str = preg_replace('/-?"[^"]*"/s', '', $str);	//Strip out quoted text
+
+  //First get non-quoted terms
+  $terms = explode(' ', $str);
+  foreach( $terms as $term ) {
+    if( !empty($term) ) {
+      if( $term[0] == '-' ) {
+        $psearch['not'][] = trim(str_replace(array('"','-'), '', $term));
+      } else {
+        $psearch['like'][] = trim(str_replace('"', '', $term));
+      }
+    }
+  }
+  //Now get the entire contents of each quote pair as a term
+  foreach( $qterms[1] as $term ) {
+    if( !empty($term) ) {
+      if( $term[0] == '-' ) {
+        $psearch['not'][] = trim(str_replace(array('"','-'), '', $term));
+      } else {
+        $psearch['like'][] = trim(str_replace('"', '', $term));
+      }
+    }
+  }
+
+  //Put a flat version of just the likes in the array
+  $psearch['flat'] = implode(' ', $psearch['like']);
+
+  //Remove any empty elements from like and not
+  $psearch['like'] = array_filter($psearch['like']);
+  $psearch['not'] = array_filter($psearch['not']);
+
+  loggit(3, "SEARCH: ".print_r($psearch, TRUE));
+  return($psearch);
+}
+
+
+function build_search_sql($q = NULL, $colnames = NULL)
+{
+  //Punt if the query is blank
+  if( empty($q) ) {
+    loggit(2, "The search query was blank: [$q].");
+    return(FALSE);
+  }
+  if( empty($colnames) ) {
+    loggit(2, "The column names were blank: [$colnames].");
+    return(FALSE);
+  }
+
+  //This will be in an array
+  $sqla = array(
+    'text' => '',
+    'bind' => ''
+  );
+
+  //Assemble sql
+  $like1 = '';
+  $like2 = '';
+  $not1 = '';
+  $not2 = '';
+  $op = "AND";
+  $subop = "OR";
+  //Put likes together
+  foreach( $q['like'] as $like ) {
+    $like1 .= " AND (";
+    $count = 0;
+    foreach( $colnames as $colname ) {
+      if( $count != 0 ) {
+        $like1 .= " OR";
+      }
+      $like1 .= " $colname LIKE CONCAT('%', ?, '%')";
+      $like2 .= "s";
+      $count++;
+    }
+    $like1 .= ")";
+  }
+  //Put nots together
+  foreach( $q['not'] as $not ) {
+    $not1 .= " AND (";
+    $count = 0;
+    foreach( $colnames as $colname ) {
+      if( $count != 0 ) {
+        $not1 .= " AND";
+      }
+      $not1 .= " $colname NOT LIKE CONCAT('%', ?, '%')";
+      $not2 .= "s";
+      $count++;
+    }
+    $not1 .= ")";
+  }
+
+  //Append search criteria
+  $sqla['text'] .= $like1.$not1;
+
+  //Assemble the bindings
+  $setup = "$like2$not2";
+  $refArr = array(&$setup);
+  $rl = makeValuesReferenced($q['like']);
+  $rn = makeValuesReferenced($q['not']);
+  foreach( $rl as &$qlar ) {
+    foreach( $colnames as $colname ) {
+      $refArr[] = $qlar;
+    }
+  }
+  foreach( $rn as &$qnar ) {
+    foreach( $colnames as $colname ) {
+      $refArr[] = $qnar;
+    }
+  }
+  $sqla['bind'] = $refArr;
+
+  loggit(3, "SEARCH: ".print_r($sqla, TRUE));
+
+  return($sqla);
+}
+
+
+//http://stackoverflow.com/questions/7382645/converting-array-of-values-to-an-array-of-references
+function makeValuesReferenced(&$arr){
+    $refs = array();
+    foreach($arr as $key => $value)
+        $refs[$key] = &$arr[$key];
+    return $refs;
+
+}
 ?>

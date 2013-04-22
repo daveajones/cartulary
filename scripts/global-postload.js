@@ -7,6 +7,7 @@ $(document).ready( function () {
                 cache:          false,
                 timeout:        30000,
                 beforeSubmit:   function() {
+                        $('.searchbar').hide();
 			//Don't try to process empty queries
                         if( $('#navsearchq').val() == '' ) {
                                 return(false);
@@ -32,7 +33,7 @@ $(document).ready( function () {
 				if( results.length < 1 ) {
         		                $('.searchbar .body').append('<p>No Results</p>');
 				} else {
-                                        $('#search-template').tmpl(data).appendTo('.searchbar .body');
+                                        $('#search-' + data.section).tmpl(data).appendTo('.searchbar .body');
 				}
 
 				//Position the search results box to where we're at now
@@ -50,9 +51,7 @@ $(document).ready( function () {
                         }
 
 			//After the results are appended, call a post-search function if one is defined
-                        if( typeof searchPostLoad == 'function' ) {
-				searchPostLoad();
-			}
+                        freedomController.v1.search.methods.postLoad(data.section);
 
                         //Unlock the search box, hide the spinner and collapse the navbar
                         $('#divMainMenu .navbar .btn-navbar').trigger('click');

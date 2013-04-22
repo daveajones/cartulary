@@ -478,6 +478,18 @@ function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
   //Includes
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
+  //Assemble sql
+  $colnames = array(
+    "$table_post.content",
+    "$table_post.title",
+    "$table_post.sourcetitle",
+    "$table_post.url",
+    "$table_post.sourceurl",
+    "$table_post.enclosure"
+  );
+  $qsql = build_search_sql($query, $colnames);
+
+
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
@@ -487,32 +499,34 @@ function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
 	     FROM $table_post,$table_mbcatalog
 	     WHERE ($table_mbcatalog.userid=?
 	     AND ($table_mbcatalog.postid=$table_post.id OR $table_mbcatalog.public=1))
-	     AND ( $table_post.content LIKE CONCAT('%', ?, '%')
-	     OR $table_post.title LIKE CONCAT('%', ?, '%')
-	     OR $table_post.url LIKE CONCAT('%', ?, '%')
-	     OR $table_post.sourcetitle LIKE CONCAT('%', ?, '%')
-	     OR $table_post.enclosure LIKE CONCAT('%', ?, '%') )
     ";
   } else {
     $sqltxt="SELECT $table_post.id,$table_post.title,$table_post.url,$table_post.content
              FROM $table_post,$table_mbcatalog
              WHERE ($table_mbcatalog.userid=?
 	     AND $table_mbcatalog.postid=$table_post.id)
-             AND ( $table_post.content LIKE CONCAT('%', ?, '%')
-             OR $table_post.title LIKE CONCAT('%', ?, '%')
-             OR $table_post.url LIKE CONCAT('%', ?, '%')
-	     OR $table_post.sourcetitle LIKE CONCAT('%', ?, '%')
-             OR $table_post.enclosure LIKE CONCAT('%', ?, '%') )
     ";
   }
 
+  //Append search criteria
+  $sqltxt .= $qsql['text'];
+
+  //Limit
   if($max != NULL) {
     $sqltxt .= " LIMIT $max";
   }
 
-  loggit(3, "DEBUG:  [$sqltxt]");
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("ssssss", $uid, $query, $query, $query, $query, $query) or print(mysql_error());
+
+  //Adjust bindings
+  $newsetup = "s".$qsql['bind'][0];
+  $qsql['bind'][0] = &$newsetup;
+  array_splice($qsql['bind'], 1, 0, array(&$uid));
+
+  $ref    = new ReflectionClass('mysqli_stmt');
+  $method = $ref->getMethod("bind_param");
+  $method->invokeArgs($sql, $qsql['bind']);
+
   $sql->execute() or print(mysql_error());
   $sql->store_result() or print(mysql_error());
 

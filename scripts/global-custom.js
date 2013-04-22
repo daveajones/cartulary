@@ -1,8 +1,21 @@
+//System-wide globals
 var systemUrl = '<?echo $system_fqdn?>';
 var platform = '<?echo $platform?>';
 var gDatestamp = '<?echo date('YmdHis')?>';
 var msgtimer;
 
+
+//http://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string
+//Call a function who's name is in a variable
+function executeFunctionByName(functionName, context /*, args */) {
+  var args = Array.prototype.slice.call(arguments).splice(2);
+  var namespaces = functionName.split(".");
+  var func = namespaces.pop();
+  for(var i = 0; i < namespaces.length; i++) {
+    context = context[namespaces[i]];
+  }
+  return context[func].apply(this, args);
+}
 
 
 //http://stackoverflow.com/questions/4652734/return-html-from-a-user-selection/4652824#4652824
@@ -563,9 +576,6 @@ function newMicroblogPostWindow(riveritem) {
 		$(modal + ' .bpdescription textarea').trigger('keyup');
         });
 
-	//Set focus to the textarea
-	$(modal + ' .bpdescription textarea').focus();
-
 	//Track text length
         $(modal + ' .mbcharcount').text( $(modal + ' .bpdescription textarea').val().length );	
 	$(modal + ' .bpdescription textarea').bind('keyup', function() {
@@ -586,6 +596,10 @@ function newMicroblogPostWindow(riveritem) {
 		$(modal + ' .bpdescription textarea').unbind('keyup');
 	});
 
+	//Set focus to the textarea
+	$(modal).on('shown', function () {
+		$(modal + ' .bpdescription textarea').focus();		
+	});
 
 
 	return false;

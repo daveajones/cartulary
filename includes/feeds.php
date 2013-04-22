@@ -2966,6 +2966,15 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
   //Includes
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
+  //Assemble sql
+  $colnames = array(
+    "$table_newsfeed.title",
+    "$table_newsfeed.url",
+    "$table_newsfeed.link"
+  );
+  $qsql = build_search_sql($query, $colnames);
+
+
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
@@ -2987,19 +2996,31 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
 	     FROM $table_newsfeed,
                   $table_nfcatalog
 	     WHERE $table_nfcatalog.userid=?
-             AND ($table_nfcatalog.feedid=$table_newsfeed.id)
-             AND ($table_newsfeed.title LIKE CONCAT('%', ?, '%')
-             OR $table_newsfeed.url LIKE CONCAT('%', ?, '%')
-             OR $table_newsfeed.link LIKE CONCAT('%', ?, '%'))";
+             AND ($table_nfcatalog.feedid=$table_newsfeed.id)";
+
+  //Append search criteria
+  $sqltxt .= $qsql['text'];
+
+  //Sort order
   $sqltxt .= " ORDER BY $table_newsfeed.title ASC";
 
+  //Limit
   if($max != NULL) {
     $sqltxt .= " LIMIT $max";
   }
 
   //loggit(3, "[$sqltxt]");
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("ssss", $uid, $query, $query, $query) or print(mysql_error());
+
+  //Adjust bindings
+  $newsetup = "s".$qsql['bind'][0];
+  $qsql['bind'][0] = &$newsetup;
+  array_splice($qsql['bind'], 1, 0, array(&$uid));
+
+  $ref    = new ReflectionClass('mysqli_stmt');
+  $method = $ref->getMethod("bind_param");
+  $method->invokeArgs($sql, $qsql['bind']);
+
   $sql->execute() or print(mysql_error());
   $sql->store_result() or print(mysql_error());
 
@@ -4004,7 +4025,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   	    $esize = (string)$item->link[$lcount]->attributes()->length;
 	  //Otherwise, do a head size check over http
           } else {
-            //$esize = check_head_size($esrc);
+            $esize = check_head_size($esrc);
           }
 	  //If it's not duplicate, add it
           if( !in_array_r($esrc, $enclosures) ) {
@@ -4909,6 +4930,16 @@ function search_feed_items($uid = NULL, $query = NULL, $max = NULL)
   //Connect to the database server
   $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
 
+  //Assemble sql
+  $colnames = array(
+    "$table_nfitem.description",
+    "$table_nfitem.title",
+    "$table_nfitem.sourcetitle",
+    "$table_nfitem.url",
+    "$table_nfitem.author"
+  );
+  $qsql = build_search_sql($query, $colnames);
+
   //We search by doing the equivelant of a river build, but we limit based on the query text
   $sqltxt = "SELECT $table_nfitem.id,
                     $table_nfitem.title,
@@ -4928,16 +4959,15 @@ function search_feed_items($uid = NULL, $query = NULL, $max = NULL)
              FROM $table_nfitem
 	     LEFT OUTER JOIN $table_nfitemprop ON $table_nfitemprop.itemid = $table_nfitem.id AND $table_nfitemprop.userid=? AND $table_nfitemprop.sticky = 1
 	     INNER JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
-             WHERE $table_nfcatalog.userid=?
-	     AND ($table_nfitem.description LIKE CONCAT('%', ?, '%')
-	     OR $table_nfitem.title LIKE CONCAT('%', ?, '%')
-	     OR $table_nfitem.sourcetitle LIKE CONCAT('%', ?, '%')
-	     OR $table_nfitem.url LIKE CONCAT('%', ?, '%')
-	     OR $table_nfitem.author LIKE CONCAT('%', ?, '%'))";
-  $sqltxt .= " ORDER BY $table_nfitem.timeadded DESC";
-  //loggit(3, "DEBUG: [$sqltxt]");
-  //loggit(3, "DEBUG: [$query]");
+             WHERE $table_nfcatalog.userid=?";
 
+  //Append search criteria
+  $sqltxt .= $qsql['text'];
+
+  //Sort by date
+  $sqltxt .= " ORDER BY $table_nfitem.timeadded DESC";
+
+  //Limits
   if($max != NULL) {
     $sqltxt .= " LIMIT $max";
   } else {
@@ -4946,7 +4976,16 @@ function search_feed_items($uid = NULL, $query = NULL, $max = NULL)
 
   //loggit(3, "[$sqltxt]");
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("sssssss", $uid, $uid, $query, $query, $query, $query, $query) or print(mysql_error());
+
+  //Adjust bindings
+  $newsetup = "ss".$qsql['bind'][0];
+  $qsql['bind'][0] = &$newsetup;
+  array_splice($qsql['bind'], 1, 0, array(&$uid));
+  array_splice($qsql['bind'], 1, 0, array(&$uid));
+
+  $ref    = new ReflectionClass('mysqli_stmt');
+  $method = $ref->getMethod("bind_param");
+  $method->invokeArgs($sql, $qsql['bind']);
   $sql->execute() or print(mysql_error());
   $sql->store_result() or print(mysql_error());
 

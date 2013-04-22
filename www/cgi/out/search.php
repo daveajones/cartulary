@@ -14,28 +14,35 @@ $jsondata['data'] = "";
 
 //First we process the incoming query for shenanigans
 $query = $_REQUEST['q'];
-if( ereg("^[A-z0-9+. -,@]*[']?[A-z0-9+. -,@]*$", $query) ) {
+if( !empty($query) ) {
   $trimmed = trim($query);
 } else {
   //Log it
-  loggit(2,"User: [$uid | $sid] entered a suspicious search term.");
+  loggit(2,"User: [$uid | $sid] gave a blank query.");
   $jsondata['status'] = "false";
-  $jsondata['description'] = "That search looks suspicious.";
+  $jsondata['description'] = "The query is blank.";
   echo json_encode($jsondata);
   exit(1);
 }
 $query = $trimmed;
 $jsondata['query'] = $query;
 
-//What are we searching?
+//Section given?
 $section = $_REQUEST['s'];
-if( $section == "Articles" ) {
+
+//Parse the query
+$query = parse_search_query($query, $section);
+$section = $query['section'];
+$jsondata['section'] = $section;
+
+//What are we searching?
+if( $section == "articles" ) {
   $results = search_articles($uid, $query, 100);
-} elseif( $section == "River" ) {
+} elseif( $section == "river" ) {
   $results = search_feed_items($uid, $query, 100);
-} elseif( $section == "Microblog" ) {
+} elseif( $section == "microblog" ) {
   $results = search_posts($uid, $query, 100);
-} elseif( $section == "Subscribe" ) {
+} elseif( $section == "subscribe" ) {
   $results = search_feeds($uid, $query, 100);
 } else {
   //Log it

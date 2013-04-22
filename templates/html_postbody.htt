@@ -1,5 +1,14 @@
-<?if( isset($section) ) {?>
-<script id="search-template" type="text/x-jquery-tmpl">
-<?include "$confroot/$scripts/search-$section-temp.js"?>
+<!-- Search templates -->
+<script id="search-river" type="text/x-jquery-tmpl">
+<?include "$confroot/$scripts/search-River-temp.js"?>
 </script>
-<?}?>
+<script id="search-articles" type="text/x-jquery-tmpl">
+<?include "$confroot/$scripts/search-Articles-temp.js"?>
+</script>
+<script id="search-microblog" type="text/x-jquery-tmpl">
+<?include "$confroot/$scripts/search-Microblog-temp.js"?>
+</script>
+<script id="search-subscribe" type="text/x-jquery-tmpl">
+<?include "$confroot/$scripts/search-Subscribe-temp.js"?>
+</script>
+<!-- ---------------- -->

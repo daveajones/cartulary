@@ -2351,8 +2351,18 @@ function parse_search_query($inq = NULL, $section = NULL)
     'section' => '',
     'like'    => array(),
     'not'     => array(),
-    'flat'    => ''
+    'flat'    => '',
+    'max'     => 100
   );
+
+  //Was a max results specified?
+  $str = preg_replace('/"[^"]*"/s', '', $inq);          //Strip out quoted text
+  $max = stripos($str, "max:");                         //Look for the position of a colon
+  if( $max !== FALSE ) {
+      preg_match('/max:([0-9]*)/', $str, $vmax);
+      $inq = preg_replace('/max:[0-9]* /s', '', $inq);                //Strip out quoted text
+      $psearch['max'] = $vmax[1];
+  }
 
   //Is there a section prefix embedded in the search?
   $str = preg_replace('/"[^"]*"/s', '', $inq);	//Strip out quoted text

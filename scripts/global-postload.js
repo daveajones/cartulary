@@ -40,7 +40,7 @@ $(document).ready( function () {
 				$('.searchbar').css('top', $('.navbar').offset().top + 60 + 'px');
 
 				//Show the results
-				$('.searchbar .head h4 small').empty().append('(' + data.query + ')');
+				$('.searchbar .head h4 small').empty().append('(' + data.query + ') max:' + data.max);
                 	        $('.searchbar').show();
 				$('.searchbar .head .btnCloseSearchResults').unbind('click');
 				$('.searchbar .head .btnCloseSearchResults').click( function() {

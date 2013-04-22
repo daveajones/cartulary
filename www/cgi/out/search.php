@@ -25,25 +25,26 @@ if( !empty($query) ) {
   exit(1);
 }
 $query = $trimmed;
-$jsondata['query'] = $query;
 
 //Section given?
 $section = $_REQUEST['s'];
 
 //Parse the query
 $query = parse_search_query($query, $section);
-$section = $query['section'];
-$jsondata['section'] = $section;
+$jsondata['query'] = $query['flat'];
+$jsondata['section'] = $query['section'];
+$jsondata['max'] = $query['max'];
 
 //What are we searching?
+$section = $query['section'];
 if( $section == "articles" ) {
-  $results = search_articles($uid, $query, 100);
+  $results = search_articles($uid, $query, $query['max']);
 } elseif( $section == "river" ) {
-  $results = search_feed_items($uid, $query, 100);
+  $results = search_feed_items($uid, $query, $query['max']);
 } elseif( $section == "microblog" ) {
-  $results = search_posts($uid, $query, 100);
+  $results = search_posts($uid, $query, $query['max']);
 } elseif( $section == "subscribe" ) {
-  $results = search_feeds($uid, $query, 100);
+  $results = search_feeds($uid, $query, $query['max']);
 } else {
   //Log it
   loggit(2, "Given section:[$section] not searchable.");

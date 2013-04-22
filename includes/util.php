@@ -2360,7 +2360,7 @@ function parse_search_query($inq = NULL, $section = NULL)
   $max = stripos($str, "max:");                         //Look for the position of a colon
   if( $max !== FALSE ) {
       preg_match('/max:([0-9]*)/', $str, $vmax);
-      $inq = preg_replace('/max:[0-9]* /s', '', $inq);                //Strip out quoted text
+      $inq = preg_replace('/max:[0-9]{0,9}/s', '', $inq);                //Strip out quoted text
       $psearch['max'] = $vmax[1];
   }
 

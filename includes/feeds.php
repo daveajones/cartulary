@@ -133,13 +133,13 @@ function get_feed_description($content = NULL)
 
   //Look for a title node in the rss
   foreach($x->channel->description as $entry) {
-    loggit(3, "Found a description node: [$entry].");
+    loggit(1, "Found a description node: [$entry].");
     return((string)$entry);
   }
 
   //Look for atom nodes
   foreach($x->subtitle as $entry) {
-    loggit(3, "Found a subtitle(description) node: [$entry].");
+    loggit(1, "Found a subtitle(description) node: [$entry].");
     return((string)$entry);
   }
 
@@ -276,14 +276,14 @@ function feed_exists($url = NULL)
   if($sql->num_rows() < 1) {
     $sql->close()
       or print(mysql_error());
-    loggit(1,"The feed at url: [$url] does not exist in the repository.");
+    loggit(3,"The feed at url: [$url] does not exist in the repository.");
     return(FALSE);
   }
   $sql->bind_result($feedid) or print(mysql_error());
   $sql->fetch() or print(mysql_error());
   $sql->close() or print(mysql_error());
 
-  loggit(1,"The feed: [$feedid] at url: [$url] is already in the repository.");
+  loggit(3,"The feed: [$feedid] at url: [$url] is already in the repository.");
   return($feedid);
 }
 
@@ -3412,7 +3412,7 @@ function purge_outline_feeds($oid = NULL)
 
 //_______________________________________________________________________________________
 //Get and parse out the content of an RSS feed
-function get_feed_items($fid = NULL, $max = NULL)
+function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 {
   //Check params
   if( empty($fid) ) {
@@ -3472,7 +3472,7 @@ function get_feed_items($fid = NULL, $max = NULL)
   //Let's do some intelligent header checking so we don't waste time and bandwidth
   update_feed_lastcheck($fid, time());
   $lastmodtime = check_head_lastmod($url);
-  if( ($lastmodtime == $feed['lastmod']) && ($lastmodtime != FALSE) ) {
+  if( ($lastmodtime == $feed['lastmod']) && ($lastmodtime != FALSE) && $force == FALSE ) {
     loggit(1, "Feed: [($url) $fid] hasn't been updated. Skipping.");
     $stats['checktime'] += (time() - $fstart);
     set_feed_stats($fid, $stats);
@@ -3540,7 +3540,7 @@ function get_feed_items($fid = NULL, $max = NULL)
   } else {
     $pubdate = time();
   }
-  if( $feed['pubdate'] == $pubdate ) {
+  if( $feed['pubdate'] == $pubdate && $force == FALSE) {
     //The feed says that it hasn't been updated
     loggit(1, "The pubdate in the feed has not changed.");
     $stats['checktime'] += (time() - $fstart);
@@ -4009,17 +4009,20 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       if($item->link[$lcount]['rel'] == "alternate") {
         $linkurl = $item->link[$lcount]['href'];
       }
+
       //Enclosures are links also
       if($item->link[$lcount]['rel'] == "enclosure") {
         $esize = "";
 	$esrc = "";
+        $etype = "";
 
 	//Some stupid ass feeds use src instead of href. HuffPo!
         if( isset($item->link[$lcount]->attributes()->src) ) {  $esrc = (string)$item->link[$lcount]->attributes()->src;  }
         if( isset($item->link[$lcount]->attributes()->href) ) {  $esrc = (string)$item->link[$lcount]->attributes()->href;  }
+        if( isset($item->link[$lcount]->attributes()->type) ) {  $etype = (string)$item->link[$lcount]->attributes()->type;  }
 
 	//If we couldn't get a decent url don't go any further
-	if( !empty($esrc) && str_pos($esrc, 'http') !== FALSE ) {
+	if( !empty($esrc) && strpos($esrc, 'http') !== FALSE ) {
 	  //If a length is given then use it
           if( isset($item->link[$lcount]->attributes()->length) ) {
   	    $esize = (string)$item->link[$lcount]->attributes()->length;
@@ -4031,7 +4034,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
           if( !in_array_r($esrc, $enclosures) ) {
             $enclosures[] = array( 'url'    => $esrc,
 	  		           'length' => 0 + $esize,
-                                   'type'   => make_mime_type($esrc, (string)$item->link[$lcount]->attributes()->type)
+                                   'type'   => make_mime_type($esrc, $etype)
             );
 	    $media = 1;
           }
@@ -4054,6 +4057,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $description = $cleaned['text'];
 
     //Attach extracted media tags as enclosures with correct type
+    if( !empty($cleaned['media']) ) {
     foreach( $cleaned['media'] as $mediatag ) {
       $esize = "";
       if( $mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video' ) {
@@ -4063,6 +4067,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         $enclosures[] = array( 'url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => make_mime_type($mediatag['src'], $mediatag['type']) );
         $media = 1;
       }
+    }
     }
 
     //Serialize enclosures
@@ -4275,7 +4280,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   }
 
   //Log and return
-  loggit(3,"Put a new feed item: [$id] in for feed: [$fid].");
+  loggit(3,"New feed item: [$id] for feed: [$fid].");
   return($id);
 }
 
@@ -5850,7 +5855,7 @@ function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL
 	     LIMIT ?,?";
 
 
-  loggit(3, "[$sqltxt]");
+  //loggit(3, "[$sqltxt]");
   $sql=$dbh->prepare($sqltxt) or print(mysql_error());
   $sql->bind_param("dsdd", $tstart, $uid, $start, $max) or loggit(2, $sql->error);
   $sql->execute() or print(mysql_error());

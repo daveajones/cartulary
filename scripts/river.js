@@ -93,7 +93,7 @@ River.generate = (function () {
                         // indicate that there are new items
                         //var noticeText = ( (count <= 50) ? count : '50+' ) + ' new items';
 			var noticeText = 'There are new items.';
-                        $('#stream-notice').die().live('click', function (e) {
+                        $('#stream-notice').off('click').on('click', function (e) {
                             e.preventDefault();
                             _populate(data, lastItemId);
                         }).text(noticeText).fadeSlideDown();
@@ -153,6 +153,7 @@ River.generate = (function () {
         River.methods.bindSubscribeLinks();
         River.methods.bindCartLinks();
 	River.methods.bindMicroblogLinks();
+	River.methods.bindEnclosureLinks();
         //Jump to top button
         $('.jumpTop').click(function () {
 		$('html, body').animate({ scrollTop: '0px' }, 300); 
@@ -293,7 +294,7 @@ River.methods = (function () {
         }
 
 
-	//Ajaxify the cartulize links
+	//Modalize the cartulize links
 	function _bindCartLinks() {
         	$('.cartlink').unbind('click');
         	$('.cartlink').click(function() {
@@ -309,8 +310,9 @@ River.methods = (function () {
 	}
 
 
-	//Ajaxify the MB links
+	//Modalize the MB links
 	function _bindMicroblogLinks() {
+		<?if( $g_platform != "mobile" ) {?>
         	$('.mblink').unbind('click');
         	$('.mblink').click(function() {
 			var modal = '#mdlMicroblogPost';
@@ -321,6 +323,22 @@ River.methods = (function () {
 			focusThisArticle(id);
 			return false;
         	});
+		<?}?>
+        	return true;
+	}
+
+
+	//Modalize the enclosure links
+	function _bindEnclosureLinks() {
+		<?if( $g_platform != "mobile" ) {?>
+        	$('.enclosureview a').unbind('click');
+        	$('.enclosureview a').click(function() {
+			if( $(this).children('img').length > 0 ) {
+				openMediaShadowbox( $(this).children('img') );
+				return false;
+			}
+        	});
+		<?}?>
         	return true;
 	}
 	
@@ -642,6 +660,7 @@ River.methods = (function () {
         bindSubscribeLinks : _bindSubscribeLinks,
 	bindCartLinks : _bindCartLinks,
 	bindMicroblogLinks : _bindMicroblogLinks,
+	bindEnclosureLinks : _bindEnclosureLinks,
         convertYoutube : _convertYoutube,
 	isAvatar : _isAvatar,
         urlNotRelative : _urlNotRelative,

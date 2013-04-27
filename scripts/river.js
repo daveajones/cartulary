@@ -6,6 +6,7 @@ jQuery.fn.fadeSlideDown = function (speed, easing, callback) {
 
 var River = River || {};
 var resizeTimer = null;
+var enclosureActivator = null;
 
 // defaults
 River.defaults = {
@@ -162,6 +163,7 @@ River.generate = (function () {
 	<?if($g_platform != "mobile"){?>
 	focusFirstVisibleArticle();
 	<?}?>
+	River.methods.activateEnclosures(10);
     };
     
     // expand stream items
@@ -459,6 +461,21 @@ River.methods = (function () {
 	return false;
     };
 
+    function _activateEnclosures( numto ) {
+        clearTimeout(enclosureActivator);
+        console.log("activating enclosures");
+	$('.encobj.inactive').each(function(k, v) {
+          console.log('['+k+']: '+$(this).attr('data-src'));
+          $(this).attr('src', $(this).attr('data-src')).removeClass('inactive');
+	  if( k === numto ) {
+            enclosureActivator = setTimeout(function(){  River.methods.activateEnclosures(10);  }, 3000);
+            return false;
+          }
+        });
+
+	return false;
+    };
+
     function _getDomain(url) {
         var domain;
         if (( url !== null ) && ( url !== "" )) {
@@ -669,6 +686,7 @@ River.methods = (function () {
 	isAudio : _isAudio,
         isVideo : _isVideo,
         isIframe  : _isIframe,
+        activateEnclosures : _activateEnclosures,
         getDomain : _getDomain,
         getFavicon : _getFavicon,
 	newGetText : _newGetText,

@@ -2950,4 +2950,83 @@ function delete_sys_flag($flag = NULL)
 }
 
 
+//_______________________________________________________________________________________
+//Search for users who's names or emails contain a certain string
+function search_users($query = NULL, $max = NULL)
+{
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+
+  //Assemble sql
+  $colnames = array(
+    "$table_user.name",
+    "$table_user.email"
+  );
+  $qsql = build_search_sql($query, $colnames);
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Look for the
+  $sqltxt = "SELECT $table_user.id,
+                    $table_user.name,
+                    $table_user.email,
+                    $table_prefs.avatarurl
+             FROM $table_user
+	     LEFT JOIN $table_prefs ON $table_user.id = $table_prefs.uid
+             WHERE active=1
+  ";
+
+  //Append search criteria
+  $sqltxt .= $qsql['text'];
+
+  //Sorting
+  $sqltxt .= " ORDER BY $table_user.name DESC";
+
+  //Limit
+  if($max != NULL) {
+    $sqltxt .= " LIMIT $max";
+  }
+
+  loggit(3, "USERs: [$sqltxt]");
+  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+
+  //Adjust bindings
+  $ref    = new ReflectionClass('mysqli_stmt');
+  $method = $ref->getMethod("bind_param");
+  $method->invokeArgs($sql, $qsql['bind']);
+
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+
+  //See if there were any feeds for this user
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(2,"There are no users in the system.");
+    return(FALSE);
+  }
+
+  $sql->bind_result($uid,$uname,$uemail,$uavatarurl) or print(mysql_error());
+
+  $users = array();
+  $count = 0;
+  while($sql->fetch()){
+    $users[$count] = array( 'id' => $uid,
+                            'name' => $uname,
+                            'email' => $uemail,
+                            'sopmlurl' => get_social_outline_url($uid),
+                            'avatarurl' => $uavatarurl
+    );
+    $count++;
+  }
+
+  $sql->close() or print(mysql_error());
+
+  loggit(1,"Returning: [$count] users that fit search.");
+  return($users);
+}
+
+
 ?>

@@ -54,6 +54,30 @@ div.searchbar {
   background-color: #FBF0D9;
   color: #5F4B32;
 }
+div.searchbar ul.search-people li {
+  clear:both;
+  margin:18px;
+}
+div.searchbar ul.search-people li a {
+  text-align: left;
+  font-size: 120%;
+  line-height: 150%;
+  margin: 10px;
+}
+div.searchbar ul.search-people li img {
+  max-width: 60px;
+  max-height: 60px;
+  float: left;
+}
+div.searchbar .search-pre {
+  border-bottom: solid #222 1px;
+  font-style: italic;
+}
+div.searchbar ul.search-people {
+  list-style-type:none;
+  margin-left: 10px;
+  padding-left: 10px;
+}
 /* --------------------------------------------------- */
 
 

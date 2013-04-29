@@ -19,4 +19,5 @@
 <?include "$confroot/$scripts/freedomcontroller.v1.js"?>
 <?include "$confroot/$scripts/api-subscribe.js"?>
 <?include "$confroot/$scripts/api-search.js"?>
+<?include "$confroot/$scripts/api-people.js"?>
 </script>

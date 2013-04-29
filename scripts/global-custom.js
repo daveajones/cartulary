@@ -96,7 +96,7 @@ function showMessage( text, status, timeout) {
    clearInterval(msgtimer);
    $('#divMessageBox').slideUp("normal", function(){ $('#divMessageBox').remove(); });
 
-   $('#divPageTitle').after('<div style="display:none;" id="divMessageBox"><p id="messagebox"></p></div>');
+   $('.navbar-inner').after('<div style="display:none;" id="divMessageBox"><p id="messagebox"></p></div>');
 
    $('#messagebox').empty();
    $('#messagebox').removeClass('msggood');
@@ -663,6 +663,9 @@ function showArticleWindow(riveritem) {
                                 $(modal + ' .arbody').append('<p>Error communicating with server. Connection problem?</p>');
                 }
         });
+
+	//Jump up to the top
+	$(modal + ' .arbody').scrollTop(0);
 
 	//When modal closes we should clean up
 	$(modal).on('hidden', function () {

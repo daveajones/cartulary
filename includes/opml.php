@@ -1529,6 +1529,7 @@ function get_all_outlines($max = NULL)
   return($outlines);
 }
 
+
 //_______________________________________________________________________________________
 //Add an outline item to the item storage table
 function add_outline_item($id = NULL, $item = NULL, $format = NULL)
@@ -2107,6 +2108,35 @@ function convert_opml_to_html($content = NULL, $max = NULL)
   return($html);
 }
 
+
+//_______________________________________________________________________________________
+//Retrieve a list of the social outlines for all the users in the database
+function get_social_outline_directory($query = NULL, $max = NULL)
+{
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+  require_once "$confroot/$includes/auth.php";
+
+  //Get a list of all matching local users
+  $users = search_users($query, $max);
+
+  //Loop through and get the url for each social outline, but only if the user
+  //has not marked themselves as private
+  $sol = array();
+  foreach( $users as $user ) {
+    $prefs = get_user_prefs($user['id']);
+    if( $prefs['hideme'] != 1 ) {
+      $sol[] = array(
+        'name'      => $user['name'],
+        'url'       => $user['sopmlurl'],
+        'avatarurl' => $user['avatarurl']
+      );
+    }
+  }
+
+
+  return($sol);
+}
 
 
 //########################################################################################

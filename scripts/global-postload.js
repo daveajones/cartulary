@@ -2,6 +2,8 @@ $(document).ready( function () {
         // Setup the search form in the navbar.  This is globally done, but the action is unique
 	// for each page, based on how the html_menubar template sets the action attribute of the
         // form.
+	(function() {
+	var lastQuery = "";
         $('#navsearch').ajaxForm({
                 dataType:       'json',
                 cache:          false,
@@ -9,9 +11,11 @@ $(document).ready( function () {
                 beforeSubmit:   function() {
                         $('.searchbar').hide();
 			//Don't try to process empty queries
-                        if( $('#navsearchq').val() == '' ) {
+                        if( $('#navsearchq').val() === '' ) {
                                 return(false);
-                        }
+                        } else {
+				lastQuery = $('#navsearchq').val();
+			}
 			//Give some visual indication that we're waiting for results
 			//and lock the query box
                         $('#navSpinner').show();
@@ -51,79 +55,19 @@ $(document).ready( function () {
                         }
 
 			//After the results are appended, call a post-search function if one is defined
-                        freedomController.v1.search.methods.postLoad(data.section);
+                        freedomController.v1.search.methods.postLoad(lastQuery, data.section, '.searchbar');
 
                         //Unlock the search box, hide the spinner and collapse the navbar
                         $('#divMainMenu .navbar .btn-navbar').trigger('click');
                         $('#navSpinner').hide();
-                        $('#navsearchq').attr("disabled", false);
+                        $('#navsearchq').attr("disabled", false);                       
                }
         });
+	})();
 
 
-        //Ajaxify the social outline links
-        $('.sopmllink').click(function() {
-                        var aobj = $(this);
-                        var href = aobj.attr("data-href");
-	                var cgiurl = $('#cgiUrls').attr("data-getsopml");
-
-                        $('#mdlSocialOutlineView .modal-header').hide();
-                        $('#mdlSocialOutlineView .modal-body .sobody').hide();
-                        $('#mdlSocialOutlineView .modal-footer').hide();
-                        $('#mdlSocialOutlineView .soserver .serverlink').empty();
-                        $('#mdlSocialOutlineView .soname').empty();
-                        $('#mdlSocialOutlineView .soavatar').attr('src', '/images/blank.gif');
-                        $('#mdlSocialOutlineView .sopubfeeds').empty();
-                        $('#mdlSocialOutlineView .spinner').show();
-
-                        modalFullHeight('#mdlSocialOutlineView', true);
-                        $('#mdlSocialOutlineView').modal('show');
-                        $.ajax({
-                                url:      cgiurl + '?url=' + href,
-                                type:     "GET",
-                                dataType: 'json',
-                                timeout:  30000,
-                                success:  function(data) {
-                                                $('#mdlSocialOutlineView .spinner').hide();
-                                                if(data.status == "false") {
-                                                        $('#mdlSocialOutlineView .sotitle').append(data.title);
-                                                        $('#mdlSocialOutlineView .sobody').append(data.description);
-                                                } else {
-                                                        modalFullHeight('#mdlSocialOutlineView', false);
-							//Set the server link
-                                                        $('#mdlSocialOutlineView .soserver .serverlink').append(data.server);
-                                                        $('#mdlSocialOutlineView .soserver .serverlink').attr('href', 'http://' + data.server);
-							//Set the name
-                                                        $('#mdlSocialOutlineView .soname').append(data.ownername);
-							//Set the avatar
-							if( data.avatarurl == '' ) {
-								data.avatarurl = '/images/noavatar.png';
-							}
-                                                        $('#mdlSocialOutlineView .soavatar').attr('src', data.avatarurl);
-							//Display the pub feeds list
-							for( var i = 0 ; i < data.feeds.pub.length ; i++ ) {
-								$('#mdlSocialOutlineView .sopubfeeds').append('<li><a href="' + data.feeds.pub[i].url + '"><img class="icon-feed-raw" src="/images/blank.gif" alt="" /></a><a href="' + data.feeds.pub[i].html + '">' + data.feeds.pub[i].text + '</a></li>');
-							}
-							//Display some recent activity for this user
-							$('#mdlSocialOutlineView .soactivity').append('');
-
-                                                        $('#mdlSocialOutlineView .sofooter .link').attr('href', data.url);
-                                                        $('#mdlSocialOutlineView .sofooter').show();
-                                                }
-                                                $('#mdlSocialOutlineView .modal-header').show();
-                                                $('#mdlSocialOutlineView .modal-body .sobody').show();
-                                                $('#mdlSocialOutlineView .modal-footer').show();		
-                                        },
-                                error:  function(x, t, m) {
-                                                $('#mdlSocialOutlineView .modal-header').show();
-                                                //$('#mdlSocialOutlineView .modal-footer').show();
-                                                $('#mdlSocialOutlineView .spinner').hide();
-                                                $('#mdlSocialOutlineView .sotitle').append('');
-                                                $('#mdlSocialOutlineView .sobody').append('<p>Error communicating with server. Connection problem?</p>');
-                                }
-                        });
-                        return false;
-        });
+	//Bindings
+	freedomController.v1.people.methods.bindSocialOutlineLinks( "body" );
 
 
         //Keyboard shortcuts

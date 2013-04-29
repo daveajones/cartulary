@@ -133,7 +133,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
   </div>
   <div class="modal-footer">
     <div class="soserver">Server: <a class="serverlink" href="#"></a></div>
-    <button type="button" class="primary sosubscribe" aria-hidden="true">Subscribe</button>
+    <a class="aSubscribe pull-right" data-sourceurl="#">Subscribe</a>
   </div>
 </div>
 <!-- Social Outline View/Subscribe -->

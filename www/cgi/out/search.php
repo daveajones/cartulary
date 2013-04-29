@@ -45,6 +45,8 @@ if( $section == "articles" ) {
   $results = search_posts($uid, $query, $query['max']);
 } elseif( $section == "subscribe" ) {
   $results = search_feeds($uid, $query, $query['max']);
+} elseif( $section == "people" ) {
+  $results = get_social_outline_directory($query, $query['max']);
 } else {
   //Log it
   loggit(2, "Given section:[$section] not searchable.");

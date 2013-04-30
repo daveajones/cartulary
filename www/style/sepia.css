@@ -65,9 +65,13 @@ div.searchbar {
   -webkit-box-shadow: 0px 0px 15px #222;
   box-shadow: 0px 0px 15px #222;
 }
+div.searchbar ul.search-people {
+  background-color: #e0d6c2;
+}
 div.searchbar ul.search-people li {
   clear:both;
-  margin:18px;
+  margin-bottom:18px;
+  height: 60px;
 }
 div.searchbar ul.search-people li a {
   text-align: left;
@@ -78,16 +82,23 @@ div.searchbar ul.search-people li a {
 div.searchbar ul.search-people li img {
   max-width: 60px;
   max-height: 60px;
+  margin-left: 10px;
   float: left;
 }
 div.searchbar .search-pre {
   border-bottom: solid #222 1px;
   font-style: italic;
+  margin-bottom:0;
 }
 div.searchbar ul.search-people {
   list-style-type:none;
-  margin-left: 10px;
+  margin-left: 0;
+  padding-left: 0;
+}
+div.searchbar p.result-msg {
   padding-left: 10px;
+  background-color: #E0D6C2;
+  color: #500;
 }
 /* --------------------------------------------------- */
 

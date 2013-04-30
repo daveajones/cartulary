@@ -10,6 +10,9 @@ $(document).ready( function () {
                 timeout:        30000,
                 beforeSubmit:   function() {
                         $('.searchbar').hide();
+                        $('.searchbar .body').empty();
+			$('.searchbar .search-more').empty();
+			$('.searchbar .search-extra').remove();
 			//Don't try to process empty queries
                         if( $('#navsearchq').val() === '' ) {
                                 return(false);
@@ -20,25 +23,21 @@ $(document).ready( function () {
 			//and lock the query box
                         $('#navSpinner').show();
                         $('#navsearchq').attr("disabled", true);
-			//Set a default content in case no results are returned.
-                        $('.searchbar .body').append('<p>No Results</p>');
                 },
                 success:        function(data) {
 			//If an error occured on the backend, give a warning message
                         if(data.status == "false") {
                                 showMessage( data.description, data.status, 5 );
 				data.query = '';
-                                $('.searchbar .body').empty();
                                 $('.searchbar .body').append('<center><p>Error during search: ' + data.description + '</p></center>');
                         } else {
-				//If we got a blank result, then say so
-        	                var results = data.data;
-                	        $('.searchbar .body').empty();
-				if( results.length < 1 ) {
-        		                $('.searchbar .body').append('<p>No Results</p>');
-				} else {
-                                        $('#search-' + data.section).tmpl(data).appendTo('.searchbar .body');
-				}
+				//Parse the returned data into the appropriate section template
+                                $('#search-' + data.section).tmpl(data).appendTo('.searchbar .body');
+
+				//Print 'no results' if there was no data returned
+			        if( data.data.length < 1 ) {
+			                $('.searchbar .body').append('<p>No Results</p>');
+			        }
 
 				//Position the search results box to where we're at now
 				$('.searchbar').css('top', $('.navbar').offset().top + 60 + 'px');

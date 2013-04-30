@@ -1,4 +1,10 @@
 <!-- Two empty divs for search and notifications -->
 <div class="row noticebar alert alert-block hide"></div>
-<div class="row searchbar well hide"><div class="head"><a href="#" class="btnCloseSearchResults pull-right"><img class="icon-close" src="/images/blank.gif" alt="" /></a><h4>Search Results <small></small></h4></div><div class="body"></div></div>
+<div class="row searchbar well hide">
+  <div class="head">
+    <a href="#" class="btnCloseSearchResults pull-right"><img class="icon-close" src="/images/blank.gif" alt="" /></a>
+    <h4>Search Results <small></small></h4>
+  </div>
+  <div class="body"></div>
+</div>
 

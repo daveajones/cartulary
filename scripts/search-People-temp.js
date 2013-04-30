@@ -8,4 +8,3 @@
  </li>
  {{/each}}
 </ul>
-<div class="search-more"><img class="spinner" src="/images/spinner.gif" alt="" /></div>

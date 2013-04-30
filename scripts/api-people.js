@@ -7,29 +7,50 @@ freedomController.v1.people.methods = (function() {
 function _searchPostLoad( query, elParent ) {
         //If this is a people search, then
         //Get a list of the other servers we know about and ping each of them as well
-        $('.searchbar .body .search-pre').append("Local");
+        $(elParent + ' .body .search-pre').append("Local");
         $.ajax({
                 url:      "/cgi/out/list.servers",
                 type:     "GET",
                 dataType: 'json',
                 timeout:  10000,
                 success:  function(data) {
-                                if(data.status == "false") {
-                                        //Can't get server list data
-                                } else {
-                                        $.each(data.servers, function(k, v) {
-                                                console.log( "Server:" + v.address );
-						if( v.address !== systemUrl ) {
-	                                                var lpUrl = "http://" + v.address + "/cgi/out/list.people?q=" + encodeURI(query) + "&callback=?";
-        	                                        $.getJSON( lpUrl, { format:"json" }, function (data) {
-                	                                        $('#search-people').tmpl(data).appendTo('.searchbar .search-more');
-                        	                                $('.searchbar .search-more .search-pre').append("Server:" + v.address);
-                                	                        $('.searchbar .search-more:first').addClass('search-remote-results').removeClass('.search-more');
+	                if(data.status != "false") {
+				//Loop through the server list and call each one
+                                $.each(data.servers, function(k, v) {
+                	                console.log( "Server [" + k + "]:" + v.address );
+					if( v.address !== systemUrl ) {
+						(function() {
+	                	                  var lpUrl = "http://" + v.address + "/cgi/out/list.people?q=" + encodeURI(query) + "&callback=?";
+						  var serverclass = "server" + k;
+
+					          $(elParent).append('<div class="search-extra ' + serverclass + '">' + v.address + '<img class="search-server-spinner" src="/images/spinner.gif" alt="" /></div>');
+						  $.ajax({
+							url:      lpUrl,
+							dataType: "jsonp",
+							timeout:  10000,
+							success:  function(data) {
+								if( data.data.length < 1 ) {
+		                        		                $(elParent + ' .' + serverclass).append('<p class="search-pre">Server:' + v.address + '</p>');
+									$(elParent + ' .' + serverclass).append('<p class="result-msg">No matches.</p>');
+								} else {
+									$(elParent + ' .' + serverclass).empty();
+	                	        	                        $('#search-people').tmpl(data).appendTo(elParent + ' .' + serverclass);
+	                        			                $(elParent + ' .' + serverclass + ' .search-pre').append('Server:' + v.address);
+								}
+		                               	                $(elParent + ' .' + serverclass).addClass('search-remote-results').addClass('search-extra').addClass('search-more');
+								$(elParent + ' .' + serverclass + ' .search-server-spinner').remove();
 								_rebindEverything( elParent );
-                                                	});
-						}
-                                        });
-                                }
+							},
+							error:	  function() {
+								$(elParent + ' .' + serverclass).empty();
+	                        		                $(elParent + ' .' + serverclass).append('<p class="search-pre">Server:' + v.address + '</p>');
+								$(elParent + ' .' + serverclass).append('<p class="result-msg">Connection error.</p>');
+							}
+						  });
+						})();
+					}
+                                });
+                	}
                 }
         });
 

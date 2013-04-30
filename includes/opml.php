@@ -2125,7 +2125,7 @@ function get_social_outline_directory($query = NULL, $max = NULL)
   $sol = array();
   foreach( $users as $user ) {
     $prefs = get_user_prefs($user['id']);
-    if( $prefs['hideme'] != 1 ) {
+    if( $prefs['hideme'] != 1 && $user['email'] != "cartulary@localhost" ) {
       $sol[] = array(
         'name'      => $user['name'],
         'url'       => $user['sopmlurl'],

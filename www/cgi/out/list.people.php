@@ -11,16 +11,6 @@ $jsondata = array();
 //This will hold the search results
 $jsondata['data'] = "";
 
-//Respond?
-if( $cg_peoplesearch == 0 ) {
-  //Log it
-  loggit(2,"Incoming people search request ignored.");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "This server is private.";
-  echo json_encode($jsondata);
-  exit(1);
-}
-
 //First we process the incoming query for shenanigans
 $query="";
 if( isset($_REQUEST['q']) && !empty($_REQUEST['q']) ) {
@@ -28,6 +18,16 @@ if( isset($_REQUEST['q']) && !empty($_REQUEST['q']) ) {
 }
 if( isset($_REQUEST['callback']) && !empty($_REQUEST['callback']) ) {
   $callback = trim($_REQUEST['callback']);
+}
+
+//Is privacy enabled?
+if( $cg_peoplesearch == 0 ) {
+  //Log it
+  loggit(2,"Incoming people search request ignored.");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "This server is private.";
+  echo $callback."(".json_encode($jsondata).")";
+  exit(1);
 }
 
 //Parse the query

@@ -17,8 +17,7 @@ function _searchPostLoad( query, elParent ) {
 	                if(data.status != "false") {
 				//Loop through the server list and call each one
                                 $.each(data.servers, function(k, v) {
-                	                console.log( "Server [" + k + "]:" + v.address );
-					if( v.address !== systemUrl ) {
+					//if( v.address !== systemUrl ) {
 						(function() {
 	                	                  var lpUrl = "http://" + v.address + "/cgi/out/list.people?q=" + encodeURI(query) + "&callback=?";
 						  var serverclass = "server" + k;
@@ -29,7 +28,11 @@ function _searchPostLoad( query, elParent ) {
 							dataType: "jsonp",
 							timeout:  10000,
 							success:  function(data) {
-								if( data.data.length < 1 ) {
+								if( data.status == "false" ) {
+		                        		                $(elParent + ' .' + serverclass).append('<p class="search-pre">Server:' + v.address + '</p>');
+									$(elParent + ' .' + serverclass).append('<p class="result-msg">Private.</p>');
+								} else
+                                                                if( data.data.length < 1 ) {
 		                        		                $(elParent + ' .' + serverclass).append('<p class="search-pre">Server:' + v.address + '</p>');
 									$(elParent + ' .' + serverclass).append('<p class="result-msg">No matches.</p>');
 								} else {
@@ -48,7 +51,7 @@ function _searchPostLoad( query, elParent ) {
 							}
 						  });
 						})();
-					}
+					//}
                                 });
                 	}
                 }

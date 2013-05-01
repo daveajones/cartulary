@@ -3674,6 +3674,8 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
   //Include high error feeds?
   if( $witherrors == FALSE ) {
     $sqltxt .= " WHERE errors < 10";
+  } else {
+    $sqltxt .= " WHERE errors > 0";
   }
 
   //Include old feeds?

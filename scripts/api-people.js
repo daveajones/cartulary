@@ -17,7 +17,7 @@ function _searchPostLoad( query, elParent ) {
 	                if(data.status != "false") {
 				//Loop through the server list and call each one
                                 $.each(data.servers, function(k, v) {
-					//if( v.address !== systemUrl ) {
+					if( v.address !== systemUrl ) {
 						(function() {
 	                	                  var lpUrl = "http://" + v.address + "/cgi/out/list.people?q=" + encodeURI(query) + "&callback=?";
 						  var serverclass = "server" + k;
@@ -51,7 +51,7 @@ function _searchPostLoad( query, elParent ) {
 							}
 						  });
 						})();
-					//}
+					}
                                 });
                 	}
                 }

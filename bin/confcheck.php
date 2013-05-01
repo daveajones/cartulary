@@ -34,6 +34,7 @@
     $l_s3redirectbucket = "";
     $l_ipreflectorurl = "http://checkip.dyndns.com";
     $l_rsscloud = 0;
+    $l_peoplesearch = 1;
 
     //If there is already a config file, let's hang on to it
     if( file_exists($cfname) ) {
@@ -65,6 +66,9 @@
           $l_serverguid = $cg_main_serverguid;
         }
         $l_rsscloud = $enable_rsscloud;
+        if( isset($cg_peoplesearch) ) {
+	  $l_peoplesearch = $cg_peoplesearch;
+	}
       }
 
       copy( $cfname, $cfname.'.old.'.time() );
@@ -210,6 +214,11 @@
     //Preserve rssCloud setting
     if( $l_rsscloud == 1 ) {
       $template = str_replace('enable_rsscloud=0', 'enable_rsscloud=1', $template);
+    }
+
+    //Preserve peoplesearch setting
+    if( $l_peoplesearch == 0 ) {
+      $template = str_replace('cg_peoplesearch=1', 'cg_peoplesearch=0', $template);
     }
 
     //Eliminate the newinstall flag if it's set

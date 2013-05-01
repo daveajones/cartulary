@@ -7,10 +7,19 @@ header("Content-Type: application/json");
 $jsondata = array();
 // --------------------------------------------------------------------------------
 
-loggit(3, "DEBUG: ".print_r($_REQUEST, TRUE));
 
 //This will hold the search results
 $jsondata['data'] = "";
+
+//Respond?
+if( $cg_peoplesearch == 0 ) {
+  //Log it
+  loggit(2,"Incoming people search request ignored.");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "This server is private.";
+  echo json_encode($jsondata);
+  exit(1);
+}
 
 //First we process the incoming query for shenanigans
 $query="";

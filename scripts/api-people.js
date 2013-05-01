@@ -1,9 +1,23 @@
 //-----------------------------------------------------------------------------------
 // ----- People API -----
 freedomController.v1.people = {};
-freedomController.v1.people.methods = (function() {
-//-----------------------------------------------------------------------------------
 
+
+//Settings --------------------------------------------------------------------------
+freedomController.v1.people.static  = (function() {
+  return {
+	mdlSocialOutlineView : "#mdlSocialOutlineView"
+  };
+}());
+
+
+//Methods ---------------------------------------------------------------------------
+freedomController.v1.people.methods = (function() {
+	var static = freedomController.v1.people.static;
+
+//After a people search, we query the server for a list of servers it knows about and send search queries
+//to each one.  We attach the results of each search to the bottom of the results box.  The results returned
+//are in jsonp format to avoid CORS
 function _searchPostLoad( query, elParent ) {
         //If this is a people search, then
         //Get a list of the other servers we know about and ping each of them as well
@@ -82,6 +96,7 @@ function _bindSubscribeLinks( elParent ) {
                                 if(data.status == "false") {
                                         showMessage( data.description, data.status, 5 );
                                 } else {
+					$(static.mdlSocialOutlineView).modal('hide');
                                         showMessage( data.description, data.status, 5 );
                                 }
                         }
@@ -94,8 +109,9 @@ function _bindSubscribeLinks( elParent ) {
 
 function _bindSocialOutlineLinks( elParent ) {
         //Ajaxify the social outline links
+        $(elParent + ' .sopmllink').unbind('click');
         $(elParent + ' .sopmllink').click(function() {
-			var modal = '#mdlSocialOutlineView';
+			var modal = static.mdlSocialOutlineView;
                         var aobj = $(this);
                         var href = aobj.attr("data-href");
 	                var cgiurl = $('#cgiUrls').attr("data-getsopml");

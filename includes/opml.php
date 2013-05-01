@@ -2123,17 +2123,18 @@ function get_social_outline_directory($query = NULL, $max = NULL)
   //Loop through and get the url for each social outline, but only if the user
   //has not marked themselves as private
   $sol = array();
-  foreach( $users as $user ) {
-    $prefs = get_user_prefs($user['id']);
-    if( $prefs['hideme'] != 1 && $user['email'] != "cartulary@localhost" ) {
-      $sol[] = array(
-        'name'      => $user['name'],
-        'url'       => $user['sopmlurl'],
-        'avatarurl' => $user['avatarurl']
-      );
+  if( !empty($users) ) {
+    foreach( $users as $user ) {
+      $prefs = get_user_prefs($user['id']);
+      if( $prefs['hideme'] != 1 && $user['email'] != "cartulary@localhost" ) {
+        $sol[] = array(
+          'name'      => $user['name'],
+          'url'       => $user['sopmlurl'],
+          'avatarurl' => $user['avatarurl']
+        );
+      }
     }
   }
-
 
   return($sol);
 }

@@ -2833,6 +2833,7 @@ function get_sys_s3_info() {
         $s3info['riverbucket'] = $s3_sys_server_river_bucket;
         $s3info['rivercname'] = $s3_sys_server_river_cname;
         $s3info['riverfile'] = $s3_sys_server_river_file;
+        $s3info['rivertemplate'] = $s3_sys_server_river_template;
         $s3info['rivertitle'] = $s3_sys_server_river_title;
         $s3info['redirectbucket'] = $s3_sys_server_redirect_bucket;
         //loggit(3, "DEBUG: ".print_r($s3info, TRUE));

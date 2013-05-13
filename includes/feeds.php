@@ -5250,18 +5250,26 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
       //the riverfile value is non-blank
       if( !empty($s3info['riverfile']) ) {
         //Construct the server river html file
-        $fh = fopen("$confroot/$templates/$cg_template_html_river", "r");
-        $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_template_html_river"));
+	if( empty($s3info['rivertemplate']) ) {
+	  $fh = fopen("$confroot/$templates/$cg_template_html_river", "r");
+          $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_template_html_river"));
+	  fclose($fh);
+	} else {
+          $rftemplate = fetchUrl( $s3info['rivertemplate'] );
+          if( is_outline($rftemplate) ) {
+            $rftemplate = convert_opml_to_html($rftemplate);
+	  }
+	}
         //Replace the tags
         $rftemplate = str_replace('[RIVER_TITLE]', $s3info['rivertitle'], $rftemplate);
+        $rftemplate = str_replace('<%title%>', $s3info['rivertitle'], $rftemplate);
         $rftemplate = str_replace('[RIVER_JSON_URL]', $s3url, $rftemplate);
+        $rftemplate = str_replace('<%jsonUrl%>', $s3url, $rftemplate);
         $rftemplate = str_replace('[SCRIPT_JQUERY]', $cg_script_js_jquery, $rftemplate);
         $rftemplate = str_replace('[SCRIPT_JQTEMPLATES]', $cg_script_js_jqtemplates, $rftemplate);
         $rftemplate = str_replace('[DATE]', date("D, d M Y H:i:s O"), $rftemplate);
         $rftemplate = str_replace('[SYS_NAME]', $system_name, $rftemplate);
         $rftemplate = str_replace('[SYS_VERSION]', $version, $rftemplate);
-        //Close the template
-        fclose($fh);
 
         //Put the html template
         $filename = $s3info['riverfile'];

@@ -2098,7 +2098,7 @@ function convert_opml_to_html($content = NULL, $max = NULL)
       $link = (string)$entry->attributes()->url;
       $type = (string)$entry->attributes()->type;
 
-      $html .= "<span>[$text]</span><br/>\n";
+      $html .= "$text\n";
 
       $count++;
   }

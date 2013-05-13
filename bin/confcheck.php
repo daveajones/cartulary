@@ -31,6 +31,7 @@
     $l_s3rivercname = "";
     $l_s3riverfile = "index.html";
     $l_s3rivertitle = "Community River";
+    $l_s3rivertemplate = "";
     $l_s3redirectbucket = "";
     $l_ipreflectorurl = "http://checkip.dyndns.com";
     $l_rsscloud = 0;
@@ -61,6 +62,9 @@
         }
         if( isset($s3_sys_server_river_title) ) {
           $l_s3rivertitle = $s3_sys_server_river_title;
+        }
+        if( isset($s3_sys_server_river_template) ) {
+          $l_s3rivertemplate = $s3_sys_server_river_template;
         }
         if( isset($cg_main_serverguid) ) {
           $l_serverguid = $cg_main_serverguid;
@@ -207,6 +211,11 @@
     }
     if( empty($response) ) { $response = $l_s3rivertitle; }
     $template = str_replace('s3rivertitlevalue', $response, $template);
+
+    //Preserve server river template
+    if( !empty($l_s3rivertemplate) ) {
+      $template = str_replace('s3_sys_server_river_template = ""', 's3_sys_server_river_template = "'.$l_s3rivertemplate.'"', $template);
+    }
 
     //Preserve server guid
     $template = str_replace('server.guid.goes.here', $l_serverguid, $template);

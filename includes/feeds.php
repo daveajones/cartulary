@@ -5258,15 +5258,16 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
           $rftemplate = fetchUrl( $s3info['rivertemplate'] );
           if( is_outline($rftemplate) ) {
             $rftemplate = convert_opml_to_html($rftemplate);
+            $rftemplate = str_replace('<%opmlUrl%>', $s3info['rivertemplate'], $rftemplate);
 	  }
 	}
         //Replace the tags
-        $rftemplate = str_replace('[RIVER_TITLE]', $s3info['rivertitle'], $rftemplate);
         $rftemplate = str_replace('<%title%>', $s3info['rivertitle'], $rftemplate);
         $rftemplate = str_replace('<%description%>', '', $rftemplate);
-        $rftemplate = str_replace('[RIVER_JSON_URL]', $s3url, $rftemplate);
         $rftemplate = str_replace('<%jsonUrl%>', $s3url, $rftemplate);
         $rftemplate = str_replace('<%pleaseWaitMessage%>', 'Loading news...', $rftemplate);
+        $rftemplate = str_replace('[RIVER_TITLE]', $s3info['rivertitle'], $rftemplate);
+        $rftemplate = str_replace('[RIVER_JSON_URL]', $s3url, $rftemplate);
         $rftemplate = str_replace('[SCRIPT_JQUERY]', $cg_script_js_jquery, $rftemplate);
         $rftemplate = str_replace('[SCRIPT_JQTEMPLATES]', $cg_script_js_jqtemplates, $rftemplate);
         $rftemplate = str_replace('[DATE]', date("D, d M Y H:i:s O"), $rftemplate);

@@ -163,7 +163,7 @@ River.generate = (function () {
 	<?if($g_platform != "mobile"){?>
 	focusFirstVisibleArticle();
 	<?}?>
-	River.methods.activateEnclosures(10);
+	River.methods.activateEnclosures(3);
     };
     
     // expand stream items
@@ -464,11 +464,11 @@ River.methods = (function () {
     function _activateEnclosures( numto ) {
         clearTimeout(enclosureActivator);
         console.log("activating enclosures");
-	$('.encobj.inactive').each(function(k, v) {
+	$('.enciframe.inactive').each(function(k, v) {
           console.log('['+k+']: '+$(this).attr('data-src'));
           $(this).attr('src', $(this).attr('data-src')).removeClass('inactive');
 	  if( k === numto ) {
-            enclosureActivator = setTimeout(function(){  River.methods.activateEnclosures(10);  }, 3000);
+            enclosureActivator = setTimeout(function(){  River.methods.activateEnclosures(numto);  }, 2000);
             return false;
           }
         });

@@ -5265,6 +5265,8 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
         $rftemplate = str_replace('<%title%>', $s3info['rivertitle'], $rftemplate);
         $rftemplate = str_replace('<%description%>', '', $rftemplate);
         $rftemplate = str_replace('<%jsonUrl%>', $s3url, $rftemplate);
+        $rftemplate = str_replace('<%sopmlUrl%>', '', $rftemplate);
+        $rftemplate = str_replace('[SOPML_URL]', '', $rftemplate);
         $rftemplate = str_replace('<%pleaseWaitMessage%>', 'Loading news...', $rftemplate);
         $rftemplate = str_replace('[RIVER_TITLE]', $s3info['rivertitle'], $rftemplate);
         $rftemplate = str_replace('[RIVER_JSON_URL]', $s3url, $rftemplate);
@@ -5273,6 +5275,8 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
         $rftemplate = str_replace('[DATE]', date("D, d M Y H:i:s O"), $rftemplate);
         $rftemplate = str_replace('[SYS_NAME]', $system_name, $rftemplate);
         $rftemplate = str_replace('[SYS_VERSION]', $version, $rftemplate);
+        $rftemplate = str_replace('[OPENSUBS_ADD_LINK]', '', $rftemplate);
+        $rftemplate = str_replace('<%openSubsAddLink%>', '', $rftemplate);
 
         //Put the html template
         $filename = $s3info['riverfile'];

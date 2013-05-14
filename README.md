@@ -1,4 +1,6 @@
-What is Cartulary?
+#### What is Cartulary?
+  It's part of the Freedom Controller project.
+
   We call it a digital archiver.  But, you could also call it a social network in a box.
   It's an RSS reader, RSS aggregator, readability tool, article archiver, microblogger,
   social graph manager and reading list manager.
@@ -12,7 +14,7 @@ What is Cartulary?
   a techy person, you can run your own server for all your friends.
 
 
-LICENSE:
+#### LICENSE:
   All original code in this package is currently licensend under the CDDL license.
                http://opensource.org/licenses/CDDL-1.0
   
@@ -20,7 +22,7 @@ LICENSE:
   are listed with source attribution if the code is public domain or unlicensed.
 
 
-INSTALL:
+#### INSTALL:
   The software will run on any unix-like system with a LAMP stack fairly easily, but it 
   installs and upgrades easiest on Unbuntu 12 LTS.  That's what is assumed in the install
   documentation.  Running on any other system will require installing by hand, which is

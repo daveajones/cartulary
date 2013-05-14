@@ -96,7 +96,7 @@ function showMessage( text, status, timeout) {
    clearInterval(msgtimer);
    $('#divMessageBox').slideUp("normal", function(){ $('#divMessageBox').remove(); });
 
-   $('.navbar-inner').after('<div style="display:none;" id="divMessageBox"><p id="messagebox"></p></div>');
+   $('.msganchor').after('<div style="display:none;" id="divMessageBox"><p id="messagebox"></p></div>');
 
    $('#messagebox').empty();
    $('#messagebox').removeClass('msggood');

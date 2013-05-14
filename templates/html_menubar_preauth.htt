@@ -1,4 +1,4 @@
-<div class="row page-header" id="divPageTitle" style="border-bottom:solid #333 1px;">
+<div class="row page-header msganchor" id="divPageTitle" style="border-bottom:solid #333 1px;">
         <h1><?echo $system_name?></h1>
 </div>
 <div class="pageContentWrapper <?echo $section?>">

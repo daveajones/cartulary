@@ -56,6 +56,11 @@ if ( isset($_POST['cartinriver']) ) { $cartinriver = 1; } else { $cartinriver = 
 if ( isset($_POST['staticarticles']) ) { $staticarticles = 1; } else { $staticarticles = 0; };
 if ( isset($_POST['collapseriver']) ) { $collapseriver = 1; } else { $collapseriver = 0; };
 if ( isset($_POST['hideme']) ) { $hideme = 1; } else { $hideme = 0; };
+if ( isset($_POST['pubrivertemplate']) ) { $pubrivertemplate = $_POST['pubrivertemplate']; } else { $pubrivertemplate = ""; };
+if ( isset($_POST['opensubs']) ) { $opensubs = 1; } else { $opensubs = 0; };
+if ( isset($_POST['publicriver']) ) { $publicriver = 1; } else { $publicriver = 0; };
+if ( isset($_POST['pubriverfile']) ) { $pubriverfile = $_POST['pubriverfile']; } else { $pubriverfile = ""; };
+if ( isset($_POST['pubrivertitle']) ) { $pubrivertitle = $_POST['pubrivertitle']; } else { $pubrivertitle = ""; };
 $jsondata = array();
 $jsondata['prefname'] = "";
 
@@ -577,6 +582,61 @@ if( ($hideme < 0) || ($hideme > 1) ) {
   exit(1);
 }
 $prefs['hideme'] = $hideme;
+
+$jsondata['prefname'] = "pubrivertemplate";
+if( strlen($pubrivertemplate) > 128 ) {
+  //Log it
+  loggit(2,"The value for pubrivertemplate pref was too long: [$pubrivertemplate]");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "Max pubrivertemplate length is 128 characters.";
+  echo json_encode($jsondata);
+  exit(1);
+}
+$prefs['pubrivertemplate'] = $pubrivertemplate;
+
+$jsondata['prefname'] = "opensubs";
+if( ($opensubs < 0) || ($opensubs > 1) ) {
+  //Log it
+  loggit(2,"The value for opensubs pref was not within acceptable range: [$opensubs]");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "Value of pref is out of range.";
+  echo json_encode($jsondata);
+  exit(1);
+}
+$prefs['opensubs'] = $opensubs;
+
+$jsondata['prefname'] = "publicriver";
+if( ($publicriver < 0) || ($publicriver > 1) ) {
+  //Log it
+  loggit(2,"The value for publicriver pref was not within acceptable range: [$publicriver]");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "Value of pref is out of range.";
+  echo json_encode($jsondata);
+  exit(1);
+}
+$prefs['publicriver'] = $publicriver;
+
+$jsondata['prefname'] = "pubriverfile";
+if( strlen($pubriverfile) > 32 ) {
+  //Log it
+  loggit(2,"The value for pubriverfile pref was too long: [$pubriverfile]");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "Max pubriverfile length is 32 characters.";
+  echo json_encode($jsondata);
+  exit(1);
+}
+$prefs['pubriverfile'] = $pubriverfile;
+
+$jsondata['prefname'] = "pubrivertitle";
+if( strlen($pubrivertitle) > 128 ) {
+  //Log it
+  loggit(2,"The value for pubrivertitle pref was too long: [$pubrivertitle]");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "Max pubrivertitle length is 128 characters.";
+  echo json_encode($jsondata);
+  exit(1);
+}
+$prefs['pubrivertitle'] = $pubrivertitle;
 //--------------------------------------------------------
 //--------------------------------------------------------
 

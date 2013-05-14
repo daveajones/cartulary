@@ -17,13 +17,31 @@
     	  echo "Skipping server-wide river build. Bucket or file value is empty.\n\n";
         }
 
-  	//Calculate how long it took to build the rivers
+  	//Calculate how long it took to build the server-wide river
   	$took = time() - $tstart;
-
     	loggit(1, "It took: [$took] seconds to build the server-wide river.");
-  	loggit(1, "Done.");
+
+
+        //Build the individual public rivers for each user in the system that has enabled it
+        $users = get_users();
+        echo "Building public rivers...\n";
+        loggit(3, "Building public rivers...");
+        $tstart = time();
+        foreach($users as $user) {
+          $rtstart = time();
+          $prefs = get_user_prefs($user['id']);
+          if( $prefs['publicriver'] == 1 ) {
+            build_public_river( $user['id'] );
+            echo "Built public river for user: [".$user['id']." | ".$user['name']." | ".(time() - $rtstart)."].\n";
+            loggit(3, "Built public river for user: [".$user['id']." | ".$user['name']." | ".(time() - $rtstart)."].");
+          }
+        }
+  	$took = time() - $tstart;
+    	loggit(3, "It took: [$took] seconds to build all of the public rivers.");
+
 
         //Release the lock
+  	loggit(1, "Done.");
   	cronHelper::unlock();
   }
   exit(0);

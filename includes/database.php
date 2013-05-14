@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 17;
+$cg_database_version = 18;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -191,6 +191,20 @@ CGDB0040;
 $cg_database_updates[16][] = <<<CGDB0041
  INSERT INTO `dbversion` ( `version` ) VALUES ( '17' )
 CGDB0041;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 17 to 18 -------------------------------------------------------------------------------------------------
+$cg_database_updates[17][] = <<<CGDB0042
+ ALTER TABLE `prefs` ADD `pubrivertemplate` VARCHAR( 128 ) NOT NULL COMMENT 'Template url for public rivers.',
+ ADD `opensubs` TINYINT NOT NULL DEFAULT '0' COMMENT 'Allow open subscriptions',
+ ADD `publicriver` TINYINT NOT NULL DEFAULT '0' COMMENT 'Make river public?',
+ ADD `pubriverfile` VARCHAR( 32 ) NOT NULL DEFAULT 'river.html' COMMENT 'The file name to use for public river',
+ ADD `pubrivertitle` VARCHAR( 128 ) NOT NULL DEFAULT 'My Public River' COMMENT 'The public river title.'
+CGDB0042;
+
+$cg_database_updates[17][] = <<<CGDB0043
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '18' )
+CGDB0043;
 //----------------------------------------------------------------------------------------------------------------
 
 

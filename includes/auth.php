@@ -2422,11 +2422,16 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
 	       cartinriver=?,
                staticarticles=?,
 	       collapseriver=?,
-               hideme=?
+               hideme=?,
+               pubrivertemplate=?,
+               opensubs=?,
+               publicriver=?,
+               pubriverfile=?,
+               pubrivertitle=?
            WHERE uid=?";
 
   $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsddddds",
+  $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddsss",
                                 $prefs['publicdefault'],
 				$prefs['publicrss'],
 				$prefs['publicopml'],
@@ -2469,6 +2474,11 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
 				$prefs['staticarticles'],
 				$prefs['collapseriver'],
 			        $prefs['hideme'],
+				$prefs['pubrivertemplate'],
+                                $prefs['opensubs'],
+                                $prefs['publicriver'],
+                                $prefs['pubriverfile'],
+				$prefs['pubrivertitle'],
 				$uid
   ) or print(mysql_error());
   $sql->execute() or print(mysql_error());

@@ -28,7 +28,7 @@ MAILTO=""
 */1  * * * * root php /opt/cartulary/bin/buildrivers.php
 
 ##: Build alternate rivers
-*/30  * * * * root php /opt/cartulary/bin/buildsysrivers.php
+*/20  * * * * root php /opt/cartulary/bin/buildsysrivers.php
 
 ##: Build user-level archives
 27   * * * * root php /opt/cartulary/bin/archive.php

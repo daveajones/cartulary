@@ -2091,7 +2091,7 @@ function convert_opml_to_html($content = NULL, $max = NULL)
   $count = 0;
   $html = "";
   foreach($nodes as $entry) {
-      loggit(3, "DEBUG: ".print_r($entry, TRUE));
+      //loggit(3, "DEBUG: ".print_r($entry, TRUE));
 
       $text = (string)$entry->attributes()->text;
       $name = (string)$entry->attributes()->name;

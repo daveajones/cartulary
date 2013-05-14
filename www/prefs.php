@@ -84,7 +84,7 @@
 		    ?>
 		    </select>
                 </li>
-		<li class="privacy"><input name="hideme" type="checkbox" <?if ($prefs['hideme'] == 1) echo "checked ";?>/> I don't want to be found in directory searches..</li>
+		<li class="privacy"><input name="hideme" type="checkbox" <?if ($prefs['hideme'] == 1) echo "checked ";?>/> I don't want to be found in directory searches.</li>
 	</ul>
 	</div>
 	</div>
@@ -114,6 +114,14 @@
 
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefRiver"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
+	<h3>Subscriptions</h3>
+	<ul>
+		<li class="privacy"><input name="opensubs" type="checkbox" <?if ($prefs['opensubs'] == 1) echo "checked ";?>/> Allow open subscriptions.</li>
+	</ul>
+	</div>
+
+	<div class="divPrefPane">
+	<div class="divPrefSubmit pull-right divPrefRiver"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
 	<h3>River</h3>
 	<ul>
 		<li>I want: <input id="riverhours" class="hourinput" name="riverhours" type="text" value="<?echo $prefs['riverhours']?>" /> hours worth of items listed in my river.</li>
@@ -125,6 +133,12 @@
 		<li><input name="mobilehidepics" type="checkbox" <?if ($prefs['mobilehidepics'] == 1) echo "checked ";?>/> Hide body images/videos in the river when on mobile.</li>
 		<li><input name="fulltextriver" type="checkbox" <?if ($prefs['fulltextriver'] == 1) echo "checked ";?>/> I want to see the full text of each item.</li>
 		<li><input name="collapseriver" type="checkbox" <?if ($prefs['collapseriver'] == 1) echo "checked ";?>/> Collapse similar items into a threaded view.</li>
+		<li class="privacy"><input id="chkPubriver" name="publicriver" type="checkbox" <?if ($prefs['publicriver'] == 1) echo "checked ";?>/> I want a public river.</li>
+		<div id="divPubriver" class="hide">
+			<li>My public river's file name should be: <input id="pubriverfile" name="pubriverfile" type="text" value="<?echo $prefs['pubriverfile']?>" /></li>
+			<li>My custom public river template url is: <input id="pubrivertemplate" class="urlinput" name="pubrivertemplate" type="text" value="<?echo $prefs['pubrivertemplate']?>" /></li>
+			<li>My public river title should be: <input id="pubrivertitle" class="urlinput" name="pubrivertitle" type="text" value="<?echo $prefs['pubrivertitle']?>" /></li>
+		</div>
 	</ul>
 	</div>
 

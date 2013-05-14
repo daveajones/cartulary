@@ -149,4 +149,10 @@
 			abb = true;
 			return(false);
 		});
+
+		//Toggle public river stuff
+		$('#chkPubriver').bind('change', function() {
+                        $('#divPubriver').toggle( $('#chkPubriver').prop("checked") );			
+		});
+                $('#chkPubriver').trigger('change');
 	});

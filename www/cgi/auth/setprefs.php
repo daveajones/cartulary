@@ -685,6 +685,17 @@ if( $oldprefs['maxriversize'] != $maxriversize ||
   }
 }
 
+//If any public river-affecting prefs change, we need to rebuild the public river
+if( $publicriver == 1 && (
+    $oldprefs['publicriver'] != $publicriver ||
+    $oldprefs['opensubs'] != $opensubs ||
+    $oldprefs['pubrivertitle'] != $pubrivertitle ||
+    $oldprefs['pubrivertemplate'] != $pubrivertemplate ||
+    $oldprefs['pubriverfile'] != $pubriverfile )
+) {
+    loggit(3, "Rebuilding public river for: [$uid].");
+    build_public_river($uid);
+}
 
 
 //Rebuild static files

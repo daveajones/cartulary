@@ -829,7 +829,7 @@ function build_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles =
   $prefs = get_user_prefs($uid);
 
   //If this user doesn't want his cart feed public, then exit
-  if($prefs['publicopml'] == 1) {
+  if( $prefs['publicopml'] == 1 && $nos3 == FALSE ) {
     loggit(3, "User: [$uid] want's their article feed to be private.");
     return(FALSE);
   }

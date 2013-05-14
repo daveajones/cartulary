@@ -1,9 +1,12 @@
 #### What is Cartulary?
-  It's part of the Freedom Controller project.
+  It's part of the new Freedom Controller project:  http://freedomcontroller.com
 
-  We call it a digital archiver.  But, you could also call it a social network in a box.
-  It's an RSS reader, RSS aggregator, readability tool, article archiver, microblogger,
-  social graph manager and reading list manager.
+  The larger goal of the project is an attempt at building a distributed social network
+  through the use of standard RSS and OPML feeds.  This is the first product.
+
+  We call Cartulary a digital archiver.  But, you could also call it a social network 
+  in a box.  It's an RSS reader, RSS aggregator, readability tool, article archiver, 
+  microblogger, social graph manager and reading list manager.
 
   You can publish all of your feeds into a single social outline(OPML) with it, so that
   other people can easily subscribe to all of your stuff at once.  You can save full

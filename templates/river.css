@@ -897,6 +897,8 @@ img.avatarheader {  float:right; max-height: 64px;  }
   text-shadow:0 1px 0 #777;
   border:none;
 }
+#divPageTitle a {  color: #eee;  }
+#divPageTitle div.opensub {  float:right;  }
 #divPageTitle h1 {
   width:70%;
 }

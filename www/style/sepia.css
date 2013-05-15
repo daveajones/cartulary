@@ -483,6 +483,15 @@ div.searchbar p.result-msg {
 .pageContentWrapper.River #stream .section iframe {
   max-width:100%;
 }
+.pageContentWrapper.River #stream .section .enciframe.inactive {
+  border:solid #222 1px;
+  background:#555;
+}
+.pageContentWrapper.River #stream .section .enciframe.inactive div.play {
+  margin-top:100px;
+  color:#ddd;
+  font-size:120%;
+}
 .pageContentWrapper.River #stream .section .encpicture {
   display:block;
   clear:both;

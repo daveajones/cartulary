@@ -96,7 +96,9 @@
                             <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
 			<?if( $device != "iphone" && $device != "ipad" ) {?>
                         {{else River.methods.isIframe(enclosure.url, enclosure.type) && Hidepics == false}}
-                            <iframe class="encobj enciframe inactive" src="/images/blank.gif" data-src="${enclosure.url}" data-type="${enclosure.type}" data-length="${enclosure.length}" frameborder="0" allowfullscreen></iframe>
+                            <div class="encobj enciframe inactive hide" data-src="${enclosure.url}" data-type="${enclosure.type}" data-length="${enclosure.length}" data-frameborder="0" allowfullscreen>
+                              <div class="play"><img class="icon-play" src="/images/blank.gif" alt="" /> Click to load video</div>
+                            </div>
 			<?}?>
                         {{/if}}
 		    {{/each}}

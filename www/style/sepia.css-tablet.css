@@ -409,6 +409,15 @@ div.searchbar p.result-msg {
   max-width:64px;
   margin:8px;
 }
+.pageContentWrapper.River #stream .section .enciframe.inactive {
+  border:solid #222 1px;
+  background:#555;
+}
+.pageContentWrapper.River #stream .section .enciframe.inactive div.play {
+  margin-top:100px;
+  color:#ddd;
+  font-size:120%;
+}
 .pageContentWrapper.River #stream .section .bodyvid,
 .pageContentWrapper.River #stream .section .enciframe {
   clear:both;

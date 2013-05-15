@@ -155,6 +155,7 @@ River.generate = (function () {
         River.methods.bindCartLinks();
 	River.methods.bindMicroblogLinks();
 	River.methods.bindEnclosureLinks();
+	River.methods.bindEmbedActivations();
         //Jump to top button
         $('.jumpTop').click(function () {
 		$('html, body').animate({ scrollTop: '0px' }, 300); 
@@ -163,7 +164,6 @@ River.generate = (function () {
 	<?if($g_platform != "mobile"){?>
 	focusFirstVisibleArticle();
 	<?}?>
-	River.methods.activateEnclosures(3);
     };
     
     // expand stream items
@@ -461,16 +461,16 @@ River.methods = (function () {
 	return false;
     };
 
-    function _activateEnclosures( numto ) {
-        clearTimeout(enclosureActivator);
-        console.log("activating enclosures");
+    function _bindEmbedActivations() {
 	$('.enciframe.inactive').each(function(k, v) {
-          console.log('['+k+']: '+$(this).attr('data-src'));
-          $(this).attr('src', $(this).attr('data-src')).removeClass('inactive');
-	  if( k === numto ) {
-            enclosureActivator = setTimeout(function(){  River.methods.activateEnclosures(numto);  }, 2000);
-            return false;
-          }
+          var _this = this;
+          console.log('['+k+']: ' + $(this).attr('data-src'));
+          $(this).children('div.play').bind('click', function() {
+	    var dsrc = $(_this).attr("data-src");
+	    console.log("load video");
+	    var $iframe = $('<iframe>', { class: 'encobj enciframe', src: dsrc, frameborder: 0 });
+	    $(_this).replaceWith($iframe)
+          });
         });
 
 	return false;
@@ -686,7 +686,7 @@ River.methods = (function () {
 	isAudio : _isAudio,
         isVideo : _isVideo,
         isIframe  : _isIframe,
-        activateEnclosures : _activateEnclosures,
+        bindEmbedActivations : _bindEmbedActivations,
         getDomain : _getDomain,
         getFavicon : _getFavicon,
 	newGetText : _newGetText,

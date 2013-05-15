@@ -97,7 +97,7 @@
 			<?if( $device != "iphone" && $device != "ipad" ) {?>
                         {{else River.methods.isIframe(enclosure.url, enclosure.type) && Hidepics == false}}
                             <div class="encobj enciframe inactive hide" data-src="${enclosure.url}" data-type="${enclosure.type}" data-length="${enclosure.length}" data-frameborder="0" allowfullscreen>
-                              <div class="play"><img class="icon-play" src="/images/blank.gif" alt="" /> Click to load video</div>
+                              <div class="play"><img class="icon-play" src="/images/blank.gif" alt="" /> Click to load...</div>
                             </div>
 			<?}?>
                         {{/if}}

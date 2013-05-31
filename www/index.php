@@ -54,11 +54,11 @@
 		  <input id="txtUsername" name="email" class="txtinput required" type="text" />
 		<label class="lblLoginLabel" id="lblPassword" for="txtPassword"><h2>Password:</h2></label>
                   <input id="txtPassword" name="password" class="txtinput required password" type="password" />
-		<br/><input id="submit" name="submit" class="btn pull-right" type="submit" value="Login" />
+		<br/><?if( $cg_opensignup == 1 ) {?><input id="register" name="register" class="btn pull-left" type="submit" value="Register" /><?}?>
+                     <input id="submit" name="submit" class="btn pull-right" type="submit" value="Login" />
 	    </form>
 	</div>
     </div>
-
 
 <?//--- Include the footer bar html fragments -----------?>
 <?include "$confroot/$templates/$template_html_footerbar"?>

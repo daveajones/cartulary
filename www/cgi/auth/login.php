@@ -2,9 +2,18 @@
 <?include "$confroot/$templates/php_cgi_init_noauth.php"?>
 <?
 
+
 // Get the input
 $email=$_POST['email'];
 $password=$_POST['password'];
+$type = $_POST['type'];
+
+if( $type == 'json' ) {
+  //Set up json
+  header("Content-Type: application/json");
+  $jsondata = array();
+  $jsondata['fieldname'] = "";
+}
 
 // Is it blank?
 if(empty($email) || empty($password)) {
@@ -74,18 +83,33 @@ if( ($sid = new_session($uid)) == FALSE ) {
 //Make a cookie for this session
 setcookie($sidcookie, $sid, 0, "/");
 
+
 //Is this the first time this user is logging in?
 if(is_user_active($uid)) {
   //Is there a previously requested uri we need to follow through on?
   if( !empty($_COOKIE[$postfollowcookie]) ) {
     $pfc = $_COOKIE[$postfollowcookie];
     loggit(3, "FOLLOW: $pfc");
-    header("Location: $pfc");
+    if( $type == 'json' ) {
+        $jsondata['goloc'] = $pfc;
+        $jsondata['status'] = "true";
+        $jsondata['description'] = "Login success. Redirecting.";
+        echo json_encode($jsondata);
+    } else {
+    	header("Location: $pfc");
+    }
     exit(0);
   }
 
   //Redirect to the start page
-  header("Location: $startpage");
+  if( $type == 'json' ) {
+      $jsondata['goloc'] = $startpage;
+      $jsondata['status'] = "true";
+      $jsondata['description'] = "Login success. Redirecting.";
+      echo json_encode($jsondata);
+  } else {
+      header("Location: $startpage");
+  }
 } else {
   //Log it
   loggit(3,"Redirecting new user: [$email | $uid] with sid: [$sid] to the activation page: [$activatepage].");
@@ -94,10 +118,24 @@ if(is_user_active($uid)) {
   $stg = get_activation_stage($uid);
   if($stg == 0) {
     set_activation_stage($uid, 1);
-    header("Location: $activatepage"."1");
+    if( $type == 'json' ) {
+        $jsondata['goloc'] = $activatepage."1";
+        $jsondata['status'] = "true";
+        $jsondata['description'] = "Login success. Redirecting.";
+        echo json_encode($jsondata);
+    } else {
+        header("Location: $activatepage"."1");
+    }
   } else {
     //Redirect to the activation page
-    header("Location: $activatepage".$stg);
+    if( $type == 'json' ) {
+        $jsondata['goloc'] = $activatepage.$stg;
+        $jsondata['status'] = "true";
+        $jsondata['description'] = "Login success. Redirecting.";
+        echo json_encode($jsondata);
+    } else {
+        header("Location: $activatepage".$stg);
+    }
   }
 }
 

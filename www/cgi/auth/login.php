@@ -19,7 +19,13 @@ if( $type == 'json' ) {
 if(empty($email) || empty($password)) {
   //Log it
   loggit(2,"The email[$email] or password[$password] was blank.");
-  header("Location: $loginerrorpage?code=0");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Bad credentials.";
+    echo json_encode($jsondata);
+  } else {
+    header("Location: $loginerrorpage?code=0");
+  }
   exit(1);
 }
 
@@ -31,7 +37,13 @@ $password = htmlentities($password);
 if( (preg_match("/.{6,320}/",$email)==0) || (preg_match("/.{6,128}/",$password)==0) ) {
   //Log it
   loggit(2,"The email: [$email] or password: [$password] given isn't a sane length.");
-  header("Location: $loginerrorpage?code=30");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Bad credentials.";
+    echo json_encode($jsondata);
+  } else {
+    header("Location: $loginerrorpage?code=30");
+  }
   exit(1);
 }
 
@@ -39,7 +51,13 @@ if( (preg_match("/.{6,320}/",$email)==0) || (preg_match("/.{6,128}/",$password)=
 if(get_user_id_from_email($email) == "none") {
   //Log it
   loggit(2,"The email[$email] given doesn't exist.");
-  header("Location: $loginerrorpage?code=6");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Bad credentials.";
+    echo json_encode($jsondata);
+  } else {
+    header("Location: $loginerrorpage?code=6");
+  }
   exit(1);
 }
 
@@ -47,7 +65,13 @@ if(get_user_id_from_email($email) == "none") {
 if(badlogin_check($email) == FALSE) {
   //Log it
   loggit(2,"Bad login count exceeded for: [$email]");
-  header("Location: $loginerrorpage?code=8");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Too many bad logins. Wait for reset.";
+    echo json_encode($jsondata);
+  } else {
+    header("Location: $loginerrorpage?code=8");
+  }
   exit(1);
 }
 
@@ -58,7 +82,13 @@ if($uid == FALSE) {
   loggit(2,"Login attempt failed for: [$email | $password].");
   //Increment the bad attempt counter
   badlogin_inc($email);
-  header("Location: $loginerrorpage?code=2");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Bad credentials.";
+    echo json_encode($jsondata);
+  } else {
+    header("Location: $loginerrorpage?code=2");
+  }
   exit(1);
 } else {
   badlogin_reset($email);
@@ -76,7 +106,13 @@ badlogin_reset($email);
 //Make a new session
 if( ($sid = new_session($uid)) == FALSE ) {
   loggit(2,"Could not create session: [$uid]");
-  header ("Location: $loginerrorpage?code=4");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Session creation error.";
+    echo json_encode($jsondata);
+  } else {
+    header ("Location: $loginerrorpage?code=4");
+  }
   exit(1);
 }
 

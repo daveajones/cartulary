@@ -1,3 +1,4 @@
+<?if( isset($g_uid) ) {?>
 <!-- Two empty divs for search and notifications -->
 <div class="row noticebar alert alert-block hide"></div>
 <div class="row searchbar well hide">
@@ -7,4 +8,4 @@
   </div>
   <div class="body"></div>
 </div>
-
+<?}?>

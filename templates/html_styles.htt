@@ -1,5 +1,6 @@
 <!-- Global style sheets -->
 <link rel="stylesheet" type="text/css" href="/style/bootstrap-2.3.1-noicons.css" />
+<link rel="stylesheet" type="text/css" href="/style/flat-ui.css" />
 <link rel="stylesheet" type="text/css" href="/style/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="/style/style.css" />
 <link rel="stylesheet" type="text/css" href="/style/river.css" />

@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 18;
+$cg_database_version = 19;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -205,6 +205,16 @@ CGDB0042;
 $cg_database_updates[17][] = <<<CGDB0043
  INSERT INTO `dbversion` ( `version` ) VALUES ( '18' )
 CGDB0043;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 18 to 19 -------------------------------------------------------------------------------------------------
+$cg_database_updates[18][] = <<<CGDB0044
+ ALTER TABLE `prefs` ADD `rivercolumns` INT NOT NULL DEFAULT '0' COMMENT 'Number of columns on river page.'
+CGDB0044;
+
+$cg_database_updates[18][] = <<<CGDB0045
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '19' )
+CGDB0045;
 //----------------------------------------------------------------------------------------------------------------
 
 

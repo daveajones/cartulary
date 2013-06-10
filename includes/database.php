@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 19;
+$cg_database_version = 20;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -215,6 +215,20 @@ CGDB0044;
 $cg_database_updates[18][] = <<<CGDB0045
  INSERT INTO `dbversion` ( `version` ) VALUES ( '19' )
 CGDB0045;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 19 to 20 -------------------------------------------------------------------------------------------------
+$cg_database_updates[19][] = <<<CGDB0046
+ ALTER TABLE `microblog` ADD `target` VARCHAR( 700 ) NOT NULL COMMENT 'Url of target individual for this post.'
+CGDB0046;
+
+$cg_database_updates[19][] = <<<CGDB0047
+ ALTER TABLE `nfitems` ADD `target` VARCHAR( 700 ) NOT NULL COMMENT 'Url of target individual for this post.'
+CGDB0047;
+
+$cg_database_updates[19][] = <<<CGDB0048
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '20' )
+CGDB0048;
 //----------------------------------------------------------------------------------------------------------------
 
 

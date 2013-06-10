@@ -1,6 +1,6 @@
 <div class="pinboard">
 {{if items.length < 1}}
-  <center class="noposts">You haven't posted anything. Why not?</center>
+  <center class="noposts">No media in your river yet.</center>
 {{/if}}
 {{each(p, item) items}}
   {{each(e, enc) enclosure}}
@@ -14,7 +14,7 @@
       	  {{/if}}
         </div>
         <div class="pinfooter">
-          <span class="pindate pull-right">${enc.length} | ${prettyDate(item.timeadded * 1000)}</span>
+          <span class="pindate pull-right"><a href="${item.url}" title="Link to article.">Link</a> | ${prettyDate(item.timeadded * 1000)}</span>
         </div>
       </div>
     {{/if}}

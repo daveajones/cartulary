@@ -1511,7 +1511,7 @@ function get_all_outlines($max = NULL)
     $sql->close()
       or print(mysql_error());
     loggit(1,"There are no outlines in the system.");
-    return(FALSE);
+    return(array());
   }
 
   $sql->bind_result($oid,$ourl,$otitle,$otype) or print(mysql_error());

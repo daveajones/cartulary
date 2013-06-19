@@ -2427,11 +2427,12 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                opensubs=?,
                publicriver=?,
                pubriverfile=?,
-               pubrivertitle=?
+               pubrivertitle=?,
+			   rivercolumns=?
            WHERE uid=?";
 
   $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddsss",
+  $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssds",
                                 $prefs['publicdefault'],
 				$prefs['publicrss'],
 				$prefs['publicopml'],
@@ -2479,6 +2480,7 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                                 $prefs['publicriver'],
                                 $prefs['pubriverfile'],
 				$prefs['pubrivertitle'],
+				$prefs['rivercolumns'],
 				$uid
   ) or print(mysql_error());
   $sql->execute() or print(mysql_error());
@@ -2528,7 +2530,7 @@ function get_users($max = NULL)
     $sql->close()
       or print(mysql_error());
     loggit(2,"There are no users in the system.");
-    return(FALSE);
+    return(array());
   }
 
   $sql->bind_result($uid,$uname,$uemail,$ulastlogin,$ustage,$uactive,$ubadlogins,$uusername,$uadmin,$uavatarurl) or print(mysql_error());

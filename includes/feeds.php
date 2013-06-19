@@ -3700,7 +3700,7 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
     $sql->close()
       or print(mysql_error());
     loggit(2,"There are no feeds in the system.");
-    return(FALSE);
+    return(array());
   }
 
   $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or print(mysql_error());
@@ -3920,7 +3920,7 @@ function get_updated_feeds($max = NULL)
     $sql->close()
       or print(mysql_error());
     //loggit(2,"There are no feeds that need scanning.");
-    return(FALSE);
+    return(array());
   }
 
   $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or print(mysql_error());
@@ -5794,12 +5794,12 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
                     $table_nfitemprop.`fulltext`,
                     $table_nfcatalog.`fulltext`
              FROM $table_nfitem
-             LEFT OUTER JOIN $table_nfitemprop ON $table_nfitemprop.itemid = $table_nfitem.id AND $table_nfitemprop.userid=? AND $table_nfitemprop.sticky = 1
+             LEFT OUTER JOIN $table_nfitemprop ON $table_nfitemprop.itemid = $table_nfitem.id AND $table_nfitemprop.userid=?
              INNER JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
              WHERE $table_nfcatalog.userid=?
-             AND ( $table_nfitem.timeadded > ? OR $table_nfitemprop.sticky = 1 )
+             AND $table_nfitem.timeadded > ?
              AND $table_nfitem.`old` = 0";
-  $sqltxt .= " ORDER BY $table_nfitemprop.sticky DESC, $table_nfitem.timeadded DESC";
+  $sqltxt .= " ORDER BY $table_nfitem.timeadded DESC";
   //loggit(3, $sqltxt);
 
   //Make sure to set the LIMIT to the higher of the two max values, so we cover both
@@ -5871,7 +5871,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
 		'websiteUrl' => $feed['link'],
 		'feedTitle' => $feed['title'],
 		'feedDescription' => '',
-                'feedSticky' => $fsticky,
+        'feedSticky' => $fsticky,
 		'feedHidden' => $fhidden,
 		'feedFullText' => $ffulltext,
 		'itemIndex' => $ticount,
@@ -6238,6 +6238,165 @@ function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL
 			    'origin' => $aorigin,
                             'author' => $aauthor
     );
+    $count++;
+  }
+
+  $sql->close() or print(mysql_error());
+
+  //loggit(3, print_r($items, TRUE));
+
+  loggit(1,"Returning: [$count] items.");
+  return($items);
+}
+
+
+//_______________________________________________________________________________________
+//Retrieve the feed items that are sticky
+function get_sticky_feed_items($uid = NULL)
+{
+  //Check parameters
+  if( empty($uid) ) {
+    loggit(2,"The user id is corrupt or blank: [$uid]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Get prefs
+  $prefs = get_user_prefs($uid);
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Run the query
+  $sqltxt = "SELECT nfitems.author,
+					newsfeeds.avatarurl,
+					nfitems.description,
+					'nfitemprops.fulltext',
+					'nfitemprops.hidden',
+					newsfeeds.id,
+					newsfeeds.title,
+					newsfeeds.url,
+					nfitems.guid,
+					nfitems.id,
+					nfitems.url,
+					nfitems.origin,
+					nfitems.enclosure,
+					nfitems.timestamp,
+					nfitems.timeadded,
+					nfitems.sourcetitle,
+					nfitems.sourceurl,
+					nfitems.title,
+					newsfeeds.link,
+					newsfeeds.pubdate,
+					nfcatalog.sticky,
+					'nfcatalog.hidden',
+					'nfcatalog.fulltext'
+             FROM (SELECT itemid FROM nfitemprops WHERE userid = ? AND sticky = 1) as tsub
+             INNER JOIN nfitems ON nfitems.id = tsub.itemid
+			 INNER JOIN newsfeeds ON nfitems.feedid = newsfeeds.id
+			 INNER JOIN nfcatalog ON nfitems.feedid = nfcatalog.feedid AND nfcatalog.userid = ?
+             ORDER BY timeadded DESC";
+
+  //loggit(3, "[$sqltxt]");
+  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql->bind_param("ss", $uid, $uid) or loggit(2, $sql->error);
+  $sql->execute() or print(mysql_error());
+  $sql->store_result() or print(mysql_error());
+
+  //See if there were any items returned
+  if($sql->num_rows() < 1) {
+    $sql->close()
+      or print(mysql_error());
+    loggit(1,"No feed items returned for: [$fid].");
+    return(array());
+  }
+
+  $sql->bind_result($lauthor,
+				    $lavatarurl,
+                    $ldescription,
+					$lfulltext,
+					$lhidden,
+					$lfeedid,
+					$lfeedtitle,
+					$lfeedurl,
+					$lguid,
+					$litemid,
+                    $lurl,
+                    $lorigin,
+                    $lenclosure,
+                    $ltimestamp,
+					$ltimeadded,
+                    $lsourcetitle,
+                    $lsourceurl,
+				    $ltitle,
+					$lfeedlink,
+                    $lfeedpubdate,
+					$lfsticky,
+					$lfhidden,
+					$lffulltext
+  ) or print(mysql_error());
+
+  $items = array();
+  $count = 0;
+  while($sql->fetch()){
+  	//Construct item body
+  	if($prefs['fulltextriver'] == 0) {
+  		if( $lffulltext == 1 ) {
+    		$itembody = $ldescription;
+    	} else
+    	if( strlen($ldescription) > 300 ) {
+        	$itembody = truncate_text($ldescription, 300)."...";
+    	} else {
+        	$itembody = $ldescription;
+    	}
+  	} else {
+  		$itembody = $ldescription;
+  	}
+
+	//Construct the item array
+    $items[$count] = array( 'author' 			=> $lauthor,
+                            'avatarUrl' 		=> $lavatarurl,
+							'body'				=> $itembody,
+							'guid'				=> $lguid,
+							'id'				=> $litemid,
+							'link'				=> $lurl,
+							'origin'			=> $lorigin,
+							'enclosure'			=> unserialize($lenclosure),
+							'permaLink'			=> $lurl,
+							'pubDate'			=> date("D, d M Y H:i:s O", $ltimeadded),
+							'sourcetitle'		=> $lsourcetitle,
+							'sourceurl'			=> $lsourceurl,
+							'sticky'			=> 1,
+							'hidden'			=> 0,
+							'fullText'			=> $lfulltext,
+							'title'				=> $ltitle,
+							'feed'				=> array(
+													'feedDescription'	=> '',
+													'feedFullText'		=> $lffulltext,
+													'feedHidden'		=> $lfhidden,
+													'feedId'			=> $lfeedid,
+													'feedSticky'		=> $lfsticky,
+													'feedTitle'			=> $lfeedtitle,
+													'feedUrl'			=> $lfeedurl,
+													'websiteUrl'		=> $lfeedlink,
+													'whenLastUpdate'	=> $lfeedpubdate
+							)
+    );
+
+    //Check if this feed is linked to an outline this user subscribes to
+    $oid = get_feed_outline_by_user($lfeedid, $uid);
+    if($oid != FALSE) {
+	 	$ou = get_outline_info($oid);
+		$items[$count]['feed']['linkedOutlineId'] = $oid;
+		if( !empty($ou['type']) ) { $items[$count]['feed']['linkedOutlineType'] = $ou['type']; }
+		if( !empty($ou['title']) ) {  $items[$count]['feed']['linkedOutlineTitle'] = $ou['title'];  }
+		if( !empty($ou['url']) ) {  $items[$count]['feed']['linkedOutlineUrl'] = $ou['url'];  }
+		if( !empty($ou['ownername']) ) {  $items[$count]['feed']['ownerName'] = $ou['ownername'];  }
+		if( !empty($ou['avatarurl']) ) {  $items[$count]['feed']['avatarUrl'] = $ou['avatarurl'];  }
+    }
+
     $count++;
   }
 

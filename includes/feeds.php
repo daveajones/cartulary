@@ -262,26 +262,25 @@ function feed_exists($url = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Clean the url
   $url = clean_url($url);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT id FROM $table_newsfeed WHERE url=?") or print(mysql_error());
-  $sql->bind_param("s", $url) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id FROM $table_newsfeed WHERE url=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $url) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
-    $sql->close()
-      or print(mysql_error());
+    $sql->close();
     loggit(3,"The feed at url: [$url] does not exist in the repository.");
     return(FALSE);
   }
-  $sql->bind_result($feedid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($feedid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   loggit(3,"The feed: [$feedid] at url: [$url] is already in the repository.");
   return($feedid);
@@ -302,23 +301,23 @@ function feed_id_exists($id = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the feed table
-  $sql=$dbh->prepare("SELECT id FROM $table_newsfeed WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id FROM $table_newsfeed WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The id: [$id] does not exist in the feed table.");
     return(FALSE);
   }
-  $sql->bind_result($feedid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($feedid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   loggit(1,"The feed: [$id] is already in use in the feed table.");
   return(TRUE);
@@ -343,23 +342,23 @@ function get_feed_outline($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT outlineid FROM $table_nfcatalog WHERE userid=? AND feedid=?") or print(mysql_error());
-  $sql->bind_param("ss", $uid, $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT outlineid FROM $table_nfcatalog WHERE userid=? AND feedid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $uid, $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The feed: [$fid] does not contain an outline link for user: [$uid].");
     return(FALSE);
   }
-  $sql->bind_result($oid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //loggit(1,"The feed: [$fid] links to outline: [$oid] for user: [$uid].");
   return($oid);
@@ -384,23 +383,23 @@ function get_feed_outline_by_user($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT outlineid FROM $table_nfcatalog WHERE (userid=? AND feedid=?) AND outlineid != '' AND outlineid IS NOT NULL") or print(mysql_error());
-  $sql->bind_param("ss", $uid, $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT outlineid FROM $table_nfcatalog WHERE (userid=? AND feedid=?) AND outlineid != '' AND outlineid IS NOT NULL") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $uid, $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     //loggit(1,"The feed: [$fid] does not link to an outline for user: [$uid].");
     return(FALSE);
   }
-  $sql->bind_result($oid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //loggit(1,"The feed: [$fid] links to outline: [$oid] for user: [$uid].");
   return($oid);
@@ -421,17 +420,17 @@ function get_feed_subscriber_count($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT userid FROM $table_nfcatalog WHERE feedid=?") or print(mysql_error());
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT userid FROM $table_nfcatalog WHERE feedid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if any rows came back
   $subcount = $sql->num_rows();
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   //loggit(3,"The feed: [$fid] has: [$subcount] subscribers.");
   return($subcount);
@@ -451,13 +450,13 @@ function get_feed_subscribers($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT userid FROM $table_nfcatalog WHERE feedid=?") or print(mysql_error());
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT userid FROM $table_nfcatalog WHERE feedid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if any rows came back
   $subcount = $sql->num_rows();
@@ -466,7 +465,7 @@ function get_feed_subscribers($fid = NULL)
   }
 
   //Put the feed ids in an array to send back
-  $sql->bind_result($userid) or print(mysql_error());
+  $sql->bind_result($userid) or loggit(2, "MySql error: ".$dbh->error);
   $users = array();
   $count = 0;
   while($sql->fetch()){
@@ -474,7 +473,7 @@ function get_feed_subscribers($fid = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"The feed: [$fid] has: [$count] subscribers.");
   return($users);
@@ -496,27 +495,27 @@ function get_feeds_by_outline_id($id = NULL)
   require_once "$confroot/$includes/opml.php";
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //See if this is a list or an outline
   $oi = get_outline_info($id);
 
   //Look for the url in the feed table
   if( $oi['type'] == 'list' ) {
-    $sql=$dbh->prepare("SELECT DISTINCT feedid FROM $table_listfeeds WHERE listid=?") or print(mysql_error());
-    $sql->bind_param("s", $id) or print(mysql_error());
+    $sql=$dbh->prepare("SELECT DISTINCT feedid FROM $table_listfeeds WHERE listid=?") or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_param("s", $id) or loggit(2, "MySql error: ".$dbh->error);
   } else {
-    $sql=$dbh->prepare("SELECT DISTINCT feedid FROM $table_nfcatalog WHERE outlineid=?") or print(mysql_error());
-    $sql->bind_param("s", $id) or print(mysql_error());
+    $sql=$dbh->prepare("SELECT DISTINCT feedid FROM $table_nfcatalog WHERE outlineid=?") or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_param("s", $id) or loggit(2, "MySql error: ".$dbh->error);
   }
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if any rows came back
   $subcount = $sql->num_rows();
 
   //Put the feed ids in an array to send back
-  $sql->bind_result($feedid) or print(mysql_error());
+  $sql->bind_result($feedid) or loggit(2, "MySql error: ".$dbh->error);
   $feeds = array();
   $count = 0;
   while($sql->fetch()){
@@ -524,7 +523,7 @@ function get_feeds_by_outline_id($id = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"Returning: [$subcount] feeds linked to outline: [$id].");
   return($feeds);
@@ -545,13 +544,13 @@ function get_pub_feeds($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT userid,url,linkedon,title,link FROM $table_sopml_feed WHERE userid=?") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT userid,url,linkedon,title,link FROM $table_sopml_feed WHERE userid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if any rows came back
   $subcount = $sql->num_rows();
@@ -561,7 +560,7 @@ function get_pub_feeds($uid = NULL)
   }
 
   //Put stuff in an array and send back
-  $sql->bind_result($userid,$url,$linkedon,$title,$link) or print(mysql_error());
+  $sql->bind_result($userid,$url,$linkedon,$title,$link) or loggit(2, "MySql error: ".$dbh->error);
   $feeds = array();
   $count = 0;
   while($sql->fetch()){
@@ -569,7 +568,7 @@ function get_pub_feeds($uid = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"Returning: [$subcount] pub feeds for user: [$uid].");
   return($feeds);
@@ -590,17 +589,17 @@ function get_item_count($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT id FROM $table_nfitem WHERE feedid=?") or print(mysql_error());
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id FROM $table_nfitem WHERE feedid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if any rows came back
   $itemcount = $sql->num_rows();
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"The feed: [$fid] has: [$itemcount] items.");
   return($itemcount);
@@ -621,27 +620,27 @@ function get_river($uid = NULL, $mobile = FALSE)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   if( $mobile == TRUE) {
-    $sql=$dbh->prepare("SELECT mriver FROM $table_river WHERE userid=?") or print(mysql_error());
+    $sql=$dbh->prepare("SELECT mriver FROM $table_river WHERE userid=?") or loggit(2, "MySql error: ".$dbh->error);
   } else {
-    $sql=$dbh->prepare("SELECT river FROM $table_river WHERE userid=?") or print(mysql_error());
+    $sql=$dbh->prepare("SELECT river FROM $table_river WHERE userid=?") or loggit(2, "MySql error: ".$dbh->error);
   }
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Failed to retrieve static river for user: [$uid]");
     return(FALSE);
   }
-  $sql->bind_result($sriver) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($sriver) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Unserialize it
   $river = unserialize($sriver);
@@ -678,7 +677,7 @@ function get_feed_info($id = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "SELECT $table_newsfeed.url,
@@ -701,14 +700,14 @@ function get_feed_info($id = NULL)
            FROM $table_newsfeed
            WHERE $table_newsfeed.id=?";
 
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Failed to retrieve feed info for feed id: [$id]");
     return(FALSE);
   }
@@ -716,9 +715,9 @@ function get_feed_info($id = NULL)
   $sql->bind_result($feed['url'], $feed['title'], $feed['content'], $feed['lastcheck'], $feed['lastupdate'],
                     $feed['lastmod'], $feed['createdon'], $feed['link'], $feed['rsscloudregurl'],
 		    $feed['rsscloudlastreg'], $feed['updated'], $feed['lastitemid'], $feed['oid'], 
-                    $feed['pubdate'], $feed['errors'], $feed['avatarurl'], $feed['id'] ) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+                    $feed['pubdate'], $feed['errors'], $feed['avatarurl'], $feed['id'] ) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //loggit(1,"Returning feed info for feed: [$id]");
   return($feed);
@@ -742,7 +741,7 @@ function get_feed_info_for_user($id = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "SELECT $table_newsfeed.url,
@@ -768,14 +767,14 @@ function get_feed_info_for_user($id = NULL, $uid = NULL)
 	   AND $table_newsfeed.id = $table_nfcatalog.feedid
            AND $table_nfcatalog.userid = ?";
 
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $id, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $id, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Failed to retrieve feed info for feed id: [$id]");
     return(FALSE);
   }
@@ -783,9 +782,9 @@ function get_feed_info_for_user($id = NULL, $uid = NULL)
   $sql->bind_result($feed['url'], $feed['title'], $feed['content'], $feed['lastcheck'], $feed['lastupdate'],
                     $feed['lastmod'], $feed['createdon'], $feed['link'], $feed['rsscloudregurl'],
 		    $feed['rsscloudlastreg'], $feed['updated'], $feed['lastitemid'], $feed['oid'],
-                    $feed['pubdate'], $feed['errors'], $feed['id'], $feed['sticky'], $feed['hidden'] ) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+                    $feed['pubdate'], $feed['errors'], $feed['id'], $feed['sticky'], $feed['hidden'] ) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //loggit(1,"Returning feed info for feed: [$id]");
   return($feed);
@@ -810,26 +809,26 @@ function get_feed_item_properties($id = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "SELECT sticky,hidden FROM $table_nfitemprop WHERE itemid=? AND userid=?";
 
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $id, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $id, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     //loggit(2,"Failed to retrieve feed item properties for item: [$id]");
     return(FALSE);
   }
   $item = array();
-  $sql->bind_result( $item['sticky'],$item['hidden'] ) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result( $item['sticky'],$item['hidden'] ) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //loggit(1,"Returning feed item properties for item: [$id]");
   return($item);
@@ -895,7 +894,7 @@ function get_river_info($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "SELECT $table_river.id,
@@ -908,22 +907,22 @@ function get_river_info($uid = NULL)
            FROM $table_river
            WHERE $table_river.userid=?";
 
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if we got a result
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Failed to retrieve river info for user id: [$uid]");
     return(FALSE);
   }
   $river = array();
-  $sql->bind_result( $river['id'], $river['userid'], $river['lastbuild'], $river['river'], $river['conthash'], $river['firstid'], $river['updated'] ) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result( $river['id'], $river['userid'], $river['lastbuild'], $river['river'], $river['conthash'], $river['firstid'], $river['updated'] ) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //loggit(3,"Returning river info for user: [$uid]: ".print_r($river, TRUE));
   return($river);
@@ -944,7 +943,7 @@ function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Clean the url
   $url = clean_url($url);
@@ -964,10 +963,10 @@ function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL)
     $existed = FALSE;
     //Now that we have a good id, put the article into the database
     $stmt = "INSERT INTO $table_newsfeed (id,url,createdon) VALUES (?,?,?)";
-    $sql=$dbh->prepare($stmt) or print(mysql_error());
-    $sql->bind_param("ssd", $id,$url,$createdon) or print(mysql_error());
-    $sql->execute() or print(mysql_error());
-    $sql->close() or print(mysql_error());
+    $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_param("ssd", $id,$url,$createdon) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+    $sql->close();
   } else {
     $existed = TRUE;
     $id = $fid;
@@ -1015,7 +1014,7 @@ function update_feed_title($fid = NULL, $title = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Deal with blank feed titles
   if( empty($title) ) {
@@ -1026,10 +1025,10 @@ function update_feed_title($fid = NULL, $title = NULL)
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET title=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $title,$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $title,$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Changed feed:[$fid]'s title to: [$title].");
@@ -1055,7 +1054,7 @@ function update_pub_feed($uid = NULL, $url = NULL, $title = NULL, $link = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Deal with blank feed props
   if( empty($title) ) {
@@ -1072,10 +1071,10 @@ function update_pub_feed($uid = NULL, $url = NULL, $title = NULL, $link = NULL)
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_sopml_feed SET title=?,link=? WHERE userid=? AND url=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ssss", $title,$link,$uid,$url) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssss", $title,$link,$uid,$url) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1, "Changed pub feed:[$url]'s title to: [$title] and link to: [$link].");
@@ -1097,7 +1096,7 @@ function update_feed_avatar($fid = NULL, $url = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Deal with blank feed titles
   if( empty($url) ) {
@@ -1108,10 +1107,10 @@ function update_feed_avatar($fid = NULL, $url = NULL)
 
   //Put the avatar in
   $stmt = "UPDATE $table_newsfeed SET avatarurl=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $url,$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $url,$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Changed feed:[$fid]'s avatar url to: [$url].");
@@ -1134,15 +1133,15 @@ function init_feed_stats($fid = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "INSERT IGNORE INTO $table_feedstats (id) VALUES (?)";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Get the new stats record
   if($updcount > 0) {
@@ -1176,7 +1175,7 @@ function set_feed_stats($fid = NULL, $stats = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "INSERT INTO $table_feedstats
@@ -1200,7 +1199,7 @@ function set_feed_stats($fid = NULL, $stats = NULL)
 		       lastnewtime=?,
                        subscribers=?
   ";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
   $sql->bind_param("sddddddsdddddddsd", $fid,
                                $stats['checkcount'],
                                $stats['checktime'],
@@ -1218,9 +1217,9 @@ function set_feed_stats($fid = NULL, $stats = NULL)
                                $stats['avgnewinterval'],
                                $stats['lastnewtime'],
                                $stats['subscribers']
-  ) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  ) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Set stats for feed: [$fid].");
@@ -1242,22 +1241,22 @@ function get_feed_stats($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli_Extended($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli_Extended($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Run the query
-  $sql=$dbh->prepare("SELECT * FROM $table_feedstats WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT * FROM $table_feedstats WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"This feed has no stats: [$fid]");
     return(init_feed_stats($fid));
   }
   $stats = $sql->fetch_assoc();
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"Returning stats array for feed: [$fid]");
   return($stats);
@@ -1283,14 +1282,14 @@ function update_feed_pubdate($fid = NULL, $pubdate = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET pubdate=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $pubdate,$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $pubdate,$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Changed feed:[$fid]'s pubdate to: [$pubdate].");
@@ -1316,14 +1315,14 @@ function update_feed_rsscloud_regurl($fid = NULL, $url = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET rsscloudregurl=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $url,$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $url,$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Changed feed:[$fid]'s rssCloud registration url to: [$url].");
@@ -1348,14 +1347,14 @@ function update_feed_rsscloud_lastreg($fid = NULL, $time = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET rsscloudlastreg=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $time,$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $time,$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Changed feed:[$fid]'s rssCloud lastreg time to: [$time].");
@@ -1380,14 +1379,14 @@ function update_feed_rsscloud_reglastresp($fid = NULL, $resp = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET rsscloudreglastresp=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $resp,$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $resp,$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Changed feed:[$fid]'s rssCloud last response text to: [$resp].");
@@ -1413,14 +1412,14 @@ function update_feed_lastupdate($fid = NULL, $time = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET lastupdate=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ds", $time,$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ds", $time,$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Changed feed:[$fid]'s lastupdate time to: [$time].");
@@ -1442,14 +1441,14 @@ function increment_feed_error_count($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET errors=errors+1 WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Incremented error count for feed:[$fid].");
@@ -1475,14 +1474,14 @@ function set_feed_error_count($fid = NULL, $count = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET errors=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ds", $count, $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ds", $count, $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Set error count for feed:[$fid] to: [$count].");
@@ -1504,14 +1503,14 @@ function reset_feed_error_count($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET errors=0 WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Reset error count for feed:[$fid] to zero.");
@@ -1537,14 +1536,14 @@ function update_feed_lastcheck($fid = NULL, $time = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET lastcheck=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ds", $time,$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ds", $time,$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Changed feed:[$fid]'s lastcheck time to: [$time].");
@@ -1566,15 +1565,15 @@ function flip_purge_to_old($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfitem SET `old`=1 WHERE feedid=? AND `purge`=1";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Flipped: [$updcount] items in feed:[$fid] from purge to old.");
@@ -1599,15 +1598,15 @@ function mark_feed_as_sticky($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfcatalog SET sticky=1 WHERE feedid=? AND userid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $fid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Flagged feed: [$fid] as sticky for user: [$uid].");
@@ -1633,15 +1632,15 @@ function unmark_feed_as_sticky($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfcatalog SET sticky=0 WHERE feedid=? AND userid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $fid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Flagged feed: [$fid] as sticky for user: [$uid].");
@@ -1667,15 +1666,15 @@ function mark_feed_item_as_sticky($iid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "INSERT INTO $table_nfitemprop (itemid, userid, sticky) VALUES (?,?,1) ON DUPLICATE KEY UPDATE sticky=1";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $iid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Flagged item: [$iid] as sticky for user: [$uid].");
@@ -1701,15 +1700,15 @@ function unmark_feed_item_as_sticky($iid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfitemprop SET sticky=0 WHERE itemid=? AND userid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $iid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Un-flagged item: [$iid] as sticky for user: [$uid].");
@@ -1734,15 +1733,15 @@ function mark_feed_as_hidden($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfcatalog SET hidden=1 WHERE feedid=? AND userid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $fid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Flagged feed: [$fid] as hidden for user: [$uid].");
@@ -1768,15 +1767,15 @@ function unmark_feed_as_hidden($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfcatalog SET hidden=0 WHERE feedid=? AND userid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $fid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Flagged feed: [$fid] as hidden for user: [$uid].");
@@ -1802,15 +1801,15 @@ function mark_feed_item_as_hidden($iid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "INSERT INTO $table_nfitemprop (itemid, userid, hidden) VALUES (?,?,1) ON DUPLICATE KEY UPDATE hidden=1";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $iid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Flagged item: [$iid] as hidden for user: [$uid].");
@@ -1836,15 +1835,15 @@ function unmark_feed_item_as_hidden($iid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfitemprop SET hidden=0 WHERE itemid=? AND userid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $iid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Un-flagged item: [$iid] as hidden for user: [$uid].");
@@ -1870,15 +1869,15 @@ function mark_feed_as_fulltext($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfcatalog SET `fulltext`=1 WHERE feedid=? AND userid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $fid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Flagged feed: [$fid] as fulltext for user: [$uid].");
@@ -1904,15 +1903,15 @@ function unmark_feed_as_fulltext($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfcatalog SET `fulltext`=0 WHERE feedid=? AND userid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $fid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Flagged feed: [$fid] as fulltext for user: [$uid].");
@@ -1938,15 +1937,15 @@ function mark_feed_item_as_fulltext($iid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "INSERT INTO $table_nfitemprop (itemid, userid, `fulltext`) VALUES (?,?,1) ON DUPLICATE KEY UPDATE `fulltext`=1";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $iid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"FULLTEXT: Flagged item: [$iid] as fulltext for user: [$uid].");
@@ -1972,15 +1971,15 @@ function unmark_feed_item_as_fulltext($iid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfitemprop SET `fulltext`=0 WHERE itemid=? AND userid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $iid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Un-flagged item: [$iid] as fulltext for user: [$uid].");
@@ -2002,15 +2001,15 @@ function mark_river_as_updated($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_river SET updated=1 WHERE userid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1, "Flagged river for user: [$uid] as needing to be rebuilt.");
@@ -2032,15 +2031,15 @@ function mark_feed_as_updated($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET updated=1 WHERE id=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Flagged feed: [$fid] as needing to be scanned.");
@@ -2063,15 +2062,15 @@ function unmark_feed_as_updated($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET updated=0 WHERE id=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   //loggit(3,"Cleared update flag on feed: [$fid].");
@@ -2093,15 +2092,15 @@ function mark_all_feed_items_to_purge($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfitem SET `purge`=1 WHERE feedid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Marked: [$updcount] items in feed:[$fid] to purge.");
@@ -2123,15 +2122,15 @@ function unmark_all_feed_items_to_purge($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Update all the items
   $stmt = "UPDATE $table_nfitem SET `purge`=0 WHERE feedid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s",$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s",$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Un-marked: [$updcount] items in feed:[$fid] to purge.");
@@ -2152,15 +2151,15 @@ function mark_all_outline_feeds_to_purge($oid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfcatalog SET `purge`=1 WHERE outlineid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("s", $oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("s", $oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Marked: [$updcount] feeds to purge for outline: [$oid].");
@@ -2182,15 +2181,15 @@ function unmark_all_outline_feeds_to_purge($oid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfcatalog SET `purge`=0 WHERE outlineid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("s", $oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("s", $oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   loggit(1,"Un-marked: [$updcount] feeds to purge for outline: [$oid].");
@@ -2215,15 +2214,15 @@ function mark_outline_feed_to_purge($oid = NULL, $fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfcatalog SET `purge`=1 WHERE outlineid=? AND feedid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $oid, $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $oid, $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   if($updcount < 1) {
@@ -2254,15 +2253,15 @@ function unmark_outline_feed_to_purge($oid = NULL, $fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfcatalog SET `purge`=0 WHERE outlineid=? AND feedid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("ss", $oid, $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("ss", $oid, $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   if($updcount < 1) {
@@ -2293,15 +2292,15 @@ function mark_feed_item_to_purge($fid = NULL, $guid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfitem SET `purge`=1 WHERE feedid=? AND guid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss",$fid,$guid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss",$fid,$guid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   if($updcount < 1) {
@@ -2331,15 +2330,15 @@ function unmark_feed_item_to_purge($fid = NULL, $guid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_nfitem SET `purge`=0 WHERE feedid=? AND guid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss",$fid,$guid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss",$fid,$guid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and return
   if($updcount < 1) {
@@ -2370,14 +2369,14 @@ function update_feed_link($fid = NULL, $link = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET link=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $link,$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $link,$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Changed feed:[$fid]'s link to: [$link].");
@@ -2402,14 +2401,14 @@ function update_feed_content($fid = NULL, $content = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET content=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $content,$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $content,$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Updated content for feed: [$fid].");
@@ -2434,14 +2433,14 @@ function update_feed_lastmod($fid = NULL, $lastmod = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_newsfeed SET lastmod=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ds", $lastmod,$fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ds", $lastmod,$fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Updated last-modified time to: [$lastmod] for feed: [$fid].");
@@ -2466,22 +2465,22 @@ function feed_is_sticky($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT sticky FROM $table_nfcatalog WHERE feedid=? AND userid=? AND sticky=1") or print(mysql_error());
-  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT sticky FROM $table_nfcatalog WHERE feedid=? AND userid=? AND sticky=1") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $fid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     //loggit(3,"The feed: [$fid] is NOT sticky for user: [$uid].");
     return(FALSE);
   }
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   //loggit(3,"The feed: [$fid] is sticky for user: [$uid].");
   return(TRUE);
@@ -2506,22 +2505,22 @@ function feed_is_hidden($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT hidden FROM $table_nfcatalog WHERE feedid=? AND userid=? AND hidden=1") or print(mysql_error());
-  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT hidden FROM $table_nfcatalog WHERE feedid=? AND userid=? AND hidden=1") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $fid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     //loggit(3,"The feed: [$fid] is NOT hidden for user: [$uid].");
     return(FALSE);
   }
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   //loggit(3,"The feed: [$fid] is hidden for user: [$uid].");
   return(TRUE);
@@ -2546,22 +2545,22 @@ function feed_is_fulltext($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT `fulltext` FROM $table_nfcatalog WHERE feedid=? AND userid=? AND `fulltext`=1") or print(mysql_error());
-  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT `fulltext` FROM $table_nfcatalog WHERE feedid=? AND userid=? AND `fulltext`=1") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $fid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     //loggit(3,"The feed: [$fid] is NOT fulltext for user: [$uid].");
     return(FALSE);
   }
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"The feed: [$fid] is fulltext for user: [$uid].");
   return(TRUE);
@@ -2586,21 +2585,21 @@ function feed_is_linked($fid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT * FROM $table_nfcatalog WHERE feedid=? AND userid=?") or print(mysql_error());
-  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT * FROM $table_nfcatalog WHERE feedid=? AND userid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $fid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The feed: [$fid] is not linked to user: [$uid].");
     return(FALSE);
   }
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"The feed: [$fid] is already linked to user: [$uid].");
   return(TRUE);
@@ -2632,21 +2631,21 @@ function feed_is_linked_by_url($url = NULL, $uid = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT * FROM $table_nfcatalog WHERE feedid=? AND userid=?") or print(mysql_error());
-  $sql->bind_param("ss", $fid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT * FROM $table_nfcatalog WHERE feedid=? AND userid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $fid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The feed: [$fid] is not linked to user: [$uid].");
     return(FALSE);
   }
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"The feed: [$fid] is already linked to user: [$uid].");
   return(TRUE);
@@ -2672,14 +2671,14 @@ function link_feed_to_user($fid = NULL, $uid = NULL)
   $tstamp = time();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Link the article to the user
   $stmt = "INSERT INTO $table_nfcatalog (userid,feedid,linkedon) VALUES (?,?,?)";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sss", $uid,$fid,$tstamp) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("sss", $uid,$fid,$tstamp) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Linked feed: [$fid] with user: [$uid].");
@@ -2717,14 +2716,14 @@ function add_pub_feed($url = NULL, $uid = NULL, $title = NULL, $link = NULL)
   $url = clean_url($url);
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Link the article to the user
   $stmt = "INSERT INTO $table_sopml_feed (userid,url,linkedon,title,link) VALUES (?,?,?,?,?)";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sssss", $uid,$url,$tstamp,$title,$link) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("sssss", $uid,$url,$tstamp,$title,$link) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Linked feed: [$url | $title] with user: [$uid].");
@@ -2750,15 +2749,15 @@ function del_pub_feed($uid = NULL, $url = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_sopml_feed WHERE userid=? AND url=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $uid, $url) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $uid, $url) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   if($delcount < 1) {
     loggit(2,"Failed to delete feed: [$url] from sopml feeds table for user: [$uid].");
@@ -2795,14 +2794,14 @@ function link_feed_to_outline($fid = NULL, $oid = NULL, $uid = NULL)
   $tstamp = time();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Link the feed to the user
   $stmt = "INSERT INTO $table_nfcatalog (userid, feedid, outlineid, linkedon) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE outlineid=?, linkedon=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ssssss", $uid,$fid,$oid,$tstamp,$oid,$tstamp) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssssss", $uid,$fid,$oid,$tstamp,$oid,$tstamp) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Linked feed: [$fid] with outline: [$oid] for user: [$uid].");
@@ -2829,14 +2828,14 @@ function link_feed_to_list($fid = NULL, $oid = NULL)
   $tstamp = time();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Link the feed to the user
   $stmt = "INSERT INTO $table_listfeeds (listid, feedid, linkedon) VALUES (?,?,?) ON DUPLICATE KEY UPDATE linkedon=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ssss", $oid,$fid,$tstamp,$tstamp) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssss", $oid,$fid,$tstamp,$tstamp) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   loggit(1,"Linked feed: [$fid] with list: [$oid].");
@@ -2859,7 +2858,7 @@ function get_feeds($uid = NULL, $max = NULL, $ididx = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get feeds for the given user id
   $sqltxt = "SELECT $table_newsfeed.id,
@@ -2888,15 +2887,15 @@ function get_feeds($uid = NULL, $max = NULL, $ididx = NULL)
   }
 
   //loggit(3, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"This user has not subscribed to any feeds: [$uid]");
     return(array());
   }
@@ -2914,7 +2913,7 @@ function get_feeds($uid = NULL, $max = NULL, $ididx = NULL)
                     $foid,
                     $fsticky,
                     $fhidden,
-                    $ffulltext) or print(mysql_error());
+                    $ffulltext) or loggit(2, "MySql error: ".$dbh->error);
 
   $feeds = array();
   $count = 0;
@@ -2942,7 +2941,7 @@ function get_feeds($uid = NULL, $max = NULL, $ididx = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"Returning: [$count] feeds for user: [$uid]");
   return($feeds);
@@ -2976,7 +2975,7 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
 
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get feeds for the given user id
   $sqltxt = "SELECT $table_newsfeed.id,
@@ -3010,7 +3009,7 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
   }
 
   //loggit(3, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
 
   //Adjust bindings
   $newsetup = "s".$qsql['bind'][0];
@@ -3021,13 +3020,13 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
   $method = $ref->getMethod("bind_param");
   $method->invokeArgs($sql, $qsql['bind']);
 
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"This user has not subscribed to any feeds: [$uid]");
     return(array());
   }
@@ -3045,7 +3044,7 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
                     $foid,
                     $fsticky,
                     $fhidden,
-		    $ffulltext) or print(mysql_error());
+		    $ffulltext) or loggit(2, "MySql error: ".$dbh->error);
 
   $feeds = array();
   $count = 0;
@@ -3073,7 +3072,7 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"Returning: [$count] feeds for user: [$uid] matching query: [$query].");
   return($feeds);
@@ -3099,15 +3098,15 @@ function unlink_feed_from_user($uid = NULL, $fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_nfcatalog WHERE userid=? AND feedid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $uid, $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $uid, $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and leave
   loggit(1,"Unlinked: [$delcount] feeds: [$fid] from user: [$uid].");
@@ -3133,15 +3132,15 @@ function unlink_feed_from_outline($fid = NULL, $oid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the table and kill it
   $stmt = "UPDATE $table_nfcatalog SET outlineid=NULL WHERE feedid=? AND outlineid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $fid, $oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $fid, $oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and leave
   loggit(1,"Unlinked feed: [$fid] from outline: [$oid].");
@@ -3167,15 +3166,15 @@ function unlink_feed_from_list($fid = NULL, $lid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the table and kill it
   $stmt = "DELETE FROM $table_listfeeds WHERE feedid=? AND listid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $fid, $lid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $fid, $lid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and leave
   //loggit(3,"Unlinked feed: [$fid] from list: [$lid].");
@@ -3201,15 +3200,15 @@ function trim_feed($fid = NULL, $max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_nfitem WHERE feedid=? ORDER BY timeadded DESC LIMIT ?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $fid, $max) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $fid, $max) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and leave
   loggit(1,"Deleted: [$delcount] items from feed: [$fid].");
@@ -3234,15 +3233,15 @@ function trim_feed_items($fid = NULL, $max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_nfitem WHERE id NOT IN (SELECT id FROM (SELECT id FROM $table_nfitem ORDER BY timestamp DESC LIMIT ?) x) AND feedid=?;";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $max, $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $max, $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and leave
   loggit(1,"Deleted: [$delcount] items from feed: [$fid].");
@@ -3263,15 +3262,15 @@ function purge_feed_items($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_nfitem WHERE feedid=? AND `purge`=1;";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and leave
   loggit(1,"Deleted: [$delcount] items from feed: [$fid].");
@@ -3293,17 +3292,17 @@ function delete_old_feed_items($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   $thirtydaysago = (time() - ($max_newsfeed_item_age * 86400));
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_nfitem WHERE feedid=? AND `old`=1 AND timeadded < ?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $fid, $thirtydaysago) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $fid, $thirtydaysago) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and leave
   if($delcount > 0) {
@@ -3327,15 +3326,15 @@ function delete_feed_items($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE nfi.*,nfp.* FROM $table_nfitem nfi INNER JOIN $table_nfitemprop nfp ON nfi.id = nfp.itemid WHERE nfi.feedid=? ";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and leave
   if($delcount > 0) {
@@ -3359,15 +3358,15 @@ function delete_feed($fid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_newsfeed WHERE id=? ";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   if($delcount < 1) {
     loggit(2,"Failed to delete feed: [$fid] from feed table.");
@@ -3394,15 +3393,15 @@ function purge_outline_feeds($oid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_nfcatalog WHERE `purge`=1 AND outlineid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and leave
   loggit(1,"Deleted: [$delcount] catalog links for outline: [$oid].");
@@ -3663,7 +3662,7 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get a month ago timestamp
   $monthago = (time() - (28 * 86400));
@@ -3691,19 +3690,19 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
   }
 
   //loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"There are no feeds in the system.");
     return(array());
   }
 
-  $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or print(mysql_error());
+  $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or loggit(2, "MySql error: ".$dbh->error);
 
   $feeds = array();
   $count = 0;
@@ -3712,7 +3711,7 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"Returning: [$count] feeds in the system.");
   return($feeds);
@@ -3727,7 +3726,7 @@ function get_error_feeds($max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get feeds with a high error count
   $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed WHERE errors > 10";
@@ -3737,19 +3736,19 @@ function get_error_feeds($max = NULL)
   }
 
   //loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"There are no high error feeds in the system.");
     return(FALSE);
   }
 
-  $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or print(mysql_error());
+  $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or loggit(2, "MySql error: ".$dbh->error);
 
   $feeds = array();
   $count = 0;
@@ -3758,7 +3757,7 @@ function get_error_feeds($max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"Returning: [$count] high error feeds in the system.");
   return($feeds);
@@ -3773,7 +3772,7 @@ function get_old_feeds($max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get a month ago timestamp
   $monthago = (time() - (28 * 86400));
@@ -3786,19 +3785,19 @@ function get_old_feeds($max = NULL)
   }
 
   //loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds for this criteria
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"There are no old feeds in the system.");
     return(FALSE);
   }
 
-  $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or print(mysql_error());
+  $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or loggit(2, "MySql error: ".$dbh->error);
 
   $feeds = array();
   $count = 0;
@@ -3807,7 +3806,7 @@ function get_old_feeds($max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"Returning: [$count] old feeds in the system.");
   return($feeds);
@@ -3823,7 +3822,7 @@ function get_all_feeds_with_stats($max = 50)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli_Extended($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli_Extended($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the
   $sqltxt = "SELECT $table_newsfeed.id,
@@ -3842,14 +3841,14 @@ function get_all_feeds_with_stats($max = 50)
              ORDER BY $table_feedstats.subscribers DESC";
 
 
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"There are no feeds in the system.");
     return(FALSE);
   }
@@ -3865,7 +3864,7 @@ function get_all_feeds_with_stats($max = 50)
                     $savgchecktime,
                     $savgnewitems,
                     $ssubscribers
-  ) or print(mysql_error());
+  ) or loggit(2, "MySql error: ".$dbh->error);
 
   $feeds = array();
   $count = 0;
@@ -3886,7 +3885,7 @@ function get_all_feeds_with_stats($max = 50)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   //loggit(1,"Returning: [$count] feeds in the system.");
   return($feeds);
@@ -3901,7 +3900,7 @@ function get_updated_feeds($max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the
   $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed WHERE updated=1";
@@ -3911,19 +3910,19 @@ function get_updated_feeds($max = NULL)
   }
 
   loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds returned
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     //loggit(2,"There are no feeds that need scanning.");
     return(array());
   }
 
-  $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or print(mysql_error());
+  $sql->bind_result($fid,$ftitle,$furl,$fcreatedon) or loggit(2, "MySql error: ".$dbh->error);
 
   $feeds = array();
   $count = 0;
@@ -3932,7 +3931,7 @@ function get_updated_feeds($max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"Returning: [$count] updated feeds that need scanning.");
   return($feeds);
@@ -3960,7 +3959,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Timestamp
   $timeadded = time();
@@ -3992,7 +3991,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 
   //Now that we have a good id, put the feed item into the database
   $stmt = "INSERT INTO $table_nfitem (id,feedid,title,url,description,guid,timestamp,timeadded,enclosure,`purge`,sourceurl,sourcetitle,author,origin,media) VALUES (?,?,?,?,?,?,?,?,?,0,?,?,?,?,?)";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
   if($format == "atom") {
     //-----ATOM--------------------------------------------------------------------------------------------------------------------------------------------------
     $mcount = count($item->link);
@@ -4105,7 +4104,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       $title = "";
     }
 
-    $sql->bind_param("ssssssddsssssd", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
+    $sql->bind_param("ssssssddsssssd", $id,$fid,$title,$linkurl,$description,$item->id,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or loggit(2, "MySql error: ".$dbh->error);
   } else {
     //-----RSS----------------------------------------------------------------------------------------------------------------------------------------------------
     $linkurl = $item->link;
@@ -4256,10 +4255,10 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
       }
     }
 
-    $sql->bind_param("ssssssddsssssd", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or print(mysql_error());
+    $sql->bind_param("ssssssddsssssd", $id,$fid,$title,$linkurl,$description,$uniq,$pubdate,$timeadded,$enclosure,$sourceurl,$sourcetitle,$author,$origin,$media) or loggit(2, "MySql error: ".$dbh->error);
   }
   $sql->execute() or loggit(3, $dbh->error);
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
 
   //Set the item properties per user
@@ -4304,26 +4303,26 @@ function feed_item_exists($fid = NULL, $guid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
   $stmt = "SELECT id FROM $table_nfitem WHERE feedid=? AND guid=?";
   //loggit(3, $stmt);
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $fid, $guid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $fid, $guid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   $rowcount = $sql->num_rows();
   if($rowcount < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     //loggit(3,"The feed item with guid: [$guid] does not exist for feed: [$fid]. Row count: [$rowcount].");
     return(FALSE);
   }
-  $sql->bind_result($itemid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($itemid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //loggit(3,"The feed item: [$itemid] with guid: [$guid] already exists for feed: [$fid].");
   return($itemid);
@@ -4344,23 +4343,23 @@ function river_updated($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT userid FROM $table_river WHERE userid=? AND updated=1") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT userid FROM $table_river WHERE userid=? AND updated=1") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The river for user: [$uid] does not need rebuilding.");
     return(FALSE);
   }
-  $sql->bind_result($userid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($userid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   loggit(1,"The river for user: [$uid] needs rebuilding.");
   return(TRUE);
@@ -4403,14 +4402,14 @@ function update_river($uid = NULL, $river = NULL, $mriver = NULL, $hash = NULL)
   //$conthash = md5($striver);
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good uid and river, put the river in the database
   $stmt = "REPLACE INTO $table_river (userid,lastbuild,river,conthash,firstid,updated,mriver) VALUES (?,?,?,?,?,0,?)";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ssssss", $uid,$lastbuild,$striver,$hash,$firstid,$mtriver) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssssss", $uid,$lastbuild,$striver,$hash,$firstid,$mtriver) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close();
 
   //Log and return
   //loggit(3,"Updated river array for user: [$uid]. Checksum: [$conthash].");
@@ -4435,7 +4434,7 @@ function build_river($uid = NULL, $max = NULL)
   $river = array();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the items that belong to feeds this user subscribes to
   $sqltxt = "SELECT $table_nfitem.id,
@@ -4457,20 +4456,20 @@ function build_river($uid = NULL, $max = NULL)
   }
 
   loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any items returned
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The user: [$uid] has an empty river.");
     return(FALSE);
   }
 
-  $sql->bind_result($id,$title,$url,$guid,$timestamp,$timeadded,$feedid,$description) or print(mysql_error());
+  $sql->bind_result($id,$title,$url,$guid,$timestamp,$timeadded,$feedid,$description) or loggit(2, "MySql error: ".$dbh->error);
 
   $count = 0;
   while($sql->fetch()){
@@ -4494,7 +4493,7 @@ function build_river($uid = NULL, $max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"Returning: [$count] items in user: [$uid]'s river.");
   return($river);
@@ -4531,7 +4530,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
   $mriver = array();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Assemble query
   $sqltxt = "SELECT $table_nfitem.id,
@@ -4572,15 +4571,15 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
   $sqltxt .= " LIMIT $max";
 
   //Execute the query
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("ssd", $uid, $uid, $start) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssd", $uid, $uid, $start) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any items returned
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The user: [$uid] has an empty river.");
     return(FALSE);
   }
@@ -4589,7 +4588,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
                     $timeadded,$enclosure,$description,
                     $guid,$origin,$sourceurl,$sourcetitle,
                     $author,$sticky,$fsticky,$hidden,
-                    $fhidden,$fulltext,$ffulltext) or print(mysql_error());
+                    $fhidden,$fulltext,$ffulltext) or loggit(2, "MySql error: ".$dbh->error);
 
   $fcount = -1;
   $icount = 0;
@@ -4727,7 +4726,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     $ticount++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   //Encapsulate the river
   $doutput['updatedFeeds']['updatedFeed'] = $driver;
@@ -4935,7 +4934,7 @@ function search_feed_items($uid = NULL, $query = NULL, $max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Assemble sql
   $colnames = array(
@@ -4982,7 +4981,7 @@ function search_feed_items($uid = NULL, $query = NULL, $max = NULL)
   }
 
   //loggit(3, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
 
   //Adjust bindings
   $newsetup = "ss".$qsql['bind'][0];
@@ -4993,18 +4992,18 @@ function search_feed_items($uid = NULL, $query = NULL, $max = NULL)
   $ref    = new ReflectionClass('mysqli_stmt');
   $method = $ref->getMethod("bind_param");
   $method->invokeArgs($sql, $qsql['bind']);
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any articles for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No feed items returned for user: [$uid] with given criteria.");
     return(FALSE);
   }
 
-  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$timeadded,$enclosure,$description,$sourceurl,$sourcetitle,$author,$sticky,$fsticky,$hidden,$fhidden) or print(mysql_error());
+  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$timeadded,$enclosure,$description,$sourceurl,$sourcetitle,$author,$sticky,$fsticky,$hidden,$fhidden) or loggit(2, "MySql error: ".$dbh->error);
 
   $nfitems = array();
   $count = 0;
@@ -5016,7 +5015,7 @@ function search_feed_items($uid = NULL, $query = NULL, $max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   loggit(1,"Returning: [$count] newsfeed items for user: [$uid]");
   return($nfitems);
@@ -5043,7 +5042,7 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
   $mriver = array();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get the items
   $sqltxt = "SELECT $table_nfitem.id,
@@ -5075,20 +5074,20 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
   $sqltxt .= " LIMIT $max";
 
   //loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("d", $start) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("d", $start) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any items returned
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The server has an empty river.");
     return(FALSE);
   }
 
-  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$timeadded,$enclosure,$description,$guid,$sourceurl,$sourcetitle,$author,$origin) or print(mysql_error());
+  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$timeadded,$enclosure,$description,$guid,$sourceurl,$sourcetitle,$author,$origin) or loggit(2, "MySql error: ".$dbh->error);
 
   $fcount = -1;
   $icount = 0;
@@ -5191,7 +5190,7 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
     $ticount++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   //Encapsulate the river
   $doutput['updatedFeeds']['updatedFeed'] = $driver;
@@ -5354,7 +5353,7 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
   $mriver = array();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Assemble query
   $sqltxt = "SELECT $table_nfitem.id,
@@ -5391,15 +5390,15 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
   $sqltxt .= " LIMIT $max";
 
   //Execute the query
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("ssd", $uid, $uid, $start) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssd", $uid, $uid, $start) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any items returned
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The user: [$uid] has an empty river.");
     return(FALSE);
   }
@@ -5407,7 +5406,7 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
   $sql->bind_result($id,$title,$url,$timestamp,$feedid,
                     $timeadded,$enclosure,$description,
                     $guid,$origin,$sourceurl,$sourcetitle,
-                    $author,$hidden,$fhidden) or print(mysql_error());
+                    $author,$hidden,$fhidden) or loggit(2, "MySql error: ".$dbh->error);
 
   $fcount = -1;
   $icount = 0;
@@ -5510,7 +5509,7 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
     $ticount++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   //Encapsulate the river
   $doutput['updatedFeeds']['updatedFeed'] = $driver;
@@ -5664,7 +5663,7 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Run the query
   $sqltxt = "SELECT url,
@@ -5685,15 +5684,15 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
   }
 
   //loggit(3, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("s", $fid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $fid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any items returned
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No feed items returned for: [$fid].");
     return(array());
   }
@@ -5705,7 +5704,7 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
                     $atitle,
                     $asourceurl,
                     $asourcetitle
-  ) or print(mysql_error());
+  ) or loggit(2, "MySql error: ".$dbh->error);
 
   $items = array();
   $count = 0;
@@ -5721,7 +5720,7 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   //loggit(3, print_r($items, TRUE));
 
@@ -5771,7 +5770,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
   $mriver = array();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Assemble query
   $sqltxt = "SELECT $table_nfitem.id,
@@ -5812,15 +5811,15 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
   //$sqltxt .= " LIMIT $max";
 
   //Execute the query
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("ssd", $uid, $uid, $start) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssd", $uid, $uid, $start) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any items returned
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The user: [$uid] has an empty river.");
     return(FALSE);
   }
@@ -5829,7 +5828,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
                     $timeadded,$enclosure,$description,
                     $guid,$origin,$sourceurl,$sourcetitle,
                     $author,$sticky,$fsticky,$hidden,
-                    $fhidden,$fulltext,$ffulltext) or print(mysql_error());
+                    $fhidden,$fulltext,$ffulltext) or loggit(2, "MySql error: ".$dbh->error);
 
 
   // ----- Begin building the river. -----
@@ -6018,7 +6017,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     $mriver = $river;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   //Debugging
   //echo "-- forigins --------------------------\n";
@@ -6165,7 +6164,7 @@ function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Set up max limit
   if( empty($max) ) {
@@ -6197,15 +6196,15 @@ function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL
 
 
   //loggit(3, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
   $sql->bind_param("dsdd", $tstart, $uid, $start, $max) or loggit(2, $sql->error);
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any items returned
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No feed items returned for: [$fid].");
     return(array());
   }
@@ -6221,7 +6220,7 @@ function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL
                     $asourcetitle,
 		    $aorigin,
                     $aauthor
-  ) or print(mysql_error());
+  ) or loggit(2, "MySql error: ".$dbh->error);
 
   $items = array();
   $count = 0;
@@ -6241,7 +6240,7 @@ function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   //loggit(3, print_r($items, TRUE));
 
@@ -6267,7 +6266,7 @@ function get_sticky_feed_items($uid = NULL)
   $prefs = get_user_prefs($uid);
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Run the query
   $sqltxt = "SELECT nfitems.author,
@@ -6300,15 +6299,15 @@ function get_sticky_feed_items($uid = NULL)
              ORDER BY timeadded DESC";
 
   //loggit(3, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
   $sql->bind_param("ss", $uid, $uid) or loggit(2, $sql->error);
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any items returned
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No feed items returned for: [$fid].");
     return(array());
   }
@@ -6336,7 +6335,7 @@ function get_sticky_feed_items($uid = NULL)
 					$lfsticky,
 					$lfhidden,
 					$lffulltext
-  ) or print(mysql_error());
+  ) or loggit(2, "MySql error: ".$dbh->error);
 
   $items = array();
   $count = 0;
@@ -6400,7 +6399,7 @@ function get_sticky_feed_items($uid = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close();
 
   //loggit(3, print_r($items, TRUE));
 

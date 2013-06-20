@@ -18,14 +18,14 @@ function update_server_address($guid = NULL, $addr = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Database call
   $stmt = "INSERT INTO $table_servers (guid, address) VALUES (?,?) ON DUPLICATE KEY UPDATE address=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sss", $guid, $addr, $addr) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("sss", $guid, $addr, $addr) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(3,"Server: [$guid] is located at: [$addr].");
@@ -41,20 +41,20 @@ function get_all_servers()
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Database call
-  $sql=$dbh->prepare("SELECT guid,address FROM $table_servers") or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT guid,address FROM $table_servers") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No servers known.");
     return(FALSE);
   }
-  $sql->bind_result($guid,$address) or print(mysql_error());
+  $sql->bind_result($guid,$address) or loggit(2, "MySql error: ".$dbh->error);
 
   //Collect the results
   $servers = array();
@@ -64,7 +64,7 @@ function get_all_servers()
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
 
   loggit(3,"Returning: [$count] servers.");
@@ -80,23 +80,23 @@ function get_server_address_by_guid($guid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Database call
-  $sql=$dbh->prepare("SELECT address FROM $table_servers WHERE guid=?") or print(mysql_error());
-  $sql->bind_param("s", $guid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT address FROM $table_servers WHERE guid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $guid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No servers known.");
     return(FALSE);
   }
-  $sql->bind_result($address) or print(mysql_error());
+  $sql->bind_result($address) or loggit(2, "MySql error: ".$dbh->error);
   $sql->fetch();
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
 
   loggit(3,"Returning address: [$address] for server guid: [$guid].");

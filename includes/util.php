@@ -59,6 +59,7 @@ function loggit($lognum, $message)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Timestamp for this log
+  date_default_timezone_set($default_timezone);
   $tstamp=date("Y.m.d - h:i:s");
 
   //Open the file
@@ -144,7 +145,7 @@ function get_system_message($id = NULL, $type = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt="SELECT message FROM $table_string WHERE id=? AND type=?";
@@ -596,7 +597,7 @@ function tweet($uid = NULL, $content = NULL, $link = "")
   $tweet = $twcontent." ".$link;
 
   //Make an API call to post the tweet
-  $code = $connection->request('POST', $connection->url('1/statuses/update'), array('status' => $tweet));
+  $code = $connection->request('POST', $connection->url('1.1/statuses/update'), array('status' => $tweet));
 
   //Log and return
   if ($code == 200) {
@@ -679,14 +680,14 @@ function check_head_lastmod($url, $timeout = 5){
 
   curl_setopt($curl, CURLOPT_URL,$url);
     //don't fetch the actual page, you only want headers
-    //curl_setopt($curl, CURLOPT_NOBODY, true);
+    curl_setopt($curl, CURLOPT_NOBODY, true);
     curl_setopt($curl, CURLOPT_HEADER, true);
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
     //stop it from outputting stuff to stdout
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, $timeout );
-    curl_setopt( $curl, CURLOPT_TIMEOUT, 30 );
+    curl_setopt( $curl, CURLOPT_TIMEOUT, $timeout );
 
     // attempt to retrieve the modification date
     curl_setopt($curl, CURLOPT_FILETIME, true);
@@ -698,14 +699,14 @@ function check_head_lastmod($url, $timeout = 5){
     if($info['filetime'] != -1) { //otherwise unknown
       return($info['filetime']);
     } else {
-      loggit(3, "Unknown Last-Modified time returned during head check.");
+      loggit(1, "Unknown Last-Modified time returned during head check.");
       return(FALSE);
     }
 
 }
 
 //Do a HEAD request on a url to see what the Last-Modified time is
-function check_head_size($url, $timeout = 3){
+function check_head_size($url, $timeout = 5){
 
   //Check parameters
   if($url == NULL) {
@@ -728,7 +729,7 @@ function check_head_size($url, $timeout = 3){
     curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, $timeout );
     curl_setopt( $curl, CURLOPT_TIMEOUT, $timeout );
 
-    loggit(3, "CURL: Head check on: [$url]");
+    loggit(1, "CURL: Head check on: [$url]");
 
     $result = curl_exec($curl);
 
@@ -737,7 +738,7 @@ function check_head_size($url, $timeout = 3){
     if( $info['download_content_length'] != -1 ) { //otherwise unknown
       return($info['download_content_length']);
     } else {
-      //loggit(3, "CURL: ".print_r($info, TRUE));
+      loggit(1, "CURL: ".print_r($info, TRUE));
       return('');
     }
 
@@ -1278,14 +1279,14 @@ function update_last_shortcode($uid = NULL, $shortcode = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_prefs SET lastshortcode=? WHERE uid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $shortcode, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $shortcode, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Set last shortcode to: [$shortcode] for user: [$uid].");
@@ -2414,7 +2415,7 @@ function parse_search_query($inq = NULL, $section = NULL)
   $psearch['like'] = array_filter($psearch['like']);
   $psearch['not'] = array_filter($psearch['not']);
 
-  loggit(3, "SEARCH: ".print_r($psearch, TRUE));
+  loggit(1, "SEARCH: ".print_r($psearch, TRUE));
   return($psearch);
 }
 
@@ -2493,7 +2494,7 @@ function build_search_sql($q = NULL, $colnames = NULL)
   }
   $sqla['bind'] = $refArr;
 
-  loggit(3, "SEARCH: ".print_r($sqla, TRUE));
+  loggit(1, "SEARCH: ".print_r($sqla, TRUE));
 
   return($sqla);
 }

@@ -17,23 +17,23 @@ function post_exists($url = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT id FROM $table_post WHERE url=?") or print(mysql_error());
-  $sql->bind_param("s", $url) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id FROM $table_post WHERE url=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $url) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The post at url: [$url] does not exist in the repository.");
     return(FALSE);
   }
-  $sql->bind_result($postid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($postid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"The post at url: [$url] is already in the repository.");
   return($postid);
@@ -54,24 +54,24 @@ function get_post($id = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT url,title,content,origin FROM $table_post WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT url,title,content,origin FROM $table_post WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Failed to retrieve post content for post id: [$id]");
     return(FALSE);
   }
   $post = array();
-  $sql->bind_result($post['url'],$post['title'],$post['content'],$post['origin']) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($post['url'],$post['title'],$post['content'],$post['origin']) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning post content for post id: [$id]");
   return($post);
@@ -115,7 +115,7 @@ function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, 
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Timestamp
   $id = random_gen(128);
@@ -180,7 +180,7 @@ function link_post_to_user($aid = NULL, $uid = NULL, $pub = FALSE)
   $tstamp = time();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Check if public
   if($pub == TRUE) {
@@ -191,10 +191,10 @@ function link_post_to_user($aid = NULL, $uid = NULL, $pub = FALSE)
 
   //Link the post to the user
   $stmt = "INSERT INTO $table_mbcatalog (userid,postid,public,linkedon) VALUES (?,?,?,?)";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ssds", $uid,$aid,$publ,$tstamp) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssds", $uid,$aid,$publ,$tstamp) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Linked post: [$aid] with user: [$uid].");
@@ -220,22 +220,22 @@ function user_can_view_post($aid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT userid FROM $table_mbcatalog WHERE postid=? AND (userid=? OR public=1)") or print(mysql_error());
-  $sql->bind_param("ss", $aid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT userid FROM $table_mbcatalog WHERE postid=? AND (userid=? OR public=1)") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $aid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"This user: [$uid] is not allowed to see post: [$aid].");
     return(FALSE);
   }
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"User: [$uid] is allowed to see post: [$aid].");
   return(TRUE);
@@ -260,22 +260,22 @@ function user_owns_post($uid = NULL, $pid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT userid FROM $table_mbcatalog WHERE postid=? AND userid=?") or print(mysql_error());
-  $sql->bind_param("ss", $pid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT userid FROM $table_mbcatalog WHERE postid=? AND userid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $pid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"User: [$uid] does not own post: [$pid].");
     return(FALSE);
   }
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"User: [$uid] is the owner of post: [$pid].");
   return(TRUE);
@@ -305,7 +305,7 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $sqltxt = "SELECT $table_post.id,
@@ -341,20 +341,20 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
   }
 
   loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any posts for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No posts returned for: [$uid] with the given criteria.");
     return(array());
   }
 
-  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$aenclosure,$asourceurl,$asourcetitle,$tweeted,$origin,$clinkedon) or print(mysql_error());
+  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$aenclosure,$asourceurl,$asourcetitle,$tweeted,$origin,$clinkedon) or loggit(2, "MySql error: ".$dbh->error);
 
   $posts = array();
   $count = 0;
@@ -375,7 +375,7 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] posts for user: [$uid]");
   return($posts);
@@ -396,7 +396,7 @@ function get_first_blog_post($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Build the query
   $sqltxt = "SELECT $table_post.id,
@@ -418,20 +418,20 @@ function get_first_blog_post($uid = NULL)
   $sqltxt .= " ORDER BY $table_post.createdon ASC LIMIT 1";
 
   loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any posts for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"This user has no posts: [$uid]");
     return(FALSE);
   }
 
-  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$aenclosure,$asourceurl,$asourcetitle,$tweeted,$origin,$clinkedon) or print(mysql_error());
+  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$aenclosure,$asourceurl,$asourcetitle,$tweeted,$origin,$clinkedon) or loggit(2, "MySql error: ".$dbh->error);
 
   $posts = array();
   $count = 0;
@@ -452,7 +452,7 @@ function get_first_blog_post($uid = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(3,"Earliest post for user: [$uid] is timestamp: [".$posts[0]['linkedon']."]");
   return($posts[0]);
@@ -491,7 +491,7 @@ function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
 
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   if($pub == TRUE) {
@@ -516,7 +516,7 @@ function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
     $sqltxt .= " LIMIT $max";
   }
 
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
 
   //Adjust bindings
   $newsetup = "s".$qsql['bind'][0];
@@ -527,18 +527,18 @@ function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
   $method = $ref->getMethod("bind_param");
   $method->invokeArgs($sql, $qsql['bind']);
 
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any posts for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No posts returned for: [$uid] with the given criteria.");
     return(FALSE);
   }
 
-  $sql->bind_result($id,$title,$url,$content) or print(mysql_error());
+  $sql->bind_result($id,$title,$url,$content) or loggit(2, "MySql error: ".$dbh->error);
 
   $posts = array();
   $count = 0;
@@ -550,7 +550,7 @@ function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] posts for user: [$uid]");
   return($posts);
@@ -805,15 +805,15 @@ function unlink_post($uid = NULL, $aid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_mbcatalog WHERE userid=? AND postid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $uid, $aid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $uid, $aid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and leave
   loggit(1,"Deleted: [$delcount] post: [$aid] from user: [$uid].");
@@ -835,19 +835,19 @@ function delete_post($pid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_post WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $pid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $pid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
   if( $delcount < 1) {
     loggit(2,"Failed to delete post: [$pid].");
     return(FALSE);
   }
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and leave
   loggit(1,"Deleted: [$delcount] post: [$pid].");
@@ -1466,14 +1466,14 @@ function purge_orphaned_blog_posts()
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Find posts that have no linkage
   $stmt = "DELETE FROM $table_post WHERE NOT EXISTS ( SELECT * FROM $table_mbcatalog WHERE $table_post.id = $table_mbcatalog.postid )";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close();
 
   //Log and leave
   loggit(3,"Deleted: [$delcount] orphaned blog posts.");

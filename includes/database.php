@@ -247,7 +247,7 @@ function get_database_version()
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get the database version number
   $stmt = "SELECT version FROM $table_dbversion ORDER BY version DESC LIMIT 1";
@@ -259,15 +259,15 @@ function get_database_version()
     loggit(3,"Error executing query for database version.");
     return(FALSE);
   }
-  $sql->store_result() or print(mysql_error());
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   if($sql->num_rows() != 1) {
-    $sql->close() or print(mysql_error());
+    $sql->close() or loggit(2, "MySql error: ".$dbh->error);
     loggit(3,"Too many, or not enough, records returned for database version.");
     return(FALSE);
   }
-  $sql->bind_result($cdbversion) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($cdbversion) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
 
   loggit(3,"Database version: [$cdbversion]");
@@ -285,7 +285,7 @@ function apply_all_database_updates()
   global $cg_database_updates;
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get the current database version
   $error = FALSE;
@@ -312,7 +312,7 @@ function apply_all_database_updates()
       }
       if ($dbh->errno) {
         loggit(3, "DATABASE UPGRADE ERROR ON [$i]: ".print_r($dbh->error, TRUE));
-        $dbh->close() or print(mysql_error());
+        $dbh->close() or loggit(2, "MySql error: ".$dbh->error);
         return(FALSE);
       }
 
@@ -320,13 +320,13 @@ function apply_all_database_updates()
       $dbversion = get_database_version();
       if( $dbversion == FALSE ) {
         loggit(3,"The last database update: [$dbversion] did not apply correctly.");
-        $dbh->close() or print(mysql_error());
+        $dbh->close() or loggit(2, "MySql error: ".$dbh->error);
         return(FALSE);
       }
 
       if( $dbversion == $cg_database_version ) {
         loggit(3,"Database is current at version: [$dbversion].");
-        $dbh->close() or print(mysql_error());
+        $dbh->close() or loggit(2, "MySql error: ".$dbh->error);
         return(TRUE);
       } else {
         loggit(3,"Database now at version: [$dbversion].");
@@ -335,7 +335,7 @@ function apply_all_database_updates()
 
 
   //Close connection and bail
-  $dbh->close() or print(mysql_error());
+  $dbh->close() or loggit(2, "MySql error: ".$dbh->error);
   return(FALSE);
 }
 
@@ -347,7 +347,7 @@ function check_database_sanity()
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get the database version number
   $stmt = "SELECT table_name FROM information_schema.tables WHERE table_schema = ? and table_name = ?";
@@ -363,13 +363,13 @@ function check_database_sanity()
     loggit(3,"Error executing query for schema check.");
     return(FALSE);
   }
-  $sql->store_result() or print(mysql_error());
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   if($sql->num_rows() != 1) {
-    $sql->close() or print(mysql_error());
+    $sql->close() or loggit(2, "MySql error: ".$dbh->error);
     loggit(3,"Too many, or not enough, records returned for database version.");
     return(FALSE);
   }
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
 
   loggit(3,"Users table present. Database schema appears sane.");

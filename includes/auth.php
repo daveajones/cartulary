@@ -64,26 +64,26 @@ function user_exist($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Debug
   //loggit(3, "Looking for user id: [$uid].");
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT id FROM $table_user WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Too many, or not enough, records returned for user: [$uid]");
     return(FALSE);
   }
-  $sql->bind_result($userid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($userid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"User exists: [$uid]");
   return(TRUE);
@@ -106,23 +106,23 @@ function is_session_valid($sid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT userid FROM $table_session WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $sid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT userid FROM $table_session WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $sid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad session lookup attempt: [$sid]");
     return(FALSE);
   }
-  $sql->bind_result($userid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($userid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //The session was valid, but does the user exist?
   if( !user_exist($userid) ) {
@@ -159,23 +159,23 @@ function session_changed($sid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT firstsourceip,firstbrowser FROM $table_session WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $sid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT firstsourceip,firstbrowser FROM $table_session WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $sid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the lookup was valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(3,"Bad remoteip and browser lookup attempt for: [$sid]");
     return(TRUE);
   }
-  $sql->bind_result($firstip,$firstbrowser) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($firstip,$firstbrowser) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Get the browser and remote ip address
   if( isset($_SERVER['HTTP_USER_AGENT']) ) {
@@ -231,21 +231,21 @@ function new_session($uid = NULL)
   $tstamp = time();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "INSERT INTO $table_session (id,created,userid,firstsourceip,firstbrowser) VALUES(?,?,?,?,?)";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sssss", $sid, $tstamp, $uid, $remoteip, $browser) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("sssss", $sid, $tstamp, $uid, $remoteip, $browser) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Timestamp the user record
   $stmt = "UPDATE $table_user SET lastlogin=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $tstamp, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $tstamp, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Created new session record: [$sid]");
@@ -281,14 +281,14 @@ function touch_session($sid = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Timestamp the user record
   $stmt = "UPDATE $table_session SET lastactivity=?, lastsourceip=?, lastbrowser=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ssss", $tstamp, $remoteip, $browser, $sid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssss", $tstamp, $remoteip, $browser, $sid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Touched the session at: [$tstamp]");
@@ -310,15 +310,15 @@ function purge_old_sessions($time = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for this user's sessions
   $stmt = "DELETE FROM $table_session WHERE lastactivity < ?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $time) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $rows = $dbh->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $time) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $rows = $dbh->affected_rows;
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Removed: [$rows] old sessions.");
@@ -341,14 +341,14 @@ function remove_sessions_for_user($uid = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for this user's sessions
   $stmt = "DELETE FROM $table_session WHERE userid=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Removed sessions for: [$uid]");
@@ -400,23 +400,23 @@ function get_user_id_from_sid($sid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT userid FROM $table_session WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $sid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT userid FROM $table_session WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $sid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad user id lookup attempt: [$sid]");
     return(FALSE);
   }
-  $sql->bind_result($userid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($userid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning user id: [$userid] for sid: [$sid]");
   return($userid);
@@ -438,23 +438,23 @@ function get_user_name_from_uid($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT name FROM $table_user WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT name FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad user name lookup attempt: [$uid]");
     return(FALSE);
   }
-  $sql->bind_result($username) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($username) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning user name: [$username] for uid: [$uid]");
   return($username);
@@ -476,23 +476,23 @@ function get_username_from_uid($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT username FROM $table_user WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT username FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad username lookup attempt: [$uid]");
     return(FALSE);
   }
-  $sql->bind_result($username) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($username) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning user name: [$username] for uid: [$uid]");
   return($username);
@@ -515,23 +515,23 @@ function get_email_from_uid($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT email FROM $table_user WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT email FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad email lookup attempt: [$uid]");
     return(FALSE);
   }
-  $sql->bind_result($email) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($email) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning email: [$email] for uid: [$uid]");
   return($email);
@@ -552,7 +552,7 @@ function get_user_id_from_email($email = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //See if this is an alias of an existing email
   //if(get_email_from_alias($email, $aliasof) == TRUE) {
@@ -560,26 +560,26 @@ function get_user_id_from_email($email = NULL)
   //}
 
   //Look for the matching email address in the user table
-  $sql=$dbh->prepare("SELECT id FROM $table_user WHERE email=?") or print(mysql_error());
-  $sql->bind_param("s", $email) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id FROM $table_user WHERE email=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   $returned = $sql->num_rows();
   if($returned > 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad user id lookup attempt: [$email].  Too many records returned.");
     return(FALSE);
   }
   if($returned < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"No user exists with this email: [$email]");
     return("none");
   }
-  $sql->bind_result($uid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
+  $sql->bind_result($uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning user id: [$uid] for email: [$email]");
   return($uid);
@@ -599,23 +599,23 @@ function is_user_active($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the uid in the user table
-  $sql=$dbh->prepare("SELECT active FROM $table_user WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT active FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad activation check attempt: [$uid]");
     return(FALSE);
   }
-  $sql->bind_result($active) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($active) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Check and return
   if($active == 0) {
@@ -648,14 +648,14 @@ function activate_user($uid = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "UPDATE $table_user SET active=1 WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Now set a new activation code to prevent shenanigans
   //$newpp = random_gen(9);
@@ -682,14 +682,14 @@ function deactivate_user($uid = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "UPDATE $table_user SET active=0 WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Now set a new activation code to prevent shenanigans
   //$newpp = random_gen(9);
@@ -720,7 +720,7 @@ function check_credentials($email = NULL, $password = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //See if this is an alias of an existing email
   //if(get_email_from_alias($email, $aliasof) == TRUE) {
@@ -728,20 +728,20 @@ function check_credentials($email = NULL, $password = NULL)
   //}
 
   //Look for the user id in the user table that matches this email address and password
-  $sql=$dbh->prepare("SELECT id,password,lastpasschange FROM $table_user WHERE email=?") or print(mysql_error());
-  $sql->bind_param("s", $email) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id,password,lastpasschange FROM $table_user WHERE email=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if(($rows = $sql->num_rows()) != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad credential check for: [$email].  Rows returned: [$rows]");
     return(FALSE);
   }
-  $sql->bind_result($uid,$pwd,$lpc) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($uid,$pwd,$lpc) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Let's see if we need to hash?
   $bcrypt = new Bcrypt();
@@ -771,7 +771,7 @@ function badlogin_reset($email = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //See if this is an alias of an existing email
   //if(get_email_from_alias($email, $aliasof) == TRUE) {
@@ -780,10 +780,10 @@ function badlogin_reset($email = NULL)
 
   //Look for the email address in the user table
   $stmt = "UPDATE $table_user SET badlogins=0 WHERE email=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $email) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Reset the badlogins counter for user: [$email]");
@@ -810,14 +810,14 @@ function badlogin_set($email = NULL, $number = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the email address in the user table
   $stmt = "UPDATE $table_user SET badlogins=? WHERE email=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ds", $number, $email) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ds", $number, $email) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Set the badlogins counter for user: [$email] to: [$number].");
@@ -840,7 +840,7 @@ function badlogin_inc($email = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //See if this is an alias of an existing email
   //if(get_email_from_alias($email, $aliasof) == TRUE) {
@@ -849,11 +849,11 @@ function badlogin_inc($email = NULL)
 
   //Look for the email in the user table
   $stmt = "UPDATE $table_user SET badlogins=badlogins+1 WHERE email=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $email) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $rows = $dbh->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $rows = $dbh->affected_rows;
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Incremented the bad logins counter for user: [$email] rows changed: [$rows]");
@@ -876,24 +876,24 @@ function badlogin_check($email = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the email in the user table
   $stmt = "SELECT badlogins FROM $table_user WHERE email=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $email) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if(($rows = $sql->num_rows()) != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad badlogin count check.  Should only be one row returned.  Instead there were: [$rows]");
     return(FALSE);
   }
-  $sql->bind_result($badlogs) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($badlogs) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   if($badlogs >= $maxbadlogins) {
     loggit(2,"Too many bad login attempts for this user: [$email]");
@@ -1036,23 +1036,23 @@ function user_sanity_check($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the uid in the session table
-  $sql=$dbh->prepare("SELECT id,name,email,active,password,passphrase,badlogins FROM $table_user WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id,name,email,active,password,passphrase,badlogins FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad user name lookup attempt: [$uid]");
     return(FALSE);
   }
-  $sql->bind_result($id,$username,$email,$active,$password,$passphrase,$badlogins) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($id,$username,$email,$active,$password,$passphrase,$badlogins) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   
   //Go through a bunch of tests, redirecting to an error page if something bad was found
@@ -1145,23 +1145,23 @@ function allowed_inside($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT inside FROM $table_user WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT inside FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() > 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Too many inside records returned for user: [$uid]");
     return(FALSE);
   }
-  $sql->bind_result($inside) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($inside) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Check value
   if($inside == 0) {
@@ -1188,23 +1188,23 @@ function is_admin($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT admin FROM $table_user WHERE id=? AND admin=1") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT admin FROM $table_user WHERE id=? AND admin=1") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() > 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Too many 'admin' records returned for user: [$uid]");
     return(FALSE);
   }
-  $sql->bind_result($admin) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($admin) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Check value
   if($admin == 0) {
@@ -1350,7 +1350,7 @@ function get_security_question_by_email($email = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //See if this is an alias of an existing email
   //if(get_email_from_alias($email, $aliasof) == TRUE) {
@@ -1358,22 +1358,22 @@ function get_security_question_by_email($email = NULL)
   //}
 
   //Look for the question in the user table
-  $sql=$dbh->prepare("SELECT question FROM $table_user WHERE email=?") or print(mysql_error());
-  $sql->bind_param("s", $email) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT question FROM $table_user WHERE email=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if the question existed
   $returned = $sql->num_rows();
   if($returned != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad question lookup for: [$email].  Returned too many or too few: [$returned].");
     return(FALSE);
   }
 
-  $sql->bind_result($question) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
+  $sql->bind_result($question) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning question: [$question] for email: [$email]");
   return($question);
@@ -1394,7 +1394,7 @@ function get_security_answer_by_email($email = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //See if this is an alias of an existing email
   //if(get_email_from_alias($email, $aliasof) == TRUE) {
@@ -1402,22 +1402,22 @@ function get_security_answer_by_email($email = NULL)
   //}
 
   //Look for the question in the user table
-  $sql=$dbh->prepare("SELECT answer FROM $table_user WHERE email=?") or print(mysql_error());
-  $sql->bind_param("s", $email) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT answer FROM $table_user WHERE email=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if the question existed
   $returned = $sql->num_rows();
   if($returned != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad answer lookup for: [$email].  Returned too many or too few: [$returned].");
     return(FALSE);
   }
 
-  $sql->bind_result($answer) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
+  $sql->bind_result($answer) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning answer: [$answer] for email: [$email]");
   return($answer);
@@ -1507,14 +1507,14 @@ function set_password($uid = NULL, $password = NULL)
   $timestamp = time();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "UPDATE $table_user SET password=?,lastpasschange=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sss", $pwdhash,$timestamp,$uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("sss", $pwdhash,$timestamp,$uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Password changed to: [hashed:$pwdhash] for user: [$uid]");
@@ -1541,14 +1541,14 @@ function set_passphrase($uid = NULL, $passphrase = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "UPDATE $table_user SET passphrase=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $passphrase,$uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $passphrase,$uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Passphrase changed to: [$passphrase] for user: [$uid]");
@@ -1575,17 +1575,17 @@ function set_email($uid = NULL, $email = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Change any alias mappings for this email address
   //change_alias_mapping(get_email_from_uid($uid), $email);
 
   //Look for the email address in the user table
   $stmt = "UPDATE $table_user SET email=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $email,$uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $email,$uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
 
   //Return
@@ -1613,17 +1613,17 @@ function set_name($uid = NULL, $name = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Change any alias mappings for this email address
   //change_alias_mapping(get_email_from_uid($uid), $email);
 
   //Look for the email address in the user table
   $stmt = "UPDATE $table_user SET name=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $name,$uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $name,$uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
 
   //Return
@@ -1711,14 +1711,14 @@ function set_question_by_user_id($uid = NULL, $question = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "UPDATE $table_user SET question=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $question,$uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $question,$uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Question changed to: [$question] for user: [$uid]");
@@ -1745,14 +1745,14 @@ function set_answer_by_user_id($uid = NULL, $answer = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "UPDATE $table_user SET answer=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $answer,$uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $answer,$uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Answer changed to: [$answer] for user: [$uid]");
@@ -1779,14 +1779,14 @@ function set_identity_by_user_id($uid = NULL, $identity = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "UPDATE $table_user SET name=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $identity,$uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $identity,$uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Identity changed to: [$identity] for user: [$uid]");
@@ -1808,23 +1808,23 @@ function get_old_user_name_by_id($olduid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbolduser,$dboldpass,$dboldname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbolduser,$dboldpass,$dboldname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT name FROM $table_old_user WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $olduid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT name FROM $table_old_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $olduid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if(($rows = $sql->num_rows()) != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad old username lookup.  Should only be 1 row returned.  Instead there were: [$rows]");
     return(FALSE);
   }
-  $sql->bind_result($cname) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($cname) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning [$cname] for old username lookup with: [$olduid]");
   return($cname);
@@ -1851,23 +1851,23 @@ function check_old_credentials($username = NULL, $password = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbolduser,$dboldpass,$dboldname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbolduser,$dboldpass,$dboldname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT id,name FROM $table_old_user WHERE username=? AND password=?") or print(mysql_error());
-  $sql->bind_param("ss", $username, $password) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id,name FROM $table_old_user WHERE username=? AND password=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $username, $password) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if(($rows = $sql->num_rows()) != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad credential check.  Should only be 1 row returned.  Instead there were: [$rows]");
     return(FALSE);
   }
-  $sql->bind_result($cid,$cname) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($cid,$cname) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning [$cid] for old login check with: [$username | $password]");
   return($cid);
@@ -1915,23 +1915,23 @@ function old_user_exists($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbolduser,$dboldpass,$dboldname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbolduser,$dboldpass,$dboldname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT id,name FROM $table_old_user WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id,name FROM $table_old_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Too many records returned for user: [$uid]");
     return(FALSE);
   }
-  $sql->bind_result($userid,$cname) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($userid,$cname) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"User exists: [$userid | $cname]");
   return($cname);
@@ -1953,14 +1953,14 @@ function set_old_user_as_imported($olduid = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "INSERT INTO $table_olduser_import (id,imported) VALUES(?,1)";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $olduid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $olduid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Marked old user: [$olduid] as imported.");
@@ -1982,21 +1982,21 @@ function check_old_user_import_status($olduid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT * FROM $table_olduser_import WHERE id=? AND imported=1") or print(mysql_error());
-  $sql->bind_param("s", $olduid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT * FROM $table_olduser_import WHERE id=? AND imported=1") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $olduid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() <> 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"No records returned for old user: [$olduid]");
     return(FALSE);
   }
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"User already imported: [$olduid]");
   return(TRUE);
@@ -2085,24 +2085,24 @@ function get_email_from_alias($alias = NULL, &$mappedto = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Set the mappedto [out] argument to match the email address we are checking for initially
   //to cut down on potential programming errors when calling this function
   $mappedto = $alias;
 
   //Look for the mapping in the alias table
-  $sql=$dbh->prepare("SELECT mapsto FROM $table_alias WHERE alias=?") or print(mysql_error());
-  $sql->bind_param("s", $alias) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT mapsto FROM $table_alias WHERE alias=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $alias) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   $returned = $sql->num_rows();
 
   //Something screwy happened if more than one row is returned
   if($returned > 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad alias lookup attempt: [$alias].  Too many records returned.");
     return(FALSE);
   }
@@ -2110,14 +2110,14 @@ function get_email_from_alias($alias = NULL, &$mappedto = NULL)
   //If no rows were returned then this email had no alias mappings
   if($returned < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"This email has no aliases: [$alias]");
     return(FALSE);
   }
 
   //One row was returned so return the mapped email address
-  $sql->bind_result($email) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
+  $sql->bind_result($email) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and leave
   loggit(1,"Email address: [$alias] is an alias pointing to: [$email].");
@@ -2145,14 +2145,14 @@ function change_alias_mapping($oldemail = NULL, $newemail = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the old email address in the alias table
   $stmt = "UPDATE $table_alias SET mapsto=? WHERE mapsto=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $newemail,$oldemail) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $newemail,$oldemail) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Email alias mapping changed from: [$oldemail] to: [$newemail]");
@@ -2168,22 +2168,22 @@ function get_inactive_users()
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Find users that are not marked active
   $users = array();
   $count = 0;
   $stmt = "SELECT id FROM $table_user WHERE active=0";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
-  $sql->bind_result($id) or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_result($id) or loggit(2, "MySql error: ".$dbh->error);
 
   while($sql->fetch()) {
     $users[$count] = $id;
     $count++;
   }
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   $usercount = count($users);
 
@@ -2211,14 +2211,14 @@ function log_browser_by_user_id($uid = NULL, $browser = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the uid in the session table
   $stmt = "UPDATE $table_user SET browser=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $browser, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $browser, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Made the user active for: [$uid]");
@@ -2241,14 +2241,14 @@ function set_user_as_admin($uid = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the uid in the session table
   $stmt = "UPDATE $table_user SET admin=1 WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Made user: [$uid] an admin!");
@@ -2271,14 +2271,14 @@ function unset_user_as_admin($uid = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the uid in the session table
   $stmt = "UPDATE $table_user SET admin=0 WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Return
   loggit(1,"Disabled admin status for user: [$uid]!");
@@ -2301,17 +2301,17 @@ function get_user_prefs($uid = NULL, $noinit = FALSE)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli_Extended($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli_Extended($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT * FROM $table_prefs WHERE uid=?") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT * FROM $table_prefs WHERE uid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"This user has no prefs: [$uid].");
     if( $noinit == TRUE ) {
       return(FALSE);
@@ -2320,7 +2320,7 @@ function get_user_prefs($uid = NULL, $noinit = FALSE)
     }
   }
   $prefs = $sql->fetch_assoc();
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning pref array for user: [$uid]");
   return($prefs);
@@ -2341,14 +2341,14 @@ function init_user_prefs($uid = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "INSERT IGNORE INTO $table_prefs (uid,sourceurlrt,sourceurlrss,maxlist,lastshortcode,stylesheet) VALUES (?,1,1,?,'1',?)";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sds", $uid, $default_max_list, $default_style_sheet) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("sds", $uid, $default_max_list, $default_style_sheet) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Now get the prefs we just made
   $prefs = get_user_prefs($uid, TRUE);
@@ -2377,7 +2377,7 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt = "UPDATE $table_prefs
@@ -2431,7 +2431,7 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
 			   rivercolumns=?
            WHERE uid=?";
 
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
   $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssds",
                                 $prefs['publicdefault'],
 				$prefs['publicrss'],
@@ -2482,9 +2482,9 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
 				$prefs['pubrivertitle'],
 				$prefs['rivercolumns'],
 				$uid
-  ) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  ) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Set prefs for user: [$uid]");
@@ -2499,7 +2499,7 @@ function get_users($max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the
   $sqltxt = "SELECT $table_user.id,
@@ -2521,19 +2521,19 @@ function get_users($max = NULL)
   }
 
   loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"There are no users in the system.");
     return(array());
   }
 
-  $sql->bind_result($uid,$uname,$uemail,$ulastlogin,$ustage,$uactive,$ubadlogins,$uusername,$uadmin,$uavatarurl) or print(mysql_error());
+  $sql->bind_result($uid,$uname,$uemail,$ulastlogin,$ustage,$uactive,$ubadlogins,$uusername,$uadmin,$uavatarurl) or loggit(2, "MySql error: ".$dbh->error);
 
   $users = array();
   $count = 0;
@@ -2552,7 +2552,7 @@ function get_users($max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] users in the system.");
   return($users);
@@ -2567,7 +2567,7 @@ function get_admin_users($max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the
   $sqltxt = "SELECT id,name,email,lastlogin,stage,username FROM $table_user WHERE admin=1 ORDER BY name DESC";
@@ -2577,19 +2577,19 @@ function get_admin_users($max = NULL)
   }
 
   loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"There are no admin users in the system.");
     return(FALSE);
   }
 
-  $sql->bind_result($uid,$uname,$uemail,$ulastlogin,$ustage,$uusername) or print(mysql_error());
+  $sql->bind_result($uid,$uname,$uemail,$ulastlogin,$ustage,$uusername) or loggit(2, "MySql error: ".$dbh->error);
 
   $users = array();
   $count = 0;
@@ -2598,7 +2598,7 @@ function get_admin_users($max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] admin users in the system.");
   return($users);
@@ -2721,14 +2721,14 @@ function set_activation_stage($uid = NULL, $stagenum = NULL)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the uid in the user table
   $stmt = "UPDATE $table_user SET stage=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ds", $stagenum, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ds", $stagenum, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //If the stage number is greater than 1, activate the user
   if($stagenum > 3) {
@@ -2757,25 +2757,25 @@ function get_activation_stage($uid = NULL)
   global $dbhost,$dbuser,$dbpass,$dbname,$table_user;
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the question in the user table
-  $sql=$dbh->prepare("SELECT stage FROM $table_user WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT stage FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if we got a value
   $returned = $sql->num_rows();
   if($returned != 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Bad stage lookup for: [$uid].  Returned too many or too few: [$returned].");
     return(FALSE);
   }
 
-  $sql->bind_result($stage) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
+  $sql->bind_result($stage) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning stage: [$stage] for uid: [$uid]");
   return($stage);
@@ -2871,23 +2871,23 @@ function sys_flag_is_set($flag = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT value FROM $table_flag WHERE name=?") or print(mysql_error());
-  $sql->bind_param("s", $flag) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT value FROM $table_flag WHERE name=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $flag) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(3,"The [$flag] flag is not set.");
     return(FALSE);
   }
-  $sql->bind_result($flagval) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($flagval) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(3,"The: [$flag] flag is set with value: [$flagval].");
   return($flagval);
@@ -2915,17 +2915,17 @@ function set_sys_flag($flag = NULL, $flagval = NULL, $setby = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Timestamp
   $tstamp = time();
 
   //Look for the url in the feed table
   $stmt = "INSERT INTO $table_flag (name,value,timeset,setby) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE value=?,timeset=?,setby=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sdssdds", $flag, $flagval, $tstamp, $setby, $flagval, $tstamp, $setby) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("sdssdds", $flag, $flagval, $tstamp, $setby, $flagval, $tstamp, $setby) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(3,"Set flag: [$flag] with value: [$flagval].");
   return(TRUE);
@@ -2946,17 +2946,17 @@ function delete_sys_flag($flag = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Timestamp
   $tstamp = time();
 
   //Look for the url in the feed table
   $stmt = "DELETE FROM $table_flag WHERE name=?";
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $flag) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $flag) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(3,"Deleted flag: [$flag].");
   return(TRUE);
@@ -2979,7 +2979,7 @@ function search_users($query = NULL, $max = NULL)
   $qsql = build_search_sql($query, $colnames);
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the
   $sqltxt = "SELECT $table_user.id,
@@ -3003,25 +3003,25 @@ function search_users($query = NULL, $max = NULL)
   }
 
   loggit(3, "USERs: [$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
 
   //Adjust bindings
   $ref    = new ReflectionClass('mysqli_stmt');
   $method = $ref->getMethod("bind_param");
   $method->invokeArgs($sql, $qsql['bind']);
 
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"There are no users in the system.");
     return(FALSE);
   }
 
-  $sql->bind_result($uid,$uname,$uemail,$uavatarurl) or print(mysql_error());
+  $sql->bind_result($uid,$uname,$uemail,$uavatarurl) or loggit(2, "MySql error: ".$dbh->error);
 
   $users = array();
   $count = 0;
@@ -3035,7 +3035,7 @@ function search_users($query = NULL, $max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] users that fit search.");
   return($users);

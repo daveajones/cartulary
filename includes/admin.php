@@ -13,7 +13,7 @@ function create_user($email = NULL, $silent = NULL, $inside = NULL, $active = NU
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Check the alias table to see if this email is an existing alias of another email address
   if(get_email_from_alias($email, $aliasof) == TRUE) {
@@ -47,7 +47,7 @@ function create_user($email = NULL, $silent = NULL, $inside = NULL, $active = NU
   $username = $emparts[0].random_gen(4);
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Insert the user into this table
   if($inside != TRUE) {
@@ -63,10 +63,10 @@ function create_user($email = NULL, $silent = NULL, $inside = NULL, $active = NU
       $stmt = "INSERT INTO $table_user (name,id,email,active,password,inside,username) VALUES(?,?,?,1,?,1,?)";
     }
   }
-  $sql = $dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sssss", $name, $newuid, $email, $password,$username) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("sssss", $name, $newuid, $email, $password,$username) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Hash the password
   set_password($newuid, $password);
@@ -99,15 +99,15 @@ function delete_user_by_user_id($uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_user WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and leave
   loggit(1,"Deleted: [$delcount] user: [$uid].");
@@ -135,7 +135,7 @@ function add_admin_log_item($content = NULL, $title = "", $url = "", $enclosure 
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Timestamp
   $createdon = time();
@@ -162,7 +162,7 @@ function get_admin_log_items($max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $sqltxt = "SELECT id,title,url,createdon,content,enclosure,sourceurl,sourcetitle FROM $table_adminlog";
@@ -174,19 +174,19 @@ function get_admin_log_items($max = NULL)
   }
 
   //loggit(3, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any posts for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No posts returned for: [$uid] with the given criteria.");
     return(FALSE);
   }
 
-  $sql->bind_result($aid,$atitle,$aurl,$acreatedon,$acontent,$aenclosure,$asourceurl,$asourcetitle) or print(mysql_error());
+  $sql->bind_result($aid,$atitle,$aurl,$acreatedon,$acontent,$aenclosure,$asourceurl,$asourcetitle) or loggit(2, "MySql error: ".$dbh->error);
 
   $posts = array();
   $count = 0;
@@ -202,7 +202,7 @@ function get_admin_log_items($max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] log items in the admin log.");
   return($posts);

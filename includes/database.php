@@ -240,7 +240,7 @@ CGDB0048;
 // ----- Database utility functions
 
 //_______________________________________________________________________________________
-//Check if the given user id actually exists in the system
+//Check for the current database version
 function get_database_version()
 {
   //Includes
@@ -339,6 +339,42 @@ function apply_all_database_updates()
   return(FALSE);
 }
 
+//_______________________________________________________________________________________
+//Check if the database actually has a good schema
+function check_database_sanity()
+{
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+
+  //Get the database version number
+  $stmt = "SELECT table_name FROM information_schema.tables WHERE table_schema = ? and table_name = ?";
+  if( ($sql=$dbh->prepare($stmt)) === FALSE ) {
+    loggit(3,"Error preparing to query schema.");
+    return(FALSE);
+  }
+  if( $sql->bind_param("ss", $dbname, $table_user) === FALSE ) {
+    loggit(3,"Error binding parameters for schema check.");
+    return(FALSE);
+  }
+  if( $sql->execute() === FALSE ) {
+    loggit(3,"Error executing query for schema check.");
+    return(FALSE);
+  }
+  $sql->store_result() or print(mysql_error());
+  if($sql->num_rows() != 1) {
+    $sql->close() or print(mysql_error());
+    loggit(3,"Too many, or not enough, records returned for database version.");
+    return(FALSE);
+  }
+  $sql->close() or print(mysql_error());
+
+
+  loggit(3,"Users table present. Database schema appears sane.");
+  return( TRUE );
+}
 
 
 ?>

@@ -28,7 +28,21 @@
 
         //Make sure the system has the correct crontab entries
         if( !file_exists("$cronloc") ) {
-          copy( "$confroot/$templates/crontab", "$cronloc");
+		  //Read the template
+          $crontemp = "$confroot/$templates/crontab";
+	      $fh = fopen($crontemp, "r");
+          $template = fread($fh, filesize($crontemp));
+          fclose($fh);
+
+		  //Adjust file paths
+          $template = str_replace('[$CONF_ROOT]', $confroot, $template);
+
+          //Write the new config file
+		  $fh = fopen($cronloc, "w+");
+          fwrite( $fh, $template );
+          fclose($fh);
+
+		  //Log it
           if( $action == "" ) {
             echo "WARNING: The server had no cron file. A fresh one was created.\n";
             loggit(2, "The server had no cron file. A fresh one was created.");

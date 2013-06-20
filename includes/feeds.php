@@ -462,7 +462,7 @@ function get_feed_subscribers($fid = NULL)
   //See if any rows came back
   $subcount = $sql->num_rows();
   if($subcount < 1) {
-    return(FALSE);
+    return(array());
   }
 
   //Put the feed ids in an array to send back
@@ -2898,7 +2898,7 @@ function get_feeds($uid = NULL, $max = NULL, $ididx = NULL)
     $sql->close()
       or print(mysql_error());
     loggit(2,"This user has not subscribed to any feeds: [$uid]");
-    return(FALSE);
+    return(array());
   }
 
   $sql->bind_result($fid,
@@ -3029,7 +3029,7 @@ function search_feeds($uid = NULL, $query = NULL, $max = NULL, $ididx = NULL)
     $sql->close()
       or print(mysql_error());
     loggit(2,"This user has not subscribed to any feeds: [$uid]");
-    return(FALSE);
+    return(array());
   }
 
   $sql->bind_result($fid,

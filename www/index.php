@@ -35,22 +35,26 @@
 			return false;
 		});
 
-                //Ajaxify the login form
-                $('#loginForm').ajaxForm({
-                        cache:          false,
-                        clearForm:      true,
-                        resetForm:      true,
-                        timeout:        30000,
+        //Ajaxify the login form
+        $('#loginForm').ajaxForm({
+	        cache:          false,
+            clearForm:      true,
+            resetForm:      true,
+            timeout:        30000,
 			beforeSubmit:   function(data) {
-                                $('h3.msg').empty();
+				$('a#aLogin').attr('disabled', true);
+    	        $('h3.msg').html('<img src="/images/spinner.gif" /> Logging in...');
 			},
-                        success:        function(data) {
-                                if(data.status == "false") {
-                                        $('h3.msg').append( data.description );
-                                } else {
-					alert(data.goloc);
+            success:        function(data) {
+	            if(data.status == "false") {
+    	            $('h3.msg').html( data.description );
+                } else {
 					window.location = data.goloc;
 				}
+			},
+			error:			function(x, t, m) {
+				$('a#aLogin').attr('disabled', false);
+   	            $('h3.msg').html('Error: ' + m + ' (' + t + ')');
 			}
 		});
 
@@ -76,8 +80,10 @@
 		<input id="txtPassword" name="password" class="txtinput required password" placeholder="Password" type="password" />
 		<input type="hidden" name="type" value="json" />
 
-                <a id="aLogin" class="btn" href="#">Login</a>
-		<?if( $cg_opensignup == 1 ) {?> or <a id="aRegister" class="btn" href="#">Register</a><?}?>
+		<?if( $g_platform == "mobile" ) {?><br/><br/><?}?>
+
+        <a id="aLogin" class="btn" href="#">Login</a>
+        <?if( $cg_opensignup == 1 ) {?> or <a id="aRegister" class="btn" href="#">Register</a><?}?>
 	    </form>
 	</div>
 	<br/>

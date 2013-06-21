@@ -10,9 +10,9 @@
       <th title="Consecutive error count.">Err</th>
       <th title="The date this feed first entered the system.">Born</th>
       <th title="The last time this feed changed.">Modified</th>
-      <th title="Average number of new items per scan.">Avg.New</th>
-      <th title="Average time it takes to scan this feed.">Avg.Time</th>
-      <th title="Average checks between new items.">Av.Intvl</th>
+      <th class="overage" title="Average number of new items per scan.">Avg.New</th>
+      <th class="overage" title="Average time it takes to scan this feed.">Avg.Time</th>
+      <th class="overage" title="Average checks between new items.">Av.Intvl</th>
       <?}?>
     </tr>
   </thead>
@@ -27,9 +27,9 @@
         <td>${feed.errors}</td>
         <td>${prettyDate(feed.createdon * 1000)}</td>
         <td>${prettyDate(feed.lastupdate * 1000)}</td>
-        <td>${feed.avgnewitems}</td>
-        <td>${feed.avgchecktime}</td>
-        <td>${feed.avgnewinterval}</td>
+        <td class="overage">${feed.avgnewitems}</td>
+        <td class="overage">${feed.avgchecktime}</td>
+        <td class="overage">${feed.avgnewinterval}</td>
         <?}?>
       </tr>
     {{/each}}

@@ -70,7 +70,7 @@ class HumbleHttpAgent
 				'ignore_errors' => true,
 				'timeout' => $this->requestOptions['timeout'],
 				'max_redirects' => $this->requestOptions['redirect'],
-				'header' => "User-Agent: PHP/".phpversion()."\r\n".
+				'header' => "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; Trident/4.0)\r\n".
 							"Accept: */*\r\n"
 				)
 			);

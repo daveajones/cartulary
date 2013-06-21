@@ -28,10 +28,6 @@
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar"?>
 
-<div class="row page-header" id="divPageTitle">
-  <h1><?echo $tree_location?></h1>
-</div>
-
 <?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
 
@@ -41,14 +37,14 @@
   <div class="control-group">
     <div id="divSubscribeUrl"><input type="text" name="url" id="txtSubscribeUrl" placeholder="Paste in a feed, list or outline url..." />
       <div id="divSubscribeUpload">
-        <input id="fileOpml" name="fileopml" class="btn btn-primary" type="file" value="Import" />
+        <input id="fileOpml" name="fileopml" class="btn btn-success" type="file" value="Import" />
       </div>
     </div>
     <div id="divSubscribeButtons">
       <img class="imgSpinner" src="/images/spinner.gif" />
-      <input id="btnSubscribe" name="submitSubscribe" class="btn btn-primary btnSubmit" type="submit" value="Subscribe" />
+      <input id="btnSubscribe" name="submitSubscribe" class="btn btn-success btnSubmit" type="submit" value="Subscribe" />
       <?if($platform != "mobile"){?>
-      or <input id="btnFileShow" name="submitImport" class="btn btn-primary btnSubmit" type="button" value="Import..." />
+      or <input id="btnFileShow" name="submitImport" class="btn btnSubmit" type="button" value="Import..." />
       <?}?>
     </div>
   </div>
@@ -63,7 +59,7 @@
 <!-- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -->
 <div class="row" id="divSubscribePeople">
 <div style="float:left;">
-<h3>People I Follow</h3>
+<h3>People I Follow <small>Click to expand.</small></h3>
 <ul class="ulPeople" style="list-style-type:none;display:inline;vertical-align:top;">
 <?
 foreach( $outlines as $ou ) {
@@ -72,7 +68,7 @@ foreach( $outlines as $ou ) {
     <img class="personimg" src="<?echo (!empty($ou['avatarurl']) ? $ou['avatarurl'] : $default_avatar_url)?>" />
     <span class="personcaption personcaption-block"><a href="<?echo $ou['url']?>"><?echo $ou['ownername']?></a></span>
     <a class="persondrop aUnsubscribe"  href="#"><img src="/images/glyph/glyphicons_191_circle_minus-red.png" /></a>
-    <ul class="personList" style="display:none;">
+    <ul class="personList hide">
     <?
     foreach($ou['feeds'] as $ofd) {
 	?><li data-id="<?echo $ofd?>">
@@ -155,13 +151,13 @@ foreach( $outlines as $ou ) {
       <input type="checkbox" class="selector" />
       <a class="manlistdrop aUnsubscribe" href="#"><img class="icon-remove-small" src="/images/blank.gif" /></a>
       <a href="<?echo $ou['url']?>"><?echo $ou['title']?></a>
-      <ul class="outlineList ulListFeeds" style="display:none;">
+      <ul class="outlineList ulListFeeds">
       <?
       foreach($ou['feeds'] as $ofd) {
 	?><li data-id="<?echo $ofd?>" class="nooverflow" style="color:black;">
         <input type="checkbox" class="selector" />
         <?if( @$feeds[$ofd]['errors'] > 50 ) {?><img title="This feed has had more than 50 errors." class="icon-warning" src="/images/blank.gif" /><?}?>
-        <a href="<?echo (@empty($feeds[$ofd]['link']) ? @$feeds[$ofd]['url'] : @$feeds[$ofd]['link'])?>">
+        <a class="nooverflow" href="<?echo (@empty($feeds[$ofd]['link']) ? @$feeds[$ofd]['url'] : @$feeds[$ofd]['link'])?>">
         <?echo (@empty($feeds[$ofd]['title']) ? @$feeds[$ofd]['url'] : @$feeds[$ofd]['title'])?></a></li><?
       }
       ?>
@@ -185,7 +181,7 @@ foreach( $outlines as $ou ) {
   if( $ou['type'] != 'sopml' && $ou['ownerid'] != $uid) {
   ?><li class="label liOutsideList" id="<?echo $ou['id']?>" data-id="<?echo $ou['id']?>" data-title="<?echo $ou['title']?>" style="background:#<?echo $ou['color']?>;margin:3px;color:black;">
     <a class="outlistdrop aUnsubscribe" href="#"><img class="icon-remove-small" src="/images/blank.gif" /></a><?echo $ou['title']?>
-    <ul class="outlineList" style="display:none;">
+    <ul class="outlineList">
     <?
     foreach($ou['feeds'] as $ofd) {
 	?><li data-id="<?echo $ofd?>" class="nooverflow" style="color:black;"><a href="<?echo $feeds[$ofd]['url']?>"><?echo $feeds[$ofd]['title']?></a></li><?

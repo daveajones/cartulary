@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 20;
+$cg_database_version = 21;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -229,6 +229,16 @@ CGDB0047;
 $cg_database_updates[19][] = <<<CGDB0048
  INSERT INTO `dbversion` ( `version` ) VALUES ( '20' )
 CGDB0048;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 20 to 21 -------------------------------------------------------------------------------------------------
+$cg_database_updates[20][] = <<<CGDB0049
+ UPDATE `prefs` SET stylesheet = '' WHERE 1
+CGDB0049;
+
+$cg_database_updates[20][] = <<<CGDB0050
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '21' )
+CGDB0050;
 //----------------------------------------------------------------------------------------------------------------
 
 

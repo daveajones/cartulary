@@ -116,7 +116,7 @@
 	            <?if( $g_prefs['riverheadlinecart'] != 1 ) {?>
 					<?if( $g_prefs['cartinriver'] == 1 && $g_platform['mobile'] ) {?>
                     	<div class="cartform action">
-							<a class="_cartlink" href="<?echo $cartulizecgi?>?title=${encodeURIComponent(title)}&url=${encodeURIComponent(link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}" rel="external nofollow">
+							<a class="_cartlink" href="<?echo $cartulizecgi?>?title=${encodeURIComponent(title)}&url=${encodeURIComponent(link)}&surl=${encodeURIComponent(feed.feedUrl)}&stitle=${encodeURIComponent(feedTitle)}" rel="external nofollow">
 								<img class="icon-bookmark" src="/images/blank.gif" alt="" />
 							</a>
 						</div>

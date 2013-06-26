@@ -1,9 +1,7 @@
 <!-- Global style sheets -->
 <link rel="stylesheet" type="text/css" href="/style/bootstrap-2.3.1-noicons.css" />
-<link rel="stylesheet" type="text/css" href="/style/flat-ui.css" />
 <link rel="stylesheet" type="text/css" href="/style/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="/style/style.css" />
-<link rel="stylesheet" type="text/css" href="/style/river.css" />
 <?
   if ( isset($g_prefs['stylesheet']) && !empty($g_prefs['stylesheet']) ) {
     $mainstyle=$g_prefs['stylesheet'];
@@ -12,15 +10,17 @@
   }
 
   if ( $platform == "tablet" ) {
-    ?><link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-tablet.css'?>" />
-    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-tablet-icons.css'?>" /><?
+    ?><link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-tablet-base.css'?>" />
+    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-tablet-icons.css'?>" />
+    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-tablet.css'?>" /><?
   } else if ( $platform == "mobile" ) {
-    ?><link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-mobile.css'?>" />
-    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-mobile-icons.css'?>" /><?
+    ?><link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-mobile-base.css'?>" />
+    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-mobile-icons.css'?>" />
+    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-mobile.css'?>" /><?
   } else {
-    ?><link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle?>" />
-    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-icons.css'?>" /><?
+    ?><link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-base.css'?>" />
+    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-icons.css'?>" />
+    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle?>" /><?
   }
 ?>
 <link rel="stylesheet" type="text/css" href="/style/bootstrap-responsive-2.3.1.min.css" />
-

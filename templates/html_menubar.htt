@@ -2,14 +2,20 @@
   $myuid = get_user_id_from_sid(get_session_id());
   $myprefs = get_user_prefs($myuid);
   $myuname = get_user_name_from_uid($myuid);
+
+  if( !empty($myprefs['avatarurl']) ) {
+    $avatarurl = $myprefs['avatarurl'];
+  } else {
+    $avatarurl = $default_avatar_url;
+  }
 ?>
 
 <!-- Menu bar -->
 <div id="divMainMenu" class="row">
 <div id="divSearchResultsHook"></div>
-<div class="navbar navbar-inverse <?if($g_platform != "mobile"){?>navbar-fixed-top<?}?>">
+<div class="navbar <?if($g_platform != "mobile"){?>navbar-fixed-top<?}?>">
 	<div class="navbar-inner msganchor">
-		<a class="brand" href="<?echo $startpage?>"><?echo $system_name?></a>
+	    <a class="brand" href="<?echo $startpage?>"><?echo $system_name?></a>
 		<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
@@ -17,13 +23,35 @@
 		</a>
 		<div class="nav-collapse">
 			<ul class="nav">
-			<li <?if($section == "River"){echo "class='active'";}?>><a href="<?echo $newsriverpage?>">Home</a></li>
-			<li <?if($section == "Microblog"){echo "class='active'";}?>><a href="<?echo $microblogpage?>">Microblog</a></li>
-  			<li <?if($section == "Articles"){echo "class='active'";}?>><a href="<?echo $articlespage?>">Articles</a></li>
-			<li <?if($section == "Media"){echo "class='active'";}?>><a href="<?echo $mediapage?>">Media</a></li>
-			<li <?if($section == "Subscribe"){echo "class='active'";}?>><a href="<?echo $subscribepage?>">Subscribe</a></li>
+			<li <?if($section == "River"){echo "class='River active'";}?>>
+                          <a class="homebutton" title="River" href="<?echo $newsriverpage?>"><img class="icon-nav-home" src="/images/blank.gif" /><span class="hidden-desktop">Home</span></a>
+                        </li>
+			<li <?if($section == "Microblog"){echo "class='active'";}?>>
+                          <a href="<?echo $microblogpage?>" title="Microblog"><img class="icon-nav-microblog" src="/images/blank.gif" /><span class="hidden-desktop">Microblog</span></a>
+                        </li>
+  			<li <?if($section == "Articles"){echo "class='active'";}?>>
+                          <a href="<?echo $articlespage?>" title="Articles"><img class="icon-nav-articles" src="/images/blank.gif" /><span class="hidden-desktop">Articles</span></a>
+                        </li>
+			<li <?if($section == "Media"){echo "class='active'";}?>>
+                          <a href="<?echo $mediapage?>" title="Media"><img class="icon-nav-media" src="/images/blank.gif" /><span class="hidden-desktop">Media</span></a>
+                        </li>
+			<li <?if($section == "Subscribe"){echo "class='active'";}?>>
+                          <a href="<?echo $subscribepage?>" title="Subscribe"><img class="icon-nav-subscribe" src="/images/blank.gif" /><span class="hidden-desktop">Subscribe</span></a>
+                        </li>
 
-	                <li>
+		        <?if(is_admin($myuid)){?>
+			<li class="divider-vertical"></li>
+                        <li <?if($section == "Admin-user"){echo "class='active'";}?>>
+                          <a href="<?echo $adminpage?>.user" title="User Admin"><img class="icon-nav-admin-user" src="/images/blank.gif" /><span class="hidden-desktop">User Admin</span></a>
+                        </li>
+                        <li <?if($section == "Admin-feed"){echo "class='active'";}?>>
+                          <a href="<?echo $adminpage?>.feed" title="Feed Admin"><img class="icon-nav-admin-feed" src="/images/blank.gif" /><span class="hidden-desktop">Feed Admin</span></a>
+                        </li>
+                        <?}?>
+                       
+
+			<? if( $platform == "mobile" || $platform == "tablet" ) {?>
+                        <li>
                           <form class="navbar-search" id="navsearch" name="navsearch" method="POST" action="<?echo $searchcgi?>">
 			    <input id="navsearchs" type="hidden" name="s" value="<?echo $section?>" />
 	                    <input id="navsearchq" type="text" class="search-query span3" name="q" placeholder="Search" /> <img id="navSpinner" src="/images/spinner.gif" alt="" />
@@ -31,58 +59,36 @@
 			  <div id="divNavSearchResults"></div>
                         </li>
 
-			<? if( $platform == "mobile" || $platform == "tablet" ) {?>
                         <li <?if($section == "Prefs"){echo "class='active'";}?>><a href="<?echo $prefspage?>">Prefs</a></li>
                         <li><a href="<?echo $logoutpage?>">Logout</a></li>
 			<?}?>
-		        <?if(is_admin($myuid)){?>
-                        <li <?if($section == "Admin-user"){echo "class='active'";}?>><a href="<?echo $adminpage?>.user">User Admin</a></li>
-                        <li <?if($section == "Admin-feed"){echo "class='active'";}?>><a href="<?echo $adminpage?>.feed">Feed Admin</a></li>
-                        <?}?>
 			</ul>           
-			<a class="sysname pull-right" href="<?echo $cg_productsite?>">v<?echo $version?></a>
+
+			<?if( $platform != "mobile" && $platform != "tablet" ) {?>
+			<!-- Profile Header -->
+			<ul class="nav pull-right">
+  	                  <li>
+                            <form class="navbar-search" id="navsearch" name="navsearch" method="POST" action="<?echo $searchcgi?>">
+			      <input id="navsearchs" type="hidden" name="s" value="<?echo $section?>" />
+	                      <input id="navsearchq" type="text" class="search-query span3" name="q" placeholder="Search" /> <img id="navSpinner" src="/images/spinner.gif" alt="" />
+	                    </form>
+			    <div id="divNavSearchResults"></div>
+                          </li>
+  			  <li class="divider-vertical"></li>                          
+
+			  <li class="dropdown <?if($section == "Prefs"){echo " active";}?>">
+                            <a style="padding:0;padding-left:8px;href="#" id="drop5" role="button" class="edgecase dropdown-toggle" data-toggle="dropdown"><?echo $myuname?> <img class="avatar48" src="<?echo $avatarurl?>" alt="" /></a>
+			    <ul id="menu3" role="menu" class="dropdown-menu" aria-labelledby="drop5">
+                              <li><a href="<?echo $prefspage?>">Prefs</a></li>
+                              <li><a href="<?echo $logoutpage?>">Logout</a></li>
+			    </ul>
+			  </li>
+			</ul>
+                        <?}?>
+			<!-- <a class="sysname pull-right" href="<?echo $cg_productsite?>">v<?echo $version?></a> -->
 		</div>
 	</div>
 </div>
 </div>
 
-<?if($platform == "testing") {?>
-<!--  Search bar -->
-<div id="divSearchMenu" class="row">
-<div class="navbar">
-	<div class="navbar-inner">
-		<ul class="nav">
-        	<li><form class="nav navbar-search" id="navsearch" name="navsearch" method="POST" action="<?echo $searchcgi?>">
-			<input id="navsearchs" type="hidden" name="s" value="<?echo $section?>" />
-	                <input id="navsearchq" type="text" class="search-query span3" name="q" placeholder="Search" />
-			<input type="submit" name="searchSubmit" style="display:none;" />
-			<img id="navSpinner" src="/images/spinner.gif" alt="" />
-	        </form></li>
-		</ul>
-		<div class="nav-collapse">
-		        <div id="divNavSearchResults"></div>
-		</div>
-	</div>
-</div>
-</div>
-<?}?>
-
-
-<!-- Profile Header -->
-<? if( $platform != "mobile" && $platform != "tablet" ) {
-  if( !empty($myprefs['avatarurl']) ) {
-    $avatarurl = $myprefs['avatarurl'];
-  } else {
-    $avatarurl = $default_avatar_url;
-  }
-  ?>
-  <div id="divProfileHeader">
-    <ul style="float:left;margin-right:8px;list-style:none;">
-      <li <?if($section == "Prefs"){echo "class='active'";}?>><a href="<?echo $prefspage?>"><img class="icon-prefs" title="Prefs" alt="Prefs" src="/images/blank.gif" /></a></li>
-      <li class="last"><a href="<?echo $logoutpage?>"><img class="icon-logout" title="Logout" alt="Logout" src="/images/blank.gif" /></a></li>
-    </ul>
-
-    <a href="<?echo $prefspage?>"><img class="avatarheader" src="<?echo $avatarurl?>" alt="" /></a>
-  </div>
-<?}?>
 <div class="pageContentWrapper <?echo $section?>">

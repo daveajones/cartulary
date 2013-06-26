@@ -74,11 +74,11 @@
 <?}?>
 
 <script id="template" type="text/x-jquery-tmpl">
-<?include "$confroot/$scripts/river-temp-beta.js"?>
+<?include "$confroot/$scripts/river-temp-item.js"?>
 </script>
 
 <script id="template-sticky" type="text/x-jquery-tmpl">
-<?include "$confroot/$scripts/river-temp-sticky-beta.js"?>
+<?include "$confroot/$scripts/river-temp-sticky.js"?>
 </script>
 
 <script id="template-subitem" type="text/x-jquery-tmpl">

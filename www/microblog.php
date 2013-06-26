@@ -75,10 +75,6 @@
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar"?>
 
-<div class="row page-header" id="divPageTitle">
-	<h1><?echo $tree_location?><small><span id="message"></span></small></h1>
-</div>
-
 <?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
 
@@ -96,7 +92,7 @@
 
 			<div id="divPostIt">
         		        <span id="spnCharCount"></span>
-		                <input id="btnSubmit" name="submitbtn" class="btn btn-primary" type="submit" value="Post It!" /> <img id="imgSpinner" alt="" src="/images/spinner.gif" />
+		                <input id="btnSubmit" name="submitbtn" class="btn btn-success" type="submit" value="Post It!" /> <img id="imgSpinner" alt="" src="/images/spinner.gif" />
 			</div>
                 </div>
 
@@ -197,12 +193,6 @@
         </div>
 </div>
 
-<div class="row statline">
-  <div class="showall">
-    <a href="?max=0">Show all</a>
-  </div>
-</div>
-
 <script id="microblog-template" type="text/x-jquery-tmpl">
 <?include "$confroot/$scripts/microblog-temp.js"?>
 </script>
@@ -227,7 +217,7 @@
     <form id="frmFeedImport" name="feedimport" action="/cgi/in/import.feed" method="POST">
       <div class="form-horizontal">
       URL: <input type="text" id="txtFeedImportUrl" class="urlinput" name="url" />
-      <input id="btnFeedImportSubmit" class="btn btn-primary" name="btnFeedImportSubmit" type="submit" value="Import" />
+      <input id="btnFeedImportSubmit" class="btn btn-success" name="btnFeedImportSubmit" type="submit" value="Import" />
       </div>
     </form>
     <div id="divWaitMessage" class="hide pagination-centered"><img id="imgSpinner" alt="" src="/images/spinner.gif" /> This could take a while. Please wait...</div>

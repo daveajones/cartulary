@@ -61,6 +61,7 @@ if ( isset($_POST['opensubs']) ) { $opensubs = 1; } else { $opensubs = 0; };
 if ( isset($_POST['publicriver']) ) { $publicriver = 1; } else { $publicriver = 0; };
 if ( isset($_POST['pubriverfile']) ) { $pubriverfile = $_POST['pubriverfile']; } else { $pubriverfile = ""; };
 if ( isset($_POST['pubrivertitle']) ) { $pubrivertitle = $_POST['pubrivertitle']; } else { $pubrivertitle = ""; };
+if ( isset($_POST['rivercolumns']) ) { $rivercolumns = $_POST['rivercolumns']; } else { $rivercolumns = ""; };
 $jsondata = array();
 $jsondata['prefname'] = "";
 
@@ -637,6 +638,17 @@ if( strlen($pubrivertitle) > 128 ) {
   exit(1);
 }
 $prefs['pubrivertitle'] = $pubrivertitle;
+
+$jsondata['prefname'] = "rivercolumns";
+if( $rivercolumns > 9 || !is_numeric($rivercolumns) ) {
+  //Log it
+  loggit(2,"The value for rivercolumns pref was not valid: [$rivercolumns]");
+  $jsondata['status'] = "false";
+  $jsondata['description'] = "Max rivercolumns value is 9.";
+  echo json_encode($jsondata);
+  exit(1);
+}
+$prefs['rivercolumns'] = $rivercolumns;
 //--------------------------------------------------------
 //--------------------------------------------------------
 

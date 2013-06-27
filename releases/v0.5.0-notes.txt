@@ -1,0 +1,36 @@
+Release Notes - Freedom Controller v0.5.0
+
+What's new for users:
+	1. New UI.
+		I like it.  If you don't, there's a stylesheet url option in the prefs.  Start hacking.  :-) 
+
+	2. New river design.
+		Multi-column layout:  By default, each user is set to "0" columns, which means auto-adjust.  The river page will give you as 
+		many columns as it thinks it can safely fit within your viewport.  If you'd rather hard-code your column count, go into the 
+		prefs and set it to whatever you want up to a max of 5.  The setting is in the "River" section of the prefs.  
+		Mobile and tablets are always 1 column.  They ignore this pref.
+
+		Filter by feed:  The home page is now a hybrid river/inbox style newsreader.  You can click on feeds on the right-hand sidebar 
+		to see only posts from that feed.  Any feed currently in the river will show up on the right.  Social Outlines always show up on top.
+
+		Inline actions:  Cartulizing a post and re-blogging a post now happen right in the post itself.  No more modals or page 
+		switching.  This was a better solution for mobile too, since phones don't handle modals very well.
+
+		Re-blogging:  When you re-blog something it goes into the post as a sub-item.  Even though it hasn't been aggregated yet, it 
+		makes the user feel better that their post has actually gone through.
+		
+		Better sticky handling:  Sticky posts are now coming from their own ajax call.  They are no longer included in the river.js file.  
+		This means they will go away instantly instead of dealing with the lag between river builds.
+
+What's new for devs:
+	Much of this release is under the hood stuff.
+
+	We're no longer using Nic's code to parse the river.js.  Everything has been shifted to api-river.js.  Instead of parsing it as one huge 
+	operationg, we now have 3 templates and build it in a more incremental way.  This makes it a lot more flexible moving forward.  It also 
+	sped up river building a lot.  The river page feels very fast now.
+
+	The river data is also stored in localStorage now, so moving forward we'll be able to leverage having that data locally available.  On 
+	phones this will make populating the river initially much faster.
+
+	Look in /opt/cartulary/scripts/api-river.js for an idea of what's going on.
+

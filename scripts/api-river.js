@@ -675,60 +675,58 @@ function _getStreamWidth() {
 	return ((viewportWidth - sidebarWidth) - 80);
 }
 
-function _sortGrid() {
+function _sortGrid(sizeOnly) {
+    var sizeOnly = (typeof sizeOnly === "undefined") ? false : sizeOnly;
 	var streamWidth = _getStreamWidth();
 	var colcount = _calculateColumnCount();
 	
 	//Build the columns
-	$('#stream #stream-items .col').remove();
-    for( c = 1 ; c <= colcount ; c++ ) {
-        $('#stream #stream-items').append('<div class="col col' + c + '"><ul class="stream-list"></ul></div>');
-    }
+	if( sizeOnly == false ) {
+		$('#stream #stream-items .col').remove();
+    	for( c = 1 ; c <= colcount ; c++ ) {
+        	$('#stream #stream-items').append('<div class="col col' + c + '"><ul class="stream-list"></ul></div>');
+    	}
+	}
 
 	//Adjust their sizing and layout
 	if( platform == "mobile" ) {
 		return colcount;
 	}
 
+	//Reset some values
+	$('#stream #stream-items .col').addClass('span3');
+	$('#stream').css('margin-left', 'auto');
+	$('#stream').css('margin-right', 'auto');
+	$('#stream .stream-list').css('max-width', '600px');
+	$('#stream #stream-items .col').css('max-width', '600px');
+	$('#stream-wrap').css('width', streamWidth + 'px');
+
+	//Size the grid
 	if( colcount == 1 ) {
 		$('#stream').css('width', '800px');
-		$('#stream').css('margin-left', 'auto');
-		$('#stream').css('margin-right', 'auto');
 		$('#stream .stream-list').css('width', '600px');
 		$('#stream #stream-items .col').css('width', '600px');
-		$('#stream #stream-items .col').addClass('span3');
+		$('#stream-wrap').css('width', '');
 	} else
 	if( colcount == 2 ) {
-		$('#stream').css('width', (streamWidth * .99).toFixed() + 'px');
-		$('#stream').css('margin-left', '');
-		$('#stream').css('margin-right', '');
+		$('#stream').css('width', Math.min(1500, (streamWidth * .99).toFixed()) + 'px');
 		$('#stream .stream-list').css('width', (streamWidth * .47).toFixed() + 'px');
 		$('#stream #stream-items .col').css('width', (streamWidth * .47).toFixed() + 'px');
-		$('#stream #stream-items .col').addClass('span3');
 	} else
 	if( colcount == 3 ) {
-		$('#stream').css('width', (streamWidth * .99).toFixed() + 'px');
-		$('#stream').css('margin-left', '');
-		$('#stream').css('margin-right', '');
+		$('#stream').css('width', Math.min(2000, (streamWidth * .99).toFixed()) + 'px');
 		$('#stream .stream-list').css('width', (streamWidth * .30).toFixed() + 'px');
 		$('#stream #stream-items .col').css('width', (streamWidth * .30).toFixed() + 'px');
-		$('#stream #stream-items .col').addClass('span3');
 	} else
 	if( colcount == 4 ) {
-		$('#stream').css('width', (streamWidth * .99).toFixed() + 'px');
-		$('#stream').css('margin-left', '');
-		$('#stream').css('margin-right', '');
+		$('#stream').css('width', Math.min(2500, (streamWidth * .99).toFixed()) + 'px');
 		$('#stream .stream-list').css('width', (streamWidth * .22).toFixed() + 'px');
 		$('#stream #stream-items .col').css('width', (streamWidth * .22).toFixed() + 'px');
-		$('#stream #stream-items .col').addClass('span3');
 	} else
 	if( colcount == 5 ) {
-		$('#stream').css('width', (streamWidth * .99).toFixed() + 'px');
-		$('#stream').css('margin-left', '');
-		$('#stream').css('margin-right', '');
+		$('#stream').css('width', Math.min(3000, (streamWidth * .99).toFixed()) + 'px');
 		$('#stream .stream-list').css('width', (streamWidth * .17).toFixed() + 'px');
 		$('#stream #stream-items .col').css('width', (streamWidth * .17).toFixed() + 'px');
-		$('#stream #stream-items .col').addClass('span3');
 	} else {
 		$('#stream .stream-list').css('width', '');
 	}
@@ -776,7 +774,7 @@ function _buildRiver(cached) {
 		//Remove loading notice
 		_changeStreamNotice('', true);
 
-		<?if( $g_prefs['rivercolumns'] == 0 && $g_platform != "mobile" && $g_platform != "tablet" ) {?>
+		<?if( $g_platform != "mobile" && $g_platform != "tablet" ) {?>
 		//Re-trigger masonry when viewport is resized
 		$(window).off('debouncedresize');
     	$(window).on('debouncedresize', function( event ){
@@ -785,6 +783,7 @@ function _buildRiver(cached) {
 				freedomController.v1.river.methods.resizeGrid();  	
 			} else {
 				console.log('no re-flow needed');
+				_sortGrid(true);
 			}
     	});
 		<?}?>
@@ -981,7 +980,9 @@ function _calculateColumnCount() {
 	var streamWidth = _getStreamWidth();
 
     var ccsize = streamWidth / 500;
-    var colcount = ccsize.toFixed();
+
+	//Limit to a max of 5 columns for now
+    var colcount = Math.min(5, Math.floor(ccsize));
     if( ccsize < 2 ) {
         colcount = 1;
     }

@@ -7,7 +7,7 @@ body {
 body > .container {  margin-top:80px;  }
 .navbar-inner a.brand {  display:none;  }
 @media (min-width:1px) and (max-width:979px) {
-	body > .container {  margin-top:30px;  }
+	body > .container {  margin-top:0px;  }
 	.navbar-inner a.brand {  display:inline;  }
 }
 #divMainMenu #navsearch {  margin-top:8px;  }

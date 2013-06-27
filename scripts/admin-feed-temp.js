@@ -6,7 +6,7 @@
       <th>&nbsp;</th>
       <th title="The title of the feed.">Title</th>
       <th title="Subscriber count.">Sub</th>
-      <?if($platform != "mobile") {?>
+      <?if($g_platform != "mobile" && $g_platform != "tablet") {?>
       <th title="Consecutive error count.">Err</th>
       <th title="The date this feed first entered the system.">Born</th>
       <th title="The last time this feed changed.">Modified</th>
@@ -23,7 +23,7 @@
         <td><a id="reset_${feed.id}" class="aResetFeed" title="Force a scan of this feed." href="#"><img class="icon-reset" src="/images/blank.gif" /></a></td>
         <td><a href="${feed.url}">{{if isBlank(feed.title)}}Untitled Feed{{else}}${feed.title}{{/if}}</a></td>
         <td>${feed.subscribers}</td>
-        <?if($platform != "mobile") {?>
+        <?if($g_platform != "mobile" && $g_platform != "tablet") {?>
         <td>${feed.errors}</td>
         <td>${prettyDate(feed.createdon * 1000)}</td>
         <td>${prettyDate(feed.lastupdate * 1000)}</td>

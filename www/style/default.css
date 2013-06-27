@@ -37,6 +37,9 @@
 
 /* --------------------------------------------------- */
 /* ----- River Page ---------------------------------- */
+.pageContentWrapper.River #stream.filtered {
+	margin-top:20px;
+}
 .pageContentWrapper.River #stream #stream-items .stream-list {
    	list-style:none;
 	margin:0;
@@ -168,10 +171,13 @@
 
 /* ----- Interactive------------------------------- */
 .pageContentWrapper.River #stream .filternotice {
-	text-align:center;
-    margin:0 auto 24px;
-	padding:10px;
-	background:lightyellow;
+    position:absolute;
+    top:47px;
+    left:0px;
+    width:100%;
+	text-align:left;
+	padding:7px;
+	background:#f0e067;
 	color: #5F4B32;
 }
 .pageContentWrapper.River #stream #stream-items .stream-list > li.article .inlinecartmsg {

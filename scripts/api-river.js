@@ -49,6 +49,7 @@ function _showOnlyItems( klass, title ) {
 	_showAllItems();
     $(pathToStreamItem).not('.' + klass).hide();
 	$('#stream').prepend('<div class="filternotice">Currently showing only items from '+title+'.<a class="removefilter">Show all</a></div>');
+	$('#stream').addClass('filtered');
 	$('#stream div.filternotice a.removefilter').click(function() {
 		_showAllItems();
 		return false;
@@ -58,6 +59,7 @@ function _showOnlyItems( klass, title ) {
 
 function _showAllItems() {
 	$('#stream div.filternotice').remove();
+	$('#stream').removeClass('filtered');
 	$(pathToStreamItem).show();
 }
 
@@ -612,6 +614,9 @@ function _bindStickyLinks(elid) {
                 var id = bobj.attr("data-id");
                 var fid = bobj.attr("data-feedid");
 				var idx = bobj.attr("data-index");
+
+				//Hide the item first
+				$('#' + id).hide();
 
 				//Get any sticky subitems so we can un-sticky them too
 				var subitems = $('#' + id + ' .subitem.sticky').map(function() { return this.id; }).get();	

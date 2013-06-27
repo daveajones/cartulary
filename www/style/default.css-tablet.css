@@ -1,4 +1,26 @@
 /* --------------------------------------------------- */
+/* ----- Menus --------------------------------------- */
+.navbar-inner {
+  border:none;
+  background-color: #fafafa;
+  background-image: none;
+  background-repeat: no-repeat;
+  -webkit-border-radius: 0px;
+     -moz-border-radius: 0px;
+          border-radius: 0px;
+  filter: none;
+  -webkit-box-shadow: none;
+     -moz-box-shadow: none;
+          box-shadow: none;
+}
+.navbar .divider-vertical {
+  height: 48px;
+  border-right: 1px solid #f2f2f2;
+  border-left: 1px solid #efefef;
+}
+/* --------------------------------------------------- */
+
+/* --------------------------------------------------- */
 /* ----- Widgets ------------------------------------- */
 .avatar32  {  height:32px;   }
 .avatar48  {  height:48px;   }

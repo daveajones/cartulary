@@ -1,6 +1,6 @@
   <div id="ulPostList" class="postList">
   {{if posts.length < 1}}
-    <center class="noposts">You haven't posted anything. Why not?</center>
+    <center class="noposts">You haven't posted anything. Use the <a href="<?echo sprintf($bookmarklet_blog_url, $system_url)?>">Microblog</a> bookmarklet.</center>
   {{else}}
     <div class="postItem well toolPanel">
       Microblog Shortcuts:

@@ -689,7 +689,7 @@ function _sortGrid(sizeOnly) {
 	}
 
 	//Adjust their sizing and layout
-	if( platform == "mobile" ) {
+	if( platform == "mobile" || platform == "tablet" ) {
 		return colcount;
 	}
 
@@ -941,7 +941,7 @@ function _removeStickyItemLS(index) {
 function _bindEnclosureLinks(elid) {
     var elid = (typeof elid === "undefined") ? "" : elid;		
 
-	if( platform == "mobile" ) {  return true;  }
+	if( platform == "mobile" || platform == "tablet" ) {  return true;  }
 
     $(elid + ' .enclosureview a').unbind('click');
     $(elid + ' .enclosureview a').click(function() {

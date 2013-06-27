@@ -1,50 +1,46 @@
-    <!-- /*This is the stream header*/ -->
-    <div id="stream-header">
-        <div id="stream-updated">
-          <span class="river-timestamp">Updated <span class="time">${dateFormat(metadata.whenGMT, 'timeDate')}</span></span>
-          <span class="river-stats">Items: <span id="spnItemCount"></span> <a href="${River.settings.url}">JSON</a></span>
-        </div>
-    </div>
+<!-- /*This is the river template*/ -->
+<div id="stream-items">
+	<ul class="stream-list">
 
-
-    <!-- /*This is where new item notification happens*/ -->
-    <a id="stream-notice" href="#"></a>
-
-
-    <!-- /*This is the river template*/ -->
-    <div id="stream-items">
-   
-      <!-- /*Each feed is parsed*/ -->
-      {{each(f,feed) updatedFeeds.updatedFeed}}
-
-        <div class="section{{if linkedOutlineId}} ${linkedOutlineId}{{/if}}{{if feedHidden == 1}} elHidden{{/if}}{{if linkedOutlineType}} ${linkedOutlineType}{{/if}}">
-            <div class="header">
-		<a class="jumpTop pull-right" title="Jump back to the top of the page." href="#"><img class="icon-jumptop" src="/images/blank.gif"></a>
-                <?if( $cg_terror == 1) {?><div class="pull-right"><button class="btn btn-mini btn-danger" onclick="javascript:alert('Nice job douchebag!');">Report this post<br/>as terrorism.</button></div><?}?>
-                <h2>
-                    <span class="header-tools">
-                    {{if feedSticky == 1}}<a class="aFeedUnSticky" href="#" data-id="${feedId}"><img class="icon-feed-unsticky" src="/images/blank.gif" alt="" /></a>
-                    {{else}}<a class="aFeedSticky" href="#" data-id="${feedId}"><img class="icon-feed-sticky" src="/images/blank.gif" alt="" /></a>
-                    {{/if}}
-                    </span>
-                    {{if websiteUrl}}<a href="${websiteUrl}">{{/if}}${feedTitle}{{if websiteUrl}}</a>{{/if}}
-                </h2>
-                <span class="time">${dateFormat(whenLastUpdate, 'timeDate')}</span>
-            </div>
-
+    <!-- /*Each feed is parsed*/ -->
+    {{each(f,feed) updatedFeeds.updatedFeed}}
+		{{if linkedOutlineType}}
+			{{if linkedOutlineType == 'sopml'}}
+				{{if River.methods.prependActiveFeed(linkedOutlineId, ownerName, linkedOutlineUrl, avatarUrl, "person")}}{{/if}}
+			{{else}}
+				{{if River.methods.appendActiveFeed(feedId, feedTitle, feedUrl, websiteUrl, "feed")}}{{/if}}
+			{{/if}}
+		{{else}}
+			{{if River.methods.appendActiveFeed(feedId, feedTitle, feedUrl, websiteUrl, "feed")}}{{/if}}
+		{{/if}}
+    	<!-- /*Each item is parsed*/ -->
         {{each(i,item) item}}
+            <li class="article{{if item.sticky}}{{if River.methods.alreadyUnsticky(item.id)}} noshow{{else}} sticky{{/if}}{{/if}}{{if item.enclosure && item.enclosure.length > 0}} with-enclosures{{/if}} fulltext {{if linkedOutlineType}}{{if linkedOutlineType == 'sopml'}}${linkedOutlineId}{{else}}${feedId}{{/if}}{{else}}${feedId}{{/if}}" id="${item.id}" data-index="${item.index}" data-feedid="${feedId}">
+				<div class="postinfo hide"
+					 data-url="${item.permaLink || item.link}" 
+					 data-title="${item.title || item.body}"
+					 data-sourceurl="${item.sourceurl || feedUrl}"
+					 data-sourcetitle="${item.sourcetitle || feedTitle}"
+					 data-origin="{{if item.origin}}${item.origin}{{/if}}">
+				</div>
 
-            <div class="article{{if item.sticky}} sticky{{/if}} fulltext" id="${item.id}" data-index="${item.index}">
-                {{if avatarUrl}}{{if i < 1}}
-			{{if linkedOutlineUrl}}<a class="sopmllink" href="#mdlSocialOutlineView" label="View Social Outline" data-href="${linkedOutlineUrl}">{{/if}}
-			<img class="riverminitar" src="${avatarUrl}" alt="" />
-			{{if linkedOutlineUrl}}</a>{{/if}}
-		{{/if}}{{/if}}
+                {{if item.sticky}}<a class="aUnSticky" href="#" data-id="${item.id}" data-feedid="{{if linkedOutlineType}}{{if linkedOutlineType == 'sopml'}}${linkedOutlineId}{{else}}${feedId}{{/if}}{{else}}${feedId}{{/if}}"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>{{/if}}
+	            {{if avatarUrl}}
+				{{if i < 1}}
+					{{if linkedOutlineUrl}}<a class="sopmllink" href="#mdlSocialOutlineView" label="View Social Outline" data-href="${linkedOutlineUrl}">{{/if}}
+					<img class="riverminitar" src="${avatarUrl}" alt="" />
+					{{if linkedOutlineUrl}}</a>{{/if}}
+				{{/if}}
+				{{/if}}
+
+		    	<!-- /*Each enclosure is parsed looking for an avatar*/ -->
                 {{each(e,enclosure) item.enclosure}}
                   {{if River.methods.isAvatar(enclosure.url)}}
-                    <img class="riverminitar" src="${enclosure.url}" alt="" title="Enclosure: ${e}."/>
+    	              <img class="riverminitar" src="${enclosure.url}" alt="" title="Enclosure: ${e}."/>
                   {{/if}}
                 {{/each}}
+
+		    	<!-- /*The article header*/ -->
                 <div class="header">
                     <h3>
                     <?if($prefs['riverheadlinecart'] == 1) {?>
@@ -61,19 +57,19 @@
                     </h3>
                 </div>
 
-            {{if item.author}}<div class="byline">by: <span class="author">${item.author}</span></div>{{/if}}
+	            {{if item.author}}<div class="byline">by: <span class="author">${item.author}</span></div>{{/if}}
 
-            {{if item.title && item.body}}
-                <div class="description">
-                    ${River.methods.newGetText(item.body)}
-                    {{if Hidepics == false && River.methods.convertYoutube(item.link) != false}}
-                        <br/><br/><iframe class="bodyvid" src="${River.methods.convertYoutube(item.link)}" frameborder="0" allowfullscreen></iframe>
-                    {{/if}}
-                </div>
-            {{/if}}
+	            {{if item.title && item.body}}
+                	<div class="description">
+                    	${River.methods.newGetText(item.body)}
+                    	{{if Hidepics == false && River.methods.convertYoutube(item.link) != false}}
+                        	<br/><br/><iframe class="bodyvid" src="${River.methods.convertYoutube(item.link)}" frameborder="0" allowfullscreen></iframe>
+	                    {{/if}}
+    	            </div>
+            	{{/if}}
 
                 <div class="enclosureview">
-		    {{each(e,enclosure) item.enclosure}}
+			    {{each(e,enclosure) item.enclosure}}
                         {{if River.methods.isImage(enclosure.url, enclosure.type) && (Hidebigpics == false || enclosure.length < 50000) && Hidepics == false && River.methods.isAvatar(enclosure.url) == false}}
                             <a href="${enclosure.url}">
 			    {{if River.methods.countEnclosuresOfType(item.enclosure, 'image') == 2}}
@@ -96,7 +92,9 @@
                             <div class="enclosure ${River.methods.getMediaType(enclosure.type)}"><a href="${enclosure.url}">Download enclosure{{if enclosure.type && enclosure.length}} (${enclosure.type}, ${River.methods.getEnclosureSize(enclosure.length)}){{/if}}</a></div>
 			<?if( $device != "iphone" && $device != "ipad" ) {?>
                         {{else River.methods.isIframe(enclosure.url, enclosure.type) && Hidepics == false}}
-                            <iframe class="encobj enciframe inactive" src="/images/blank.gif" data-src="${enclosure.url}" data-type="${enclosure.type}" data-length="${enclosure.length}" frameborder="0" allowfullscreen></iframe>
+                            <div class="encobj enciframe inactive hide" data-src="${enclosure.url}" data-type="${enclosure.type}" data-length="${enclosure.length}" data-frameborder="0" allowfullscreen>
+                              <div class="play"><img class="icon-play" src="/images/blank.gif" alt="" /> Click to load...</div>
+                            </div>
 			<?}?>
                         {{/if}}
 		    {{/each}}
@@ -104,32 +102,35 @@
 
                 <div class="footer" style="clear:both;">
 		    <div class="actionwrap">
+					<a class="jumpTop pull-left" title="Jump back to the top of the page." href="#"><img class="icon-jumptop" src="/images/blank.gif"></a>
+
                     <div class="time">
                       ${River.methods.prettyDate(item.pubDate)}
                       {{if item.sourceurl}}
                         <span class="source"> via: <a href="${item.sourceurl}">${item.sourcetitle}</a> | <a class="aSubscribe" data-sourceurl="${encodeURIComponent(item.sourceurl)}" href="#">Subscribe</a></span>
-		      {{else}}
-                        <span class="source hide"> via: <a href="${feedUrl}">${feedTitle}</a></span>
+				      {{else}}
+                        <span class="source"> | <a href="${feedUrl}">${feedTitle}</a></span>
                       {{/if}}
                       {{if item.origin}}<span class="origin hide">${item.origin}</span>{{/if}}
                     </div>
+
                     <div class="actions">
                         <?if( $g_prefs['riverheadlinecart'] != 1 ) {?>
-                        <?if( $g_prefs['cartinriver'] == 1 && $g_platform['mobile'] ) {?>
-                          <div class="cartform"><a class="_cartlink" href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}" rel="external nofollow"><img class="icon-book-small" src="/images/blank.gif" alt="" /></a></div>
-			<?} else {?>
-                          <div class="cartform"><a class="cartlink" href="#mdlShowArticle" data-id="${item.id}" data-toggle="modal" label="Cartulize Article" data-href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}"><img class="icon-book-small" src="/images/blank.gif" alt="" /></a></div>
-			<?}?>
+                          <?if( $g_prefs['cartinriver'] == 1 && $g_platform['mobile'] ) {?>
+                            <div class="cartform action"><a class="_cartlink" href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}" rel="external nofollow"><img class="icon-bookmark" src="/images/blank.gif" alt="" /></a></div>
+						  <?} else {?>
+                            <a class="cartlink" href="#" data-id="${item.id}" label="Cartulize Article"><img class="icon-bookmark" src="/images/blank.gif" alt="" /></a>
+                            <!-- <div class="cartform action"><a class="cartlink" href="#mdlShowArticle" data-id="${item.id}" data-toggle="modal" label="Cartulize Article" data-href="<?echo $cartulizecgi?>?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.link)}&surl=${encodeURIComponent(feedUrl)}&stitle=${encodeURIComponent(feedTitle)}"><img class="icon-bookmark" src="/images/blank.gif" alt="" /></a></div> -->
+						  <?}?>
                         <?}?>
 
                         <?if(!empty($prefs['linkblog'])) {?>
 			  <div><a href="<?echo $prefs['linkblog']?>/?description=${encodeURIComponent(item.title)}&link=${encodeURIComponent(item.link)}" rel="external nofollow" target="_blank">RT</a></div>
-			<?} else if( $g_platform != "mobile" ) {?>
-			  <a class="mblink rtgo" href="#" data-id="${item.id}"><img class="icon-retweet" src="/images/blank.gif" alt="" /></a>
 			<?} else {?>
-                          <div class="rtriverform">
+			  <a class="mblink rtgo action" href="#" data-id="${item.id}"><img class="icon-share" src="/images/blank.gif" alt="" /></a>
+<!--                          <div class="rtriverform">
 			  <form id="frm${item.id}" action="<?echo $microblogpage?>" method="post" target"_new">
-			  <a class="rtlink rtgo" href="#" onclick="javascript:document.getElementById('frm${item.id}').submit();return false;"><img class="icon-retweet" src="/images/blank.gif" alt="" /></a>
+			  <a class="rtlink rtgo" href="#" onclick="javascript:document.getElementById('frm${item.id}').submit();return false;"><img class="icon-share" src="/images/blank.gif" alt="" /></a>
 			  {{if item.title}}<input type="hidden" name="title" value="${item.title}" />{{/if}}
 			  {{if item.title || item.description || item.body}}<input type="hidden" name="description" value="${item.title || item.description || item.body}" />{{/if}}
 			  {{if item.permaLink || item.link}}<input type="hidden" name="link" value="${item.permaLink || item.link}" />{{/if}}
@@ -139,19 +140,18 @@
                             <input type="hidden" name="extenclosure[${e}][type]" value="${enclosure.type}" />
                             <input type="hidden" name="extenclosure[${e}][length]" value="${enclosure.length}" />
                           {{/each}}
-			  <input type="hidden" name="source[url]" value="${feedUrl}" />
-			  <input type="hidden" name="source[title]" value="${feedTitle}" />
+					  <input type="hidden" name="source[url]" value="${feedUrl}" />
+					  <input type="hidden" name="source[title]" value="${feedTitle}" />
 			  </form>
                           </div>
+-->
 			<?}?>
-	                {{if item.sticky}}<a class="aUnSticky" href="#" data-id="${item.id}"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>{{/if}}
                     </div>
 		    </div>
                     <div class="footclear"></div>
                 </div>
 
 	    <!-- Other items that reference this item's origin value. -->
-	    {{if subitem}}<hr style="border-top:solid #bbb 1px;" />{{/if}}
 	    {{each(i,subitem) subitem}}
 		<div class="subitem{{if subitem.sticky}} sticky{{/if}}" id="${subitem.id}">
                     {{if subitem.avatarUrl}}<img class="rivermicrotar" src="${subitem.avatarUrl}" alt="" />{{/if}}
@@ -177,12 +177,16 @@
 		<div class="footclear"></div>           
 	    {{/each}}
 
-            </div>
-
-
+            </li>
         {{/each}}
-
-        </div>
-
     {{/each}}
+     </ul>
    </div>
+
+    <!-- /*This is the stream information*/ -->
+    <div id="stream-header">
+        <div id="stream-updated">
+          <span class="river-timestamp">Updated <span class="time">${dateFormat(metadata.whenGMT, 'timeDate')}</span></span>
+          <span class="river-stats">Items: <span id="spnItemCount"></span> <a href="${River.settings.url}">JSON</a></span>
+        </div>
+    </div>

@@ -376,7 +376,7 @@ $(document).ready( function() {
 
 
 	//##: ----------------------------------
-	//Expand people on hover
+	//Expand people on click
 	//##: ----------------------------------
         $('#divSubscribePeople .ulPeople .liPerson').click( function() {
 		hidePeople('#divSubscribePeople .ulPeople .liPerson');
@@ -400,6 +400,7 @@ $(document).ready( function() {
 	//##: ----------------------------------
 	//Expand lists on hover
 	//##: ----------------------------------
+	/*
         $('.ulManagedLists .liManagedList').hover(
 		function() {
 			$(this).children('.outlineList').show();
@@ -418,6 +419,7 @@ $(document).ready( function() {
 			$(this).children('.outlineList').hide();
 		}
 	);
+	*/
 	//##: ----------------------------------
 	//##: ----------------------------------
 

@@ -67,10 +67,6 @@ $(document).ready( function() {
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar_postauth"?>
 
-<div class="row page-header" id="divPageTitle">
-	<h1><?echo get_user_name_from_uid($uid)?><small><span id="message"></span></small></h1>
-</div>
-
 <?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
 

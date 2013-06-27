@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 18;
+$cg_database_version = 21;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -207,6 +207,40 @@ $cg_database_updates[17][] = <<<CGDB0043
 CGDB0043;
 //----------------------------------------------------------------------------------------------------------------
 
+//Version 18 to 19 -------------------------------------------------------------------------------------------------
+$cg_database_updates[18][] = <<<CGDB0044
+ ALTER TABLE `prefs` ADD `rivercolumns` INT NOT NULL DEFAULT '0' COMMENT 'Number of columns on river page.'
+CGDB0044;
+
+$cg_database_updates[18][] = <<<CGDB0045
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '19' )
+CGDB0045;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 19 to 20 -------------------------------------------------------------------------------------------------
+$cg_database_updates[19][] = <<<CGDB0046
+ ALTER TABLE `microblog` ADD `target` VARCHAR( 700 ) NOT NULL COMMENT 'Url of target individual for this post.'
+CGDB0046;
+
+$cg_database_updates[19][] = <<<CGDB0047
+ ALTER TABLE `nfitems` ADD `target` VARCHAR( 700 ) NOT NULL COMMENT 'Url of target individual for this post.'
+CGDB0047;
+
+$cg_database_updates[19][] = <<<CGDB0048
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '20' )
+CGDB0048;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 20 to 21 -------------------------------------------------------------------------------------------------
+$cg_database_updates[20][] = <<<CGDB0049
+ UPDATE `prefs` SET stylesheet = '' WHERE 1
+CGDB0049;
+
+$cg_database_updates[20][] = <<<CGDB0050
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '21' )
+CGDB0050;
+//----------------------------------------------------------------------------------------------------------------
+
 
 ?>
 
@@ -216,14 +250,14 @@ CGDB0043;
 // ----- Database utility functions
 
 //_______________________________________________________________________________________
-//Check if the given user id actually exists in the system
+//Check for the current database version
 function get_database_version()
 {
   //Includes
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get the database version number
   $stmt = "SELECT version FROM $table_dbversion ORDER BY version DESC LIMIT 1";
@@ -235,15 +269,15 @@ function get_database_version()
     loggit(3,"Error executing query for database version.");
     return(FALSE);
   }
-  $sql->store_result() or print(mysql_error());
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   if($sql->num_rows() != 1) {
-    $sql->close() or print(mysql_error());
+    $sql->close() or loggit(2, "MySql error: ".$dbh->error);
     loggit(3,"Too many, or not enough, records returned for database version.");
     return(FALSE);
   }
-  $sql->bind_result($cdbversion) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($cdbversion) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
 
   loggit(3,"Database version: [$cdbversion]");
@@ -261,7 +295,7 @@ function apply_all_database_updates()
   global $cg_database_updates;
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get the current database version
   $error = FALSE;
@@ -288,7 +322,7 @@ function apply_all_database_updates()
       }
       if ($dbh->errno) {
         loggit(3, "DATABASE UPGRADE ERROR ON [$i]: ".print_r($dbh->error, TRUE));
-        $dbh->close() or print(mysql_error());
+        $dbh->close() or loggit(2, "MySql error: ".$dbh->error);
         return(FALSE);
       }
 
@@ -296,13 +330,13 @@ function apply_all_database_updates()
       $dbversion = get_database_version();
       if( $dbversion == FALSE ) {
         loggit(3,"The last database update: [$dbversion] did not apply correctly.");
-        $dbh->close() or print(mysql_error());
+        $dbh->close() or loggit(2, "MySql error: ".$dbh->error);
         return(FALSE);
       }
 
       if( $dbversion == $cg_database_version ) {
         loggit(3,"Database is current at version: [$dbversion].");
-        $dbh->close() or print(mysql_error());
+        $dbh->close() or loggit(2, "MySql error: ".$dbh->error);
         return(TRUE);
       } else {
         loggit(3,"Database now at version: [$dbversion].");
@@ -311,10 +345,46 @@ function apply_all_database_updates()
 
 
   //Close connection and bail
-  $dbh->close() or print(mysql_error());
+  $dbh->close() or loggit(2, "MySql error: ".$dbh->error);
   return(FALSE);
 }
 
+//_______________________________________________________________________________________
+//Check if the database actually has a good schema
+function check_database_sanity()
+{
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+
+  //Connect to the database server
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+
+  //Get the database version number
+  $stmt = "SELECT table_name FROM information_schema.tables WHERE table_schema = ? and table_name = ?";
+  if( ($sql=$dbh->prepare($stmt)) === FALSE ) {
+    loggit(3,"Error preparing to query schema.");
+    return(FALSE);
+  }
+  if( $sql->bind_param("ss", $dbname, $table_user) === FALSE ) {
+    loggit(3,"Error binding parameters for schema check.");
+    return(FALSE);
+  }
+  if( $sql->execute() === FALSE ) {
+    loggit(3,"Error executing query for schema check.");
+    return(FALSE);
+  }
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
+  if($sql->num_rows() != 1) {
+    $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    loggit(3,"Too many, or not enough, records returned for database version.");
+    return(FALSE);
+  }
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+
+
+  loggit(3,"Users table present. Database schema appears sane.");
+  return( TRUE );
+}
 
 
 ?>

@@ -1,6 +1,7 @@
 </div>
 </div>
 
+<?if( isset($g_uid) ){?>
 <!-- JS API Pointers -->
 <div id="cgiUrls" style="display:none;" 
 data-unsubscribe="<?echo $unsubpage?>" 
@@ -16,9 +17,8 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 
 
 <!-- Global Modals -->
-
 <!-- Microblog Post -->
-<div id="mdlMicroblogPost" class="modal hide fade" tabindex="-1">
+<div id="mdlMicroblogPost" class="modal hide fade fcmodal" tabindex="-1">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h4 class="title">Microblog Post</h4>
@@ -35,7 +35,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
         	</div>
 	
 		<!-- Attach files button -->
-                <?if( (s3_is_enabled($uid) || sys_s3_is_enabled()) && ($device != "ipad" && $device != "iphone" && $device != "wphone") ) {?>
+                <?if( (s3_is_enabled($g_uid) || sys_s3_is_enabled()) && ($device != "ipad" && $device != "iphone" && $device != "wphone") ) {?>
                 <a class="pull-right" id="btnAttachFile" title="Attach enclosures."><img class="icon-attach" src="/images/blank.gif" alt="" /></a>
                 <?}?>
 
@@ -66,7 +66,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 		</div>
 
                 <!-- Enclosure drop zone. -->
-                <?if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {?>
+                <?if( s3_is_enabled($g_uid) || sys_s3_is_enabled() ) {?>
                 <div id="divEnclosures" class="dropzone hide">
                         <input type="hide" name="datestamp" class="datestamp" value="" />
                         <div id="queue"><span id="spnQueueText">Drop file(s) here...</span></div>
@@ -102,14 +102,14 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
     <?if( twitter_is_enabled($g_uid) ) {?>
     <span class="tweeters"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt="" /><span class="warntweet hide">Tweet will be truncated...</span></span>
     <?}?>
-    <button type="button" class="btn btn-primary mbsubmit pull-right" aria-hidden="true">Post It!</button>
+    <button type="button" class="btn btn-success mbsubmit pull-right" aria-hidden="true">Post It!</button>
   </div>
 </div>
 <!-- Microblog Post -->
 
 
 <!-- Social Outline View/Subscribe -->
-<div id="mdlSocialOutlineView" class="modal hide fade" tabindex="-1">
+<div id="mdlSocialOutlineView" class="modal hide fade fcmodal" tabindex="-1">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h4 class="soname">&nbsp;</h4>
@@ -162,7 +162,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 <!-- Show article modal dialog -->
 
 <!-- Media display shadow box modal -->
-<div id="mdlMediaShadowbox" class="modal hide fade" tabindex="-1">
+<div id="mdlMediaShadowbox" class="modal hide fade fcmodal" tabindex="-1">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h4 class="artitle">&nbsp;</h4>
@@ -178,9 +178,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
   </div>
 </div>
 <!-- Media display shadow box modal -->
-
 <!-- Global Modals -->
-
 
 <!-- End-of-body content -->
 <script>
@@ -189,4 +187,4 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 <script>
 <?include "$confroot/$scripts/global-postload.js"?>
 </script>
-
+<?}?>

@@ -17,25 +17,50 @@
 <title><?echo $company_name?></title>
 <?include "$confroot/$templates/$template_html_styles"?>
 <?include "$confroot/$templates/$template_html_scripts"?>
-<script type="text/javascript">
-<!--
+<script>
         $(document).ready(function() {
-		$('#loginForm').validate({
-			errorPlacement: function(error, element) {
-				element.parent().next().empty();
-				error.appendTo( element.parent().next() );
+		var btnClicked = 'login';
+
+		//Login button
+		$('#aLogin').click( function() {
+			$('#loginForm').attr('action', '/cgi/auth/login');
+			$('#loginForm').submit();
+			return false;
+		});
+
+		//Register button
+		$('#aRegister').click( function() {
+			$('#loginForm').attr('action', '/cgi/auth/register');
+			$('#loginForm').submit();
+			return false;
+		});
+
+        //Ajaxify the login form
+        $('#loginForm').ajaxForm({
+	        cache:          false,
+            clearForm:      true,
+            resetForm:      true,
+            timeout:        30000,
+			beforeSubmit:   function(data) {
+				$('a#aLogin').attr('disabled', true);
+    	        $('h3.msg').html('<img src="/images/spinner.gif" /> Logging in...');
 			},
-			messages: {
-				email: {
-					required: " Email required."
-				},
-				password: {
-					required: " Password required."
+            success:        function(data) {
+	            if(data.status == "false") {
+    	            $('h3.msg').html( data.description );
+                } else {
+					window.location = data.goloc;
 				}
+			},
+			error:			function(x, t, m) {
+				$('a#aLogin').attr('disabled', false);
+   	            $('h3.msg').html('Error: ' + m + ' (' + t + ')');
 			}
 		});
+
+		//Show the elements
+		$('#divLoginFrame').show();
 	});
--->
 </script>
 </head>
 <?include "$confroot/$templates/$template_html_posthead"?>
@@ -47,18 +72,28 @@
 <?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
 
-    <div id="divLoginFrame">
+    <div id="divLoginFrame" class="row hide">
+    <center>
 	<div id="divLoginInner">
-	    <form id="loginForm" action="/cgi/auth/login" method="post">
-		<label class="lblLoginLabel" id="lblUsername" for="txtUsername"><h2>Username:</h2></label>
-		  <input id="txtUsername" name="email" class="txtinput required" type="text" />
-		<label class="lblLoginLabel" id="lblPassword" for="txtPassword"><h2>Password:</h2></label>
-                  <input id="txtPassword" name="password" class="txtinput required password" type="password" />
-		<br/><input id="submit" name="submit" class="btn pull-right" type="submit" value="Login" />
+	    <form id="loginForm" action="/cgi/auth/login" method="post" class="form-horizontal">
+		<input id="txtUsername" name="email" class="txtinput required" placeholder="Username" type="text" />
+		<input id="txtPassword" name="password" class="txtinput required password" placeholder="Password" type="password" />
+		<input type="hidden" name="type" value="json" />
+
+		<?if( $g_platform == "mobile" ) {?><br/><br/><?}?>
+
+        <a id="aLogin" class="btn" href="#">Login</a>
+        <?if( $cg_opensignup == 1 ) {?> or <a id="aRegister" class="btn" href="#">Register</a><?}?>
 	    </form>
 	</div>
+	<br/>
+        <h3 class="msg text-error"></h3>
+    </center>
     </div>
 
+    <noscript>
+        <center><h3 class="text-error">This site doesn't work without javascript.</h3></center>
+    </noscript>
 
 <?//--- Include the footer bar html fragments -----------?>
 <?include "$confroot/$templates/$template_html_footerbar"?>

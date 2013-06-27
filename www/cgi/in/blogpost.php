@@ -203,7 +203,14 @@ loggit(1, "User: [$uid]'s static files were rebuilt.");
 //Log it
 loggit(1,"User: [$uid] posted a new blog: [$pid].");
 $jsondata['pid'] = $pid;
-
+$jsondata['post'] = array(
+	'id' 		=> $pid,
+	'body' 		=> $content,
+	'link'		=> $url,
+	'title'		=> $title,
+	'avatarUrl'	=> $g_prefs['avatarurl'],
+	'pubDate'	=> date("D, d M Y H:i:s O")
+);
 $jsondata['status'] = "true";
 $jsondata['description'] = "Blog was posted.";
 

@@ -22,10 +22,6 @@
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar"?>
 
-<div class="row page-header" id="divPageTitle">
-	<h1><?echo $tree_location?></h1>
-</div>
-
 <?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
 
@@ -50,7 +46,7 @@
 		<li>Confirm: <input name="password2" class="urlinput" type="text" value="" /></li>
 		<div class="buttonline">
 		<img class="imgSpinner imgSpinnerPwd" src="/images/spinner.gif" />
-		<button id="btnPwdSubmit" class="btn btn-primary" type="submit">Change</button>
+		<button id="btnPwdSubmit" class="btn" type="submit">Change</button>
 		</div>
 	</ul>
 	</fieldset>
@@ -63,7 +59,7 @@
 	<div id="divPref" class="control-group">
 
 	<div class="divPrefPane">
-	<div class="divPrefSubmit pull-right divPrefMe"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
+	<div class="divPrefSubmit pull-right divPrefMe"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Me</h3>
 	<ul>
         <div class="control-group">
@@ -90,7 +86,7 @@
 	</div>
 
 	<div class="divPrefPane">
-	<div class="divPrefSubmit pull-right divPrefAmazon"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
+	<div class="divPrefSubmit pull-right divPrefAmazon"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Amazon S3</h3>
 	<ul>
         	<div class="control-group">
@@ -113,7 +109,7 @@
 	</div>
 
 	<div class="divPrefPane">
-	<div class="divPrefSubmit pull-right divPrefRiver"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
+	<div class="divPrefSubmit pull-right divPrefRiver"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Subscriptions</h3>
 	<ul>
 		<li class="privacy"><input name="opensubs" type="checkbox" <?if ($prefs['opensubs'] == 1) echo "checked ";?>/> Allow open subscriptions.</li>
@@ -121,9 +117,10 @@
 	</div>
 
 	<div class="divPrefPane">
-	<div class="divPrefSubmit pull-right divPrefRiver"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
+	<div class="divPrefSubmit pull-right divPrefRiver"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>River</h3>
 	<ul>
+		<li>I want: <input id="rivercolumns" class="hourinput" name="rivercolumns" type="text" value="<?echo $prefs['rivercolumns']?>" /> columns on my river page. [0 for auto]</li>
 		<li>I want: <input id="riverhours" class="hourinput" name="riverhours" type="text" value="<?echo $prefs['riverhours']?>" /> hours worth of items listed in my river.</li>
 		<li>But, never show more than: <input class="hourinput" name="maxriversize" type="text" value="<?echo $prefs['maxriversize']?>" /> items at a time.</li>
 		<li>And, never show more than: <input class="hourinput" name="maxriversizemobile" type="text" value="<?echo $prefs['maxriversizemobile']?>" /> items while on mobile.</li>
@@ -143,7 +140,7 @@
 	</div>
 
 	<div class="divPrefPane">
-	<div class="divPrefSubmit pull-right divPrefMicroblog"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
+	<div class="divPrefSubmit pull-right divPrefMicroblog"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Microblog</h3>
 	<ul>
 		<li>My microblog title should be: <input name="microblogtitle" class="urlinput" type="text" value="<?echo $prefs['microblogtitle']?>" /></li>
@@ -159,7 +156,7 @@
 	</div>
 
 	<div class="divPrefPane">
-	<div class="divPrefSubmit pull-right divPrefArticles"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
+	<div class="divPrefSubmit pull-right divPrefArticles"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Articles</h3>
 	<ul>
 		<li>My article archive title should be: <input name="cartularytitle" class="urlinput" type="text" value="<?echo $prefs['cartularytitle']?>" /></li>
@@ -173,7 +170,7 @@
 	</div>
 
 	<div class="divPrefPane">
-	<div class="divPrefSubmit pull-right divPrefLinks"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
+	<div class="divPrefSubmit pull-right divPrefLinks"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Links</h3>
 	<ul>
 		<li><input name="sourceurlrt" type="checkbox" <?if ($prefs['sourceurlrt'] == 1) echo "checked ";?>/> I want RT links to use the original source url.</li>
@@ -182,7 +179,7 @@
 	</div>
 
 	<div class="divPrefPane">
-	<div class="divPrefSubmit pull-right divPrefStyle"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
+	<div class="divPrefSubmit pull-right divPrefStyle"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Style</h3>
 	<ul>
 	        <div class="control-group">
@@ -195,7 +192,7 @@
 	</div>
 
 	<div class="divPrefPane">
-	<div class="divPrefSubmit pull-right divPrefTwitter"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
+	<div class="divPrefSubmit pull-right divPrefTwitter"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Twitter <small>(Create app <a href="https://dev.twitter.com/apps/new">here</a>. Instructions <a href="https://groups.google.com/d/msg/sopml/fbMd0cWPzRk/84mMoDM4BEsJ">here</a>.)</small></h3>
 	<ul>
         	<div class="control-group">
@@ -214,7 +211,7 @@
 	</div>
 
 	<div class="divPrefPane">
-	<div class="divPrefSubmit pull-right divPrefShortener"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-primary" type="submit">Save</button></div>
+	<div class="divPrefSubmit pull-right divPrefShortener"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Url Shortener</h3>
 	<ul>
 	        <div class="control-group">

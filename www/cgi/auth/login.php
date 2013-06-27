@@ -2,15 +2,30 @@
 <?include "$confroot/$templates/php_cgi_init_noauth.php"?>
 <?
 
+
 // Get the input
 $email=$_POST['email'];
 $password=$_POST['password'];
+$type = $_POST['type'];
+
+if( $type == 'json' ) {
+  //Set up json
+  header("Content-Type: application/json");
+  $jsondata = array();
+  $jsondata['fieldname'] = "";
+}
 
 // Is it blank?
 if(empty($email) || empty($password)) {
   //Log it
   loggit(2,"The email[$email] or password[$password] was blank.");
-  header("Location: $loginerrorpage?code=0");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Bad credentials.";
+    echo json_encode($jsondata);
+  } else {
+    header("Location: $loginerrorpage?code=0");
+  }
   exit(1);
 }
 
@@ -22,7 +37,13 @@ $password = htmlentities($password);
 if( (preg_match("/.{6,320}/",$email)==0) || (preg_match("/.{6,128}/",$password)==0) ) {
   //Log it
   loggit(2,"The email: [$email] or password: [$password] given isn't a sane length.");
-  header("Location: $loginerrorpage?code=30");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Bad credentials.";
+    echo json_encode($jsondata);
+  } else {
+    header("Location: $loginerrorpage?code=30");
+  }
   exit(1);
 }
 
@@ -30,7 +51,13 @@ if( (preg_match("/.{6,320}/",$email)==0) || (preg_match("/.{6,128}/",$password)=
 if(get_user_id_from_email($email) == "none") {
   //Log it
   loggit(2,"The email[$email] given doesn't exist.");
-  header("Location: $loginerrorpage?code=6");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Bad credentials.";
+    echo json_encode($jsondata);
+  } else {
+    header("Location: $loginerrorpage?code=6");
+  }
   exit(1);
 }
 
@@ -38,7 +65,13 @@ if(get_user_id_from_email($email) == "none") {
 if(badlogin_check($email) == FALSE) {
   //Log it
   loggit(2,"Bad login count exceeded for: [$email]");
-  header("Location: $loginerrorpage?code=8");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Too many bad logins. Wait for reset.";
+    echo json_encode($jsondata);
+  } else {
+    header("Location: $loginerrorpage?code=8");
+  }
   exit(1);
 }
 
@@ -49,7 +82,13 @@ if($uid == FALSE) {
   loggit(2,"Login attempt failed for: [$email | $password].");
   //Increment the bad attempt counter
   badlogin_inc($email);
-  header("Location: $loginerrorpage?code=2");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Bad credentials.";
+    echo json_encode($jsondata);
+  } else {
+    header("Location: $loginerrorpage?code=2");
+  }
   exit(1);
 } else {
   badlogin_reset($email);
@@ -67,12 +106,19 @@ badlogin_reset($email);
 //Make a new session
 if( ($sid = new_session($uid)) == FALSE ) {
   loggit(2,"Could not create session: [$uid]");
-  header ("Location: $loginerrorpage?code=4");
+  if( $type == 'json' ) {
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Session creation error.";
+    echo json_encode($jsondata);
+  } else {
+    header ("Location: $loginerrorpage?code=4");
+  }
   exit(1);
 }
 
 //Make a cookie for this session
 setcookie($sidcookie, $sid, 0, "/");
+
 
 //Is this the first time this user is logging in?
 if(is_user_active($uid)) {
@@ -80,12 +126,26 @@ if(is_user_active($uid)) {
   if( !empty($_COOKIE[$postfollowcookie]) ) {
     $pfc = $_COOKIE[$postfollowcookie];
     loggit(3, "FOLLOW: $pfc");
-    header("Location: $pfc");
+    if( $type == 'json' ) {
+        $jsondata['goloc'] = $pfc;
+        $jsondata['status'] = "true";
+        $jsondata['description'] = "Login success. Redirecting.";
+        echo json_encode($jsondata);
+    } else {
+    	header("Location: $pfc");
+    }
     exit(0);
   }
 
   //Redirect to the start page
-  header("Location: $startpage");
+  if( $type == 'json' ) {
+      $jsondata['goloc'] = $startpage;
+      $jsondata['status'] = "true";
+      $jsondata['description'] = "Login success. Redirecting.";
+      echo json_encode($jsondata);
+  } else {
+      header("Location: $startpage");
+  }
 } else {
   //Log it
   loggit(3,"Redirecting new user: [$email | $uid] with sid: [$sid] to the activation page: [$activatepage].");
@@ -94,10 +154,24 @@ if(is_user_active($uid)) {
   $stg = get_activation_stage($uid);
   if($stg == 0) {
     set_activation_stage($uid, 1);
-    header("Location: $activatepage"."1");
+    if( $type == 'json' ) {
+        $jsondata['goloc'] = $activatepage."1";
+        $jsondata['status'] = "true";
+        $jsondata['description'] = "Login success. Redirecting.";
+        echo json_encode($jsondata);
+    } else {
+        header("Location: $activatepage"."1");
+    }
   } else {
     //Redirect to the activation page
-    header("Location: $activatepage".$stg);
+    if( $type == 'json' ) {
+        $jsondata['goloc'] = $activatepage.$stg;
+        $jsondata['status'] = "true";
+        $jsondata['description'] = "Login success. Redirecting.";
+        echo json_encode($jsondata);
+    } else {
+        header("Location: $activatepage".$stg);
+    }
   }
 }
 

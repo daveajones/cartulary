@@ -54,16 +54,10 @@
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar"?>
 
-<div class="row page-header" id="divPageTitle">
-        <h1><?echo $tree_location?>
-            <a href="<?echo $s3cartfeed?>" label="RSS"><img class="icon-rss" alt="" src="/images/blank.gif" /></a><a id="aOpmlExport" href="<?echo $s3cartopml?>" label="OPML"><img class="icon-opml" alt="" src="/images/blank.gif" /></a><small><span id="message"></span></small>
-        </h1>
-</div>
-
 <?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
 
-<div class="statline"><ul><li><a class="showall"><a href="?max=0"> Show all </a></li><?if($platform == "mobile") {?><li><a class="showdatepicker" href="#">Date Range</a></li><?}?></ul></div>
+<?if($platform == "mobile") {?><div class="statline"><ul><li><a class="showdatepicker" href="#">Date Range</a></li></ul></div><?}?>
 <div class="row" id="divArticleList">
 
         <div id="date-line">
@@ -77,10 +71,14 @@
               End: <input id="end-date" name="dend" class="txtDatePicker" type="text" disabled value="<?echo $dend?>" />
             </div>
 	    </div>
-            <input id="btnSubmitDates" type="submit" class="btn btn-primary" name="submitdateget" value="Get" />
+            <input id="btnSubmitDates" type="submit" class="btn btn-success" name="submitdateget" value="Get" />
+		<div style="float:left;clear:both;">
+          <a href="<?echo $s3cartfeed?>" label="RSS"><img class="icon-rss" alt="" src="/images/blank.gif" /></a><a id="aOpmlExport" href="<?echo $s3cartopml?>" label="OPML"><img class="icon-opml" alt="" src="/images/blank.gif" /></a>
+		</div>
           </fieldset>
 	</form>
         </div>
+
 
         <?
         //If a date range of articles was requested, we need to honor that

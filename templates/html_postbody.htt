@@ -1,3 +1,4 @@
+<?if( isset($g_uid) ){?>
 <!-- Search templates -->
 <script id="search-river" type="text/x-jquery-tmpl">
 <?include "$confroot/$scripts/search-River-temp.js"?>
@@ -15,3 +16,4 @@
 <?include "$confroot/$scripts/search-People-temp.js"?>
 </script>
 <!-- ---------------- -->
+<?}?>

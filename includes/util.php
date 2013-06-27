@@ -145,7 +145,7 @@ function get_system_message($id = NULL, $type = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $stmt="SELECT message FROM $table_string WHERE id=? AND type=?";
@@ -1279,14 +1279,14 @@ function update_last_shortcode($uid = NULL, $shortcode = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_prefs SET lastshortcode=? WHERE uid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $shortcode, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $shortcode, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Set last shortcode to: [$shortcode] for user: [$uid].");

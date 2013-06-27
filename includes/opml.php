@@ -109,23 +109,23 @@ function outline_exists($url = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT id FROM $table_sopml_outlines WHERE url=?") or print(mysql_error());
-  $sql->bind_param("s", $url) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id FROM $table_sopml_outlines WHERE url=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $url) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The outline at url: [$url] does not exist in the repository.");
     return(FALSE);
   }
-  $sql->bind_result($oid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"The outline: [$oid] at url: [$url] does exist in the repository.");
   return($oid);
@@ -146,23 +146,23 @@ function outline_exists_by_id($id = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT id FROM $table_sopml_outlines WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id FROM $table_sopml_outlines WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The outline: [$id] does not exist in the repository.");
     return(FALSE);
   }
-  $sql->bind_result($oid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"The outline: [$oid] does exist in the repository.");
   return(TRUE);
@@ -187,26 +187,26 @@ function outline_item_exists($oid = NULL, $item = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Text content of the item
   $content = (string)$item->attributes()->text;
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT id,content FROM $table_sopml_outlineitems WHERE oid=? AND conthash=?") or print(mysql_error());
-  $sql->bind_param("ss", $oid, md5($content)) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id,content FROM $table_sopml_outlineitems WHERE oid=? AND conthash=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $oid, md5($content)) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The outline item does not exist in the repository.");
     return(FALSE);
   }
-  $sql->bind_result($iid,$content) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($iid,$content) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(3,"The outline item: [$iid | $content] already exists.");
   return(TRUE);
@@ -227,17 +227,17 @@ function get_outline_subscriber_count($oid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the catalog
-  $sql=$dbh->prepare("SELECT oid FROM $table_sopml_catalog WHERE oid=?") or print(mysql_error());
-  $sql->bind_param("s", $oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT oid FROM $table_sopml_catalog WHERE oid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if any rows came back
   $subcount = $sql->num_rows();
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"The outline: [$oid] has: [$subcount] subscribers.");
   return($subcount);
@@ -258,23 +258,23 @@ function get_outline_subscribers($oid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the catalog
-  $sql=$dbh->prepare("SELECT uid FROM $table_sopml_catalog WHERE oid=?") or print(mysql_error());
-  $sql->bind_param("s", $oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT uid FROM $table_sopml_catalog WHERE oid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there are any subscribers to this feed
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Outline: [$oid] has no subscribers.");
     return(FALSE);
   }
 
-  $sql->bind_result($uid) or print(mysql_error());
+  $sql->bind_result($uid) or loggit(2, "MySql error: ".$dbh->error);
 
   $users = array();
   $count = 0;
@@ -284,7 +284,7 @@ function get_outline_subscribers($oid = NULL)
   }
   $subcount = count($users);
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning an array of: [$subcount] user id's for outline: [$oid].");
   return($users);
@@ -305,17 +305,17 @@ function get_outline_item_count($oid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT id FROM $table_sopml_items WHERE oid=?") or print(mysql_error());
-  $sql->bind_param("s", $oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id FROM $table_sopml_items WHERE oid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if any rows came back
   $itemcount = $sql->num_rows();
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"The outline: [$oid] has: [$itemcount] items.");
   return($itemcount);
@@ -336,15 +336,15 @@ function get_items_by_outline_id($oid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT id,content,attributes,timeadded FROM $table_sopml_items WHERE oid=?") or print(mysql_error());
-  $sql->bind_param("s", $oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id,content,attributes,timeadded FROM $table_sopml_items WHERE oid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
-  $sql->bind_result($iid,$content,$attributes,$timeadded) or print(mysql_error());
+  $sql->bind_result($iid,$content,$attributes,$timeadded) or loggit(2, "MySql error: ".$dbh->error);
 
   $items = array();
   $count = 0;
@@ -355,7 +355,7 @@ function get_items_by_outline_id($oid = NULL)
   $subcount = count($items);
 
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$itemcount] items for outline: [$oid].");
   return($items);
@@ -376,7 +376,7 @@ function get_outline_info($id = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $sql=$dbh->prepare("SELECT title,
@@ -393,14 +393,14 @@ function get_outline_info($id = NULL)
                              filename
                       FROM $table_sopml_outlines
                       WHERE id=?")
-  or print(mysql_error());
-  $sql->bind_param("s", $id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Failed to retrieve info for outline id: [$id]");
     return(FALSE);
   }
@@ -417,10 +417,10 @@ function get_outline_info($id = NULL)
 		    $outline['ownerid'],
 		    $outline['control'],
 		    $outline['filename']
-  ) or print(mysql_error());
+  ) or loggit(2, "MySql error: ".$dbh->error);
 
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //loggit(3,"Returning info for outline: [$id]");
   //loggit(3,"Returning url for outline: [".$outline['url']."]");
@@ -442,23 +442,23 @@ function get_outline_content($id = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT content FROM $table_sopml_outlines WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT content FROM $table_sopml_outlines WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Failed to retrieve content for outline: [$id]");
     return(FALSE);
   }
-  $sql->bind_result($content) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($content) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //loggit(1,"Returning info for outline: [$id]");
   return($content);
@@ -479,7 +479,7 @@ function add_outline($url = NULL, $uid = NULL, $type = '')
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Timestamp
   $id = random_gen(128);
@@ -489,10 +489,10 @@ function add_outline($url = NULL, $uid = NULL, $type = '')
   if($oid == FALSE) {
     //Now that we have a good id, put the outline into the database
     $stmt = "INSERT INTO $table_sopml_outlines (id,url,type) VALUES (?,?,?)";
-    $sql=$dbh->prepare($stmt) or print(mysql_error());
-    $sql->bind_param("sss", $id,$url,$type) or print(mysql_error());
-    $sql->execute() or print(mysql_error());
-    $sql->close() or print(mysql_error());
+    $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_param("sss", $id,$url,$type) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+    $sql->close() or loggit(2, "MySql error: ".$dbh->error);
   } else {
     $id = $oid;
   }
@@ -522,7 +522,7 @@ function add_social_outline($url = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Timestamp
   $id = random_gen(128);
@@ -533,10 +533,10 @@ function add_social_outline($url = NULL, $uid = NULL)
   if($oid == FALSE) {
     //Now that we have a good id, put the outline into the database
     $stmt = "INSERT INTO $table_sopml_outlines (id,url,type) VALUES (?,?,?)";
-    $sql=$dbh->prepare($stmt) or print(mysql_error());
-    $sql->bind_param("sss", $id,$url,$type) or print(mysql_error());
-    $sql->execute() or print(mysql_error());
-    $sql->close() or print(mysql_error());
+    $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_param("sss", $id,$url,$type) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+    $sql->close() or loggit(2, "MySql error: ".$dbh->error);
   } else {
     $id = $oid;
   }
@@ -573,14 +573,14 @@ function update_outline_content($id = NULL, $content = NULL)
   $tstamp = time();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_sopml_outlines SET content=?,lastupdate=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sss", $content,$tstamp,$id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("sss", $content,$tstamp,$id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Updated content for outline: [$id].");
@@ -605,14 +605,14 @@ function update_outline_lastmod($id = NULL, $lastmod = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_sopml_outlines SET lastmod=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $lastmod,$id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $lastmod,$id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Updated last-modified time to: [$lastmod] for outline: [$id].");
@@ -640,14 +640,14 @@ function update_outline_title($id = NULL, $title = NULL)
   $title = trim($title);
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_sopml_outlines SET title=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $title,$id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $title,$id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Updated title to: [$title] for outline: [$id].");
@@ -676,14 +676,14 @@ function update_outline_type($id = NULL, $type = NULL)
   $type = trim($type);
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_sopml_outlines SET type=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $type,$id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $type,$id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Updated type to: [$type] for outline: [$id].");
@@ -709,14 +709,14 @@ function update_outline_ownername($id = NULL, $name = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_sopml_outlines SET ownername=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $name,$id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $name,$id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Updated owner name to: [$name] for outline: [$id].");
@@ -741,14 +741,14 @@ function update_outline_avatar($id = NULL, $url = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_sopml_outlines SET avatarurl=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $url,$id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $url,$id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Updated avatar url to: [$url] for outline: [$id].");
@@ -774,14 +774,14 @@ function update_outline_link($id = NULL, $url = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_sopml_outlines SET url=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $url,$id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $url,$id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Updated link url to: [$url] for outline: [$id].");
@@ -807,14 +807,14 @@ function update_outline_lastcheck($id = NULL, $lastcheck = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article into the database
   $stmt = "UPDATE $table_sopml_outlines SET lastcheck=? WHERE id=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $lastcheck,$id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $lastcheck,$id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Updated lastcheck time to: [$lastcheck] for outline: [$id].");
@@ -840,21 +840,21 @@ function outline_is_linked($oid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT * FROM $table_sopml_catalog WHERE oid=? AND uid=?") or print(mysql_error());
-  $sql->bind_param("ss", $oid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT * FROM $table_sopml_catalog WHERE oid=? AND uid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $oid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if any rows came back
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The outline: [$oid] is NOT linked to user: [$uid].");
     return(FALSE);
   }
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"The outline: [$oid] IS linked to user: [$uid].");
   return(TRUE);
@@ -883,14 +883,14 @@ function link_outline_to_user($oid = NULL, $uid = NULL)
   $color = random_gen(6, 'abcdef');
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Link the article to the user
   $stmt = "INSERT INTO $table_sopml_catalog (uid,oid,linkedon,color) VALUES (?,?,?,?)";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ssss", $uid,$oid,$tstamp,$color) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssss", $uid,$oid,$tstamp,$color) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Linked outline: [$oid] with user: [$uid] and color: [$color].");
@@ -913,7 +913,7 @@ function get_outlines($uid = NULL, $max = NULL, $otype = NULL, $ididx = NULL)
   require_once "$confroot/$includes/feeds.php";
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Grab all the outlines that link to this user
   $sqltxt = "SELECT $table_sopml_outlines.id,
@@ -941,24 +941,24 @@ function get_outlines($uid = NULL, $max = NULL, $otype = NULL, $ididx = NULL)
   }
 
   //loggit(3, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
   if($otype != NULL) {
-    $sql->bind_param("ss", $uid, $otype) or print(mysql_error());
+    $sql->bind_param("ss", $uid, $otype) or loggit(2, "MySql error: ".$dbh->error);
   } else {
-    $sql->bind_param("s", $uid) or print(mysql_error());
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
   }
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"This user has not subscribed to any outlines: [$uid]");
     return(FALSE);
   }
 
-  $sql->bind_result($id,$title,$url,$type,$linkedon,$avatarurl,$ownername,$ownerid,$control,$color) or print(mysql_error());
+  $sql->bind_result($id,$title,$url,$type,$linkedon,$avatarurl,$ownername,$ownerid,$control,$color) or loggit(2, "MySql error: ".$dbh->error);
 
   $outlines = array();
   $count = 0;
@@ -985,7 +985,7 @@ function get_outlines($uid = NULL, $max = NULL, $otype = NULL, $ididx = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] outlines for user: [$uid]");
   return($outlines);
@@ -1009,7 +1009,7 @@ function get_social_outlines($uid = NULL, $max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Grab all the outlines that link to this user
   $sqltxt = "SELECT $table_sopml_outlines.id,
@@ -1033,20 +1033,20 @@ function get_social_outlines($uid = NULL, $max = NULL)
   }
 
   //loggit(3, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("ss", $uid, $type) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $uid, $type) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any feeds for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"This user has not subscribed to any outlines: [$uid]");
     return(FALSE);
   }
 
-  $sql->bind_result($id,$title,$url,$type,$linkedon,$avatarurl,$ownername,$ownerid,$control) or print(mysql_error());
+  $sql->bind_result($id,$title,$url,$type,$linkedon,$avatarurl,$ownername,$ownerid,$control) or loggit(2, "MySql error: ".$dbh->error);
 
   $outlines = array();
   $count = 0;
@@ -1064,7 +1064,7 @@ function get_social_outlines($uid = NULL, $max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] outlines for user: [$uid]");
   return($outlines);
@@ -1089,15 +1089,15 @@ function unlink_outline_from_user($oid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_sopml_catalog WHERE uid=? AND oid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $uid, $oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $uid, $oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and leave
   loggit(1,"Unlinked: [$delcount] outline: [$oid] from user: [$uid].");
@@ -1492,7 +1492,7 @@ function get_all_outlines($max = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Grab all the outlines
   $sqltxt = "SELECT id,url,title,type FROM $table_sopml_outlines";
@@ -1502,19 +1502,19 @@ function get_all_outlines($max = NULL)
   }
 
   //loggit(3, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any outlines
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"There are no outlines in the system.");
-    return(FALSE);
+    return(array());
   }
 
-  $sql->bind_result($oid,$ourl,$otitle,$otype) or print(mysql_error());
+  $sql->bind_result($oid,$ourl,$otitle,$otype) or loggit(2, "MySql error: ".$dbh->error);
 
   $outlines = array();
   $count = 0;
@@ -1523,7 +1523,7 @@ function get_all_outlines($max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] outlines in the system.");
   return($outlines);
@@ -1551,7 +1551,7 @@ function add_outline_item($id = NULL, $item = NULL, $format = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Timestamp
   $iid = random_gen(128);
@@ -1562,10 +1562,10 @@ function add_outline_item($id = NULL, $item = NULL, $format = NULL)
 
   //Now that we have a good id, put the outline item into the database
   $stmt = "INSERT INTO $table_sopml_outlineitems (id,content,attributes,oid,timeadded,conthash) VALUES (?,?,?,?,?,?)";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ssssss", $iid,$content,$item->attributes(),$id,$timeadded,md5($content)) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssssss", $iid,$content,$item->attributes(),$id,$timeadded,md5($content)) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   //loggit(1,"Put a new outline item: [$iid] in for outline: [$id].");
@@ -1590,7 +1590,7 @@ function get_outline_as_html($uid = NULL, $max = NULL)
   $river = array();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the items that belong to feeds this user subscribes to
   $sqltxt = "SELECT $table_nfitem.id,$table_nfitem.title,$table_nfitem.url,$table_nfitem.timestamp,$table_nfitem.feedid,$table_nfitem.description
@@ -1604,20 +1604,20 @@ function get_outline_as_html($uid = NULL, $max = NULL)
   }
 
   loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any items returned
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"The user: [$uid] has an empty river.");
     return(FALSE);
   }
 
-  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$description) or print(mysql_error());
+  $sql->bind_result($id,$title,$url,$timestamp,$feedid,$description) or loggit(2, "MySql error: ".$dbh->error);
 
   $count = 0;
   while($sql->fetch()){
@@ -1638,7 +1638,7 @@ function get_outline_as_html($uid = NULL, $max = NULL)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] items in user: [$uid]'s river.");
   return($river);
@@ -1825,7 +1825,7 @@ function build_reading_list($title = NULL, $uid = NULL, $oid = NULL, $nos3 = FAL
   require_once "$confroot/$includes/feeds.php";
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Get username
   $username = get_user_name_from_uid($uid);
@@ -1902,10 +1902,10 @@ function build_reading_list($title = NULL, $uid = NULL, $oid = NULL, $nos3 = FAL
   //Now that we have a good id and a url, put the outline into the database
   if( empty($oid) ) {
     $stmt = "INSERT INTO $table_sopml_outlines (id,title,url,type,content,ownername,ownerid,control,filename) VALUES (?,?,?,'list',?,?,?,'local',?)";
-    $sql=$dbh->prepare($stmt) or print(mysql_error());
-    $sql->bind_param("sssssss", $id,$title,$url,$opml,$username,$uid,$filename) or print(mysql_error());
-    $sql->execute() or print(mysql_error());
-    $sql->close() or print(mysql_error());
+    $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_param("sssssss", $id,$title,$url,$opml,$username,$uid,$filename) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+    $sql->close() or loggit(2, "MySql error: ".$dbh->error);
   }
 
   //Now link the outline's id to this user's id
@@ -1961,7 +1961,7 @@ function purge_orphaned_outlines($type = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Find articles that have no linkage
   $stmt = "DELETE FROM $table_sopml_outlines WHERE NOT EXISTS ( SELECT * FROM $table_sopml_catalog WHERE $table_sopml_outlines.id = $table_sopml_catalog.oid )";
@@ -1969,15 +1969,15 @@ function purge_orphaned_outlines($type = NULL)
   //Type selection
   if( !empty($type) ) {
     $stmt .= " AND $table_sopml_outlines.type = ?";
-    $sql=$dbh->prepare($stmt) or print(mysql_error());
-    $sql->bind_param("s", $type) or print(mysql_error());
+    $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_param("s", $type) or loggit(2, "MySql error: ".$dbh->error);
   } else {
-    $sql=$dbh->prepare($stmt) or print(mysql_error());
+    $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
   }
 
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and leave
   loggit(3,"Deleted: [$delcount] orphaned outlines.");
@@ -1999,15 +1999,15 @@ function mark_all_outline_items_to_purge($oid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Database call
   $stmt = "UPDATE $table_sopml_outlineitems SET `purge`=1 WHERE oid=?";
   $sql=$dbh->prepare($stmt) or loggit(3, $dbh->error);
-  $sql->bind_param("s", $oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_param("s", $oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Marked: [$updcount] items in outline:[$oid] to purge.");
@@ -2029,15 +2029,15 @@ function unmark_all_outline_items_to_purge($oid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Update all the items
   $stmt = "UPDATE $table_sopml_outlineitems SET `purge`=0 WHERE oid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("s",$oid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $updcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s",$oid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $updcount = $sql->affected_rows;
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Un-marked: [$updcount] items in outline:[$oid] to purge.");

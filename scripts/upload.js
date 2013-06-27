@@ -77,6 +77,7 @@ $(document).ready( function() {
 		//Attach removers to extra elements
 		$('.aRemoveListItem').click(function() {
 			$(this).parent('li').remove();
+			return false;
 		});
 
 		//Expose drop zone when a drag and drop comes in

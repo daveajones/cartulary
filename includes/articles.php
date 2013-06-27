@@ -17,23 +17,23 @@ function article_exists($url = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT id FROM $table_article WHERE url=?") or print(mysql_error());
-  $sql->bind_param("s", $url) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id FROM $table_article WHERE url=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $url) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The article at url: [$url] does not exist in the repository.");
     return(FALSE);
   }
-  $sql->bind_result($articleid) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($articleid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"The article at url: [$url] is already in the repository.");
   return($articleid);
@@ -54,17 +54,17 @@ function get_article($id = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT id,title,url,shorturl,createdon,content,sourceurl,sourcetitle FROM $table_article WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id,title,url,shorturl,createdon,content,sourceurl,sourcetitle FROM $table_article WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Failed to retrieve article content for article id: [$id]");
     return(FALSE);
   }
@@ -77,9 +77,9 @@ function get_article($id = NULL, $uid = NULL)
                     $article['content'],
 		    $article['sourceurl'],
                     $article['sourcetitle']
-  ) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  ) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //If a user id was given, get those details
   if( !empty($uid) ) {
@@ -105,23 +105,23 @@ function get_article_analysis($id = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT analysis FROM $table_article WHERE id=?") or print(mysql_error());
-  $sql->bind_param("s", $id) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT analysis FROM $table_article WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $id) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Failed to retrieve article content for article id: [$id]");
     return(FALSE);
   }
-  $sql->bind_result($analysis) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($analysis) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Put the analysis text into an array
   $analarray = explode(',', $analysis);
@@ -140,16 +140,16 @@ function get_random_article()
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT id,title,url,shorturl,createdon,content,sourceurl,sourcetitle FROM $table_article ORDER BY RAND() LIMIT 1") or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT id,title,url,shorturl,createdon,content,sourceurl,sourcetitle FROM $table_article ORDER BY RAND() LIMIT 1") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(2,"Failed to retrieve article content for article id: [$id]");
     return(FALSE);
   }
@@ -162,9 +162,9 @@ function get_random_article()
                     $article['content'],
 		    $article['sourceurl'],
                     $article['sourcetitle']
-  ) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  ) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(3,"Returning article titled: [".$article['title']."] as a random article.");
   return($article);
@@ -209,7 +209,7 @@ function add_article($url = NULL, $title = NULL, $content = NULL, $analysis = NU
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Timestamp
   $id = random_gen(128);
@@ -225,10 +225,10 @@ function add_article($url = NULL, $title = NULL, $content = NULL, $analysis = NU
 
   //Now that we have a good id, put the article into the database
   $stmt = "INSERT INTO $table_article (id,url,title,content,analysis,createdon,shorturl,sourceurl,sourcetitle) VALUES (?,?,?,?,?,?,?,?,?)";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sssssssss", $id,$url,$title,$content,$analysis,$createdon,$shorturl,$sourceurl,$sourcetitle) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("sssssssss", $id,$url,$title,$content,$analysis,$createdon,$shorturl,$sourceurl,$sourcetitle) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Now link the article's id to this user's id
   if($uid != FALSE) {
@@ -260,7 +260,7 @@ function link_article_to_user($aid = NULL, $uid = NULL, $pub = FALSE)
   $tstamp = time();
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Check if public
   if($pub == TRUE) {
@@ -271,10 +271,10 @@ function link_article_to_user($aid = NULL, $uid = NULL, $pub = FALSE)
 
   //Link the article to the user
   $stmt = "INSERT INTO $table_catalog (userid,articleid,public,linkedon) VALUES (?,?,?,?)";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ssds", $uid,$aid,$publ,$tstamp) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ssds", $uid,$aid,$publ,$tstamp) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(1,"Linked article: [$aid] with user: [$uid].");
@@ -300,22 +300,22 @@ function user_can_view_article($aid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT userid FROM $table_catalog WHERE articleid=? AND (userid=? OR public=1)") or print(mysql_error());
-  $sql->bind_param("ss", $aid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT userid FROM $table_catalog WHERE articleid=? AND (userid=? OR public=1)") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $aid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"This user: [$uid] is not allowed to see article: [$aid].");
     return(FALSE);
   }
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"User: [$uid] is allowed to see article: [$aid].");
   return(TRUE);
@@ -344,7 +344,7 @@ function get_articles($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE)
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $sqltxt = "SELECT $table_article.id,
@@ -375,20 +375,20 @@ function get_articles($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE)
   }
 
   loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any articles for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No articles returned for user: [$uid] with given criteria.");
     return(array());
   }
 
-  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$clinkedon,$asourceurl,$asourcetitle) or print(mysql_error());
+  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$clinkedon,$asourceurl,$asourcetitle) or loggit(2, "MySql error: ".$dbh->error);
 
   $articles = array();
   $count = 0;
@@ -406,7 +406,7 @@ function get_articles($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] articles for user: [$uid]");
   return($articles);
@@ -445,7 +445,7 @@ function get_articles_in_range($uid = NULL, $max = NULL, $pub = FALSE, $dstart =
   }
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   $sqltxt = "SELECT $table_article.id,
@@ -476,20 +476,20 @@ function get_articles_in_range($uid = NULL, $max = NULL, $pub = FALSE, $dstart =
   }
 
   loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
-  $sql->bind_param("s", $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any articles for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No articles returned for user: [$uid] with given criteria.");
     return(FALSE);
   }
 
-  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$clinkedon,$asourceurl,$asourcetitle) or print(mysql_error());
+  $sql->bind_result($aid,$atitle,$aurl,$ashorturl,$acreatedon,$acontent,$clinkedon,$asourceurl,$asourcetitle) or loggit(2, "MySql error: ".$dbh->error);
 
   $articles = array();
   $count = 0;
@@ -506,7 +506,7 @@ function get_articles_in_range($uid = NULL, $max = NULL, $pub = FALSE, $dstart =
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] articles for user: [$uid]");
   return($articles);
@@ -543,7 +543,7 @@ function search_articles($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
   $qsql = build_search_sql($query, $colnames);
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
   if($pub == TRUE) {
@@ -567,7 +567,7 @@ function search_articles($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
   }
 
   //loggit(3, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or print(mysql_error());
+  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
 
   //Adjust bindings
   $newsetup = "s".$qsql['bind'][0];
@@ -578,18 +578,18 @@ function search_articles($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
   $method = $ref->getMethod("bind_param");
   $method->invokeArgs($sql, $qsql['bind']);
 
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
 
   //See if there were any articles for this user
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"No articles returned for user: [$uid] with given criteria.");
     return(FALSE);
   }
 
-  $sql->bind_result($aid,$atitle,$aurl) or print(mysql_error());
+  $sql->bind_result($aid,$atitle,$aurl) or loggit(2, "MySql error: ".$dbh->error);
 
   $articles = array();
   $count = 0;
@@ -598,7 +598,7 @@ function search_articles($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
     $count++;
   }
 
-  $sql->close() or print(mysql_error());
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Returning: [$count] articles for user: [$uid]");
   return($articles);
@@ -771,15 +771,15 @@ function unlink_article($uid = NULL, $aid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the id in the transaction table
   $stmt = "DELETE FROM $table_catalog WHERE userid=? AND articleid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("ss", $uid, $aid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $uid, $aid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and leave
   loggit(1,"Deleted: [$delcount] article: [$aid] from user: [$uid].");
@@ -795,14 +795,14 @@ function purge_orphaned_articles()
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Find articles that have no linkage
   $stmt = "DELETE FROM $table_article WHERE NOT EXISTS ( SELECT * FROM $table_catalog WHERE $table_article.id = $table_catalog.articleid )";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $delcount = $sql->affected_rows or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $delcount = $sql->affected_rows;
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and leave
   loggit(3,"Deleted: [$delcount] orphaned articles.");
@@ -1054,14 +1054,14 @@ function update_article_static_url($aid = NULL, $uid = NULL, $url = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Now that we have a good id, put the article url in the database
   $stmt = "UPDATE $table_catalog SET staticurl=? WHERE articleid=? AND userid=?";
-  $sql=$dbh->prepare($stmt) or print(mysql_error());
-  $sql->bind_param("sss", $url, $aid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("sss", $url, $aid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   //Log and return
   loggit(3,"Changed article: [$aid]'s url to: [$url] for user: [$uid].");
@@ -1087,23 +1087,23 @@ function get_article_static_url($aid = NULL, $uid = NULL)
   include get_cfg_var("cartulary_conf").'/includes/env.php';
 
   //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or print(mysql_error());
+  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
 
   //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT staticurl FROM $table_catalog WHERE articleid=? AND userid=?") or print(mysql_error());
-  $sql->bind_param("ss", $aid, $uid) or print(mysql_error());
-  $sql->execute() or print(mysql_error());
-  $sql->store_result() or print(mysql_error());
+  $sql=$dbh->prepare("SELECT staticurl FROM $table_catalog WHERE articleid=? AND userid=?") or loggit(2, "MySql error: ".$dbh->error);
+  $sql->bind_param("ss", $aid, $uid) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
   //See if the session is valid
   if($sql->num_rows() < 1) {
     $sql->close()
-      or print(mysql_error());
+      or loggit(2, "MySql error: ".$dbh->error);
     loggit(1,"The article: [$aid] does not exist in the repository.");
     return(FALSE);
   }
-  $sql->bind_result($staticurl) or print(mysql_error());
-  $sql->fetch() or print(mysql_error());
-  $sql->close() or print(mysql_error());
+  $sql->bind_result($staticurl) or loggit(2, "MySql error: ".$dbh->error);
+  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
   loggit(1,"Article: [$aid] has static url: [$staticurl] for user: [$uid].");
   return($staticurl);

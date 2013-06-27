@@ -1,0 +1,30 @@
+Freedom Controller - v0.4.9 - Release Notes
+
+What's new for users:
+	1. Public rivers.
+		On the prefs page you can now set the "I want a public river" pref.  This will reveal 3 new prefs:
+			1. "My public river's file name should be:" will give the html of the river a particular file name in S3.  You can then point your bucket at this filename to set it as your index for static hosting.
+			2. "My custom public river template url is:" will tell the system to build your public river html using the template at a given url.  The template can be in HTML or OPML format.  If you leave this blank, the default system template will be used.
+			3. "My public river title should be:" will set the title of your river.
+	2. External templates for your public river.
+		For a list of template variables you can use, look <a href="http://reader.smallpicture.com/?opmlurl=https%3A%2F%2Fdl.dropbox.com%2Fs%2F1ep56x95ta4s27r%2Ffc.opml">here</a>.
+		In addition to those, there are 2 new ones for user-level public rivers: 
+			<%openSubsAddLink%> or [OPENSUBS_ADD_LINK]  -  This placeholder will be replaced by a link to the open subscription page for your account.  It's a full link with anchor tag and text.
+			<%sopmlUrl%> or [SOPML_URL]  -  This will be replaced with a link to your social outline.
+	3. Allow open subscriptions to your account.
+		There's a new pref in the Subscriptions section called "Allow open subscriptions."  If you check this box, anyone in the world will be able to add new feed, list, outline subscriptions to your account.  Use with caution please.
+
+What's new for server ops:
+	Using these new features you can create a community server quickly, like so:     
+		1. Create a user and call it something like "Public".
+		2. Fill it with some feeds related to your project.
+		3. Give this user a bucket and a cname in S3.  Something like "news.myproject.com".
+		4. Set the bucket's static index page to "index.html".
+		5. Enable the public river option and set the file name to be "index.html".
+		6. Set the public river title pref to "My Project's News".
+		7. Enable open subscriptions for the Public user.
+	
+	Public rivers build every 20 minutes.  You can force the build by running: sudo php /opt/cartulary/bin/buildsysrivers.php .  This is helpful if you're testing templates.
+	
+	Users on your server can individually spawn their own community rivers this way without interfering with other users.  You can always delete feeds from your server using the feed admin page if anyone gets up to some shenanigans.
+

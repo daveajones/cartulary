@@ -91,17 +91,13 @@ River.generate = (function () {
                             });
                         });
                         
-                        // indicate that there are new items
-                        //var noticeText = ( (count <= 50) ? count : '50+' ) + ' new items';
-			var noticeText = 'There are new items.';
-                        $('#stream-notice').off('click').on('click', function (e) {
-                            e.preventDefault();
-                            _populate(data, lastItemId);
-                        }).text(noticeText).fadeSlideDown();
+			document.title = 'River - New Items';
+			$('#divMainMenu .navbar a.homebutton img').removeClass('icon-nav-home').addClass('icon-nav-home-lights');
                         $('#stream-updated .time').text(riverUpdated);
                     } 
                     
                     else {
+			$('#divMainMenu .navbar a.homebutton img').removeClass('icon-nav-home-lights').addClass('icon-nav-home');
                         $('#stream-updated .time').text(riverUpdated);
                     }
                 }
@@ -153,8 +149,9 @@ River.generate = (function () {
         River.methods.bindStickyLinks();
         River.methods.bindSubscribeLinks();
         River.methods.bindCartLinks();
-	River.methods.bindMicroblogLinks();
-	River.methods.bindEnclosureLinks();
+		River.methods.bindMicroblogLinks();
+		River.methods.bindEnclosureLinks();
+		River.methods.bindEmbedActivations();
         //Jump to top button
         $('.jumpTop').click(function () {
 		$('html, body').animate({ scrollTop: '0px' }, 300); 
@@ -163,7 +160,9 @@ River.generate = (function () {
 	<?if($g_platform != "mobile"){?>
 	focusFirstVisibleArticle();
 	<?}?>
-	River.methods.activateEnclosures(3);
+	document.title = 'River';
+	$('#divMainMenu .navbar a.homebutton img').removeClass('icon-nav-home-lights').addClass('icon-nav-home');
+	River.methods.sortGrid();
     };
     
     // expand stream items
@@ -189,14 +188,45 @@ River.generate = (function () {
 
 
 River.methods = (function () {
+	function _sortGrid() {
+		<?if($g_platform != "mobile"){?>
+		var viewportWidth = $(window).width();
+		var sidebarWidth = $('#stream-sidebar-right').width();
+		var streamWidth = (viewportWidth - sidebarWidth) - 80;
+
+		$('#stream').css('width', streamWidth + 'px')
+
+		var ccsize = streamWidth / 570;
+		var colcount = ccsize.toFixed();
+		if( ccsize < 2 ) {
+			colcount = 1;
+		}
+		<?if($g_prefs['rivercolumns'] > 0) {?>
+		colcount = <?echo $g_prefs['rivercolumns']?>;
+		<?}?>
+		if( colcount == 1 ) {
+			$('#stream .stream-list').css('width', '600px');
+			$('#stream .stream-list').css('margin-left', 'auto');
+			$('#stream .stream-list').css('margin-right', 'auto');
+		} else {
+			$('#stream .stream-list').css('width', '');
+		}
+		$('#stream .stream-list').css('column-count', '1');
+		$('#stream .stream-list').css('column-count', colcount);
+		$('#stream .stream-list').css('-webkit-column-count', colcount);
+		$('#stream .stream-list').css('-moz-column-count', colcount);
+		<?}?>
+	}
+
 	function _bindStickyLinks() {
         	//Bind some new clicks to the stickybuttons
         	$('.aUnSticky').click(function() {
                 	var bobj = $(this);
                 	var id = bobj.attr("data-id");
+                	var fid = bobj.attr("data-feedid");
 
-			//Get any sticky subitems so we can un-sticky them too
-			var subitems = $('#' + id + ' .subitem.sticky').map(function() { return this.id; }).get();	
+					//Get any sticky subitems so we can un-sticky them too
+					var subitems = $('#' + id + ' .subitem.sticky').map(function() { return this.id; }).get();	
 	
                 	//Make the call
                 	$.ajax({
@@ -208,19 +238,31 @@ River.methods = (function () {
                                 	if(data.status == "false") {
                                                 showMessage( data.description, data.status, 5 );
                                 	} else {
-                                                //showMessage( data.description, data.status, 5 );
+										//Add the un-stickied item id to sessionStorage
+										var postProperties = {};
+										var post = sessionStorage.getItem(id);
+										if( post !== null ) {
+											postProperties = JSON.parse(post);
+										}
+										postProperties.sticky = false;
+										sessionStorage.setItem(id, JSON.stringify(postProperties));
                                 	}
-					//$('#' + id).removeClass('sticky');
-					if( $('#' + id).siblings('.sticky').length < 1 ) {
-					  $('#' + id).parent().remove();
-					} else {
-					  $('#' + id).remove();
-					}
-					bobj.remove();
+
+									//Remove the item
+									$('#' + id).remove();
+
+									//Remove feed from the active feed list if no more posts exist
+									console.log("feedid:"+fid);
+									if( $('.stream-list li.article.' + fid).length < 1 ) {
+										$('#divActiveFeeds ul.feedlist li.' + fid).remove();
+									}
+					
+									//Ajust grid
+                                    _sortGrid();
 	
-					//Target the next article after this one goes away
-					focusFirstVisibleArticle();
-                        	}
+									//Target the next article after this one goes away
+										focusFirstVisibleArticle();
+		                        	}
                 	});
 
 			//Loop through the sticky subitems and un-sticky them as well
@@ -300,13 +342,59 @@ River.methods = (function () {
 	function _bindCartLinks() {
         	$('.cartlink').unbind('click');
         	$('.cartlink').click(function() {
-			var modal = '#mdlShowArticle';
-                	var aobj = $(this);
-                	var id = aobj.attr("data-id");
+	   	       	var aobj = $(this);
+        	   	var postId = aobj.attr("data-id");
+				var pathToPost = '#stream .stream-list li.article#' + postId;
+				console.log('pathToPost:' + pathToPost);
+
+				//Don't allow more than one attempt at reblogging
+				if( $(pathToPost).hasClass('cartulized') ) {
+					focusThisArticle(postId);
+					return false;
+				}
+
+				//Kill any existing messages
+				$(pathToPost + ' .description .inlinecartmsg').remove();
+
+				//Build a cartulize url from the post attributes
+				var postUrl = encodeURIComponent($(pathToPost + ' .postinfo').attr("data-url"));
+				var postTitle = encodeURIComponent($(pathToPost + ' .postinfo').attr("data-title"));
+				var postSourceUrl = encodeURIComponent($(pathToPost + ' .postinfo').attr("data-sourceurl"));
+				var postSourceTitle = encodeURIComponent($(pathToPost + ' .postinfo').attr("data-sourcetitle"));
 	
-			showArticleWindow('#stream-items .article#' + id);
-			focusThisArticle(id);
-			return false;
+				//Set focus on this article
+				focusThisArticle(postId);
+			
+				//Make the cartulization call
+				$(pathToPost + ' .description').append('<div class="inlinecartmsg"><img src="/images/spinner.gif" /> Cartulizing. Please wait...</div>');
+		        $.ajax({
+        	        url:      '<?echo $cartulizecgi?>?json=true' + '&url=' + postUrl + '&title=' + postTitle + '&surl=' + postSourceUrl + '&stitle=' + postSourceTitle,
+            	    type:     "GET",
+                	dataType: 'json',
+	                timeout:  30000,
+    	            success:  function(data) {
+						if( data.status == 'true' ) {
+							//Kill wait message
+							$(pathToPost + ' .description .inlinecartmsg').remove();
+							//Replace the body text with what we got back
+        	                $(pathToPost + ' .description').html(data.article.body);
+							//Change to a reading-friendly style
+							$(pathToPost).addClass('cartulized');
+						} else {
+							//Append error message
+							$(pathToPost + ' .description .inlinecartmsg').html(data.article.body).addClass('carterrormsg');
+						}
+						//Set focus on this article
+						focusThisArticle(postId);
+                    },
+	                error:  function(x, t, m) {
+						//Append error message
+						$(pathToPost + ' .description .inlinecartmsg').html('<p>Error communicating with server. Connection problem?</p>').addClass('carterrormsg');
+						//Set focus on this article
+						focusThisArticle(postId);
+	                }
+    	    	});
+				return false;
         	});
         	return true;
 	}
@@ -314,18 +402,166 @@ River.methods = (function () {
 
 	//Modalize the MB links
 	function _bindMicroblogLinks() {
-		<?if( $g_platform != "mobile" ) {?>
         	$('.mblink').unbind('click');
         	$('.mblink').click(function() {
-			var modal = '#mdlMicroblogPost';
-                	var aobj = $(this);
-                	var id = aobj.attr("data-id");
+	   	       	var aobj = $(this);
+        	   	var postId = aobj.attr("data-id");
+				var pathToPost = '#stream .stream-list li.article#' + postId;
+				var pathToBlog = '#stream .stream-list li.article#' + postId + ' .footer .mbinline';
+				var pathToForm = '#stream .stream-list li.article#' + postId + ' .footer .mbinline .mbinform';
+				console.log('pathToPost:' + pathToPost);
 
-			newMicroblogPostWindow('#stream-items .article#' + id);
-			focusThisArticle(id);
-			return false;
+				//Don't allow more than one attempt at reblogging
+				if( $(pathToBlog).length > 0 ) {
+					focusThisArticleFooter(postId);
+					return false;
+				}
+
+				//Tag a class on the end of the footer so we can hook re-blog mode
+				$(pathToPost + ' .footer').removeClass('mbposted').addClass('mbmode');
+
+				//Build a form from the post attributes
+				var postUrl = $(pathToPost + ' .postinfo').attr("data-url");
+				var postDescription = $(pathToPost + ' .postinfo').attr("data-title");
+				var postSourceUrl = $(pathToPost + ' .postinfo').attr("data-sourceurl");
+				var postSourceTitle = $(pathToPost + ' .postinfo').attr("data-sourcetitle");
+				var postOrigin = $(pathToPost + ' .postinfo').attr("data-origin");
+	
+				//Create a little re-blog window in the footer of the post with a form in it
+				$(pathToPost + ' .footer').append('<div class="mbinline ' + postId + '"><form class="mbinform ' + postId + '" method="post" action="<?echo $blogpostcgi?>"></form></div>');
+				
+				//Add a please wait element
+				$(pathToPost + ' .footer').append('<div class="inlineblogmsg hide"><img src="/images/spinner.gif" /> Posting. Please wait...</div>');
+
+				//Build out the form
+				//Description
+				$(pathToForm).append('<span><textarea class="mbdescription" name="content">' + postDescription.trim() + '</textarea></span>');
+				$(pathToForm).append('<img class="icon-extlink" src="/images/blank.gif" /><span><input class="mblink" type="text" name="link" value="' + postUrl.trim() + '" /></span>');
+				$(pathToForm).append('<input class="mbsourceurl hide" type=hidden" name="source[url]" value="' + postSourceUrl.trim() + '" />');
+				$(pathToForm).append('<input class="mbsourcetitle hide" type="hidden" name="source[title]" value="' + postSourceTitle.trim() + '" />');
+				$(pathToForm).append('<input class="mborigin hide" type="hidden" name="origin" value="' + postOrigin.trim() + '" />');
+
+				//Add enclosures to the form
+				var encount = 0;
+				//Add a div with a list for holding external enclosures	
+				$(pathToForm).append('<div class="mbextenc hide"><ul></ul></div>');
+				$(pathToPost + ' .enclosureview .encobj').each(function() {
+					//Add a list element for each enclosure
+					$(pathToForm + ' .mbextenc ul').append('<li></li>');
+
+					//Add a delete button for each enclosure
+					$(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<a href="#" class="delete"><img class="icon-remove-small" src="/images/blank.gif" /></a>');
+
+					//Now add the enclosure thumbnail
+					if( $(this).hasClass('enclosurepic') ) {
+						$(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure" src="' + $(this).attr("src") + '" />');
+					} else
+					if( $(this).hasClass('encaudio') ) {
+						$(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure icon-audio-enclosure" src="/images/blank.gif" alt="" />');
+					} else
+					if( $(this).hasClass('encvideo') ) {
+						$(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure icon-video-enclosure" src="/images/blank.gif" alt="" />');
+					} else
+					if( $(this).hasClass('enciframe') ) {
+						$(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure icon-iframe-enclosure" src="/images/blank.gif" alt="" />');
+					}
+
+					//Add the input element to the form
+					$(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<input type="text" name="extenclosure[' + encount + '][url]" value="' + $(this).attr("src") + '" />');
+					$(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<input type="hidden" name="extenclosure[' + encount + '][type]" value="' + $(this).attr("data-type") + '" />');
+					$(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<input type="hidden" name="extenclosure[' + encount + '][length]" value="' + $(this).attr("data-length") + '" />');
+
+					//Attach click handler for the delete button
+					$(pathToForm + ' .mbextenc ul li:eq(' + encount + ') a.delete').click(function() {
+						$(this).parent().remove();
+						if( $(pathToForm + ' .mbextenc ul li').length == 0 ) {  $(pathToForm + ' .mbextenc').hide();  }
+						return false;
+					});
+
+					//Un-hide the external enclosure form since we have at least one external enclosure
+					$(pathToForm + ' .mbextenc').show();			
+
+					//Increment the enclosure counter
+					encount++;
+				});
+
+				//Add a twitter toggle if twitter is enabled
+				<?if( twitter_is_enabled($g_uid) ) {?>
+				$(pathToForm).append('<label class="checkbox tweetbox"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt="" /><input class="tweetcheck hide" name="tweet" type="checkbox" /></label>');
+				<?}?>
+
+				//Submit buttons go in the div and we'll trigger form submission from outside
+				$(pathToForm).append('<a class="btn btn-success mbsubmit ' + postId + '" href="#">Post</a> <a class="btn btn-error mbcancel ' + postId + '" href="#">Cancel</a>');
+
+				//Attach click handlers to the buttons
+				$(pathToBlog + ' a.mbsubmit.' + postId).unbind('click');
+				$(pathToBlog + ' a.mbsubmit.' + postId).click(function() {
+					$(pathToForm + '.' + postId).submit();
+					return false;
+				});
+				$(pathToBlog + ' a.mbcancel.' + postId).unbind('click');
+				$(pathToBlog + ' a.mbcancel.' + postId).click(function() {
+					$(pathToPost + ' .footer').removeClass('mbmode');
+					$(pathToBlog + '.' + postId).remove();
+					return false;
+				});
+
+				//Ajaxify the form
+				$(pathToForm + '.' + postId).ajaxForm({
+	                <?if($device=="android") {?>
+					dataType:       'html',
+					<?} else {?>
+					dataType:       'json',
+					<?}?>
+	                cache:          false,
+	                clearForm:      true,
+	                resetForm:      true,
+	                timeout:        60000,
+	                beforeSubmit:   function() {
+						$(pathToBlog + '.' + postId).hide();    					                    
+						$(pathToPost + ' .footer .inlineblogmsg').show();
+	                },
+	                success:        function(data) {
+                        if(data.status == "false") {
+                            showMessage( data.description, data.status, 5 );
+							$(pathToPost + ' .footer .inlineblogmsg').hide();
+							$(pathToBlog + '.' + postId).show();    					                    
+                        } else {
+                            showMessage( "Post Successful!", data.status, 5 );
+							$(pathToPost + ' .footer').removeClass('mbmode').addClass('mbposted');
+							$(pathToPost + ' .footer .inlineblogmsg').remove();
+							$(pathToBlog + '.' + postId).remove();			  
+
+							$(pathToPost).append('<div class="subitem">Comment Posted</div>');
+                        }
+	                },
+	                error:          function(x, t, m) {
+                        showMessage( "Error: " + m + "(" + t + ")", false, 60 );
+						$(pathToPost + ' .footer .inlineblogmsg').hide();
+   						$(pathToBlog + '.' + postId).show();    					                    
+    	            }
+				});
+	
+				//Set focus on this article and scroll to the
+				//re-blog area
+				focusThisArticleFooter(postId);
+
+				//Set focus in description field
+				$(pathToForm + '.' + postId + ' span textarea.mbdescription').focus();
+				
+		    	//Set the twitter toggle
+		    	$(pathToForm + ' .tweetbox .tweeticon').removeClass('icon-twitter').addClass('icon-notwitter');
+		    	$(pathToForm + ' .tweetbox .tweetcheck').prop('checked', false);
+		    	$(pathToForm + ' .tweetbox .tweeticon').bind('click', function() {
+		        	$(pathToForm + ' .tweetbox .tweetcheck').prop('checked', !$(pathToForm + ' .tweetbox .tweetcheck').prop('checked'));
+		        	$(pathToForm + ' .tweetbox .tweeticon').toggleClass('icon-twitter');
+		        	$(pathToForm + ' .tweetbox .tweeticon').toggleClass('icon-notwitter');
+		        	$(pathToForm + ' .tweetbox .mbdescription').trigger('keyup');
+		    	});
+
+				return false;
         	});
-		<?}?>
+
         	return true;
 	}
 
@@ -461,16 +697,16 @@ River.methods = (function () {
 	return false;
     };
 
-    function _activateEnclosures( numto ) {
-        clearTimeout(enclosureActivator);
-        console.log("activating enclosures");
+    function _bindEmbedActivations() {
 	$('.enciframe.inactive').each(function(k, v) {
-          console.log('['+k+']: '+$(this).attr('data-src'));
-          $(this).attr('src', $(this).attr('data-src')).removeClass('inactive');
-	  if( k === numto ) {
-            enclosureActivator = setTimeout(function(){  River.methods.activateEnclosures(numto);  }, 2000);
-            return false;
-          }
+          var _this = this;
+          console.log('['+k+']: ' + $(this).attr('data-src'));
+          $(this).children('div.play').bind('click', function() {
+	    var dsrc = $(_this).attr("data-src");
+	    console.log("load video");
+	    var $iframe = $('<iframe>', { class: 'encobj enciframe', src: dsrc, frameborder: 0 });
+	    $(_this).replaceWith($iframe)
+          });
         });
 
 	return false;
@@ -670,26 +906,99 @@ River.methods = (function () {
         }
         return dateFormat(date, 'longDate');    
     };
+
+	function _prependActiveFeed(feedId, feedTitle, feedUrl, urlForIcon, type) {
+		<?if( $g_platform != "mobile" ) {?>
+		if( $('#divActiveFeeds ul.feedlist li.' + feedId).length < 1  ) {
+			var feedImg = '/images/blank.gif';
+			if( type == 'person' ) {
+				feedImg = urlForIcon;
+				imgClass = 'avatar48';
+			} else {
+				feedImg = _getFavicon(urlForIcon);
+				imgClass = 'favicon';
+			}
+			$('#divActiveFeeds ul.feedlist').prepend('<li class="' + type + ' ' + feedId + '">' + feedTitle + ' <img class="'+ imgClass +'" src="' + feedImg + '" /></li>');
+			$('#divActiveFeeds ul.feedlist li.' + feedId).unbind('click');
+			$('#divActiveFeeds ul.feedlist li.' + feedId).click(function () {
+				$('#stream div.filternotice').remove();
+				showAllItems();
+				showOnlyItems(feedId);
+				$('#stream').prepend('<div class="filternotice">Currently showing only items from '+feedTitle+'.<a class="removefilter">Show all</a></div>');
+				$('#stream div.filternotice a.removefilter').click(function() {
+					showAllItems();
+					$('#stream div.filternotice').remove();
+					return false;
+				});
+				return false;
+			});
+		}
+		<?}?>
+		return false;
+	}
+
+	function _appendActiveFeed(feedId, feedTitle, feedUrl, urlForIcon, type) {
+		<?if( $g_platform != "mobile" ) {?>
+		if( $('#divActiveFeeds ul.feedlist li.' + feedId).length < 1  ) {
+			var feedImg = '/images/blank.gif';
+			if( type == 'person' ) {
+				feedImg = urlForIcon;
+				imgClass = 'avatar48';
+			} else {
+				feedImg = _getFavicon(urlForIcon);
+				imgClass = 'favicon';
+			}
+			$('#divActiveFeeds ul.feedlist').append('<li class="' + type + ' ' + feedId + '">' + feedTitle + ' <img class="'+ imgClass +'" src="' + feedImg + '" /></li>');
+			$('#divActiveFeeds ul.feedlist li.' + feedId).unbind('click');
+			$('#divActiveFeeds ul.feedlist li.' + feedId).click(function () {
+				$('#stream div.filternotice').remove();
+				showAllItems();
+				showOnlyItems(feedId);
+				$('html, body').animate({ scrollTop: '0px' }, 300); 		
+				$('#stream').prepend('<div class="filternotice">Currently showing only items from '+feedTitle+'.<a class="removefilter">Show all</a></div>');
+				$('#stream div.filternotice a.removefilter').click(function() {
+					showAllItems();
+					$('#stream div.filternotice').remove();
+					return false;
+				});
+				return false;
+			});
+		}
+		<?}?>
+		return false;
+	}
+
+	function _alreadyUnsticky(postId) {
+		var pp;
+				
+		pp = sessionStorage.getItem(postId);
+		if( pp === null ) {  return false;  }
+		pp = JSON.parse(pp);
+        if( pp.sticky === false ) {  return true;  }
+
+		return false;
+	}
     
     return {
+		sortGrid : _sortGrid,
         bindStickyLinks : _bindStickyLinks,
         bindFeedStickyLinks : _bindFeedStickyLinks,
         bindSubscribeLinks : _bindSubscribeLinks,
-	bindCartLinks : _bindCartLinks,
-	bindMicroblogLinks : _bindMicroblogLinks,
-	bindEnclosureLinks : _bindEnclosureLinks,
+		bindCartLinks : _bindCartLinks,
+		bindMicroblogLinks : _bindMicroblogLinks,
+		bindEnclosureLinks : _bindEnclosureLinks,
         convertYoutube : _convertYoutube,
-	isAvatar : _isAvatar,
+		isAvatar : _isAvatar,
         urlNotRelative : _urlNotRelative,
         countEnclosuresOfType : _countEnclosuresOfType,
-	isImage : _isImage,
-	isAudio : _isAudio,
+		isImage : _isImage,
+		isAudio : _isAudio,
         isVideo : _isVideo,
         isIframe  : _isIframe,
-        activateEnclosures : _activateEnclosures,
+        bindEmbedActivations : _bindEmbedActivations,
         getDomain : _getDomain,
         getFavicon : _getFavicon,
-	newGetText : _newGetText,
+		newGetText : _newGetText,
         getText : _getText,
         getMediaType : _getMediaType,
         getEnclosureSize : _getEnclosureSize,
@@ -701,7 +1010,10 @@ River.methods = (function () {
         getVideos : _getVideos,
         getAudios : _getAudios,
         getIframes : _getIframes,
-        prettyDate : _prettyDate
+        prettyDate : _prettyDate,
+		prependActiveFeed : _prependActiveFeed,
+		appendActiveFeed : _appendActiveFeed,
+		alreadyUnsticky : _alreadyUnsticky
     };
 }());
 

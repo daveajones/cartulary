@@ -23,10 +23,6 @@
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar"?>
 
-<div class="row page-header" id="divPageTitle">
-	<h1><?echo $tree_location?></h1>
-</div>
-
 <?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
 

@@ -9,16 +9,16 @@ function loadMedia(elDiv, elTemplate) {
 
 	      //Get rid of tiny images
               $(elDiv + ' .pinenclosure img').load(function() {
-                //if( $(this).width() < 50 || $(this).height() < 50 ) {
-                  $(this).parent().append($(this).width());
+                if( $(this).width() < 90 || $(this).height() < 90 ) {
+                  $(this).parent().parent().parent().remove();
                   return false;
-		//}
+				}
               });
               $(elDiv + ' .pinenclosure img').ready(function() {
-                //if( $(this).width() < 50 || $(this).height() < 50 ) {
-                  $(this).parent().append($(this).width());
+                if( $(this).width() < 90 || $(this).height() < 90 ) {
+                  $(this).parent().parent().parent().remove();
                   return false;
-		//}
+				}
               });
 
               //Go masonry

@@ -1,0 +1,104 @@
+/* --------------------------------------------------- */
+/* ----- Body and other major elements --------------- */
+body {
+	padding-bottom: 40px;
+    background: #eee url(/images/bg_lightgrey.png) repeat;
+}
+body > .container {  margin-top:80px;  }
+.navbar-inner a.brand {  display:none;  }
+@media (min-width:1px) and (max-width:979px) {
+	body > .container {  margin-top:0px;  }
+	.navbar-inner a.brand {  display:inline;  }
+}
+#divMainMenu #navsearch {  margin-top:8px;  }
+
+
+
+/* --------------------------------------------------- */
+/* ----- Buttons ------------------------------------- */
+.btn,
+.btn-group > .btn,
+.btn-group > .dropdown-menu,
+.btn-group > .popover {
+  font-size: 14.994px;
+  /* 15px */
+  font-weight: 500;
+}
+.btn {
+  border: none;
+  background: #bdc3c7;
+  color: #ffffff;
+  padding: 6px 10px 8px;
+  line-height: 22px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  text-decoration: none;
+  text-shadow: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -webkit-transition: 0.25s;
+  -moz-transition: 0.25s;
+  -o-transition: 0.25s;
+  transition: 0.25s;
+  -webkit-backface-visibility: hidden;
+}
+.btn:hover,
+.btn:focus,
+.btn-group:focus .btn.dropdown-toggle {
+  background-color: #cacfd2;
+  color: #ffffff;
+  outline: none;
+  -webkit-transition: 0.25s;
+  -moz-transition: 0.25s;
+  -o-transition: 0.25s;
+  transition: 0.25s;
+  -webkit-backface-visibility: hidden;
+}
+.btn:active,
+.btn-group.open .btn.dropdown-toggle,
+.btn.active {
+  background-color: #a1a6a9;
+  color: rgba(255, 255, 255, 0.75);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.btn.btn-success {
+  background-color: #2ecc71;
+}
+.btn.btn-success:hover,
+.btn.btn-success:focus,
+.btn-group:focus .btn.btn-success.dropdown-toggle {
+  background-color: #58d68d;
+}
+.btn.btn-success:active,
+.btn-group.open .btn.btn-success.dropdown-toggle,
+.btn.btn-success.active {
+  background-color: #27ad60;
+}
+.btn.btn-danger {
+  background-color: #e74c3c;
+}
+.btn.btn-danger:hover,
+.btn.btn-danger:focus,
+.btn-group:focus .btn.btn-danger.dropdown-toggle {
+  background-color: #ec7063;
+}
+.btn.btn-danger:active,
+.btn-group.open .btn.btn-danger.dropdown-toggle,
+.btn.btn-danger.active {
+  background-color: #c44133;
+}
+
+
+
+/* --------------------------------------------------- */
+/* ----- Inputs ------------------------------------- */
+textarea,
+input[type=text] {
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+}

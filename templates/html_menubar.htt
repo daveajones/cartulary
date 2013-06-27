@@ -50,7 +50,7 @@
                         <?}?>
                        
 
-			<? if( $platform == "mobile" || $platform == "tablet" ) {?>
+			<? if( $g_platform == "mobile" ) {?>
                         <li>
                           <form class="navbar-search" id="navsearch" name="navsearch" method="POST" action="<?echo $searchcgi?>">
 			    <input id="navsearchs" type="hidden" name="s" value="<?echo $section?>" />
@@ -64,7 +64,7 @@
 			<?}?>
 			</ul>           
 
-			<?if( $platform != "mobile" && $platform != "tablet" ) {?>
+			<?if( $g_platform != "mobile" ) {?>
 			<!-- Profile Header -->
 			<ul class="nav pull-right">
   	                  <li>

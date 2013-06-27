@@ -689,10 +689,9 @@ function _sortGrid(sizeOnly) {
     	}
 	}
 
-	if( $(window).width() < 979 ) { 
+	if( $(window).outerWidth(true) < 900 ) { 
 		$('.navbar').removeClass('navbar-fixed-top');
 		$('#stream').css('max-width', '700px');
-		return colcount;
 	} else {
 		$('.navbar').addClass('navbar-fixed-top');	
 		$('#stream').css('max-width', '');

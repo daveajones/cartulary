@@ -178,6 +178,9 @@
 	background-color:#fff;
 	color:#111;
 }
+.pageContentWrapper.River #stream #stream-items .stream-list > li.article .footer.mbposted {
+	background-color: #9acd32;
+}
 .pageContentWrapper.River #stream #stream-items .stream-list > li.article .footer .mbinline {
     margin:14px;
     text-align:right;
@@ -249,6 +252,10 @@
 }
 .pageContentWrapper.River #stream-sidebar-right #divActiveFeeds ul.feedlist li:hover {
 	background:lightyellow;
+}
+/* ----- Subitems ------------------------------------ */
+.pageContentWrapper.River #stream #stream-items .stream-list > li.article .subitem .rivermicrotar {
+	margin:0 0 8px 8px;
 }
 /* --------------------------------------------------- */
 
@@ -1013,6 +1020,7 @@ div.searchbar p.result-msg {
 }
 .pageContentWrapper.Subscribe .liManagedList {
   background:#777;
+  width:100%;
   border:solid black 1px;
   margin:3px;
   color:black;
@@ -1036,6 +1044,14 @@ div.searchbar p.result-msg {
   display:inline-block;
   max-width:50px;
 }
+.pageContentWrapper.Subscribe .nooverflow {
+  vertical-align:middle;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  word-wrap:nowrap;
+}
+
 /* --------------------------------------------------- */
 
 

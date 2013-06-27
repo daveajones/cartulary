@@ -510,6 +510,7 @@ function _bindMicroblogLinks(elid) {
 						}
 
 		    			$('#template-subitem').tmpl(si).prependTo(pathToPost + ' .subitems');		
+						_focusThisArticleFooter(postId);
                     }
 	            },
 	            error:          function(x, t, m) {
@@ -686,6 +687,15 @@ function _sortGrid(sizeOnly) {
     	for( c = 1 ; c <= colcount ; c++ ) {
         	$('#stream #stream-items').append('<div class="col col' + c + '"><ul class="stream-list"></ul></div>');
     	}
+	}
+
+	if( $(window).width() < 979 ) { 
+		$('.navbar').removeClass('navbar-fixed-top');
+		$('#stream').css('max-width', '700px');
+		return colcount;
+	} else {
+		$('.navbar').addClass('navbar-fixed-top');	
+		$('#stream').css('max-width', '');
 	}
 
 	//Adjust their sizing and layout

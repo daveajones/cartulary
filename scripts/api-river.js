@@ -139,6 +139,13 @@ function _getEnclosureSize(bytes) {
     return t;
 };
 
+function _clearActiveFeeds() {
+
+	$('#divActiveFeeds ul.feedlist').empty();
+
+	return true;
+}
+
 function _addActiveFeed(feedId, feedTitle, feedUrl, urlForIcon, type, position) {
 	if( platform == "mobile" ) {  return false;  }
 
@@ -763,6 +770,7 @@ function _buildRiver(cached) {
 	var cols = 1;
 
 	_showAllItems();
+	_clearActiveFeeds();
 	_changeStreamNotice('<img src="/images/spinner.gif" /> Building river...');
 
 	//Size columns and build the html structure
@@ -1011,6 +1019,7 @@ return {
 		isIframe				: _isIframe,
 		getMediaType			: _getMediaType,
 		getEnclosureSize		: _getEnclosureSize,
+		clearActiveFeeds		: _clearActiveFeeds,
 		addActiveFeed			: _addActiveFeed,
 		getDomain				: _getDomain,
 		getFavicon				: _getFavicon,

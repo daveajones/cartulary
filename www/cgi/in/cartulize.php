@@ -182,11 +182,12 @@ if ($test !== false && $test !== null && preg_match('!^https?://!', $url)) {
 	die('Invalid URL supplied');
 }
 
-//Remove feedburner garbage
-$url = preg_replace("/&?utm_(.*?)\=[^&]+/", "", $url);
-
 //Resolve re-directs
-$url = get_final_url($url);
+$newurl = get_final_url($url);
+
+//Remove feedburner garbage
+$url = trim(rtrim(preg_replace("/&?utm_(.*?)\=[^&]+/", "", $newurl), '?'));
+
 
 //////////////////////////////////
 // Set up HTTP agent
@@ -194,12 +195,13 @@ $url = get_final_url($url);
 $http = new HumbleHttpAgent();
 
 //See if the response returned was actually a meta-refresh forwarding document
-$response = $http->get($url);
+
+$response = fetchUrlExtra($url);
 $mret = preg_match('|http-equiv.*refresh.*content="\s*\d+\s*;\s*url=\'?(.*?)\'?\s*"|i', $response['body'], $mrmatches);
 if( ($mret > 0) && !empty($mrmatches[1]) ) {
 	loggit(3, "Found a meta refresh pointing to: [".$mrmatches[1]."].");
 	$url = get_final_url($mrmatches[1]);
-	$response = $http->get($url);
+	$response = fetchUrlExtra($url);
 }
 
 

@@ -475,11 +475,7 @@ function _bindMicroblogLinks(elid) {
 
 			//Ajaxify the form
 			$(pathToForm + '.' + postId).ajaxForm({
-	            <?if($device=="android") {?>
-				dataType:       'html',
-				<?} else {?>
 				dataType:       'json',
-				<?}?>
 	            cache:          false,
 	            clearForm:      true,
 	            resetForm:      true,

@@ -825,7 +825,7 @@ function fetchUrl($url, $timeout = 30)
 	$url = clean_url($url);
 
 	$ch = curl_init();
-        $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
 	curl_setopt($ch,CURLOPT_USERAGENT, $ua);
 	curl_setopt($ch,CURLOPT_URL, $url);
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);
@@ -843,6 +843,36 @@ function fetchUrl($url, $timeout = 30)
 	}
 
 	return $data;
+}
+
+/* gets the data from a URL along with extra info returned */
+function fetchUrlExtra($url, $timeout = 30)
+{
+	$url = clean_url($url);
+
+	$ch = curl_init();
+    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+	curl_setopt($ch,CURLOPT_USERAGENT, $ua);
+	curl_setopt($ch,CURLOPT_URL, $url);
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch,CURLOPT_HEADER, 1);
+	curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($ch,CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($ch,CURLOPT_ENCODING, "");
+
+	$data = curl_exec($ch);
+    $response = curl_getinfo($ch);
+
+	list($response['headers'], $response['body']) = explode("\r\n\r\n", $data, 2);
+
+	$response['effective_url'] = $url;
+	$response['status_code'] = $response['http_code'];
+
+	curl_close($ch);
+
+	loggit(3, "DEBUG: [".$response."]");
+
+	return $response;
 }
 
 function safe_feof($fp, &$start = NULL) {

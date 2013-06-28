@@ -169,7 +169,8 @@
 
 /* ----- Interactive------------------------------- */
 .pageContentWrapper.River #stream .filternotice {
-    position:absolute;
+    position:fixed;
+	z-index:5;
     top:47px;
     left:0px;
     width:100%;
@@ -254,6 +255,7 @@
 .pageContentWrapper.River #stream-sidebar-right {
 	display:none;
 	position:absolute;
+	z-index:6;
     top:48px;
     right:0px;
     max-width:240px;

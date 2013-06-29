@@ -730,6 +730,72 @@ function twitter_search_to_rss($query = NULL)
 }
 
 
+//_______________________________________________________________________________________
+//Get a timeline from twitter and return the response as an rss feed
+function twitter_timeline_to_rss($user = NULL)
+{
+  //Check parameters
+  if($user == NULL) {
+    loggit(2,"The user is blank or corrupt: [$user]");
+    return(FALSE);
+  }
+
+  //Includes
+  include get_cfg_var("cartulary_conf").'/includes/env.php';
+  require_once "$confroot/$libraries/oauth/tmhOAuth.php";
+
+  //Globals
+  if( !sys_twitter_is_enabled() ) {
+    loggit(2,"System level Twitter credentials are not enabled.  Check configuration file.");
+    return(FALSE);
+  }
+
+  //Connect to twitter using oAuth
+  $connection = new tmhOAuth(array(
+        'consumer_key' => $tw_sys_key,
+        'consumer_secret' => $tw_sys_secret,
+        'user_token' => $tw_sys_token,
+        'user_secret' => $tw_sys_tokensecret,
+        'curl_ssl_verifypeer'   => false
+  ));
+
+  //Make an API call to get the information in JSON format
+  $code = $connection->request( 'GET',
+								$connection->url('1.1/statuses/user_timeline'),
+								array( 'screen_name' => $user )
+  );
+
+  //Log and return
+  if ($code == 200) {
+    $twresponse = $connection->response['response'];
+    $twrcode = $connection->response['code'];
+    loggit(3, "Twitter search for [$user] returned code: [$twrcode].");
+
+	$twr = json_decode($twresponse, TRUE);
+
+	$xml = new SimpleXMLElement('<rss version="2.0"></rss>');
+	$xml->addChild('channel');
+	$xml->channel->addChild('title', 'Twitter Timeline - ['.$user.']');
+	$xml->channel->addChild('link', 'http://twitter.com');
+	$xml->channel->addChild('description', 'Twitter timeline for ['.$user.']');
+	foreach( $twr as $tweet ) {
+		$item = $xml->channel->addChild('item');
+	    $item->addChild('description', $tweet['text']);
+    	$item->addChild('pubDate', date(DATE_RSS, strtotime($tweet['created_at'])));
+		$item->addChild('guid', 'http://twitter.com/'.$tweet['user']['screen_name'].'/status/'.$tweet['id_str']);
+		$item->addChild('link', 'http://twitter.com/'.$tweet['user']['screen_name'].'/status/'.$tweet['id_str']);
+	}
+
+    return($xml);
+  } else {
+    $twresponse = $connection->response['response'];
+    $twrcode = $connection->response['code'];
+    loggit(2,"Failed to perform twitter search for: [$query]. Response code: [$twrcode].");
+    return(FALSE);
+  }
+}
+
+
 
 //Do a HEAD request on a url to see what the Last-Modified time is
 function check_head_lastmod($url, $timeout = 5){

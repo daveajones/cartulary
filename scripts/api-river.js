@@ -829,8 +829,9 @@ function _populateGridSticky(cols) {
 
 			//Check if the item exists already
 			if( $(pathToStreamItem + '#' + item.id).length > 0 ) {
-				$(pathToStreamItem + '#' + item.id).remove();
-			}
+				$(pathToStreamItem + '#' + item.id).prependTo('#stream .col' + col + ' .stream-list');
+				_makePostSticky(pathToStreamItem + '#' + item.id, item.id, item.feed.feedId);
+			} else {
 
 			//Check if the origin exists already
 			if( item.origin != "" && $(pathToStreamItem + '[data-origin="' + item.origin + '"]').length > 0 ) {
@@ -843,6 +844,7 @@ function _populateGridSticky(cols) {
 
 				//Increment column counter
 				if( col == cols ) {  col = 1;  } else {  col++;  }
+			}
 			}
 		}
 	});
@@ -982,6 +984,13 @@ function _bindEmbedActivations(elid) {
 
 	return true;
 };
+
+function _makePostSticky(elid, pid, fid) {
+	$(elid).addClass('sticky');
+    $(elid).append('<a class="aUnSticky" href="#" data-id="' + pid + '" data-feedid="' + fid + '"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>');
+	
+	return true;
+}
 
 function _calculateColumnCount() {
 	if( platform == "mobile" || platform == "tablet" ) {  return 1;  }

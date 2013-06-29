@@ -139,6 +139,13 @@ function _getEnclosureSize(bytes) {
     return t;
 };
 
+function _clearActiveFeeds() {
+
+	$('#divActiveFeeds ul.feedlist').empty();
+
+	return true;
+}
+
 function _addActiveFeed(feedId, feedTitle, feedUrl, urlForIcon, type, position) {
 	if( platform == "mobile" ) {  return false;  }
 
@@ -763,6 +770,7 @@ function _buildRiver(cached) {
 	var cols = 1;
 
 	_showAllItems();
+	_clearActiveFeeds();
 	_changeStreamNotice('<img src="/images/spinner.gif" /> Building river...');
 
 	//Size columns and build the html structure
@@ -821,8 +829,9 @@ function _populateGridSticky(cols) {
 
 			//Check if the item exists already
 			if( $(pathToStreamItem + '#' + item.id).length > 0 ) {
-				$(pathToStreamItem + '#' + item.id).remove();
-			}
+				$(pathToStreamItem + '#' + item.id).prependTo('#stream .col' + col + ' .stream-list');
+				_makePostSticky(pathToStreamItem + '#' + item.id, item.id, item.feed.feedId);
+			} else {
 
 			//Check if the origin exists already
 			if( item.origin != "" && $(pathToStreamItem + '[data-origin="' + item.origin + '"]').length > 0 ) {
@@ -835,6 +844,7 @@ function _populateGridSticky(cols) {
 
 				//Increment column counter
 				if( col == cols ) {  col = 1;  } else {  col++;  }
+			}
 			}
 		}
 	});
@@ -975,6 +985,13 @@ function _bindEmbedActivations(elid) {
 	return true;
 };
 
+function _makePostSticky(elid, pid, fid) {
+	$(elid).addClass('sticky');
+    $(elid).append('<a class="aUnSticky" href="#" data-id="' + pid + '" data-feedid="' + fid + '"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>');
+	
+	return true;
+}
+
 function _calculateColumnCount() {
 	if( platform == "mobile" || platform == "tablet" ) {  return 1;  }
 
@@ -1011,6 +1028,7 @@ return {
 		isIframe				: _isIframe,
 		getMediaType			: _getMediaType,
 		getEnclosureSize		: _getEnclosureSize,
+		clearActiveFeeds		: _clearActiveFeeds,
 		addActiveFeed			: _addActiveFeed,
 		getDomain				: _getDomain,
 		getFavicon				: _getFavicon,

@@ -33,6 +33,10 @@
     $l_s3rivertitle = "Community River";
     $l_s3rivertemplate = "";
     $l_s3redirectbucket = "";
+	$l_tw_sys_key = "";
+    $l_tw_sys_secret = "";
+	$l_tw_sys_token = "";
+	$l_tw_sys_tokensecret = "";
     $l_ipreflectorurl = "http://checkip.dyndns.com";
     $l_rsscloud = 0;
     $l_peoplesearch = 1;
@@ -49,6 +53,10 @@
         $l_s3bucket = $s3_sys_bucket;
         $l_s3cname = $s3_sys_cname;
         $l_s3backup = $s3_sys_backup;
+		$l_tw_sys_key = $tw_sys_key;
+    	$l_tw_sys_secret = $tw_sys_secret;
+		$l_tw_sys_token = $tw_sys_token;
+		$l_tw_sys_tokensecret = $tw_sys_tokensecret;
         $l_s3riverbucket = $s3_sys_server_river_bucket;
         $l_s3rivercname = $s3_sys_server_river_cname;
         if( isset($s3_sys_server_redirect_bucket) ) {
@@ -211,6 +219,12 @@
     }
     if( empty($response) ) { $response = $l_s3rivertitle; }
     $template = str_replace('s3rivertitlevalue', $response, $template);
+
+	//Preserve sys twitter values
+    $template = str_replace('tw_sys_key = ""', 'tw_sys_key = "'.$l_tw_sys_key.'"', $template);
+    $template = str_replace('tw_sys_secret = ""', 'tw_sys_secret = "'.$l_tw_sys_secret.'"', $template);
+    $template = str_replace('tw_sys_token = ""', 'tw_sys_token = "'.$l_tw_sys_token.'"', $template);
+    $template = str_replace('tw_sys_tokensecret = ""', 'tw_sys_tokensecret = "'.$l_tw_sys_tokensecret.'"', $template);
 
     //Preserve server river template
     if( !empty($l_s3rivertemplate) ) {

@@ -712,6 +712,9 @@ function twitter_search_to_rss($query = NULL)
 	$xml->channel->addChild('title', 'Twitter Search - ['.$query.']');
 	$xml->channel->addChild('link', 'http://twitter.com');
 	$xml->channel->addChild('description', 'Twitter search for ['.$query.']');
+    if( isset($twr['statuses'][0]['created_at']) ) {
+	    $xml->channel->addChild('pubDate', date(DATE_RSS, strtotime($twr['statuses'][0]['created_at'])));
+	}
 	foreach( $twr['statuses'] as $tweet ) {
 		$item = $xml->channel->addChild('item');
 	    $item->addChild('description', $tweet['text']);
@@ -778,6 +781,9 @@ function twitter_timeline_to_rss($user = NULL)
 	$xml->channel->addChild('title', 'Twitter Timeline - ['.$user.']');
 	$xml->channel->addChild('link', 'http://twitter.com');
 	$xml->channel->addChild('description', 'Twitter timeline for ['.$user.']');
+    if( isset($twr[0]['created_at']) ) {
+	    $xml->channel->addChild('pubDate', date(DATE_RSS, strtotime($twr[0]['created_at'])));
+	}
 	foreach( $twr as $tweet ) {
 		$item = $xml->channel->addChild('item');
 	    $item->addChild('description', $tweet['text']);

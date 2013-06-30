@@ -78,7 +78,7 @@ $(document).ready( function() {
                                         	} else {
                                                 	$('#'+rowid).remove();
                                         	}
-						<?if($device=="android") {?>alert("Post deleted.");<?}?>
+						<?if($g_platform=="mobile") {?>alert("Post deleted.");<?}?>
 						loadPostList();
                                 	}
                         	});
@@ -106,7 +106,7 @@ $(document).ready( function() {
 
                 //Ajaxify the blog post form
                 $('#frmBlogPost').ajaxForm({
-                        <?if($device=="android") {?>dataType:       'html',<?
+                        <?if($g_device=="android") {?>dataType:       'html',<?
                         } else {?>dataType:       'json',<?}?>
 			cache:		false,
                         clearForm:	true,
@@ -134,7 +134,7 @@ $(document).ready( function() {
 					$('#chkTweet').prop("checked", false);
                                         $('#imgTweet').removeClass('icon-twitter').addClass('icon-notwitter');
 					$('#divEnclosures').hide();
-					<?if($device=="android") {?>
+					<?if($g_platform=="mobile") {?>
 					$("#fileMobile").replaceWith($("#fileMobile").clone(true));
 					<?} else {?>
 					$('#file_upload').uploadifive('clearQueue');

@@ -80,7 +80,7 @@
 
 <div class="row" id="divBlogPost">
 	<div class="blogPostWrapper">
-	<form id="frmBlogPost" name="blogpost" action="/cgi/in/blogpost" method="POST"<?if($device=="android") {?> enctype="multipart/form-data"<?}?>>
+	<form id="frmBlogPost" name="blogpost" action="/cgi/in/blogpost" method="POST"<?if($g_platform=="mobile") {?> enctype="multipart/form-data"<?}?>>
         <fieldset>
         <div class="control-group">
 		<!-- The submit button box. -->
@@ -103,10 +103,6 @@
 
 		<div id="divLower">
 
-                <?if( (s3_is_enabled($uid) || sys_s3_is_enabled()) && ($device != "ipad" && $device != "iphone" && $device != "wphone") ) {?>
-		<a id="btnAttachFile" title="Attach enclosures."><img class="icon-attach" src="/images/blank.gif" alt="" /></a>
-		<?}?>
-
 		<!-- Title box. -->
         	<div id="divTitle">
 		<img class="icon-text-height" src="/images/blank.gif" title="Title of Post" /><input name="title" id="txtTitle" type="text" placeholder="Title your post..." value="<?echo $title?>" />
@@ -123,6 +119,12 @@
 		<img class="icon-hyperlink-small" src="/images/blank.gif" title="Shortened Link" /><input name="shortlink" id="txtShortLink" type="text" value="<?echo $shortlink?>" />
 		</div>
                 <?}?>
+
+                <?if( (s3_is_enabled($uid) || sys_s3_is_enabled()) ) {?>
+		<a id="btnAttachFile" title="Attach enclosures."><img class="icon-attach" src="/images/blank.gif" alt="" /></a>
+		<?}?>
+
+
 
 		<!-- Origin box. -->
                 <?if( !empty($origin) ) {?>
@@ -142,7 +144,7 @@
 
 		<!-- Uploadify controls. -->
 		<div id="divUpload">
-			<?if($device=="android") {?>
+			<?if($g_platform=="mobile") {?>
 	        	<input type="file" name="file_mobile" id="fileMobile" />
 			<?} else {?>
 			You can drag and drop files into this page to attach them.<br/>

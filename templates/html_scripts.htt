@@ -8,8 +8,12 @@
 <script type="text/javascript" src="/script/jquery.tmpl.min.js"></script>
 <script type="text/javascript" src="/script/jquery.masonry.min.js"></script>
 <script type="text/javascript" src="/script/jquery.debouncedresize.js"></script>
+<script type="text/javascript" src="/script/jquery.appear.js"></script>
 <!-- Other -->
 <script type="text/javascript" src="/script/keymaster.min.js"></script>
+<?if( $g_platform == "mobile" ){?>
+<script type="text/javascript" src="/script/swipe.js"></script>
+<?}?>
 <!-- Global custom -->
 <script>
 <?include "$confroot/$scripts/global-custom.js"?>

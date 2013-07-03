@@ -3,17 +3,15 @@
 <script type="text/javascript" src="/script/jquery.form.js"></script>
 <script type="text/javascript" src="/script/bootstrap-2.3.1.min.js"></script>
 <?if( isset($g_uid) ) {?>
+<script type="text/javascript" src="/script/jquery.appear.js"></script>
 <script type="text/javascript" src="/script/jquery.uploadifive-v1.1.1.min.js"></script>
 <script type="text/javascript" src="/script/jquery-ui-1.10.2.js"></script>
 <script type="text/javascript" src="/script/jquery.tmpl.min.js"></script>
 <script type="text/javascript" src="/script/jquery.masonry.min.js"></script>
 <script type="text/javascript" src="/script/jquery.debouncedresize.js"></script>
-<script type="text/javascript" src="/script/jquery.appear.js"></script>
+<script type="text/javascript" src="/script/jquery.touchSwipe.min.js"></script>
 <!-- Other -->
 <script type="text/javascript" src="/script/keymaster.min.js"></script>
-<?if( $g_platform == "mobile" ){?>
-<script type="text/javascript" src="/script/swipe.js"></script>
-<?}?>
 <!-- Global custom -->
 <script>
 <?include "$confroot/$scripts/global-custom.js"?>

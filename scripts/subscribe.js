@@ -82,7 +82,7 @@ $(document).ready( function() {
 				showMessage( data.description, data.status, 5 );
                         } else {
 				showMessage( data.description, data.status, 5 );
-                                window.location = "/subscribe";
+                                window.location = "/subscribe#fd-" + data.fid;
                         }
                         $('.imgSpinner').hide();
                         $('.feedFinderForm .btnSubmit').attr("disabled", false);

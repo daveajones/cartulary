@@ -249,6 +249,7 @@ if( !feed_is_valid($content) ) {
 if( feed_is_linked_by_url($url, $uid) ) {
   //Feed was already linked to this user
   loggit(2,"The feed: [$url] was already subscribed to by user: [$uid].");
+  $jsondata['fid'] = feed_exists($url);
   $jsondata['status'] = "false";
   $jsondata['description'] = "You already follow that feed.";
   echo json_encode($jsondata);

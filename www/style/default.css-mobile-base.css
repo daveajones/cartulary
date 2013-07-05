@@ -8,6 +8,23 @@ body > .container {  margin-top:20px;  }
 #divMainMenu #navsearch {  margin-top:8px;  }
 
 
+/* --------------------------------------------------- */
+/* ----- Swipe --------------------------------------- */
+.swipe {
+  overflow: hidden;
+  visibility: hidden;
+  position: relative;
+}
+.swipe-wrap {
+  overflow: hidden;
+  position: relative;
+}
+.swipe-wrap div.slide {
+  float:left;
+  width:100%;
+  position: relative;
+}
+
 
 /* --------------------------------------------------- */
 /* ----- Buttons ------------------------------------- */

@@ -122,7 +122,7 @@ foreach( $feeds as $fd ) {
   if( isset($outlines[$fd['oid']]) && $outlines[$fd['oid']]['type'] == 'sopml' ) {
     continue;
   }
-  ?><li data-id="<?echo $fd['id']?>" class="nooverflow" title="<?if(strlen($fd['title'])>50){echo $fd['title'];}?>">
+  ?><li style="padding-top:60px;margin-top:-60px;" id="fd-<?echo $fd['id']?>" data-id="<?echo $fd['id']?>" class="nooverflow" title="<?if(strlen($fd['title'])>50){echo $fd['title'];}?>">
     <input type="checkbox" class="selector" data-id="<?echo $fd['id']?>" />
     <?if( $fd['errors'] > 50 ) {?><img title="This feed has had more than 50 errors." class="icon-warning" src="/images/blank.gif" /><?}?>
     <?if( ($tnow - $fd['linkedon']) < 10800 ) {?><span class="label label-success">New!</span><?}?>

@@ -1,4 +1,4 @@
-<li class="article ${feed.feedId} {{if feed.linkedOutlineType == "sopml"}}${feed.linkedOutlineId}{{/if}}"
+<div class="article ${feed.feedId} {{if feed.linkedOutlineType == "sopml"}}${feed.linkedOutlineId}{{/if}}"
 	id="${id}"
     data-url="{{if permaLink}}${permaLink}{{else link}}${link}{{/if}}"
     data-sourceurl="{{if sourceurl}}${sourceurl}{{else feed.feedUrl}}${feed.feedUrl}{{/if}}"
@@ -52,26 +52,30 @@
 				<!-- Picture -->
 	            <a href="${enc.url}">
 			    {{if freedomController.v1.river.methods.countEnclosuresOfType(enclosure, 'image')   == 2}}
-	                <img class="encobj enclosurepic encpicture2" src="${enc.url}" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
+	                <img class="encobj enclosurepic encpicture2 postload" src="/images/blank.gif" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
 			    {{else freedomController.v1.river.methods.countEnclosuresOfType(enclosure, 'image') == 3}}
-                    <img class="encobj enclosurepic encpicture3" src="${enc.url}" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
+                    <img class="encobj enclosurepic encpicture3 postload" src="/images/blank.gif" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
 			    {{else freedomController.v1.river.methods.countEnclosuresOfType(enclosure, 'image') == 4}}
-                    <img class="encobj enclosurepic encpicture4" src="${enc.url}" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
+                    <img class="encobj enclosurepic encpicture4 postload" src="/images/blank.gif" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
 			    {{else freedomController.v1.river.methods.countEnclosuresOfType(enclosure, 'image') >= 5}}
-                    <img class="encobj enclosurepic encpictures" src="${enc.url}" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
+                    <img class="encobj enclosurepic encpictures postload" src="/images/blank.gif" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
 			    {{else}}
-                    <img class="encobj enclosurepic encpicture" src="${enc.url}" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
+                    <img class="encobj enclosurepic encpicture postload" src="/images/blank.gif" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
 			    {{/if}}
                 </a>
             {{else freedomController.v1.river.methods.isAudio(enc.url, enc.type)}}
 				<!-- Audio -->
+				<?if( $g_platform == "mobile" ){?>
                 <audio class="encobj encaudio" src="${enc.url}" preload="metadata" controls data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}"></audio>
+				<?}?>
                 <div class="enclosure ${freedomController.v1.river.methods.getMediaType(enc.type)}">
 					<a href="${enc.url}">Download enclosure{{if enc.type && enc.length}} (${enc.type}, ${freedomController.v1.river.methods.getEnclosureSize(enc.length)}){{/if}}</a>
 				</div>
             {{else freedomController.v1.river.methods.isVideo(enc.url, enc.type) && Hidepics == false}}
 				<!-- Video -->
+				<?if( $g_platform == "mobile" ){?>
 				<video class="encobj encvideo" src="${enc.url}" preload="metadata" controls data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}"></video>
+				<?}?>
                 <div class="enclosure ${freedomController.v1.river.methods.getMediaType(enc.type)}">
 					<a href="${enc.url}">Download enclosure{{if enc.type && enc.length}} (${enc.type}, ${freedomController.v1.river.methods.getEnclosureSize(enc.length)}){{/if}}</a>
 				</div>
@@ -91,23 +95,6 @@
 			<a class="jumpTop pull-left" title="Jump back to the top of the page." href="#">
 				<img class="icon-jumptop" src="/images/blank.gif">
 			</a>
-
-            <div class="time">
-	            ${prettyDate(pubDate)}
-                {{if sourceurl}}
-                	<span class="source"> via:
-						<a href="${sourceurl}">${sourcetitle}</a>
-						|
-						<a class="aSubscribe" data-sourceurl="${encodeURIComponent(sourceurl)}" href="#">Subscribe</a>
-					</span>
-				{{else}}
-                    <span class="source">
-						|
-						<a href="${feed.feedUrl}">${feed.feedTitle}</a>
-					</span>
-                {{/if}}
-                {{if origin}}<span class="origin hide">${origin}</span>{{/if}}
-            </div>
 
             <div class="actions">
 	            <?if( $g_prefs['riverheadlinecart'] != 1 ) {?>
@@ -132,6 +119,23 @@
 						<img class="icon-share" src="/images/blank.gif" alt="" />
 					</a>
 				<?}?>
+            </div>
+
+            <div class="time">
+	            <span class="stamp">${prettyDate(pubDate)}</span>
+                {{if sourceurl}}
+                	<span class="source"> via:
+						<a href="${sourceurl}">${sourcetitle}</a>
+						|
+						<a class="aSubscribe" data-sourceurl="${encodeURIComponent(sourceurl)}" href="#">Subscribe</a>
+					</span>
+				{{else}}
+                    <span class="source">
+						|
+						<a class="filter" href="#">${feed.feedTitle}</a>
+					</span>
+                {{/if}}
+                {{if origin}}<span class="origin hide">${origin}</span>{{/if}}
             </div>
 		</div>
 
@@ -162,5 +166,5 @@
 		<div class="footclear"></div>
 	{{/each}}
 	</div>
-</li>
+</div>
 

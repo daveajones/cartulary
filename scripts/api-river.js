@@ -2,8 +2,8 @@
 // ----- River API -----
 freedomController.v1.river = {};
 freedomController.v1.river.statics  = {
-	pathToStreamItem	: "#stream .stream-list li.article",
-	pathToActiveItem	: "#stream .stream-list li.article.activeItem",
+	pathToStreamItem	: "#stream .stream-list .article",
+	pathToActiveItem	: "#stream .stream-list .article.activeItem",
 	pathToStreamList	: "#stream .stream-list",
 	lsRiverDataKey		: "riverdata",
 	lsStickyDataKey		: "stickydata"
@@ -61,6 +61,7 @@ function _showAllItems() {
 	$('#stream div.filternotice').remove();
 	$('#stream').removeClass('filtered');
 	$(pathToStreamItem).show();
+	$(pathToStreamList + ' .article').appear({force_process: true});	
 }
 
 function _isAvatar(url) {
@@ -371,9 +372,9 @@ function _bindMicroblogLinks(elid) {
         $(elid + ' .mblink').click(function() {
 	   	    var aobj = $(this);
         	var postId = aobj.attr("data-id");
-			var pathToPost = '#stream .stream-list li.article#' + postId;
-			var pathToBlog = '#stream .stream-list li.article#' + postId + ' .footer .mbinline';
-			var pathToForm = '#stream .stream-list li.article#' + postId + ' .footer .mbinline .mbinform';
+			var pathToPost = '#stream .stream-list .article#' + postId;
+			var pathToBlog = '#stream .stream-list .article#' + postId + ' .footer .mbinline';
+			var pathToForm = '#stream .stream-list .article#' + postId + ' .footer .mbinline .mbinform';
 			console.log('pathToPost:' + pathToPost);
 
 			//Don't allow more than one attempt at reblogging
@@ -553,7 +554,7 @@ function _bindCartLinks(elid) {
         $(elid + ' .cartlink').click(function() {
 	   	    var aobj = $(this);
         	var postId = aobj.attr("data-id");
-			var pathToPost = '#stream .stream-list li.article#' + postId;
+			var pathToPost = '#stream .stream-list .article#' + postId;
 			console.log('pathToPost:' + pathToPost);
 
 			//Don't allow more than one attempt at reblogging
@@ -586,6 +587,9 @@ function _bindCartLinks(elid) {
 						//Kill wait message
 						$(pathToPost + ' .description .inlinecartmsg').remove();
 						//Replace the body text with what we got back
+						if( $(pathToPost + ' .description').length < 1 ) {
+							$(pathToPost + ' .header').after('<div class="description" />');
+						}
         	            $(pathToPost + ' .description').html(data.article.body);
 						//Change to a reading-friendly style
 						$(pathToPost).addClass('cartulized');
@@ -612,7 +616,7 @@ function _bindStickyLinks(elid) {
 	    var elid = (typeof elid === "undefined") ? "" : elid;		
 
         //Bind some new clicks to the stickybuttons
-		$(elid + ' .aUnsticky').unbind('click');
+		$(elid + ' .aUnSticky').unbind('click');
         $(elid + ' .aUnSticky').click(function() {
                 var bobj = $(this);
                 var id = bobj.attr("data-id");
@@ -621,6 +625,7 @@ function _bindStickyLinks(elid) {
 
 				//Hide the item first
 				$('#' + id).hide();
+				$(pathToStreamList + ' .article').appear({force_process: true});
 
 				//Get any sticky subitems so we can un-sticky them too
 				var subitems = $('#' + id + ' .subitem.sticky').map(function() { return this.id; }).get();	
@@ -641,9 +646,9 @@ function _bindStickyLinks(elid) {
 
 								//If this is the last item from this feed/owner, remove the active feed from the sidebar
 								console.log('unsticky: ' + fid);
-								//if( $(pathToStreamItem + '.' + fid).length < 1  ) {
-						//			$('#divActiveFeeds ul.feedlist li.' + fid).remove();
-						//		}
+								if( $(pathToStreamItem + '.' + fid).length < 1  ) {
+									$('#divActiveFeeds ul.feedlist li.' + fid).remove();
+								}
 
 								//Remove the item
 								$('#' + id).remove();
@@ -688,7 +693,7 @@ function _sortGrid(sizeOnly) {
 	if( sizeOnly == false ) {
 		$('#stream #stream-items .col').remove();
     	for( c = 1 ; c <= colcount ; c++ ) {
-        	$('#stream #stream-items').append('<div class="col col' + c + '"><ul class="stream-list"></ul></div>');
+        	$('#stream #stream-items').append('<div class="col col' + c + '"><div class="stream-list"></div></div>');
     	}
 	}
 
@@ -800,6 +805,15 @@ function _buildRiver(cached) {
 			}
     	});
 		<?}?>
+
+		//Limit some events to happen only when articles enter the viewport
+		$(pathToStreamItem).attr('data-appear-top-offset', '200');
+		$(pathToStreamList).off('appear');
+  		$(pathToStreamList).on('appear', '.article', function(e, $affected) {
+   			$(this).addClass("appeared");
+			$('.encobj.postload', this).attr('src', function() {  return $(this).attr('data-src');  });
+  		});
+		$(pathToStreamList + ' .article').appear({force_process: true});
 	});
 
 	return true;
@@ -831,21 +845,34 @@ function _populateGridSticky(cols) {
 			if( $(pathToStreamItem + '#' + item.id).length > 0 ) {
 				$(pathToStreamItem + '#' + item.id).prependTo('#stream .col' + col + ' .stream-list');
 				_makePostSticky(pathToStreamItem + '#' + item.id, item.id, item.feed.feedId);
-			} else {
 
-			//Check if the origin exists already
-			if( item.origin != "" && $(pathToStreamItem + '[data-origin="' + item.origin + '"]').length > 0 ) {
-				//Add as sub-item
-    			$('#template-subitem').tmpl(item).appendTo(pathToStreamItem + '[data-origin="' + item.origin + '"]');		
-				console.log('append subitem to: ' + pathToStreamItem + '#' + item.id);
 			} else {
-				//Add as item
-    			$('#template-sticky').tmpl(item).prependTo('#stream .col' + col + ' .stream-list');
+				//Check if the origin exists already
+				if( item.origin != "" && $(pathToStreamItem + '[data-origin="' + item.origin + '"]').length > 0 ) {
+					//Add as sub-item
+    				$('#template-subitem').tmpl(item).appendTo(pathToStreamItem + '[data-origin="' + item.origin + '"]');		
+					console.log('append subitem to: ' + pathToStreamItem + '#' + item.id);
+				} else {
+					//Add as item
+    				$('#template-sticky').tmpl(item).prependTo('#stream .col' + col + ' .stream-list');
+		
+					//Increment column counter
+					if( col == cols ) {  col = 1;  } else {  col++;  }
+				}
+			}
 
-				//Increment column counter
-				if( col == cols ) {  col = 1;  } else {  col++;  }
-			}
-			}
+			//Add a swipe handler for mobile
+			<?if( $g_platform == "mobile" ) {?>
+			(function() {
+				$(pathToStreamItem + '#' + item.id).swipe('destroy');
+				$(pathToStreamItem + '#' + item.id).swipe({
+					swipeRight: function() {
+						$(pathToStreamItem + '#' + item.id).hide();
+						$(pathToStreamItem + '#' + item.id + ' .aUnSticky').trigger('click');
+					}
+				});
+			})();
+			<?}?>
 		}
 	});
 
@@ -888,6 +915,14 @@ function _populateGrid(cols) {
 					//Increment column counter
 					if( col == cols ) {  col = 1;  } else {  col++;  }
 				}
+
+				//Make source link into a feed filter trigger
+				(function() {
+					$(pathToStreamItem + '#' + item.id + ' .footer .source a.filter').click(function () {
+						_showOnlyItems(item.feed.feedId, item.feed.feedTitle);
+						return false;
+					});
+				})();
 			}
 		});
     });

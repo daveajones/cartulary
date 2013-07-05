@@ -1,4 +1,4 @@
-<li class="article ${feed.feedId} {{if feed.linkedOutlineType == "sopml"}}${feed.linkedOutlineId}{{/if}} sticky"
+<div class="article ${feed.feedId} {{if feed.linkedOutlineType == "sopml"}}${feed.linkedOutlineId}{{/if}} sticky appeared"
 	id="${id}"
 	data-index="${index}"
     data-url="{{if permaLink}}${permaLink}{{else link}}${link}{{/if}}"
@@ -68,13 +68,17 @@
                 </a>
             {{else freedomController.v1.river.methods.isAudio(enc.url, enc.type)}}
 				<!-- Audio -->
-                <audio class="encobj encaudio" src="${enc.url}" preload="metadata" controls data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}"></audio>
+				<?if( $g_platform != "mobile" ){?>
+                <audio class="encobj encaudio" src="${enc.url}" preload="none" controls="controls" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}"></audio>
+				<?}?>
                 <div class="enclosure ${freedomController.v1.river.methods.getMediaType(enc.type)}">
 					<a href="${enc.url}">Download enclosure{{if enc.type && enc.length}} (${enc.type}, ${freedomController.v1.river.methods.getEnclosureSize(enc.length)}){{/if}}</a>
 				</div>
             {{else freedomController.v1.river.methods.isVideo(enc.url, enc.type) && Hidepics == false}}
 				<!-- Video -->
-				<video class="encobj encvideo" src="${enc.url}" preload="metadata" controls data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}"></video>
+				<?if( $g_platform != "mobile" ){?>
+				<video class="encobj encvideo" src="${enc.url}" preload="none" controls="controls" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}"></video>
+				<?}?>
                 <div class="enclosure ${freedomController.v1.river.methods.getMediaType(enc.type)}">
 					<a href="${enc.url}">Download enclosure{{if enc.type && enc.length}} (${enc.type}, ${freedomController.v1.river.methods.getEnclosureSize(enc.length)}){{/if}}</a>
 				</div>
@@ -94,23 +98,6 @@
 			<a class="jumpTop pull-left" title="Jump back to the top of the page." href="#">
 				<img class="icon-jumptop" src="/images/blank.gif">
 			</a>
-
-            <div class="time">
-	            ${prettyDate(pubDate)}
-                {{if sourceurl}}
-                	<span class="source"> via:
-						<a href="${sourceurl}">${sourcetitle}</a>
-						|
-						<a class="aSubscribe" data-sourceurl="${encodeURIComponent(sourceurl)}" href="#">Subscribe</a>
-					</span>
-				{{else}}
-                    <span class="source">
-						|
-						<a href="${feed.feedUrl}">${feed.feedTitle}</a>
-					</span>
-                {{/if}}
-                {{if origin}}<span class="origin hide">${origin}</span>{{/if}}
-            </div>
 
             <div class="actions">
 	            <?if( $g_prefs['riverheadlinecart'] != 1 ) {?>
@@ -136,6 +123,24 @@
 					</a>
 				<?}?>
             </div>
+
+            <div class="time">
+	            <span class="stamp">${prettyDate(pubDate)}</span>
+                {{if sourceurl}}
+                	<span class="source"> via:
+						<a href="${sourceurl}">${sourcetitle}</a>
+						|
+						<a class="aSubscribe" data-sourceurl="${encodeURIComponent(sourceurl)}" href="#">Subscribe</a>
+					</span>
+				{{else}}
+                    <span class="source">
+						|
+						<a class="filter" href="#">${feed.feedTitle}</a>
+					</span>
+                {{/if}}
+                {{if origin}}<span class="origin hide">${origin}</span>{{/if}}
+            </div>
+
 		</div>
 
         <div class="footclear"></div>
@@ -165,4 +170,5 @@
 		<div class="footclear"></div>
 	{{/each}}
 	</div>
-</li>
+</div>
+

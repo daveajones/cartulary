@@ -54,10 +54,10 @@ $(document).ready( function() {
                 },
                 success:        function(data) {
                         if(data.status == "false") {
-				showMessage( data.description, data.status, 5 );
+							showMessage( data.description, data.status, 5 );
                         } else {
-				showMessage( data.description, data.status, 5 );
-                                window.location = "/subscribe";
+							showMessage( data.description, data.status, 5 );
+                            window.location = "/subscribe?ts=" + Math.round(new Date().getTime() / 1000) + "#fd-" + data.fid;
                         }
                         $('#frmSubscribe .imgSpinner').hide();
                         $('#frmSubscribe .btnSubmit').attr("disabled", false);

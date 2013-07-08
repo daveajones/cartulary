@@ -61,7 +61,6 @@ function _showAllItems() {
 	$('#stream div.filternotice').remove();
 	$('#stream').removeClass('filtered');
 	$(pathToStreamItem).show();
-	$(pathToStreamList + ' .article').appear({force_process: true});	
 }
 
 function _isAvatar(url) {
@@ -625,7 +624,6 @@ function _bindStickyLinks(elid) {
 
 				//Hide the item first
 				$('#' + id).hide();
-				$(pathToStreamList + ' .article').appear({force_process: true});
 
 				//Get any sticky subitems so we can un-sticky them too
 				var subitems = $('#' + id + ' .subitem.sticky').map(function() { return this.id; }).get();	
@@ -806,14 +804,6 @@ function _buildRiver(cached) {
     	});
 		<?}?>
 
-		//Limit some events to happen only when articles enter the viewport
-		$(pathToStreamItem).attr('data-appear-top-offset', '200');
-		$(pathToStreamList).off('appear');
-  		$(pathToStreamList).on('appear', '.article', function(e, $affected) {
-   			$(this).addClass("appeared");
-			$('.encobj.postload', this).attr('src', function() {  return $(this).attr('data-src');  });
-  		});
-		$(pathToStreamList + ' .article').appear({force_process: true});
 	});
 
 	return true;

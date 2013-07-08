@@ -52,15 +52,15 @@
 				<!-- Picture -->
 	            <a href="${enc.url}">
 			    {{if freedomController.v1.river.methods.countEnclosuresOfType(enclosure, 'image')   == 2}}
-	                <img class="encobj enclosurepic encpicture2 postload" src="/images/blank.gif" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
+	                <img class="encobj enclosurepic encpicture2 postload" src="${enc.url}" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
 			    {{else freedomController.v1.river.methods.countEnclosuresOfType(enclosure, 'image') == 3}}
-                    <img class="encobj enclosurepic encpicture3 postload" src="/images/blank.gif" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
+                    <img class="encobj enclosurepic encpicture3 postload" src="${enc.url}" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
 			    {{else freedomController.v1.river.methods.countEnclosuresOfType(enclosure, 'image') == 4}}
-                    <img class="encobj enclosurepic encpicture4 postload" src="/images/blank.gif" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
+                    <img class="encobj enclosurepic encpicture4 postload" src="${enc.url}" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
 			    {{else freedomController.v1.river.methods.countEnclosuresOfType(enclosure, 'image') >= 5}}
-                    <img class="encobj enclosurepic encpictures postload" src="/images/blank.gif" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
+                    <img class="encobj enclosurepic encpictures postload" src="${enc.url}" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
 			    {{else}}
-                    <img class="encobj enclosurepic encpicture postload" src="/images/blank.gif" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
+                    <img class="encobj enclosurepic encpicture postload" src="${enc.url}" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
 			    {{/if}}
                 </a>
             {{else freedomController.v1.river.methods.isAudio(enc.url, enc.type)}}

@@ -994,7 +994,7 @@ function fetchFeedUrl($url, $subcount = 0, $sysver = '', $timeout = 30)
 		$uadetails .= $subcount." subscribers; ";
 	}
 	if( !empty($uadetails) ) {
-		$ua .= " ($uadetails)";
+		$ua .= " (".trim($uadetails).")";
 	}
 
 	//Clean up the url

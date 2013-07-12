@@ -983,6 +983,43 @@ function fetchUrl($url, $timeout = 30)
 	return $data;
 }
 
+/* gets a feed from a URL */
+function fetchFeedUrl($url, $subcount = 0, $sysver = '', $timeout = 30)
+{
+	//Assemble a User-agent string that will report stats to the
+	//feed owner if possible
+    $ua = "FreedomController-Cartulary/".$sysver;
+	$uadetails = "";
+	if( $subcount > 0 ) {
+		$uadetails .= $subcount." subscribers; ";
+	}
+	if( !empty($uadetails) ) {
+		$ua .= " ($uadetails)";
+	}
+
+	//Clean up the url
+	$url = clean_url($url);
+
+	$ch = curl_init();
+	curl_setopt($ch,CURLOPT_USERAGENT, $ua);
+	curl_setopt($ch,CURLOPT_URL, $url);
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, $timeout);
+        curl_setopt($ch,CURLOPT_TIMEOUT, $timeout);
+        curl_setopt($ch,CURLOPT_ENCODING, "");
+	$data = curl_exec($ch);
+        $response = curl_getinfo($ch);
+	curl_close($ch);
+
+	$rcode = $response['http_code'];
+	if($rcode != 200) {
+                loggit(2, "Got back response code: [$rcode] while fetching: [$url].");
+		return(FALSE);
+	}
+
+	return $data;
+}
+
 /* gets the data from a URL along with extra info returned */
 function fetchUrlExtra($url, $timeout = 30)
 {

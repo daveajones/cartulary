@@ -47,12 +47,19 @@ $(document).ready( function() {
 	//Turn the home button into a river re-generator if it's the active button
 	$('#divMainMenu a.homebutton').click(function() {
     	$('html, body').animate({ scrollTop: '0px' }, 300);
-		freedomController.v1.river.methods.buildRiver();  
+		freedomController.v1.river.methods.buildRiver(false);  
 	    return false;
 	});
 
 	//Initial river build
-	freedomController.v1.river.methods.buildRiver();
+	var nowt = Math.round(new Date().getTime() / 1000);
+	var rdpt = sessionStorage.getItem(freedomController.v1.river.statics.lsRiverDataPullTime);
+	if( rdpt == "undefined" || (nowt - rdpt) > 300 ) {
+		freedomController.v1.river.methods.buildRiver(false);
+	} else {
+		freedomController.v1.river.methods.buildRiver(true);
+	}
+	console.log("time since last river pull [" + (nowt - rdpt) + "]");
 });
 
 

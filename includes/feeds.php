@@ -6360,6 +6360,7 @@ function get_sticky_feed_items($uid = NULL)
 							'body'				=> $itembody,
 							'guid'				=> $lguid,
 							'id'				=> $litemid,
+							'index'				=> $count,
 							'link'				=> $lurl,
 							'origin'			=> $lorigin,
 							'enclosure'			=> unserialize($lenclosure),

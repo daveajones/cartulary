@@ -8,7 +8,7 @@
 	data-feedid="${feed.feedId}">
 
 	<!-- Sticky link -->
-    <a class="aUnSticky" href="#" data-id="${id}" data-index="${index}" data-feedid="{{if feed.linkedOutlineType}}{{if feed.linkedOutlineType == 'sopml'}}${linkedOutlineId}{{else}}${feed.feedId}{{/if}}{{else}}${feed.feedId}{{/if}}"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>
+    <a class="aUnSticky" href="#" data-id="${id}" data-index="${index}" data-feedid="{{if feed.linkedOutlineType}}{{if feed.linkedOutlineType == 'sopml'}}${feed.linkedOutlineId}{{else}}${feed.feedId}{{/if}}{{else}}${feed.feedId}{{/if}}"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>
 
 	<!-- Feed level avatar -->
 	{{if feed.avatarUrl}}

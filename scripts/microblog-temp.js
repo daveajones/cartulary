@@ -1,8 +1,5 @@
   <div id="ulPostList" class="postList">
-  {{if posts.length < 1}}
-    <center class="noposts">You haven't posted anything. Use the <a href="<?echo sprintf($bookmarklet_blog_url, $system_url)?>">Microblog</a> bookmarklet.</center>
-  {{else}}
-    <div class="postItem well toolPanel">
+    <div class="{{if posts.length > 0}}postItem well {{/if}}toolPanel">
       Microblog Shortcuts:
       <br/><br/>
       <center>
@@ -12,6 +9,8 @@
         <a class="import" href="#mdlFeedImport" data-toggle="modal" label="Import Feed"><img class="icon-import" src="/images/blank.gif" alt="" /></a>
       </center>
     </div>
+  {{if posts.length < 1}}
+    <center class="noposts">You haven't posted anything. Use the <a href="<?echo sprintf($bookmarklet_blog_url, $system_url)?>">Microblog</a> bookmarklet.</center>
   {{/if}}
   {{each(p, post) posts}}
 	<div id="${post.id}" data-title="{{if isBlank(post.title)}}${getShortTitle(post.content)}{{else}}${post.title}{{/if}}" class="postItem well {{if isBlank(post.title) == false}}postItemComplex{{/if}}">

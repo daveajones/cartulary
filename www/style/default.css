@@ -37,15 +37,15 @@
 
 /* --------------------------------------------------- */
 /* ----- River Page ---------------------------------- */
-.pageContentWrapper.River #stream.filtered {
+.pageContentWrapper.River .stream.filtered {
 	margin-top:20px;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list {
+.pageContentWrapper.River .stream .stream-items .stream-list {
    	list-style:none;
 	margin:0;
 	padding:0;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article {
 	display:inline-block;
     position:relative;
     width:100%;
@@ -61,109 +61,109 @@
        -moz-box-shadow: 0px 0px 10px rgba(20, 20, 20, 0.2);
             box-shadow: 0px 0px 10px rgba(20, 20, 20, 0.2);
 } 
-.pageContentWrapper.River #stream #stream-items .stream-list > .article.sticky {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article.sticky {
     margin-top:15px;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .byline {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .byline {
 	display:none;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article h3 {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article h3 {
 	margin:10px;
     margin-left:17px;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article h3 a {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article h3 a {
 	color:#111;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .description {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .description {
     font-size:16px;
 	margin:17px;
 	margin-bottom:24px;
     white-space:pre-line;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .aUnSticky {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .aUnSticky {
 	position:absolute;
     top:-14px;
     left:50%;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list .article a.jumpTop {
+.pageContentWrapper.River .stream .stream-items .stream-list .article a.jumpTop {
   display:inline-block;
   width:30px;
   height:30px;
   padding:3px 3px 0px 0px;
   margin-top:-5px;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list .article .footer {
+.pageContentWrapper.River .stream .stream-items .stream-list .article .footer {
     clear:both;
     background:#ddd;
     padding:8px;
 	padding-top:10px;
     min-height:30px;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list .article .actions {
+.pageContentWrapper.River .stream .stream-items .stream-list .article .actions {
     text-align:right;
     float:right;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list .article .actions .action {
+.pageContentWrapper.River .stream .stream-items .stream-list .article .actions .action {
     display:inline;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list .article .footer .actionwrap > .time {
+.pageContentWrapper.River .stream .stream-items .stream-list .article .footer .actionwrap > .time {
     font-size:80%;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list .article .subitem {
+.pageContentWrapper.River .stream .stream-items .stream-list .article .subitem {
     clear:both;
     text-align:right;
     margin:8px;
 }
 
 /* ----- Enclosures ---------------------------------- */
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .enclosureview {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .enclosureview {
 	text-align:center;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .encobj {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .encobj {
 	margin-top:8px;
 	max-width:100%;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .enciframe.inactive {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .enciframe.inactive {
 	background:#666;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .enciframe.inactive div.play {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .enciframe.inactive div.play {
 	padding-top:130px;
     color:#ddd;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .encpicture {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .encpicture {
   display:block;
   clear:both;
   margin:20px auto 0;
   max-width: 100%;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .encpicture2 {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .encpicture2 {
   display:inline-block;
   margin:20px auto 0;
   max-width: 49%;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .encpicture3 {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .encpicture3 {
   display:inline-block;
   margin:20px auto 0;
   max-width: 29%;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .encpicture4 {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .encpicture4 {
   display:inline-block;
   margin:20px auto 0;
   max-width: 24%;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .encpictures {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .encpictures {
   display:inline-block;
   margin:20px auto 0;
   max-width: 100px;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .enciframe {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .enciframe {
   display:block;
   clear:both;
   margin:10px auto 0;
   width:500px;
   height:300px;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .encvideo {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .encvideo {
   display:block;
   clear:both;
   margin:10px auto 0;
@@ -172,7 +172,7 @@
 }
 
 /* ----- Interactive------------------------------- */
-.pageContentWrapper.River #stream .filternotice {
+.pageContentWrapper.River .stream .filternotice {
     position:fixed;
 	z-index:5;
     top:47px;
@@ -183,75 +183,75 @@
 	background:#f0e067;
 	color: #5F4B32;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .inlinecartmsg {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .inlinecartmsg {
 	text-align:center;
 	margin:20px auto 20px;
 	padding:20px;
 	background-color: #FBF0D9;
 	color: #5F4B32;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article.cartulized {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article.cartulized {
 	background-color: #FBF0D9;
 	color: #5F4B32;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article.cartulized .description {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article.cartulized .description {
 	font-family:Georgia, "Times New Roman", Serif;
 	font-size:130%;
 	line-height:150%;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article.activeItem {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article.activeItem {
     -webkit-box-shadow: 0px 0px 10px rgba(255, 155, 0, 0.5);
        -moz-box-shadow: 0px 0px 10px rgba(255, 155, 0, 0.5);
             box-shadow: 0px 0px 10px rgba(255, 155, 0, 0.5);	
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .inlineblogmsg {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .inlineblogmsg {
 	text-align:center;
 	margin:20px auto 20px;
 	padding:20px;
 	background-color:#fff;
 	color:#111;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer.mbposted {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer.mbposted {
 	background-color: #9acd32;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer .mbinline {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline {
     margin:14px;
     text-align:right;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer .mbinline .mbinform span > textarea {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform span > textarea {
     width:100%;
 	height:150px;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer .mbinline .mbinform > img {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform > img {
 	float:left;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer .mbinline .mbinform span {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform span {
 	display:block;
 	overflow:hidden;
 	padding-right:15px;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer .mbinline .mbinform span > input[type=text] {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform span > input[type=text] {
     width:100%;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer .mbinline .mbinform .tweetbox {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform .tweetbox {
     display:inline-block;
     margin-right:10px;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer .mbinline .mbinform .mbextenc ul {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform .mbextenc ul {
 	list-style:none;
 	list-style-type:none;
 	list-style-position:inside;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer .mbinline .mbinform .mbextenc ul li {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform .mbextenc ul li {
     margin-bottom:6px;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer .mbinline .mbinform .mbextenc input {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform .mbextenc input {
     display:none;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer .mbinline .mbinform .mbextenc .delete {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform .mbextenc .delete {
     vertical-align:top;
 }
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .footer .mbinline .mbinform .mbextenc .imgenclosure {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform .mbextenc .imgenclosure {
     max-width:50%;
     max-height:128px;
 }
@@ -290,7 +290,7 @@
 	background:lightyellow;
 }
 /* ----- Subitems ------------------------------------ */
-.pageContentWrapper.River #stream #stream-items .stream-list > .article .subitem .rivermicrotar {
+.pageContentWrapper.River .stream .stream-items .stream-list > .article .subitem .rivermicrotar {
 	margin:0 0 8px 8px;
 }
 /* --------------------------------------------------- */
@@ -1063,28 +1063,11 @@ div.searchbar p.result-msg {
 /* --------------------------------------------------- */
 
 
-
 /* --------------------------------------------------- */
 /* ----- Subscribe ----- */
-.Subscribe-searchpop .popSearchResults .popover-content ul li {
-  clear:both;  
-}
-.Subscribe-searchpop .popSearchResults .popover-content ul li:hover {
-  background-color:#ddd;
-}
-.Subscribe-searchpop .popSearchResults .popover-content ul li:hover a {
-  text-decoration:none;
-  font-weight:bold;
-  font-size:130%;
-  line-height:120%;
-}
-.Subscribe-searchpop .popSearchResults .popover-content ul li span.feed-properties {
-  display:inline-block;
-  float:right;
-}
 .pageContentWrapper.Subscribe #divSubscribe {
   position: relative;
-  padding:20px;
+  padding:10px;
   margin-bottom:10px;
   *padding-top: 19px;
   background-color: #fff;
@@ -1099,7 +1082,7 @@ div.searchbar p.result-msg {
 }
 .pageContentWrapper.Subscribe #divSubscribePeople {
   position: relative;
-  padding:20px;
+  padding:10px;
   margin-bottom:10px;
   *padding-top: 19px;
   background-color: #fff;
@@ -1110,7 +1093,7 @@ div.searchbar p.result-msg {
 }
 .pageContentWrapper.Subscribe #divSubscriptions {
   position: relative;
-  padding:20px;
+  padding:10px;
   margin-bottom:10px;
   *padding-top: 19px;
   background-color: #fff;
@@ -1119,29 +1102,30 @@ div.searchbar p.result-msg {
      -moz-border-radius: 0px;
           border-radius: 0px;
 }
-
 .pageContentWrapper.Subscribe #divSubscribePeople a {  color:#ddd;  }
 .pageContentWrapper.Subscribe #divSubscribePeople .person {
   color:white;
   float:left;
   display:inline-block;
-  background:#555;
-  text-shadow:0 1px 0 #333;
+  background:#777;
+  text-shadow:0 1px 0 #555;
   margin:8px;
-  border:solid #555 2px;
+  border:solid #abc 2px;
+  -webkit-box-shadow: 0 0 3px 3px #333;
+     -moz-box-shadow: 0 0 3px 3px #333;
+          box-shadow: 0 0 3px 3px #333;
 }
 .pageContentWrapper.Subscribe #divSubscribePeople .person ul li img.icon-warning {  display:inline;  }
 .pageContentWrapper.Subscribe #divSubscribePeople .person ul li a.aFeedRaw {  display:inline;  }
 .pageContentWrapper.Subscribe #divSubscribePeople .person ul li span.feed-properties {
   display:inline-block;
-  float:right;
 }
 .pageContentWrapper.Subscribe #divSubscribePeople .person ul.personList li {
   clear:both;
   margin:3px 0 0;
 }
 .pageContentWrapper.Subscribe #divSubscribePeople .person ul.personList {
-  margin-top:12px; 
+  margin-top:12px;
 }
 .pageContentWrapper.Subscribe #divSubscribePeople .personcaption-block {
   display:block;
@@ -1158,7 +1142,7 @@ div.searchbar p.result-msg {
 }
 .pageContentWrapper.Subscribe #divSubscribePeople .bigPerson {
   width:95%;
-  max-width:300px
+  max-width:280px
 }
 .pageContentWrapper.Subscribe #divSubscribePeople .bigPerson .personimg {
   width:48px;
@@ -1173,48 +1157,22 @@ div.searchbar p.result-msg {
   float:right;
   padding:5px;
 }
-
-.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li img.icon-warning {  display:inline;  }
-.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li a.aFeedRaw {  display:inline;  }
-.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li span.feed-properties {
-  display:inline-block;
-  float:right;
-}
-.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li {
-  clear:both;
-  margin:3px 0 0;
-}
-.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li a {
-  display:inline-block;
-  width:70%;
-}
-.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li:hover {
-  background-color:#ddd;
-}
-.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li:hover a {
-  text-decoration:none;
-  font-weight:bold;
-  font-size:130%;
-  line-height:120%;
-}
-.pageContentWrapper.Subscribe .nooverflow {
-  vertical-align:middle;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-  word-wrap:nowrap;
-}
-
-.pageContentWrapper.Subscribe .liManagedList,
-.pageContentWrapper.Subscribe .liOutsideList {
+.pageContentWrapper.Subscribe .liManagedList {
   background:#777;
+  width:97%;
   border:solid black 1px;
   margin:3px;
   color:black;
   font-size:110%;
-  width:100%;
-  min-height:30px;
-  min-width:200px;
+  min-height:40px;
+}
+.pageContentWrapper.Subscribe .liOutsideList {
+  width:97%;
+  border:solid black 1px;
+  margin:3px;
+  color:black;
+  font-size:110%;
+  min-height:40px;
 }
 .pageContentWrapper.Subscribe #divSubscriptions .liManagedList a { color:white; }
 .pageContentWrapper.Subscribe #divSubscriptions .liManagedList .ulListFeeds {
@@ -1225,6 +1183,28 @@ div.searchbar p.result-msg {
   float:right;
   padding:5px;
 }
+.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li > input {
+  margin-bottom:5px;
+  margin-right:8px;
+}
+.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li > a {
+  display:inline-block;
+  width:70%;
+}
+.pageContentWrapper.Subscribe .feedproperties {
+  display:inline-block;
+  text-align:right;
+  max-width:100px;
+}
+.pageContentWrapper.Subscribe .nooverflow {
+  margin:3px;
+  vertical-align:middle;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  word-wrap:nowrap;
+}
+
 /* --------------------------------------------------- */
 
 
@@ -1404,6 +1384,24 @@ div.searchbar p.result-msg {
 /* --------------------------------------------------- */
 
 
+/* --------------------------------------------------- */
+/* ----- The 'Me' Page ----- */
+.pageContentWrapper.Prefs #divMySocialOutline {
+  position: relative;
+  padding:20px;
+  margin-bottom:10px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 0px;
+     -moz-border-radius: 0px;
+          border-radius: 0px;
+}
+/* --------------------------------------------------- */
+
+
+
+
 /* --------------------------------------------------------- */
 } /* ---------------- End Media: All ----------------------- */
 /* --------------------------------------------------------- */
@@ -1450,16 +1448,6 @@ div.searchbar p.result-msg {
 .pageContentWrapper.Articles #divArticles {
   display:inline-block;
   margin-top:0;
-}
-/* --------------------------------------------------- */
-
-
-
-/* --------------------------------------------------- */
-/* ----- Subscribe ----- */
-.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li a {
-  display:inline-block;
-  width:80%;
 }
 /* --------------------------------------------------- */
 

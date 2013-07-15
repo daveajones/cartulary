@@ -1012,15 +1012,16 @@ div.searchbar p.result-msg {
   float:right;
   padding:5px;
 }
-.pageContentWrapper.Subscribe .nooverflow {
-  margin:3px;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-  word-wrap:nowrap;
-}
 .pageContentWrapper.Subscribe .liManagedList {
   background:#777;
+  width:100%;
+  border:solid black 1px;
+  margin:3px;
+  color:black;
+  font-size:110%;
+  min-height:40px;
+}
+.pageContentWrapper.Subscribe .liOutsideList {
   width:100%;
   border:solid black 1px;
   margin:3px;
@@ -1037,15 +1038,17 @@ div.searchbar p.result-msg {
   float:right;
   padding:5px;
 }
-.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li a {
+.pageContentWrapper.Subscribe #divSubscriptions .ulFeedsIFollow li > a {
   display:inline-block;
-  width:70%;
+  width:50%;
 }
 .pageContentWrapper.Subscribe .feedproperties {
   display:inline-block;
-  max-width:50px;
+  text-align:right;
+  max-width:100px;
 }
 .pageContentWrapper.Subscribe .nooverflow {
+  margin:3px;
   vertical-align:middle;
   overflow:hidden;
   white-space:nowrap;

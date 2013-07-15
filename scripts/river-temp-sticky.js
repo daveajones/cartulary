@@ -101,7 +101,7 @@
 
             <div class="actions">
 	            <?if( $g_prefs['riverheadlinecart'] != 1 ) {?>
-					<?if( $g_prefs['cartinriver'] == 1 && $g_platform['mobile'] ) {?>
+					<?if( $g_prefs['cartinriver'] == 1 ) {?>
                     	<div class="cartform action">
 							<a class="_cartlink" href="<?echo $cartulizecgi?>?title=${encodeURIComponent(title)}&url=${encodeURIComponent(link)}&surl=${encodeURIComponent(feed.feedUrl)}&stitle=${encodeURIComponent(feed.feedTitle)}" rel="external nofollow">
 								<img class="icon-bookmark" src="/images/blank.gif" alt="" />

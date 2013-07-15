@@ -1,6 +1,6 @@
 <?
 //A list of database schema updates for each version
-$cg_database_version = 21;
+$cg_database_version = 22;
 $cg_database_updates = array();
 
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
@@ -239,6 +239,16 @@ CGDB0049;
 $cg_database_updates[20][] = <<<CGDB0050
  INSERT INTO `dbversion` ( `version` ) VALUES ( '21' )
 CGDB0050;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 21 to 22 -------------------------------------------------------------------------------------------------
+$cg_database_updates[21][] = <<<CGDB0051
+ ALTER TABLE `prefs` CHANGE `cartinriver` `cartinriver` TINYINT( 4 ) NOT NULL DEFAULT '0' COMMENT 'Show cartulized articles in a modal.'
+CGDB0051;
+
+$cg_database_updates[21][] = <<<CGDB0052
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '22' )
+CGDB0052;
 //----------------------------------------------------------------------------------------------------------------
 
 

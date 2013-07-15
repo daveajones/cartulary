@@ -1160,7 +1160,7 @@ function create_short_url_file($url = NULL) {
     return(FALSE);
   }
 
-  return("<html><head><meta http-equiv=\"refresh\" content=\"1;URL='$url'\"></head><body></body></html>");
+  return("<html><head><meta http-equiv=\"refresh\" content=\"0;URL='$url'\"></head><body></body></html>");
 }
 
 function get_s3_buckets($key, $secret) {

@@ -6308,7 +6308,7 @@ function get_sticky_feed_items($uid = NULL)
   if($sql->num_rows() < 1) {
     $sql->close()
       or loggit(2, "MySql error: ".$dbh->error);
-    loggit(1,"No feed items returned for: [$fid].");
+    loggit(1,"No feed items returned for: [$uid].");
     return(array());
   }
 

@@ -8,7 +8,7 @@
 	data-feedid="${feed.feedId}">
 
 	<!-- Sticky link -->
-    <a class="aUnSticky" href="#" data-id="${id}" data-index="${index}" data-feedid="{{if feed.linkedOutlineType}}{{if feed.linkedOutlineType == 'sopml'}}${linkedOutlineId}{{else}}${feed.feedId}{{/if}}{{else}}${feed.feedId}{{/if}}"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>
+    <a class="aUnSticky" href="#" data-id="${id}" data-idx="${index}" data-feedid="{{if feed.linkedOutlineType}}{{if feed.linkedOutlineType == 'sopml'}}${feed.linkedOutlineId}{{else}}${feed.feedId}{{/if}}{{else}}${feed.feedId}{{/if}}"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>
 
 	<!-- Feed level avatar -->
 	{{if feed.avatarUrl}}
@@ -101,7 +101,7 @@
 
             <div class="actions">
 	            <?if( $g_prefs['riverheadlinecart'] != 1 ) {?>
-					<?if( $g_prefs['cartinriver'] == 1 && $g_platform['mobile'] ) {?>
+					<?if( $g_prefs['cartinriver'] == 1 && $g_platform == "mobile" ) {?>
                     	<div class="cartform action">
 							<a class="_cartlink" href="<?echo $cartulizecgi?>?title=${encodeURIComponent(title)}&url=${encodeURIComponent(link)}&surl=${encodeURIComponent(feed.feedUrl)}&stitle=${encodeURIComponent(feed.feedTitle)}" rel="external nofollow">
 								<img class="icon-bookmark" src="/images/blank.gif" alt="" />

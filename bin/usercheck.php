@@ -22,12 +22,15 @@
     }
 
     //Make sure that admin users are subscribed to the admin log feed
-    $fid = add_feed('http://localhost'.$adminlogfeed, NULL, TRUE, NULL);
+	$alfurl = 'http://localhost'.$adminlogfeed;
+    $fid = add_feed($alfurl, NULL, TRUE, NULL);
     $users = get_admin_users();
     foreach($users as $user) {
-      loggit(1, "Linking admin user: [".$user['name']."] to admin log feed: [http://localhost".$adminlogfeed."]");
-      link_feed_to_user($fid, $user['id']);
-      mark_feed_as_sticky($fid, $user['id']);
+      loggit(1, "Linking admin user: [".$user['name']."] to admin log feed: [$alfurl]");
+	  if( !feed_is_linked_by_url($alfurl, $user['id']) ) {
+	      link_feed_to_user($fid, $user['id']);
+          mark_feed_as_sticky($fid, $user['id']);
+	  }
     }
 
     //Get the users list

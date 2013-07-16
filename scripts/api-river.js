@@ -6,6 +6,7 @@ freedomController.v1.river.statics  = {
 	pathToActiveItem	: "#stream .stream-list .article.activeItem",
 	pathToStreamList	: "#stream .stream-list",
 	lsRiverDataKey		: "riverdata",
+	lsRiverDataPullTime : "riverpulltime",
 	lsStickyDataKey		: "stickydata"
 };
 
@@ -17,6 +18,7 @@ var pathToStreamItem = freedomController.v1.river.statics.pathToStreamItem;
 var pathToActiveItem = freedomController.v1.river.statics.pathToActiveItem;
 var pathToStreamList = freedomController.v1.river.statics.pathToStreamList;
 var lsRiverDataKey   = freedomController.v1.river.statics.lsRiverDataKey;
+var lsRiverDataPullTime  = freedomController.v1.river.statics.lsRiverDataPullTime;
 var lsStickyDataKey  = freedomController.v1.river.statics.lsStickyDataKey;
 
 //----- River functions -----
@@ -620,7 +622,9 @@ function _bindStickyLinks(elid) {
                 var bobj = $(this);
                 var id = bobj.attr("data-id");
                 var fid = bobj.attr("data-feedid");
-				var idx = bobj.attr("data-index");
+				console.log("fid: " + fid);
+				var idx = bobj.attr("data-idx");
+				console.log("idx: " + idx);
 
 				//Hide the item first
 				$('#' + id).hide();
@@ -628,6 +632,7 @@ function _bindStickyLinks(elid) {
 				//Get any sticky subitems so we can un-sticky them too
 				var subitems = $('#' + id + ' .subitem.sticky').map(function() { return this.id; }).get();	
 
+				(function(){
                 //Make the call
                 $.ajax({
                         url:    '/cgi/in/unsticky?id=' + id,
@@ -669,6 +674,7 @@ function _bindStickyLinks(elid) {
                 	        }
                 	});
 		}
+			})();
 
                 return false;
         });
@@ -780,6 +786,7 @@ function _buildRiver(cached) {
 	cols = _sortGrid();
 
 	//Get the data and show it
+	console.log("build river from cache? " + cached);
 	$.when(_getRiverStickyItems(cached), _getRiverItems(cached)).done(function() {
 		//Bindings
 		_rebindEverything();
@@ -790,8 +797,13 @@ function _buildRiver(cached) {
 		//Remove loading notice
 		_changeStreamNotice('', true);
 
+		//Timestamp the data pull in local storage
+		if( cached == false ) {
+			sessionStorage.setItem(lsRiverDataPullTime, Math.round(new Date().getTime() / 1000));
+		}
+
+		//Re-trigger masonry when viewport is resized on desktop browsers
 		<?if( $g_platform != "mobile" && $g_platform != "tablet" ) {?>
-		//Re-trigger masonry when viewport is resized
 		$(window).off('debouncedresize');
     	$(window).on('debouncedresize', function( event ){
 			if( $(pathToStreamList).length != _calculateColumnCount() ) {
@@ -813,7 +825,7 @@ function _populateGridSticky(cols) {
 	var col = 1;
 
 	//Get data out of local storage
-	var lsdata = localStorage.getItem(lsStickyDataKey);
+	var lsdata = sessionStorage.getItem(lsStickyDataKey);
 	if( lsdata !== null ) {
 		data = JSON.parse(lsdata);
 		console.log(data);
@@ -834,7 +846,7 @@ function _populateGridSticky(cols) {
 			//Check if the item exists already
 			if( $(pathToStreamItem + '#' + item.id).length > 0 ) {
 				$(pathToStreamItem + '#' + item.id).prependTo('#stream .col' + col + ' .stream-list');
-				_makePostSticky(pathToStreamItem + '#' + item.id, item.id, item.feed.feedId);
+				_makePostSticky(pathToStreamItem + '#' + item.id, item.id, item.index, item.feed.feedId);
 
 			} else {
 				//Check if the origin exists already
@@ -873,7 +885,7 @@ function _populateGrid(cols) {
 	var col = 1;
 
 	//Get data out of local storage
-	var lsdata = localStorage.getItem(lsRiverDataKey);
+	var lsdata = sessionStorage.getItem(lsRiverDataKey);
 	if( lsdata !== null ) {
 		data = JSON.parse(lsdata);
 	}
@@ -934,7 +946,7 @@ function _getRiverStickyItems(cached) {
 		dataType: "json",
 		success: function(data) {
 			console.log('store data: ' + data);
-			localStorage.setItem(lsStickyDataKey, JSON.stringify(data));
+			sessionStorage.setItem(lsStickyDataKey, JSON.stringify(data));
 			_populateGridSticky(_calculateColumnCount());
 		},
 		error: function( x, y, z) {
@@ -956,7 +968,7 @@ function _getRiverItems(cached) {
 		dataType: "jsonp",
 		success: function(data) {
 			console.log('store data: ' + data);
-			localStorage.setItem(lsRiverDataKey, JSON.stringify(data));
+			sessionStorage.setItem(lsRiverDataKey, JSON.stringify(data));
 			_populateGrid(_calculateColumnCount());
 		},
 		error: function( x, y, z) {
@@ -968,11 +980,11 @@ function _getRiverItems(cached) {
 
 function _removeStickyItemLS(index) {
 	//Get data out of local storage
-	var lsdata = localStorage.getItem(lsStickyDataKey);
+	var lsdata = sessionStorage.getItem(lsStickyDataKey);
 	if( lsdata !== null ) {
 		data = JSON.parse(lsdata);
 		data.data.items[index].hidden = 1;
-		localStorage.setItem(lsStickyDataKey, JSON.stringify(data));
+		sessionStorage.setItem(lsStickyDataKey, JSON.stringify(data));
 		console.log('sticky item removed');
 	}
 	return true;
@@ -1010,9 +1022,9 @@ function _bindEmbedActivations(elid) {
 	return true;
 };
 
-function _makePostSticky(elid, pid, fid) {
+function _makePostSticky(elid, pid, idx, fid) {
 	$(elid).addClass('sticky');
-    $(elid).append('<a class="aUnSticky" href="#" data-id="' + pid + '" data-feedid="' + fid + '"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>');
+    $(elid).append('<a class="aUnSticky" href="#" data-idx="' + idx + '" data-id="' + pid + '" data-feedid="' + fid + '"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>');
 	
 	return true;
 }

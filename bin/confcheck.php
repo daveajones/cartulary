@@ -18,6 +18,7 @@
     $cftemp = "$confroot/$templates/cartulary.conf";
 
     //Default values
+	$l_pathtocart = $confroot;
     $l_serverguid = random_gen(64);
     $l_dbusername = "cartulary";
     $l_dbpassword = "cartulary";
@@ -40,6 +41,9 @@
     $l_ipreflectorurl = "http://checkip.dyndns.com";
     $l_rsscloud = 0;
     $l_peoplesearch = 1;
+	$l_opensignup = 0;
+	$l_backupencrypt = 0;
+	$l_backupencryptpassword = "";
 
     //If there is already a config file, let's hang on to it
     if( file_exists($cfname) ) {
@@ -79,8 +83,17 @@
         }
         $l_rsscloud = $enable_rsscloud;
         if( isset($cg_peoplesearch) ) {
-	  $l_peoplesearch = $cg_peoplesearch;
-	}
+	  		$l_peoplesearch = $cg_peoplesearch;
+		}
+        if( isset($cg_opensignup) ) {
+	  		$l_opensignup = $cg_opensignup;
+		}
+		if( isset($cg_backup_encrypt) ) {
+			$l_backupencrypt = $cg_backup_encrypt;
+		}
+		if( isset($cg_backup_encrypt_password) ) {
+			$l_backupencryptpassword = $cg_backup_encrypt_password;
+		}
       }
 
       copy( $cfname, $cfname.'.old.'.time() );
@@ -244,10 +257,24 @@
       $template = str_replace('cg_peoplesearch=1', 'cg_peoplesearch=0', $template);
     }
 
+	//Preserve backup encryption settings
+    if( $l_backupencrypt == 1 ) {
+	    $template = str_replace('cg_backup_encrypt=0', 'cg_backup_encrypt=1', $template);
+	}
+    $template = str_replace('cg_backup_encrypt_password="backupencryptpassword"', 'cg_backup_encrypt_password="'.$l_backupencryptpassword.'"', $template);
+
+	//Preserve open signup settings
+	if( $l_opensignup == 1 ) {
+	    $template = str_replace('cg_opensignup=0', 'cg_opensignup=1', $template);
+	}
+
     //Eliminate the newinstall flag if it's set
     if( !isset($cartularynewinstall) ) {
       $template = str_replace('cartularynewinstall=1', "", $template);
     }
+
+	//Build paths
+    $template = str_replace('[PATHTOCART]', $l_pathtocart, $template);
 
     //Write the new config file
     $fh = fopen($cfname, "w+");

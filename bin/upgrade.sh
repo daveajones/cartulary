@@ -21,6 +21,9 @@ BAKDATE=`date +'%Y%m%d%s'`
 ##: Go to the temp folder
 cd /tmp
 
+##: Find cart install
+CARTROOT=`echo "<?echo rtrim(get_cfg_var('cartulary_conf'), '/');?>" | php`
+
 ##: Grab the current repo and extract it
 clear
 echo
@@ -43,32 +46,32 @@ stop cron
 killall php
 
 ##: Back up the existing install
-tar -zcvf ~/cartulary-bak-$BAKDATE.tar.gz /opt/cartulary
+tar -zcvf ~/cartulary-bak-$BAKDATE.tar.gz $CARTROOT
 
 ##: Get into the repo folder
 cd cartulary-$BRANCH
 
 ##: Backup newuser sub list
-cp /opt/cartulary/www/newuser.opml /tmp
+cp $CARTROOT/www/newuser.opml /tmp
 
 ##: Put new files in place
-cp -R bin/* /opt/cartulary/bin
-cp -R includes/* /opt/cartulary/includes
-cp -R libraries/* /opt/cartulary/libraries
-cp -R scripts/* /opt/cartulary/scripts
-cp -R templates/* /opt/cartulary/templates
-cp -R www/* /opt/cartulary/www
+cp -R bin/* $CARTROOT/bin
+cp -R includes/* $CARTROOT/includes
+cp -R libraries/* $CARTROOT/libraries
+cp -R scripts/* $CARTROOT/scripts
+cp -R templates/* $CARTROOT/templates
+cp -R www/* $CARTROOT/www
 
 ##: Set permissions
-touch /opt/cartulary/logs/error.log
-touch /opt/cartulary/logs/debug.log
-touch /opt/cartulary/logs/access.log
-chown www-data /opt/cartulary/logs >>/tmp/cartinstall.log 2>&1
-chown www-data /opt/cartulary/logs/* >>/tmp/cartinstall.log 2>&1
-chown www-data /opt/cartulary/spool >>/tmp/cartinstall.log 2>&1
+touch $CARTROOT/logs/error.log
+touch $CARTROOT/logs/debug.log
+touch $CARTROOT/logs/access.log
+chown www-data $CARTROOT/logs >>/tmp/cartinstall.log 2>&1
+chown www-data $CARTROOT/logs/* >>/tmp/cartinstall.log 2>&1
+chown www-data $CARTROOT/spool >>/tmp/cartinstall.log 2>&1
 
 ##: Restore newuser sub list
-cp /tmp/newuser.opml /opt/cartulary/www
+cp /tmp/newuser.opml $CARTROOT/www
 
 ##: Get out of the repo
 cd ..
@@ -86,16 +89,16 @@ echo '##                                                          '
 echo '##  Upgrade cartulary.conf file.                            '
 echo '##                                                          '
 echo '##  - If you mess up here, just run:                        '
-echo '##    > sudo php /opt/cartulary/bin/confcheck.php upgrade   '
+echo "##    > sudo php $CARTROOT/bin/confcheck.php upgrade        "
 echo '##    after the upgrade finishes.                           '
 echo '##                                                          '
 echo '##----------------------------------------------------------'
 echo '############################################################'
 echo
-php /opt/cartulary/bin/confcheck.php upgrade silent
+php $CARTROOT/bin/confcheck.php upgrade silent
 
 ##: Check the database version
-php /opt/cartulary/bin/dbcheck.php
+php $CARTROOT/bin/dbcheck.php
 
 ##: Restart cron daemon
 echo

@@ -1,0 +1,22 @@
+Release Notes - Freedom Controller v0.5.1
+
+
+This is mostly a server maintainence and bug fix release.  Here's a run down:
+
+- Removed all of the hard coding of "/opt/cartulary" so putting the app in a different
+  folder is now much less of a headache.
+- The feed scanner now reports subscriber count in the user agent string.
+- Meta-refresh interval on S3 shortened links is now zero, per @JoeMoreno recommendation.
+- Fixed some river bugs with un-stickying items
+- Added an option to encrypt database backups using AES-256.  Look in the [security] section
+  of cartulary.conf for:
+  cg_backup_encrypt:  1 for yes, 0 for no
+  cg_backup_encrypt_password:  you'll use this password if you ever need to recover
+- Fixed a bug with mobile in-river carting pref
+- Switched to sessionStorage for river data instead of localStorage
+- Bug fix with blog tools pane not showing up if there were no blog posts
+- Fixed style sheet problem on mobile version of subscribe page
+- Fixed jumping to new feed on manual subscribe
+- Fixed a syntax error in the river item templates
+- Set the in-river carting on mobile option to default to true now that we're not
+  using modals

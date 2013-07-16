@@ -44,7 +44,9 @@
        easier for your users.
     6. Download the github zip archive.
     7. Unzip the archive.
-    8. Without going into the extracted directory, run "sudo cartulary-master/INSTALL".
+	8. You can open "cartulary-master/INSTALL" and edit the "INSTALLDIR" variable to
+       install in a different directory than the default at this point.
+    9. Without going into the extracted directory, run "sudo cartulary-master/INSTALL".
 
     ** The INSTALLation script is meant to ONLY be run on a fresh version of Ubuntu 12. I
     take no responsibility for how bad you wreck your system if you run it on anything 

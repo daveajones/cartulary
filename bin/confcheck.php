@@ -18,7 +18,7 @@
     $cftemp = "$confroot/$templates/cartulary.conf";
 
     //Default values
-	$l_pathtocart = rtrim(get_cfg_var("cartulary_conf"), '/');
+	$l_pathtocart = $confroot;
     $l_serverguid = random_gen(64);
     $l_dbusername = "cartulary";
     $l_dbpassword = "cartulary";

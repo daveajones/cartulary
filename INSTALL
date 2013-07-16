@@ -109,6 +109,7 @@ echo '#####################################################'
 echo
 cp $INSTALLDIR/templates/apache.conf /etc/apache2/sites-available/cartulary >>/tmp/cartinstall.log 2>&1
 ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cartulary >>/tmp/cartinstall.log 2>&1
+sed -i "s,\[CONFROOT\],$INSTALLDIR,g" /etc/apache2/sites-available/cartulary
 a2enmod headers
 /etc/init.d/apache2 restart >>/tmp/cartinstall.log 2>&1
 

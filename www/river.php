@@ -57,10 +57,10 @@
 
 <div class="row-fluid" id="divRiver">
 
-<div id="stream-wrap">
-  <div id="stream">
+<div id="stream-wrap" class="stream-wrap">
+  <div id="stream" class="stream">
     <p class="notice"><img id="imgLoadRiverSpinner" class="imgSpinner" src="/images/spinner.gif" alt="" /> Loading river...</p>
-	<div id="stream-items"></div>
+	<div id="stream-items" class="stream-items"></div>
   </div>
 </div>
 

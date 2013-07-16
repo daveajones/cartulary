@@ -22,7 +22,7 @@ BAKDATE=`date +'%Y%m%d%s'`
 cd /tmp
 
 ##: Find cart install
-CARTROOT=`echo "<?echo rtrim(get_cfg_var('cartulary_conf'), '/');?>" | php`
+export CARTROOT=`echo "<?echo rtrim(get_cfg_var('cartulary_conf'), '/');?>" | php`
 
 ##: Grab the current repo and extract it
 clear

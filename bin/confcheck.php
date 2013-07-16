@@ -18,6 +18,7 @@
     $cftemp = "$confroot/$templates/cartulary.conf";
 
     //Default values
+	$l_pathtocart = rtrim(get_cfg_var("cartulary_conf"), '/');
     $l_serverguid = random_gen(64);
     $l_dbusername = "cartulary";
     $l_dbpassword = "cartulary";
@@ -271,6 +272,9 @@
     if( !isset($cartularynewinstall) ) {
       $template = str_replace('cartularynewinstall=1', "", $template);
     }
+
+	//Build paths
+    $template = str_replace('[PATHTOCART]', $l_pathtocart, $template);
 
     //Write the new config file
     $fh = fopen($cfname, "w+");

@@ -10,6 +10,7 @@
 
 
 ##: This script needs to be run with sudo
+INSTALLDIR="/opt/cartulary"
 ROOT_UID="0"
 
 #Check if run as root
@@ -74,13 +75,13 @@ echo '#####################################################'
 echo
 echo  >> /etc/php5/apache2/php.ini
 echo '[cartulary]' >> /etc/php5/apache2/php.ini
-echo 'cartulary_conf="/opt/cartulary"' >> /etc/php5/apache2/php.ini
+echo "cartulary_conf=$INSTALLDIR" >> /etc/php5/apache2/php.ini
 echo 'post_max_size=300M' >> /etc/php5/apache2/php.ini
 echo 'upload_max_filesize=300M' >> /etc/php5/apache2/php.ini
 echo 'max_execution_time=90' >> /etc/php5/apache2/php.ini
 echo  >> /etc/php5/cli/php.ini
 echo '[cartulary]' >> /etc/php5/cli/php.ini
-echo 'cartulary_conf="/opt/cartulary"' >> /etc/php5/cli/php.ini
+echo "cartulary_conf=$INSTALLDIR" >> /etc/php5/cli/php.ini
 
 
 ##: 5. Install Cartulary Files
@@ -93,7 +94,7 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-mv cartulary-master /opt/cartulary >>/tmp/cartinstall.log 2>&1
+mv cartulary-master $INSTALLDIR >>/tmp/cartinstall.log 2>&1
 
 
 ##: 6. Configure Apache
@@ -106,7 +107,7 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-cp /opt/cartulary/templates/apache.conf /etc/apache2/sites-available/cartulary >>/tmp/cartinstall.log 2>&1
+cp $INSTALLDIR/templates/apache.conf /etc/apache2/sites-available/cartulary >>/tmp/cartinstall.log 2>&1
 ln -s /etc/apache2/sites-available/cartulary /etc/apache2/sites-enabled/000-cartulary >>/tmp/cartinstall.log 2>&1
 a2enmod headers
 /etc/init.d/apache2 restart >>/tmp/cartinstall.log 2>&1
@@ -122,12 +123,12 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-touch /opt/cartulary/logs/error.log
-touch /opt/cartulary/logs/debug.log
-touch /opt/cartulary/logs/access.log
-chown ubuntu.www-data /opt/cartulary/logs >>/tmp/cartinstall.log 2>&1
-chown ubuntu.www-data /opt/cartulary/logs/* >>/tmp/cartinstall.log 2>&1
-chown ubuntu.www-data /opt/cartulary/spool >>/tmp/cartinstall.log 2>&1
+touch $INSTALLDIR/logs/error.log
+touch $INSTALLDIR/logs/debug.log
+touch $INSTALLDIR/logs/access.log
+chown ubuntu.www-data $INSTALLDIR/logs >>/tmp/cartinstall.log 2>&1
+chown ubuntu.www-data $INSTALLDIR/logs/* >>/tmp/cartinstall.log 2>&1
+chown ubuntu.www-data $INSTALLDIR/spool >>/tmp/cartinstall.log 2>&1
 
 ##: 8. Create Cartulary Config File
 clear
@@ -145,13 +146,13 @@ echo '##    how the outside world gets to your site.       '
 echo '##    Example:  my.server.com.                       '
 echo '##                                                   '
 echo '##  - If you mess up, just go edit:                  '
-echo '##    /opt/cartulary/conf/cartulary.conf by hand to  '
+echo "##    $INSTALLDIR/conf/cartulary.conf by hand to     "
 echo '##    correct after the install finishes.            '
 echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-php /opt/cartulary/bin/confcheck.php 2>>/tmp/cartinstall.log
+php $INSTALLDIR/bin/confcheck.php 2>>/tmp/cartinstall.log
 
 
 ##: 9. Check database version
@@ -164,7 +165,7 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-php /opt/cartulary/bin/dbcheck.php 2>>/tmp/cartinstall.log
+php $INSTALLDIR/bin/dbcheck.php 2>>/tmp/cartinstall.log
 
 
 ##: 10. Install Cartulary Admin User
@@ -177,7 +178,7 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-php /opt/cartulary/bin/usercheck.php 2>>/tmp/cartinstall.log >/tmp/cartinstall.pass
+php $INSTALLDIR/bin/usercheck.php 2>>/tmp/cartinstall.log >/tmp/cartinstall.pass
 
 
 ##: 11. Install Crontab
@@ -190,7 +191,7 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-php /opt/cartulary/bin/syscheck.php >>/tmp/cartinstall.log 2>&1
+php $INSTALLDIR/bin/syscheck.php >>/tmp/cartinstall.log 2>&1
 /etc/init.d/cron restart >>/tmp/cartinstall.log 2>&1
 
 
@@ -205,9 +206,9 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-php /opt/cartulary/bin/outlinescan.php
-php /opt/cartulary/bin/feedscan.php
-php /opt/cartulary/bin/buildrivers.php
+php $INSTALLDIR/bin/outlinescan.php
+php $INSTALLDIR/bin/feedscan.php
+php $INSTALLDIR/bin/buildrivers.php
 
 ##: All done!
 clear

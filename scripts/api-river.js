@@ -623,7 +623,7 @@ function _bindStickyLinks(elid) {
                 var id = bobj.attr("data-id");
                 var fid = bobj.attr("data-feedid");
 				console.log("fid: " + fid);
-				var idx = bobj.attr("data-index");
+				var idx = bobj.attr("data-idx");
 				console.log("idx: " + idx);
 
 				//Hide the item first
@@ -632,7 +632,7 @@ function _bindStickyLinks(elid) {
 				//Get any sticky subitems so we can un-sticky them too
 				var subitems = $('#' + id + ' .subitem.sticky').map(function() { return this.id; }).get();	
 
-				(function() {
+				(function(){
                 //Make the call
                 $.ajax({
                         url:    '/cgi/in/unsticky?id=' + id,
@@ -674,9 +674,9 @@ function _bindStickyLinks(elid) {
                 	        }
                 	});
 		}
+			})();
 
                 return false;
-			})();
         });
 
 		return false;
@@ -846,7 +846,7 @@ function _populateGridSticky(cols) {
 			//Check if the item exists already
 			if( $(pathToStreamItem + '#' + item.id).length > 0 ) {
 				$(pathToStreamItem + '#' + item.id).prependTo('#stream .col' + col + ' .stream-list');
-				_makePostSticky(pathToStreamItem + '#' + item.id, item.id, item.feed.feedId);
+				_makePostSticky(pathToStreamItem + '#' + item.id, item.id, item.index, item.feed.feedId);
 
 			} else {
 				//Check if the origin exists already
@@ -1022,9 +1022,9 @@ function _bindEmbedActivations(elid) {
 	return true;
 };
 
-function _makePostSticky(elid, pid, fid) {
+function _makePostSticky(elid, pid, idx, fid) {
 	$(elid).addClass('sticky');
-    $(elid).append('<a class="aUnSticky" href="#" data-id="' + pid + '" data-feedid="' + fid + '"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>');
+    $(elid).append('<a class="aUnSticky" href="#" data-idx="' + idx + '" data-id="' + pid + '" data-feedid="' + fid + '"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>');
 	
 	return true;
 }

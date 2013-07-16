@@ -16,6 +16,10 @@
   It all runs on a standard LAMP stack, and it supports multiple users.  So, if you're
   a techy person, you can run your own server for all your friends.
 
+  We have a google group for announcements, questions and install help here:
+
+  https://groups.google.com/forum/#!forum/sopml
+
 
 #### LICENSE:
   All original code in this package is currently licensend under the CDDL license.

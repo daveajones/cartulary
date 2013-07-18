@@ -15,11 +15,13 @@
     $rjfile = $default_river_json_file_name;
     $rjurl = $riverpagejson;
   }
+/*
   if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {
     $jsonurl = get_s3_url($uid, NULL, $rjfile);
   } else {
     $jsonurl = $rjurl;
   }
+*/
 
   $section = "River";
   $tree_location = "River";

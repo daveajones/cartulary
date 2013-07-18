@@ -1783,7 +1783,7 @@ function get_s3_url($uid = NULL, $path = NULL, $filename = NULL) {
 
   //Globals
   $url = '';
-  $prot = 'http://';
+  $prot = 'https://';
   $host = $mybucket.'.s3.amazonaws.com';
   $path = trim($path, '/');
   $filename = ltrim($filename, '/');

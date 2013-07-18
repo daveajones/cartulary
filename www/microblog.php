@@ -19,17 +19,17 @@
   $enclosure = "";
   $origin="";
   if( isset($_REQUEST['description']) ) {
-    $description = urldecode($_REQUEST['description']);
+    $description = $_REQUEST['description'];
     //If this is a twitter re-tweet, then prefix it appropriately
     if( isset($_REQUEST['source']['url']) && strpos($_REQUEST['source']['url'], "twitter.com") !== FALSE ) {
       $description = 'RT @'.$description;
     }
   }
   if( isset($_REQUEST['link']) ) {
-    $link = urldecode($_REQUEST['link']);
+    $link = $_REQUEST['link'];
   }
   if( isset($_REQUEST['shorturl']) ) {
-    $shortlink = urldecode($_REQUEST['shorturl']);
+    $shortlink = $_REQUEST['shorturl'];
   }
   if( isset($_REQUEST['enclosure']) ) {
     $enclosure = $_REQUEST['enclosure'];

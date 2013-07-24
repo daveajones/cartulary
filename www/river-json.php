@@ -1,7 +1,7 @@
 <?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
 <?include "$confroot/$templates/php_page_init.php"?>
 <?
-  if( isset($_REQUEST['platform']) ) {
+  if( isset($_REQUEST['platform']) || $g_platform == "mobile" ) {
     if( $_REQUEST['platform'] == "mobile" ) {
       $mobile = TRUE;
     } else {

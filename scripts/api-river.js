@@ -2,6 +2,7 @@
 // ----- River API -----
 freedomController.v1.river = {};
 freedomController.v1.river.statics  = {
+    riverJsonUrl        : "<?echo $cg_riverjs_url?>",
 	pathToStreamItem	: "#stream .stream-list .article",
 	pathToActiveItem	: "#stream .stream-list .article.activeItem",
 	pathToStreamList	: "#stream .stream-list",
@@ -14,6 +15,7 @@ freedomController.v1.river.methods = (function() {
 //-----------------------------------------------------------------------------------
 
 //----- River globals -----
+var riverJsonUrl     = freedomController.v1.river.statics.riverJsonUrl;
 var pathToStreamItem = freedomController.v1.river.statics.pathToStreamItem;
 var pathToActiveItem = freedomController.v1.river.statics.pathToActiveItem;
 var pathToStreamList = freedomController.v1.river.statics.pathToStreamList;
@@ -963,7 +965,7 @@ function _getRiverItems(cached) {
 
 	//Get the river json data and parse it
     return $.ajax({
-		url: '<?echo $jsonurl?>?callback=?',
+		url: riverJsonUrl + '?callback=?',
 		jsonpCallback: 'onGetRiverStream',
 		dataType: "jsonp",
 		success: function(data) {

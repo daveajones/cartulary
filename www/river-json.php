@@ -2,7 +2,7 @@
 <?include "$confroot/$templates/php_page_init.php"?>
 <?
   if( isset($_REQUEST['platform']) || $g_platform == "mobile" ) {
-    if( $_REQUEST['platform'] == "mobile" ) {
+    if( $_REQUEST['platform'] == "mobile" || $g_platform == "mobile" ) {
       $mobile = TRUE;
     } else {
       $mobile = FALSE;

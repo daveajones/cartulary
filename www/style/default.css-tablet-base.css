@@ -98,6 +98,7 @@ body > .container {  margin-top:60px;  }
 /* --------------------------------------------------- */
 /* ----- Inputs ------------------------------------- */
 textarea,
+input[type=password],
 input[type=text] {
     -webkit-border-radius: 0px;
     -moz-border-radius: 0px;

@@ -1,4 +1,8 @@
 <?php
+//########################################################################################
+// API for general utility type functions
+//########################################################################################
+
 
 // Logging function
 function loggit($lognum, $message)
@@ -195,8 +199,8 @@ function truncate_text($string = NULL, $length)
 }
 
 
-//http://stackoverflow.com/questions/1193500/php-truncate-html-ignoring-tags
 //Truncate html to a specific word count, but keep it valid
+//via: http://stackoverflow.com/questions/1193500/php-truncate-html-ignoring-tags
 function truncate_html($html, $max_words)
 {
     if (str_word_count($html) > $max_words) {
@@ -2018,7 +2022,7 @@ function chop_extension($file = NULL)
 
 
 //Search for a substring with an array as the needle
-//http://stackoverflow.com/questions/6284553/using-an-array-as-needles-in-strpos
+//via: http://stackoverflow.com/questions/6284553/using-an-array-as-needles-in-strpos
 function strposa($haystack, $needles = array(), $offset = 0)
 {
     $chr = array();

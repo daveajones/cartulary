@@ -1,12 +1,10 @@
 <?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
 <?include "$confroot/$templates/php_page_init.php"?>
 <?
-  if( isset($_REQUEST['platform']) || $g_platform == "mobile" ) {
-    if( $_REQUEST['platform'] == "mobile" || $g_platform == "mobile" ) {
+  if( $g_platform == "mobile" ) {
       $mobile = TRUE;
-    } else {
+  } else {
       $mobile = FALSE;
-    }
   }
 
   if( isset($_REQUEST['url']) ) {

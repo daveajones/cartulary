@@ -11,6 +11,9 @@
   require_once "$confroot/$includes/posts.php";
   require_once "$confroot/$includes/articles.php";
   require_once "$confroot/$includes/net.php";
+  require_once "$confroot/$includes/subscribe.php";
+  require_once "$confroot/$includes/outline.php";
+
 
   //Is a database upgrade in progress?
   if( sys_flag_is_set($CG_FLAG_DBUPDATE) ) {

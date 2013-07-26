@@ -10,6 +10,9 @@
   require_once "$confroot/$includes/opml.php";
   require_once "$confroot/$includes/posts.php";
   require_once "$confroot/$includes/articles.php";
+  require_once "$confroot/$includes/subscribe.php";
+  require_once "$confroot/$includes/outline.php";
+
 
   // Valid session?  If not, get lost
   if(!is_logged_in()) {

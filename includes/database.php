@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 22;
+$cg_database_version = 23;
 $cg_database_updates = array();
 
 
@@ -251,6 +251,21 @@ CGDB0051;
 $cg_database_updates[21][] = <<<CGDB0052
  INSERT INTO `dbversion` ( `version` ) VALUES ( '22' )
 CGDB0052;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 22 to 23 -----------------------------------------------------------------------------------------------
+$cg_database_updates[22][] = <<<CGDB0053
+ ALTER TABLE `users` ADD `totpseed` VARCHAR( 40 ) NOT NULL COMMENT 'Seed for totp calculation.'
+CGDB0053;
+$cg_database_updates[22][] = <<<CGDB0054
+ ALTER TABLE `prefs` ADD `usetotp` TINYINT NOT NULL DEFAULT '0' COMMENT 'Enable TOTP challenge at login?'
+CGDB0054;
+$cg_database_updates[22][] = <<<CGDB0055
+ ALTER TABLE `sessions` ADD `type` INT NOT NULL DEFAULT '0' COMMENT 'What type of session is this?'
+CGDB0055;
+$cg_database_updates[22][] = <<<CGDB0056
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '23' )
+CGDB0056;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

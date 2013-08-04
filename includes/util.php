@@ -45,6 +45,89 @@ function loggit($lognum, $message)
 }
 
 
+//Calculate a TOTP value
+//via: http://www.opendoorinternet.co.uk/news/2013/05/09/simple-totp-rfc-6238-in-php
+function calculate_totp($seed = NULL, $time_window = 30 ) {
+    // Define your secret seed in hexadecimal format
+    if( empty($seed) ) {
+        loggit(3, "Bad seed given for TOTP calculation.");
+        return(FALSE);
+    }
+
+    //Convert to hex
+    $secret_seed = convert_string_to_hex($seed);
+
+    // Get the exact time from the server
+    $exact_time = microtime(true);
+
+    // Round the time down to the time window
+    $rounded_time = floor($exact_time/$time_window);
+
+    // Pack the counter into binary
+    $packed_time = pack("N", $rounded_time);
+
+    // Make sure the packed time is 8 characters long
+    $padded_packed_time = str_pad($packed_time,8, chr(0), STR_PAD_LEFT);
+
+    // Pack the secret seed into a binary string
+    $packed_secret_seed = pack("H*", $secret_seed);
+
+    // Generate the hash using the SHA1 algorithm
+    $hash = hash_hmac ('sha1', $padded_packed_time, $packed_secret_seed, true);
+
+    // Extract the 6 digit number fromt the hash as per RFC 6238
+    $offset = ord($hash[19]) & 0xf;
+    $otp = (
+            ((ord($hash[$offset+0]) & 0x7f) << 24 ) |
+            ((ord($hash[$offset+1]) & 0xff) << 16 ) |
+            ((ord($hash[$offset+2]) & 0xff) << 8 ) |
+            (ord($hash[$offset+3]) & 0xff)
+        ) % pow(10, 6);
+
+    // Add any missing zeros to the left of the numerical output
+    $otp = str_pad($otp, 6, "0", STR_PAD_LEFT);
+
+    // Display it
+    return($otp);
+}
+
+
+//Convert a string to a hexidecimal value
+function convert_string_to_hex($string = NULL)
+{
+    //Check params
+    if( empty($string) ) {
+        loggit(3, "Bad string value given for hex conversion.");
+        return(FALSE);
+    }
+
+    $hex='';
+    for ($i=0; $i < strlen($string); $i++)
+    {
+        $hex .= dechex(ord($string[$i]));
+    }
+    return $hex;
+}
+
+
+//Convert a hex value to a string
+function convert_hex_to_string($hex = NULL)
+{
+    //Check params
+    if( empty($hex) ) {
+        loggit(3, "Bad hexidecimal input value.");
+        return(FALSE);
+    }
+
+    $string='';
+    for ($i=0; $i < strlen($hex)-1; $i+=2)
+    {
+        $string .= chr(hexdec($hex[$i].$hex[$i+1]));
+    }
+    return $string;
+}
+
+
 //Generates a random string of the specified length
 function random_gen($length = 8, $chars = NULL, $seed = NULL)
 {
@@ -79,50 +162,6 @@ function random_gen($length = 8, $chars = NULL, $seed = NULL)
 
     // done!
     return $rstring;
-}
-
-
-//Calculate a TOTP value
-//via: http://www.opendoorinternet.co.uk/news/2013/05/09/simple-totp-rfc-6238-in-php
-function calculate_totp($secret_seed = NULL, $time_window = 60 ) {
-    // Define your secret seed in hexadecimal format
-    if( empty($secret_seed) ) {
-        loggit(3, "Bad seed given for TOTP calculation.");
-        return(FALSE);
-    }
-
-    // Get the exact time from the server
-    $exact_time = microtime(true);
-
-    // Round the time down to the time window
-    $rounded_time = floor($exact_time/$time_window);
-
-    // Pack the counter into binary
-    $packed_time = pack("N", $rounded_time);
-
-    // Make sure the packed time is 8 characters long
-    $padded_packed_time = str_pad($packed_time,8, chr(0), STR_PAD_LEFT);
-
-    // Pack the secret seed into a binary string
-    $packed_secret_seed = pack("H*", $secret_seed);
-
-    // Generate the hash using the SHA1 algorithm
-    $hash = hash_hmac ('sha1', $padded_packed_time, $packed_secret_seed, true);
-
-    // Extract the 6 digit number fromt the hash as per RFC 6238
-    $offset = ord($hash[19]) & 0xf;
-    $otp = (
-            ((ord($hash[$offset+0]) & 0x7f) << 24 ) |
-            ((ord($hash[$offset+1]) & 0xff) << 16 ) |
-            ((ord($hash[$offset+2]) & 0xff) << 8 ) |
-            (ord($hash[$offset+3]) & 0xff)
-        ) % pow(10, 6);
-
-    // Add any missing zeros to the left of the numerical output
-    $otp = str_pad($otp, 6, "0", STR_PAD_LEFT);
-
-    // Display it
-    return($otp);
 }
 
 
@@ -2915,5 +2954,79 @@ class Bcrypt
         } while (1);
 
         return $output;
+    }
+}
+
+
+class Base32 {
+
+    private static $map = array(
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', //  7
+        'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', // 15
+        'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', // 23
+        'Y', 'Z', '2', '3', '4', '5', '6', '7', // 31
+        '='  // padding char
+    );
+
+    private static $flippedMap = array(
+        'A'=>'0', 'B'=>'1', 'C'=>'2', 'D'=>'3', 'E'=>'4', 'F'=>'5', 'G'=>'6', 'H'=>'7',
+        'I'=>'8', 'J'=>'9', 'K'=>'10', 'L'=>'11', 'M'=>'12', 'N'=>'13', 'O'=>'14', 'P'=>'15',
+        'Q'=>'16', 'R'=>'17', 'S'=>'18', 'T'=>'19', 'U'=>'20', 'V'=>'21', 'W'=>'22', 'X'=>'23',
+        'Y'=>'24', 'Z'=>'25', '2'=>'26', '3'=>'27', '4'=>'28', '5'=>'29', '6'=>'30', '7'=>'31'
+    );
+
+    /**
+     *    Use padding false when encoding for urls
+     *
+     * @return base32 encoded string
+     * @author Bryan Ruiz
+     **/
+    public static function encode($input, $padding = true) {
+        if(empty($input)) return "";
+        $input = str_split($input);
+        $binaryString = "";
+        for($i = 0; $i < count($input); $i++) {
+            $binaryString .= str_pad(base_convert(ord($input[$i]), 10, 2), 8, '0', STR_PAD_LEFT);
+        }
+        $fiveBitBinaryArray = str_split($binaryString, 5);
+        $base32 = "";
+        $i=0;
+        while($i < count($fiveBitBinaryArray)) {
+            $base32 .= self::$map[base_convert(str_pad($fiveBitBinaryArray[$i], 5,'0'), 2, 10)];
+            $i++;
+        }
+        if($padding && ($x = strlen($binaryString) % 40) != 0) {
+            if($x == 8) $base32 .= str_repeat(self::$map[32], 6);
+            else if($x == 16) $base32 .= str_repeat(self::$map[32], 4);
+            else if($x == 24) $base32 .= str_repeat(self::$map[32], 3);
+            else if($x == 32) $base32 .= self::$map[32];
+        }
+        return $base32;
+    }
+
+    public static function decode($input) {
+        if(empty($input)) return;
+        $paddingCharCount = substr_count($input, self::$map[32]);
+        $allowedValues = array(6,4,3,1,0);
+        if(!in_array($paddingCharCount, $allowedValues)) return false;
+        for($i=0; $i<4; $i++){
+            if($paddingCharCount == $allowedValues[$i] &&
+                substr($input, -($allowedValues[$i])) != str_repeat(self::$map[32], $allowedValues[$i])) return false;
+        }
+        $input = str_replace('=','', $input);
+        $input = str_split($input);
+        $binaryString = "";
+        for($i=0; $i < count($input); $i = $i+8) {
+            $x = "";
+            if(!in_array($input[$i], self::$map)) return false;
+            for($j=0; $j < 8; $j++) {
+                $x .= str_pad(base_convert(@self::$flippedMap[@$input[$i + $j]], 10, 2), 5, '0', STR_PAD_LEFT);
+            }
+            $eightBits = str_split($x, 8);
+            for($z = 0; $z < count($eightBits); $z++) {
+                $binaryString .= ( ($y = chr(base_convert($eightBits[$z], 2, 10))) || ord($y) == 48 ) ? $y:"";
+            }
+        }
+        return $binaryString;
     }
 }

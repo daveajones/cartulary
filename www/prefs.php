@@ -1,6 +1,9 @@
 <?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
 <?include "$confroot/$templates/php_page_init.php"?>
 <?
+  //Get this user's totp seed value
+  $utps16 = get_totp_seed_from_uid($uid);
+
   $section = "Prefs";
   $tree_location = "Preferences";
 ?>
@@ -81,6 +84,14 @@
 		    </select>
                 </li>
 		<li class="privacy"><input name="hideme" type="checkbox" <?if ($prefs['hideme'] == 1) echo "checked ";?>/> I don't want to be found in directory searches.</li>
+        <li class="privacy"><input name="usetotp" type="checkbox" <?if ($prefs['usetotp'] == 1) echo "checked ";?>/> I want to use two-factor authentication to log in.</li>
+            <?if ( !empty($utps16) ) {
+                $b32 = new Base32;
+                $utps32 = $b32->encode( $utps16, true);?>
+                <br/>Google Authenticator:
+                <br/><img src="/cgi/out/qrcode.totp?ts=".time() /> <?echo $utps32?>
+                <br/>Current code: <large><?echo calculate_totp($utps16)?></large>
+            <?}?>
 	</ul>
 	</div>
 	</div>

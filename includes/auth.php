@@ -7,88 +7,88 @@
 //Check the login status by checking the cookie and making sure it's a real valid session in the database
 function is_logged_in()
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //See if the cookie even exists first
-  if(empty($_COOKIE[$sidcookie])) {
-    loggit(2,"No valid cookie found: [$sidcookie]");
-    return(FALSE);
-  } else {
-    if(is_session_valid($_COOKIE[$sidcookie]) != FALSE) {
-      return($_COOKIE[$sidcookie]);
+    //See if the cookie even exists first
+    if (empty($_COOKIE[$sidcookie])) {
+        loggit(2, "No valid cookie found: [$sidcookie]");
+        return (FALSE);
     } else {
-      loggit(2,"The session in the cookie wasn't valid: [".$_COOKIE[$sidcookie]."]");
-      return(FALSE);
+        if (is_session_valid($_COOKIE[$sidcookie]) != FALSE) {
+            return ($_COOKIE[$sidcookie]);
+        } else {
+            loggit(2, "The session in the cookie wasn't valid: [" . $_COOKIE[$sidcookie] . "]");
+            return (FALSE);
+        }
     }
-  }
 
-  //Fallback is always FALSE
-  return(FALSE);
+    //Fallback is always FALSE
+    return (FALSE);
 }
 
 
 //Get the session id
 function get_session_id()
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //See if the cookie even exists first
-  if(empty($_COOKIE[$sidcookie])) {
-    loggit(2,"No valid cookie found: [$sidcookie]");
-    return(FALSE);
-  } else {
-    if(is_session_valid($_COOKIE[$sidcookie]) != FALSE) {
-      loggit(1,"Found a session cookie.  Returning: [".$_COOKIE[$sidcookie]."]");
-      return($_COOKIE[$sidcookie]);
+    //See if the cookie even exists first
+    if (empty($_COOKIE[$sidcookie])) {
+        loggit(2, "No valid cookie found: [$sidcookie]");
+        return (FALSE);
     } else {
-      loggit(2,"The session in the cookie wasn't valid: [".$_COOKIE[$sidcookie]."]");
-      return(FALSE);
+        if (is_session_valid($_COOKIE[$sidcookie]) != FALSE) {
+            loggit(1, "Found a session cookie.  Returning: [" . $_COOKIE[$sidcookie] . "]");
+            return ($_COOKIE[$sidcookie]);
+        } else {
+            loggit(2, "The session in the cookie wasn't valid: [" . $_COOKIE[$sidcookie] . "]");
+            return (FALSE);
+        }
     }
-  }
 
-  //Fallback is always FALSE
-  return(FALSE);
+    //Fallback is always FALSE
+    return (FALSE);
 }
 
 
 //Check if the given user id actually exists in the system
 function user_exist($uid = NULL)
 {
-  //If uid is zero then balk
-  if($uid == NULL) {
-    loggit(2,"Can't lookup this user id: [$uid]");
-    return(FALSE);
-  }
+    //If uid is zero then balk
+    if ($uid == NULL) {
+        loggit(2, "Can't lookup this user id: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Debug
-  //loggit(3, "Looking for user id: [$uid].");
+    //Debug
+    //loggit(3, "Looking for user id: [$uid].");
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT id FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Too many, or not enough, records returned for user: [$uid]");
-    return(FALSE);
-  }
-  $sql->bind_result($userid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT id FROM $table_user WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Too many, or not enough, records returned for user: [$uid]");
+        return (FALSE);
+    }
+    $sql->bind_result($userid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"User exists: [$uid]");
-  return(TRUE);
+    loggit(1, "User exists: [$uid]");
+    return (TRUE);
 
 }
 
@@ -96,158 +96,198 @@ function user_exist($uid = NULL)
 //Check if the given session id is a real session id that was generated by a successful login
 function is_session_valid($sid = NULL)
 {
-  //If sid is zero then balk
-  if($sid == NULL) {
-    loggit(2,"Can't lookup this session id: [$sid]");
-    return(FALSE);
-  }
+    //If sid is zero then balk
+    if ($sid == NULL) {
+        loggit(2, "Can't lookup this session id: [$sid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT userid FROM $table_session WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $sid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() < 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad session lookup attempt: [$sid]");
-    return(FALSE);
-  }
-  $sql->bind_result($userid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT userid FROM $table_session WHERE id=? AND type=0") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $sid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad session lookup attempt: [$sid]");
+        return (FALSE);
+    }
+    $sql->bind_result($userid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //The session was valid, but does the user exist?
-  if( !user_exist($userid) ) {
-    loggit(2,"User doesn't exist: [$userid]");
-    return(FALSE);
-  }
+    //The session was valid, but does the user exist?
+    if (!user_exist($userid)) {
+        loggit(2, "User doesn't exist: [$userid]");
+        return (FALSE);
+    }
 
-  //The session was valid, but did the ip address or browser change?
-  if( session_changed($sid) ) {
-    loggit(3,"The session changed ip or browser string.  Need to re-login.");
-    expire_session($sid);
-    return(FALSE);
-  }
+    //The session was valid, but did the ip address or browser change?
+    if (session_changed($sid)) {
+        loggit(3, "The session changed ip or browser string.  Need to re-login.");
+        expire_session($sid);
+        return (FALSE);
+    }
 
-  //Timestamp it
-  touch_session($sid);
+    //Timestamp it
+    touch_session($sid);
 
-  loggit(1,"Session is valid: [$sid]");
-  return(TRUE);
+    loggit(1, "Session is valid: [$sid]");
+    return (TRUE);
+}
+
+
+//Check if the given session id is a real session id that was generated by a successful login
+function get_session_type($sid = NULL)
+{
+    //If sid is zero then balk
+    if (empty($sid)) {
+        loggit(2, "Can't lookup this session id: [$sid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the sid in the session table
+    $sqltxt = "SELECT type FROM $table_session WHERE id=?";
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $sid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad session lookup attempt: [$sid]");
+        return (FALSE);
+    }
+    $sql->bind_result($type) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Timestamp it
+    touch_session($sid);
+
+    loggit(3, "Session is valid: [$sid] with type: [$type].");
+    return ($type);
 }
 
 
 //Check if the given session's first browser/ip do not match the current browser/ip
 function session_changed($sid = NULL)
 {
-  //If sid is zero then balk
-  if($sid == NULL) {
-    loggit(2,"Can't lookup this session id: [$sid]");
-    return(TRUE);
-  }
+    //If sid is zero then balk
+    if ($sid == NULL) {
+        loggit(2, "Can't lookup this session id: [$sid]");
+        return (TRUE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT firstsourceip,firstbrowser FROM $table_session WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $sid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the lookup was valid
-  if($sql->num_rows() < 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(3,"Bad remoteip and browser lookup attempt for: [$sid]");
-    return(TRUE);
-  }
-  $sql->bind_result($firstip,$firstbrowser) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT firstsourceip,firstbrowser FROM $table_session WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $sid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the lookup was valid
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(3, "Bad remoteip and browser lookup attempt for: [$sid]");
+        return (TRUE);
+    }
+    $sql->bind_result($firstip, $firstbrowser) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Get the browser and remote ip address
-  if( isset($_SERVER['HTTP_USER_AGENT']) ) {
-    $browser = truncate_text($_SERVER['HTTP_USER_AGENT'], 120);
-  } else {
-    loggit(3,"Their was no user agent string in the HTTP request for the session.");
-    return(FALSE);
-  }
-  if( isset($_SERVER['REMOTE_ADDR']) ) {
-    $remoteip = truncate_text($_SERVER['REMOTE_ADDR'], 120);
-  } else {
-    loggit(3,"Couldn't get a remote ip address for this session.");
-    return(TRUE);
-  }
+    //Get the browser and remote ip address
+    if (isset($_SERVER['HTTP_USER_AGENT'])) {
+        $browser = truncate_text($_SERVER['HTTP_USER_AGENT'], 120);
+    } else {
+        loggit(3, "Their was no user agent string in the HTTP request for the session.");
+        return (FALSE);
+    }
+    if (isset($_SERVER['REMOTE_ADDR'])) {
+        $remoteip = truncate_text($_SERVER['REMOTE_ADDR'], 120);
+    } else {
+        loggit(3, "Couldn't get a remote ip address for this session.");
+        return (TRUE);
+    }
 
-  //Compare the browser and ip strings to the recorded session
-  if( $firstip != $remoteip && $firstbrowser != $browser ) {
-    loggit(3,"The browser: [$firstbrowser | $browser] and ip address: [$firstip | $remoteip] changed for session: [$sid].");
-    return(TRUE);
-  }
+    //Compare the browser and ip strings to the recorded session
+    if ($firstip != $remoteip && $firstbrowser != $browser) {
+        loggit(3, "The browser: [$firstbrowser | $browser] and ip address: [$firstip | $remoteip] changed for session: [$sid].");
+        return (TRUE);
+    }
 
-  loggit(1,"Session has not changed: [$sid]");
-  return(FALSE);
+    loggit(1, "Session has not changed: [$sid]");
+    return (FALSE);
 }
 
 
 //Add a sid to the session table after a successful login
-function new_session($uid = NULL)
+function new_session($uid = NULL, $type = 0)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure uid isn't empty
-  if($uid == NULL) {
-    loggit(2,"Can't make a session for this user id: [$uid]");
-    return(FALSE);
-  }
+    //Make sure uid isn't empty
+    if ($uid == NULL) {
+        loggit(2, "Can't make a session for this user id: [$uid]");
+        return (FALSE);
+    }
 
-  //Get the browser
-  if( isset($_SERVER['HTTP_USER_AGENT']) ) {
-    $browser = truncate_text($_SERVER['HTTP_USER_AGENT'], 120);
-  }
+    //Get the browser
+    if (isset($_SERVER['HTTP_USER_AGENT'])) {
+        $browser = truncate_text($_SERVER['HTTP_USER_AGENT'], 120);
+    }
 
-  //Get the remote ip address
-  if( isset($_SERVER['REMOTE_ADDR']) ) {
-    $remoteip = truncate_text($_SERVER['REMOTE_ADDR'], 120);
-  }
+    //Get the remote ip address
+    if (isset($_SERVER['REMOTE_ADDR'])) {
+        $remoteip = truncate_text($_SERVER['REMOTE_ADDR'], 120);
+    }
 
-  //Make a new session id
-  $sid = random_gen(64);
-  $tstamp = time();
+    //Make a new session id
+    $sid = random_gen(64);
+    $tstamp = time();
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "INSERT INTO $table_session (id,created,userid,firstsourceip,firstbrowser) VALUES(?,?,?,?,?)";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("sssss", $sid, $tstamp, $uid, $remoteip, $browser) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $stmt = "INSERT INTO $table_session (id,created,userid,firstsourceip,firstbrowser,type) VALUES(?,?,?,?,?,?)";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sssssd", $sid, $tstamp, $uid, $remoteip, $browser, $type) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Timestamp the user record
-  $stmt = "UPDATE $table_user SET lastlogin=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ss", $tstamp, $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Timestamp the user record
+    $stmt = "UPDATE $table_user SET lastlogin=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $tstamp, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Log and return
-  loggit(1,"Created new session record: [$sid]");
-  return($sid);
+    //Log and return
+    loggit(1, "Created new session record: [$sid]");
+    return ($sid);
 }
 
 
@@ -255,98 +295,98 @@ function new_session($uid = NULL)
 function touch_session($sid = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure uid isn't empty
-  if( empty($sid) ) {
-    loggit(2,"The session id was blank or corrupt: [$sid]");
-    return(FALSE);
-  }
+    //Make sure uid isn't empty
+    if (empty($sid)) {
+        loggit(2, "The session id was blank or corrupt: [$sid]");
+        return (FALSE);
+    }
 
-  //Get a timestamp
-  $tstamp = time();
+    //Get a timestamp
+    $tstamp = time();
 
-  //Get the browser
-  if( isset($_SERVER['HTTP_USER_AGENT']) ) {
-    $browser = truncate_text($_SERVER['HTTP_USER_AGENT'], 120);
-  }
+    //Get the browser
+    if (isset($_SERVER['HTTP_USER_AGENT'])) {
+        $browser = truncate_text($_SERVER['HTTP_USER_AGENT'], 120);
+    }
 
-  //Get the remote ip address
-  if( isset($_SERVER['REMOTE_ADDR']) ) {
-    $remoteip = truncate_text($_SERVER['REMOTE_ADDR'], 120);
-  }
+    //Get the remote ip address
+    if (isset($_SERVER['REMOTE_ADDR'])) {
+        $remoteip = truncate_text($_SERVER['REMOTE_ADDR'], 120);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Timestamp the user record
-  $stmt = "UPDATE $table_session SET lastactivity=?, lastsourceip=?, lastbrowser=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ssss", $tstamp, $remoteip, $browser, $sid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Timestamp the user record
+    $stmt = "UPDATE $table_session SET lastactivity=?, lastsourceip=?, lastbrowser=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ssss", $tstamp, $remoteip, $browser, $sid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Log and return
-  loggit(1,"Touched the session at: [$tstamp]");
-  return(TRUE);
+    //Log and return
+    loggit(1, "Touched the session at: [$tstamp]");
+    return (TRUE);
 }
 
 
 //Remove sessions older than a certain timestamp
 function purge_old_sessions($time = NULL)
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure uid isn't empty
-  if( empty($time) ) {
-    loggit(2,"Time given was malformed or blank: [$time]. Defaulting to 14 days.");
-    $time = (time() - 1209600);
-  }
+    //Make sure uid isn't empty
+    if (empty($time)) {
+        loggit(2, "Time given was malformed or blank: [$time]. Defaulting to 14 days.");
+        $time = (time() - 1209600);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for this user's sessions
-  $stmt = "DELETE FROM $table_session WHERE lastactivity < ?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $time) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $rows = $dbh->affected_rows;
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for this user's sessions
+    $stmt = "DELETE FROM $table_session WHERE lastactivity < ?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $time) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $rows = $dbh->affected_rows;
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Log and return
-  loggit(1,"Removed: [$rows] old sessions.");
-  return($rows);
+    //Log and return
+    loggit(1, "Removed: [$rows] old sessions.");
+    return ($rows);
 }
 
 
 //Removes old sessions that are lingering around for this user if any
 function remove_sessions_for_user($uid = NULL)
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure uid isn't empty
-  if($uid == NULL) {
-    loggit(2,"User id given was malformed or blank: [$uid]");
-    return(FALSE);
-  }
+    //Make sure uid isn't empty
+    if ($uid == NULL) {
+        loggit(2, "User id given was malformed or blank: [$uid]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for this user's sessions
-  $stmt = "DELETE FROM $table_session WHERE userid=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for this user's sessions
+    $stmt = "DELETE FROM $table_session WHERE userid=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Log and return
-  loggit(1,"Removed sessions for: [$uid]");
-  return(TRUE);
+    //Log and return
+    loggit(1, "Removed sessions for: [$uid]");
+    return (TRUE);
 }
 
 
@@ -354,64 +394,64 @@ function remove_sessions_for_user($uid = NULL)
 function expire_session($sid = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure sid isn't empty
-  if($sid == NULL) {
-    loggit(2,"Can't remove the given session id: [$sid]");
-    return(FALSE);
-  }
+    //Make sure sid isn't empty
+    if ($sid == NULL) {
+        loggit(2, "Can't remove the given session id: [$sid]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, $dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "DELETE FROM $table_session WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, $dbh->error);
-  $sql->bind_param("s", $sid) or loggit(2, $dbh->error);
-  $sql->execute() or loggit(2, $dbh->error);
-  $sql->close() or loggit(2, $dbh->error);
+    //Look for the sid in the session table
+    $stmt = "DELETE FROM $table_session WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, $dbh->error);
+    $sql->bind_param("s", $sid) or loggit(2, $dbh->error);
+    $sql->execute() or loggit(2, $dbh->error);
+    $sql->close() or loggit(2, $dbh->error);
 
 
-  loggit(1,"Removed session id: [$sid]");
-  return(TRUE);
+    loggit(1, "Removed session id: [$sid]");
+    return (TRUE);
 }
 
 
 //Get the user id that goes with this session id
 function get_user_id_from_sid($sid = NULL)
 {
-  //If sid is zero then balk
-  if($sid == NULL) {
-    loggit(2,"Can't get the user from this sid: [$sid]");
-    return(FALSE);
-  }
+    //If sid is zero then balk
+    if ($sid == NULL) {
+        loggit(2, "Can't get the user from this sid: [$sid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT userid FROM $table_session WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $sid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() < 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad user id lookup attempt: [$sid]");
-    return(FALSE);
-  }
-  $sql->bind_result($userid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT userid FROM $table_session WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $sid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad user id lookup attempt: [$sid]");
+        return (FALSE);
+    }
+    $sql->bind_result($userid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning user id: [$userid] for sid: [$sid]");
-  return($userid);
+    loggit(1, "Returning user id: [$userid] for sid: [$sid]");
+    return ($userid);
 
 }
 
@@ -419,36 +459,36 @@ function get_user_id_from_sid($sid = NULL)
 //Get the user name that goes with this user id
 function get_user_name_from_uid($uid = NULL)
 {
-  //If uid is zero then balk
-  if($uid == NULL) {
-    loggit(2,"Can't get the username from this uid: [$uid]");
-    return(FALSE);
-  }
+    //If uid is zero then balk
+    if ($uid == NULL) {
+        loggit(2, "Can't get the username from this uid: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT name FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad user name lookup attempt: [$uid]");
-    return(FALSE);
-  }
-  $sql->bind_result($username) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT name FROM $table_user WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad user name lookup attempt: [$uid]");
+        return (FALSE);
+    }
+    $sql->bind_result($username) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning user name: [$username] for uid: [$uid]");
-  return($username);
+    loggit(1, "Returning user name: [$username] for uid: [$uid]");
+    return ($username);
 
 }
 
@@ -456,36 +496,36 @@ function get_user_name_from_uid($uid = NULL)
 //Get the username that goes with this user id
 function get_username_from_uid($uid = NULL)
 {
-  //If uid is zero then balk
-  if($uid == NULL) {
-    loggit(2,"Can't get the username from this uid: [$uid]");
-    return(FALSE);
-  }
+    //If uid is zero then balk
+    if ($uid == NULL) {
+        loggit(2, "Can't get the username from this uid: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT username FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad username lookup attempt: [$uid]");
-    return(FALSE);
-  }
-  $sql->bind_result($username) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT username FROM $table_user WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad username lookup attempt: [$uid]");
+        return (FALSE);
+    }
+    $sql->bind_result($username) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning user name: [$username] for uid: [$uid]");
-  return($username);
+    loggit(1, "Returning user name: [$username] for uid: [$uid]");
+    return ($username);
 
 }
 
@@ -493,130 +533,200 @@ function get_username_from_uid($uid = NULL)
 //Get the email that goes with this user id
 function get_email_from_uid($uid = NULL)
 {
-  //If uid is zero then balk
-  if($uid == NULL) {
-    loggit(2,"Can't get the email from this uid: [$uid]");
-    return(FALSE);
-  }
+    //If uid is zero then balk
+    if ($uid == NULL) {
+        loggit(2, "Can't get the email from this uid: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT email FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad email lookup attempt: [$uid]");
-    return(FALSE);
-  }
-  $sql->bind_result($email) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT email FROM $table_user WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad email lookup attempt: [$uid]");
+        return (FALSE);
+    }
+    $sql->bind_result($email) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning email: [$email] for uid: [$uid]");
-  return($email);
+    loggit(1, "Returning email: [$email] for uid: [$uid]");
+    return ($email);
 
+}
+
+
+//Get the totp seed that goes with this user id
+function get_totp_seed_from_uid($uid = NULL)
+{
+    //If uid is zero then balk
+    if ($uid == NULL) {
+        loggit(2, "UID is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT totpseed FROM $table_user WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad totp seed lookup attempt: [$uid]");
+        return (FALSE);
+    }
+    $sql->bind_result($totpseed) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning totp seed: [$totpseed] for uid: [$uid]");
+    return ($totpseed);
+}
+
+
+//Set a user's totp seed
+function set_user_totp_seed($uid = NULL, $totpseed = NULL)
+{
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Make sure arguments aren't empty
+    if ($uid == NULL) {
+        loggit(2, "User ID argument blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if (empty($totpseed)) {
+        $totpseed = random_gen(20);
+        loggit(3, "TOTP seed argument was blank so we generated: [$totpseed]");
+    }
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the email address in the user table
+    $stmt = "UPDATE $table_user SET totpseed=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $totpseed, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+
+    //Return
+    loggit(1, "TOTP seed changed to: [$totpseed] for user: [$uid]");
+    return (TRUE);
 }
 
 
 //Get the user id that goes with this email address
 function get_user_id_from_email($email = NULL)
 {
-  //If email is blank then balk
-  if($email == NULL) {
-    loggit(2,"Can't get the uid from this email: [$email]");
-    return(FALSE);
-  }
+    //If email is blank then balk
+    if ($email == NULL) {
+        loggit(2, "Can't get the uid from this email: [$email]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if this is an alias of an existing email
-  //if(get_email_from_alias($email, $aliasof) == TRUE) {
-  //  $email = $aliasof;
-  //}
+    //See if this is an alias of an existing email
+    //if(get_email_from_alias($email, $aliasof) == TRUE) {
+    //  $email = $aliasof;
+    //}
 
-  //Look for the matching email address in the user table
-  $sql=$dbh->prepare("SELECT id FROM $table_user WHERE email=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  $returned = $sql->num_rows();
-  if($returned > 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad user id lookup attempt: [$email].  Too many records returned.");
-    return(FALSE);
-  }
-  if($returned < 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"No user exists with this email: [$email]");
-    return("none");
-  }
-  $sql->bind_result($uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the matching email address in the user table
+    $sql = $dbh->prepare("SELECT id FROM $table_user WHERE email=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $email) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    $returned = $sql->num_rows();
+    if ($returned > 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad user id lookup attempt: [$email].  Too many records returned.");
+        return (FALSE);
+    }
+    if ($returned < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "No user exists with this email: [$email]");
+        return ("none");
+    }
+    $sql->bind_result($uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning user id: [$uid] for email: [$email]");
-  return($uid);
+    loggit(1, "Returning user id: [$uid] for email: [$email]");
+    return ($uid);
 }
 
 
 //Check if the given user record has been activated
 function is_user_active($uid = NULL)
 {
-  //If uid is zero then balk
-  if($uid == NULL) {
-    loggit(2,"Can't check active status for this uid: [$uid]");
-    return(FALSE);
-  }
+    //If uid is zero then balk
+    if ($uid == NULL) {
+        loggit(2, "Can't check active status for this uid: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the uid in the user table
-  $sql=$dbh->prepare("SELECT active FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad activation check attempt: [$uid]");
-    return(FALSE);
-  }
-  $sql->bind_result($active) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the uid in the user table
+    $sql = $dbh->prepare("SELECT active FROM $table_user WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad activation check attempt: [$uid]");
+        return (FALSE);
+    }
+    $sql->bind_result($active) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Check and return
-  if($active == 0) {
-    loggit(2,"Returning activation status of: [FALSE($active)] for uid: [$uid]");
-    return(FALSE);
-  } else {
-    loggit(1,"Returning activation status of: [TRUE($active)] for uid: [$uid]");
-    return(TRUE);
-  }
+    //Check and return
+    if ($active == 0) {
+        loggit(2, "Returning activation status of: [FALSE($active)] for uid: [$uid]");
+        return (FALSE);
+    } else {
+        loggit(1, "Returning activation status of: [TRUE($active)] for uid: [$uid]");
+        return (TRUE);
+    }
 
-  //Fall back to false always
-  loggit(2,"Should never get here.  Something bad happened: [FALSE($active)] for uid: [$uid]");
-  return(FALSE);
+    //Fall back to false always
+    loggit(2, "Should never get here.  Something bad happened: [FALSE($active)] for uid: [$uid]");
+    return (FALSE);
 
 }
 
@@ -625,32 +735,32 @@ function is_user_active($uid = NULL)
 function activate_user($uid = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure uid isn't empty
-  if($uid == NULL) {
-    loggit(2,"Can't make this user active with this uid: [$uid]");
-    return(FALSE);
-  }
+    //Make sure uid isn't empty
+    if ($uid == NULL) {
+        loggit(2, "Can't make this user active with this uid: [$uid]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "UPDATE $table_user SET active=1 WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $stmt = "UPDATE $table_user SET active=1 WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Now set a new activation code to prevent shenanigans
-  //$newpp = random_gen(9);
-  //set_passphrase($uid, $newpp);
+    //Now set a new activation code to prevent shenanigans
+    //$newpp = random_gen(9);
+    //set_passphrase($uid, $newpp);
 
-  //Return
-  loggit(1,"Made the user active for: [$uid]");
-  return(TRUE);
+    //Return
+    loggit(1, "Made the user active for: [$uid]");
+    return (TRUE);
 }
 
 
@@ -658,85 +768,85 @@ function activate_user($uid = NULL)
 function deactivate_user($uid = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure uid isn't empty
-  if( empty($uid) ) {
-    loggit(2,"Can't make this user active with this uid: [$uid]");
-    return(FALSE);
-  }
+    //Make sure uid isn't empty
+    if (empty($uid)) {
+        loggit(2, "Can't make this user active with this uid: [$uid]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "UPDATE $table_user SET active=0 WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $stmt = "UPDATE $table_user SET active=0 WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Now set a new activation code to prevent shenanigans
-  //$newpp = random_gen(9);
-  //set_passphrase($uid, $newpp);
+    //Now set a new activation code to prevent shenanigans
+    //$newpp = random_gen(9);
+    //set_passphrase($uid, $newpp);
 
-  //Return
-  loggit(1,"Deactivated user: [$uid]");
-  return(TRUE);
+    //Return
+    loggit(1, "Deactivated user: [$uid]");
+    return (TRUE);
 }
 
 
 //Check this user's login credentials and return
 function check_credentials($email = NULL, $password = NULL)
 {
-  //If email is zero then balk
-  if($email == NULL) {
-    loggit(2,"Email was malformed or blank: [$email]");
-    return(FALSE);
-  }
-  //If password is zero then balk
-  if($password == NULL) {
-    loggit(2,"Password was malformed or blank: [$password]");
-    return(FALSE);
-  }
+    //If email is zero then balk
+    if ($email == NULL) {
+        loggit(2, "Email was malformed or blank: [$email]");
+        return (FALSE);
+    }
+    //If password is zero then balk
+    if ($password == NULL) {
+        loggit(2, "Password was malformed or blank: [$password]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if this is an alias of an existing email
-  //if(get_email_from_alias($email, $aliasof) == TRUE) {
-  //  $email = $aliasof;
-  //}
+    //See if this is an alias of an existing email
+    //if(get_email_from_alias($email, $aliasof) == TRUE) {
+    //  $email = $aliasof;
+    //}
 
-  //Look for the user id in the user table that matches this email address and password
-  $sql=$dbh->prepare("SELECT id,password,lastpasschange FROM $table_user WHERE email=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if(($rows = $sql->num_rows()) != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad credential check for: [$email].  Rows returned: [$rows]");
-    return(FALSE);
-  }
-  $sql->bind_result($uid,$pwd,$lpc) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the user id in the user table that matches this email address and password
+    $sql = $dbh->prepare("SELECT id,password,lastpasschange FROM $table_user WHERE email=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $email) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if (($rows = $sql->num_rows()) != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad credential check for: [$email].  Rows returned: [$rows]");
+        return (FALSE);
+    }
+    $sql->bind_result($uid, $pwd, $lpc) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Let's see if we need to hash?
-  $bcrypt = new Bcrypt();
-  if(!$bcrypt->verify($password, $pwd)) {
-    loggit(2, "The password didn't verify against the stored hash for user: [$uid].");
-    return(FALSE);
-  }
+    //Let's see if we need to hash?
+    $bcrypt = new Bcrypt();
+    if (!$bcrypt->verify($password, $pwd)) {
+        loggit(2, "The password didn't verify against the stored hash for user: [$uid].");
+        return (FALSE);
+    }
 
-  loggit(1,"Returning [$uid] for login check with: [$email]");
-  return($uid);
+    loggit(1, "Returning [$uid] for login check with: [$email]");
+    return ($uid);
 
 }
 
@@ -745,33 +855,33 @@ function check_credentials($email = NULL, $password = NULL)
 function badlogin_reset($email = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure email isn't empty
-  if($email == NULL) {
-    loggit(2,"Email given was blank or corrupt: [$email]");
-    return(FALSE);
-  }
+    //Make sure email isn't empty
+    if ($email == NULL) {
+        loggit(2, "Email given was blank or corrupt: [$email]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if this is an alias of an existing email
-  //if(get_email_from_alias($email, $aliasof) == TRUE) {
-  //  $email = $aliasof;
-  //}
+    //See if this is an alias of an existing email
+    //if(get_email_from_alias($email, $aliasof) == TRUE) {
+    //  $email = $aliasof;
+    //}
 
-  //Look for the email address in the user table
-  $stmt = "UPDATE $table_user SET badlogins=0 WHERE email=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the email address in the user table
+    $stmt = "UPDATE $table_user SET badlogins=0 WHERE email=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $email) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Reset the badlogins counter for user: [$email]");
-  return(TRUE);
+    //Return
+    loggit(1, "Reset the badlogins counter for user: [$email]");
+    return (TRUE);
 }
 
 
@@ -779,32 +889,32 @@ function badlogin_reset($email = NULL)
 function badlogin_set($email = NULL, $number = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure email isn't empty
-  if($email == NULL) {
-    loggit(2,"Email given was blank or corrupt: [$email]");
-    return(FALSE);
-  }
-  if($number == NULL) {
-    loggit(2,"Number given was blank or corrupt: [$number]");
-    return(FALSE);
-  }
+    //Make sure email isn't empty
+    if ($email == NULL) {
+        loggit(2, "Email given was blank or corrupt: [$email]");
+        return (FALSE);
+    }
+    if ($number == NULL) {
+        loggit(2, "Number given was blank or corrupt: [$number]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the email address in the user table
-  $stmt = "UPDATE $table_user SET badlogins=? WHERE email=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ds", $number, $email) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the email address in the user table
+    $stmt = "UPDATE $table_user SET badlogins=? WHERE email=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ds", $number, $email) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Set the badlogins counter for user: [$email] to: [$number].");
-  return(TRUE);
+    //Return
+    loggit(1, "Set the badlogins counter for user: [$email] to: [$number].");
+    return (TRUE);
 }
 
 
@@ -812,34 +922,34 @@ function badlogin_set($email = NULL, $number = NULL)
 function badlogin_inc($email = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure email isn't empty
-  if($email == NULL) {
-    loggit(2,"Email given was blank or corrupt: [$email]");
-    return(FALSE);
-  }
+    //Make sure email isn't empty
+    if ($email == NULL) {
+        loggit(2, "Email given was blank or corrupt: [$email]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if this is an alias of an existing email
-  //if(get_email_from_alias($email, $aliasof) == TRUE) {
-  //  $email = $aliasof;
-  //}
+    //See if this is an alias of an existing email
+    //if(get_email_from_alias($email, $aliasof) == TRUE) {
+    //  $email = $aliasof;
+    //}
 
-  //Look for the email in the user table
-  $stmt = "UPDATE $table_user SET badlogins=badlogins+1 WHERE email=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $rows = $dbh->affected_rows;
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the email in the user table
+    $stmt = "UPDATE $table_user SET badlogins=badlogins+1 WHERE email=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $email) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $rows = $dbh->affected_rows;
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Incremented the bad logins counter for user: [$email] rows changed: [$rows]");
-  return(TRUE);
+    //Return
+    loggit(1, "Incremented the bad logins counter for user: [$email] rows changed: [$rows]");
+    return (TRUE);
 }
 
 
@@ -847,98 +957,98 @@ function badlogin_inc($email = NULL)
 function badlogin_check($email = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure email isn't empty
-  if($email == NULL) {
-    loggit(2,"Email given was blank or corrupt: [$email]");
-    return(FALSE);
-  }
+    //Make sure email isn't empty
+    if ($email == NULL) {
+        loggit(2, "Email given was blank or corrupt: [$email]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the email in the user table
-  $stmt = "SELECT badlogins FROM $table_user WHERE email=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if(($rows = $sql->num_rows()) != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad badlogin count check.  Should only be one row returned.  Instead there were: [$rows]");
-    return(FALSE);
-  }
-  $sql->bind_result($badlogs) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the email in the user table
+    $stmt = "SELECT badlogins FROM $table_user WHERE email=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $email) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if (($rows = $sql->num_rows()) != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad badlogin count check.  Should only be one row returned.  Instead there were: [$rows]");
+        return (FALSE);
+    }
+    $sql->bind_result($badlogs) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  if($badlogs >= $maxbadlogins) {
-    loggit(2,"Too many bad login attempts for this user: [$email]");
-    return(FALSE);
-  }
+    if ($badlogs >= $maxbadlogins) {
+        loggit(2, "Too many bad login attempts for this user: [$email]");
+        return (FALSE);
+    }
 
-  //Return
-  loggit(1,"Bad login count for this user is below safe limits: [$email | $badlogs]");
-  return(TRUE);
+    //Return
+    loggit(1, "Bad login count for this user is below safe limits: [$email | $badlogs]");
+    return (TRUE);
 }
 
 
 //Send an initial activation type email to the recipient
 function send_activation_email($email = NULL)
 {
-  //Get the big vars list
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Get the big vars list
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Check all the params
-  if($email == NULL) {
-    loggit(2, "Didn't provide an email address: [$email|$name|$url]");
-    return(FALSE);
-  }
+    //Check all the params
+    if ($email == NULL) {
+        loggit(2, "Didn't provide an email address: [$email|$name|$url]");
+        return (FALSE);
+    }
 
-  //Generate an activation passphrase
-  $passphrase = random_gen(6);
-  set_passphrase(get_user_id_from_email($email), $passphrase);
+    //Generate an activation passphrase
+    $passphrase = random_gen(6);
+    set_passphrase(get_user_id_from_email($email), $passphrase);
 
-  //Create the body from a template
-  $tempfile = "$confroot/$templates/$template_email_activation";
-  $fh = fopen($tempfile, "r");
-  $template = fread($fh, filesize($tempfile));
+    //Create the body from a template
+    $tempfile = "$confroot/$templates/$template_email_activation";
+    $fh = fopen($tempfile, "r");
+    $template = fread($fh, filesize($tempfile));
 
-  //Replace the tags
-  $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
-  $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
-  $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
-  $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
-  $template = str_replace('[$COMPANY_URL]', $company_url, $template);
-  $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
-  $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
-  $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
-  //--
-  $template = str_replace('[$USERNAME]', $email, $template);
-  $template = str_replace('[$EMAIL]', $email, $template);
-  $template = str_replace('[$PASSPHRASE]', $passphrase, $template);
+    //Replace the tags
+    $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
+    $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
+    $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
+    $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
+    $template = str_replace('[$COMPANY_URL]', $company_url, $template);
+    $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
+    $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
+    $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
+    //--
+    $template = str_replace('[$USERNAME]', $email, $template);
+    $template = str_replace('[$EMAIL]', $email, $template);
+    $template = str_replace('[$PASSPHRASE]', $passphrase, $template);
 
-  //Trim all lines to 70 characters
-  $body = wordwrap($template, 70);
-  fclose($fh);
+    //Trim all lines to 70 characters
+    $body = wordwrap($template, 70);
+    fclose($fh);
 
-  //Set headers for HTML email
-  $headers = 'MIME-Version: 1.0' . "\n";
-  $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
+    //Set headers for HTML email
+    $headers = 'MIME-Version: 1.0' . "\n";
+    $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
 
-  //Set the other headers
-  $headers .= "To: <$email>" . "\n";
-  $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
+    //Set the other headers
+    $headers .= "To: <$email>" . "\n";
+    $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
 
-  //Send it
-  mail($email, "Web Transfer - Activation Code", $body, $headers);
+    //Send it
+    mail($email, "Web Transfer - Activation Code", $body, $headers);
 
 }
 
@@ -946,98 +1056,98 @@ function send_activation_email($email = NULL)
 //Send user creation email
 function send_newuser_email($email = NULL, $password = NULL)
 {
-  //Get the big vars list
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Get the big vars list
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Check all the params
-  if($email == NULL) {
-    loggit(2, "Didn't provide an email address: [$email]");
-    return(FALSE);
-  }
-  if($password == NULL) {
-    loggit(2, "Didn't provide a password: [$password]");
-    return(FALSE);
-  }
+    //Check all the params
+    if ($email == NULL) {
+        loggit(2, "Didn't provide an email address: [$email]");
+        return (FALSE);
+    }
+    if ($password == NULL) {
+        loggit(2, "Didn't provide a password: [$password]");
+        return (FALSE);
+    }
 
-  //Create the body from a template
-  $tempfile = "$confroot/$templates/$template_email_newuser";
-  $fh = fopen($tempfile, "r");
-  $template = fread($fh, filesize($tempfile));
+    //Create the body from a template
+    $tempfile = "$confroot/$templates/$template_email_newuser";
+    $fh = fopen($tempfile, "r");
+    $template = fread($fh, filesize($tempfile));
 
-  //Replace the tags
-  $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
-  $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
-  $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
-  $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
-  $template = str_replace('[$COMPANY_URL]', $company_url, $template);
-  $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
-  $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
-  $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
-  //--
-  $template = str_replace('[$USERNAME]', $email, $template);
-  $template = str_replace('[$EMAIL]', $email, $template);
-  $template = str_replace('[$PASSWORD]', $password, $template);
-  $template = str_replace('[$EXTERNAL_START_LINK]', $link_external_start, $template);
+    //Replace the tags
+    $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
+    $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
+    $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
+    $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
+    $template = str_replace('[$COMPANY_URL]', $company_url, $template);
+    $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
+    $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
+    $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
+    //--
+    $template = str_replace('[$USERNAME]', $email, $template);
+    $template = str_replace('[$EMAIL]', $email, $template);
+    $template = str_replace('[$PASSWORD]', $password, $template);
+    $template = str_replace('[$EXTERNAL_START_LINK]', $link_external_start, $template);
 
-  //Trim all lines to 70 characters
-  $body = wordwrap($template, 70);
-  fclose($fh);
+    //Trim all lines to 70 characters
+    $body = wordwrap($template, 70);
+    fclose($fh);
 
-  //Set headers for HTML email
-  $headers = 'MIME-Version: 1.0' . "\n";
-  $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
+    //Set headers for HTML email
+    $headers = 'MIME-Version: 1.0' . "\n";
+    $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
 
-  //Set the other headers
-  $headers .= "To: <$email>" . "\n";
-  $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
+    //Set the other headers
+    $headers .= "To: <$email>" . "\n";
+    $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
 
-  //Send it
-  mail($email, "Web Transfer - New Account", $body, $headers);
+    //Send it
+    mail($email, "Web Transfer - New Account", $body, $headers);
 
-  return(TRUE);
+    return (TRUE);
 }
 
 
 //Do a sanity check on the given user to see what state the account is in
 function user_sanity_check($uid = NULL)
 {
-  //If uid is zero then balk
-  if($uid == NULL) {
-    loggit(2,"Can't get the username from this uid: [$uid]");
-    return(FALSE);
-  }
+    //If uid is zero then balk
+    if ($uid == NULL) {
+        loggit(2, "Can't get the username from this uid: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the uid in the session table
-  $sql=$dbh->prepare("SELECT id,name,email,active,password,passphrase,badlogins FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad user name lookup attempt: [$uid]");
-    return(FALSE);
-  }
-  $sql->bind_result($id,$username,$email,$active,$password,$passphrase,$badlogins) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
-
-  
-  //Go through a bunch of tests, redirecting to an error page if something bad was found
+    //Look for the uid in the session table
+    $sql = $dbh->prepare("SELECT id,name,email,active,password,passphrase,badlogins FROM $table_user WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad user name lookup attempt: [$uid]");
+        return (FALSE);
+    }
+    $sql->bind_result($id, $username, $email, $active, $password, $passphrase, $badlogins) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
 
-  loggit(1,"Returning user name: [$username] for uid: [$uid]");
-  return($username);
+    //Go through a bunch of tests, redirecting to an error page if something bad was found
+
+
+    loggit(1, "Returning user name: [$username] for uid: [$uid]");
+    return ($username);
 
 }
 
@@ -1045,46 +1155,46 @@ function user_sanity_check($uid = NULL)
 //Check the given activation code
 function check_activation_code($uid = NULL, $code = NULL)
 {
-  //If uid is zero then balk
-  if($uid == NULL) {
-    loggit(2,"User id was malformed or blank: [$uid]");
-    return(FALSE);
-  }
-  //If code is zero then balk
-  if($code == NULL) {
-    loggit(2,"Activation code was malformed or blank: [$code]");
-    return(FALSE);
-  }
+    //If uid is zero then balk
+    if ($uid == NULL) {
+        loggit(2, "User id was malformed or blank: [$uid]");
+        return (FALSE);
+    }
+    //If code is zero then balk
+    if ($code == NULL) {
+        loggit(2, "Activation code was malformed or blank: [$code]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2,$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT id FROM $table_user WHERE passphrase=?") or loggit(2,$dbh->error);
-  $sql->bind_param("s", $code) or loggit(2,$dbh->error);
-  $sql->execute() or loggit(2,$dbh->error);
-  $sql->store_result() or loggit(2,$dbh->error);
-  //See if the session is valid
-  if(($rows = $sql->num_rows()) != 1) {
-    $sql->close() or loggit(2,$dbh->error);
-    loggit(2,"Bad activation check.  Should only be one row returned.  Instead there were: [$rows] for user: [$uid] and passphrase: [$code]");
-    return(FALSE);
-  }
-  $sql->bind_result($id) or loggit(2,$dbh->error);
-  $sql->fetch() or loggit(2,$dbh->error);
-  $sql->close() or loggit(2,$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT id FROM $table_user WHERE passphrase=?") or loggit(2, $dbh->error);
+    $sql->bind_param("s", $code) or loggit(2, $dbh->error);
+    $sql->execute() or loggit(2, $dbh->error);
+    $sql->store_result() or loggit(2, $dbh->error);
+    //See if the session is valid
+    if (($rows = $sql->num_rows()) != 1) {
+        $sql->close() or loggit(2, $dbh->error);
+        loggit(2, "Bad activation check.  Should only be one row returned.  Instead there were: [$rows] for user: [$uid] and passphrase: [$code]");
+        return (FALSE);
+    }
+    $sql->bind_result($id) or loggit(2, $dbh->error);
+    $sql->fetch() or loggit(2, $dbh->error);
+    $sql->close() or loggit(2, $dbh->error);
 
-  //Compare user id returned to the one given
-  if($uid != $id) {
-    loggit(2,"Bad activation check.  User id: [$uid] was expected, but: [$id] was returned.");
-    return(FALSE);
-  }
+    //Compare user id returned to the one given
+    if ($uid != $id) {
+        loggit(2, "Bad activation check.  User id: [$uid] was expected, but: [$id] was returned.");
+        return (FALSE);
+    }
 
-  loggit(1,"Returning [TRUE] for activation check with: [$uid | $code]");
-  return(TRUE);
+    loggit(1, "Returning [TRUE] for activation check with: [$uid | $code]");
+    return (TRUE);
 
 }
 
@@ -1092,159 +1202,159 @@ function check_activation_code($uid = NULL, $code = NULL)
 //See if this connection is from inside the local network or outside
 function inside_or_outside()
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Set location to outside as the default
-  $netloc = "outside";
-
-  //Get the ip of the user and compare it to our local ip range
-  if(strpos($_SERVER["REMOTE_ADDR"],$network_local_range) === FALSE) {
+    //Set location to outside as the default
     $netloc = "outside";
-  } else {
-    $netloc = "inside";
-  }
 
-  //Fallback is always FALSE
-  return($netloc);
+    //Get the ip of the user and compare it to our local ip range
+    if (strpos($_SERVER["REMOTE_ADDR"], $network_local_range) === FALSE) {
+        $netloc = "outside";
+    } else {
+        $netloc = "inside";
+    }
+
+    //Fallback is always FALSE
+    return ($netloc);
 }
 
 
 //Check if the given user id is allowed inside access
 function allowed_inside($uid = NULL)
 {
-  //If uid is zero then balk
-  if($uid == NULL) {
-    loggit(2,"Can't lookup this user id: [$uid]");
-    return(FALSE);
-  }
+    //If uid is zero then balk
+    if ($uid == NULL) {
+        loggit(2, "Can't lookup this user id: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT inside FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() > 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Too many inside records returned for user: [$uid]");
-    return(FALSE);
-  }
-  $sql->bind_result($inside) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT inside FROM $table_user WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() > 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Too many inside records returned for user: [$uid]");
+        return (FALSE);
+    }
+    $sql->bind_result($inside) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Check value
-  if($inside == 0) {
-    loggit(2,"User is not allowed inside: [$uid]");
-    return(FALSE);
-  }
+    //Check value
+    if ($inside == 0) {
+        loggit(2, "User is not allowed inside: [$uid]");
+        return (FALSE);
+    }
 
-  //Dropping through if allowed
-  loggit(1,"User is allowed inside: [$uid]");
-  return(TRUE);
+    //Dropping through if allowed
+    loggit(1, "User is allowed inside: [$uid]");
+    return (TRUE);
 }
 
 
 //Check if the given user id is allowed inside access
 function is_admin($uid = NULL)
 {
-  //If uid is zero then balk
-  if($uid == NULL) {
-    loggit(2,"Can't lookup this user id: [$uid]");
-    return(FALSE);
-  }
+    //If uid is zero then balk
+    if ($uid == NULL) {
+        loggit(2, "Can't lookup this user id: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT admin FROM $table_user WHERE id=? AND admin=1") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() > 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Too many 'admin' records returned for user: [$uid]");
-    return(FALSE);
-  }
-  $sql->bind_result($admin) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT admin FROM $table_user WHERE id=? AND admin=1") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() > 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Too many 'admin' records returned for user: [$uid]");
+        return (FALSE);
+    }
+    $sql->bind_result($admin) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Check value
-  if($admin == 0) {
-    loggit(1,"User is not an admin: [$uid]");
-    return(FALSE);
-  }
+    //Check value
+    if ($admin == 0) {
+        loggit(1, "User is not an admin: [$uid]");
+        return (FALSE);
+    }
 
-  //Dropping through if allowed
-  loggit(1,"User is an admin: [$uid]");
-  return(TRUE);
+    //Dropping through if allowed
+    loggit(1, "User is an admin: [$uid]");
+    return (TRUE);
 }
 
 
 //Send an email that notifies the user of a password change
 function send_password_change_notice($email = NULL)
 {
-  //Get the big vars list
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Get the big vars list
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Check all the params
-  if($email == NULL) {
-    loggit(2, "Didn't provide an email address: [$email|$name|$url]");
-    return(FALSE);
-  }
+    //Check all the params
+    if ($email == NULL) {
+        loggit(2, "Didn't provide an email address: [$email|$name|$url]");
+        return (FALSE);
+    }
 
-  //Create the body from a template
-  $tempfile = "$confroot/$templates/$template_email_password_change";
-  $fh = fopen($tempfile, "r");
-  $template = fread($fh, filesize($tempfile));
+    //Create the body from a template
+    $tempfile = "$confroot/$templates/$template_email_password_change";
+    $fh = fopen($tempfile, "r");
+    $template = fread($fh, filesize($tempfile));
 
-  //Replace the tags
-  $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
-  $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
-  $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
-  $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
-  $template = str_replace('[$COMPANY_URL]', $company_url, $template);
-  $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
-  $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
-  $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
-  $template = str_replace('[$COMPANY_HELP_PHONE]', $company_help_phone, $template);
-  //--
-  $template = str_replace('[$USERNAME]', $email, $template);
-  $template = str_replace('[$EMAIL]', $email, $template);
-  $template = str_replace('[$TIMESTAMP]', strftime("%b %e, %Y - %l:%M %P", time()), $template);
+    //Replace the tags
+    $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
+    $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
+    $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
+    $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
+    $template = str_replace('[$COMPANY_URL]', $company_url, $template);
+    $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
+    $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
+    $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
+    $template = str_replace('[$COMPANY_HELP_PHONE]', $company_help_phone, $template);
+    //--
+    $template = str_replace('[$USERNAME]', $email, $template);
+    $template = str_replace('[$EMAIL]', $email, $template);
+    $template = str_replace('[$TIMESTAMP]', strftime("%b %e, %Y - %l:%M %P", time()), $template);
 
-  //Trim all lines to 70 characters
-  $body = wordwrap($template, 70);
-  fclose($fh);
+    //Trim all lines to 70 characters
+    $body = wordwrap($template, 70);
+    fclose($fh);
 
-  //Set headers for HTML email
-  $headers = 'MIME-Version: 1.0' . "\n";
-  $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
+    //Set headers for HTML email
+    $headers = 'MIME-Version: 1.0' . "\n";
+    $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
 
-  //Set the other headers
-  $headers .= "To: <$email>" . "\n";
-  $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
+    //Set the other headers
+    $headers .= "To: <$email>" . "\n";
+    $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
 
-  //Send it
-  mail($email, "Web Transfer - Password Change", $body, $headers);
+    //Send it
+    mail($email, "Web Transfer - Password Change", $body, $headers);
 
 }
 
@@ -1252,62 +1362,62 @@ function send_password_change_notice($email = NULL)
 //Send an email reset message to the user
 function send_reset_email($email = NULL)
 {
-  //Get the big vars list
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Get the big vars list
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Check all the params
-  if($email == NULL) {
-    loggit(2, "Didn't provide an email address: [$email|$name|$url]");
-    return(FALSE);
-  }
+    //Check all the params
+    if ($email == NULL) {
+        loggit(2, "Didn't provide an email address: [$email|$name|$url]");
+        return (FALSE);
+    }
 
-  //Check if the user exists.  If not then balk
-  if(!user_exist(get_user_id_from_email($email))) {
-    loggit(2, "Password reset requested for a non-existent user: [$email]");
-    return(FALSE);
-  }
+    //Check if the user exists.  If not then balk
+    if (!user_exist(get_user_id_from_email($email))) {
+        loggit(2, "Password reset requested for a non-existent user: [$email]");
+        return (FALSE);
+    }
 
-  //Generate an activation passphrase
-  $passphrase = random_gen(9);
-  set_passphrase(get_user_id_from_email($email), $passphrase);
+    //Generate an activation passphrase
+    $passphrase = random_gen(9);
+    set_passphrase(get_user_id_from_email($email), $passphrase);
 
-  //Create the body from a template
-  $tempfile = "$confroot/$templates/$template_email_password_reset";
-  $fh = fopen($tempfile, "r");
-  $template = fread($fh, filesize($tempfile));
+    //Create the body from a template
+    $tempfile = "$confroot/$templates/$template_email_password_reset";
+    $fh = fopen($tempfile, "r");
+    $template = fread($fh, filesize($tempfile));
 
-  //Replace the tags
-  $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
-  $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
-  $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
-  $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
-  $template = str_replace('[$COMPANY_URL]', $company_url, $template);
-  $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
-  $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
-  $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
-  //--
-  $template = str_replace('[$USERNAME]', $email, $template);
-  $template = str_replace('[$EMAIL]', $email, $template);
-  $template = str_replace('[$PASSWORD_CHANGE_URL]', $link_external_password_change, $template);
-  $template = str_replace('[$PASSPHRASE]', $passphrase, $template);
+    //Replace the tags
+    $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
+    $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
+    $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
+    $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
+    $template = str_replace('[$COMPANY_URL]', $company_url, $template);
+    $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
+    $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
+    $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
+    //--
+    $template = str_replace('[$USERNAME]', $email, $template);
+    $template = str_replace('[$EMAIL]', $email, $template);
+    $template = str_replace('[$PASSWORD_CHANGE_URL]', $link_external_password_change, $template);
+    $template = str_replace('[$PASSPHRASE]', $passphrase, $template);
 
-  //Trim all lines to 70 characters
-  $body = wordwrap($template, 70);
-  fclose($fh);
+    //Trim all lines to 70 characters
+    $body = wordwrap($template, 70);
+    fclose($fh);
 
-  //Set headers for HTML email
-  $headers = 'MIME-Version: 1.0' . "\n";
-  $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
+    //Set headers for HTML email
+    $headers = 'MIME-Version: 1.0' . "\n";
+    $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
 
-  //Set the other headers
-  $headers .= "To: <$email>" . "\n";
-  $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
+    //Set the other headers
+    $headers .= "To: <$email>" . "\n";
+    $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
 
-  //Send it
-  mail($email, "Web Transfer - Password Reset", $body, $headers);
+    //Send it
+    mail($email, "Web Transfer - Password Reset", $body, $headers);
 
 }
 
@@ -1315,144 +1425,144 @@ function send_reset_email($email = NULL)
 //Get security question that goes with this email
 function get_security_question_by_email($email = NULL)
 {
-  //If email is blank then balk
-  if($email == NULL) {
-    loggit(2,"Email given was blank or corrupt: [$email]");
-    return(FALSE);
-  }
+    //If email is blank then balk
+    if ($email == NULL) {
+        loggit(2, "Email given was blank or corrupt: [$email]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if this is an alias of an existing email
-  //if(get_email_from_alias($email, $aliasof) == TRUE) {
-  //  $email = $aliasof;
-  //}
+    //See if this is an alias of an existing email
+    //if(get_email_from_alias($email, $aliasof) == TRUE) {
+    //  $email = $aliasof;
+    //}
 
-  //Look for the question in the user table
-  $sql=$dbh->prepare("SELECT question FROM $table_user WHERE email=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the question in the user table
+    $sql = $dbh->prepare("SELECT question FROM $table_user WHERE email=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $email) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if the question existed
-  $returned = $sql->num_rows();
-  if($returned != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad question lookup for: [$email].  Returned too many or too few: [$returned].");
-    return(FALSE);
-  }
+    //See if the question existed
+    $returned = $sql->num_rows();
+    if ($returned != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad question lookup for: [$email].  Returned too many or too few: [$returned].");
+        return (FALSE);
+    }
 
-  $sql->bind_result($question) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_result($question) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning question: [$question] for email: [$email]");
-  return($question);
+    loggit(1, "Returning question: [$question] for email: [$email]");
+    return ($question);
 }
 
 
 //Get security answer that goes with this email
 function get_security_answer_by_email($email = NULL)
 {
-  //If email is blank then balk
-  if($email == NULL) {
-    loggit(2,"Email given was blank or corrupt: [$email]");
-    return(FALSE);
-  }
+    //If email is blank then balk
+    if ($email == NULL) {
+        loggit(2, "Email given was blank or corrupt: [$email]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if this is an alias of an existing email
-  //if(get_email_from_alias($email, $aliasof) == TRUE) {
-  //  $email = $aliasof;
-  //}
+    //See if this is an alias of an existing email
+    //if(get_email_from_alias($email, $aliasof) == TRUE) {
+    //  $email = $aliasof;
+    //}
 
-  //Look for the question in the user table
-  $sql=$dbh->prepare("SELECT answer FROM $table_user WHERE email=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $email) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the question in the user table
+    $sql = $dbh->prepare("SELECT answer FROM $table_user WHERE email=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $email) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if the question existed
-  $returned = $sql->num_rows();
-  if($returned != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad answer lookup for: [$email].  Returned too many or too few: [$returned].");
-    return(FALSE);
-  }
+    //See if the question existed
+    $returned = $sql->num_rows();
+    if ($returned != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad answer lookup for: [$email].  Returned too many or too few: [$returned].");
+        return (FALSE);
+    }
 
-  $sql->bind_result($answer) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_result($answer) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning answer: [$answer] for email: [$email]");
-  return($answer);
+    loggit(1, "Returning answer: [$answer] for email: [$email]");
+    return ($answer);
 }
 
 
 //Send new password email
 function send_new_password_email($email = NULL, $password = NULL)
 {
-  //Get the big vars list
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Get the big vars list
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Check all the params
-  if($email == NULL) {
-    loggit(2, "Didn't provide an email address: [$email]");
-    return(FALSE);
-  }
-  if($password == NULL) {
-    loggit(2, "Didn't provide a password: [$password]");
-    return(FALSE);
-  }
+    //Check all the params
+    if ($email == NULL) {
+        loggit(2, "Didn't provide an email address: [$email]");
+        return (FALSE);
+    }
+    if ($password == NULL) {
+        loggit(2, "Didn't provide a password: [$password]");
+        return (FALSE);
+    }
 
-  //Create the body from a template
-  $tempfile = "$confroot/$templates/$template_email_newpassword";
-  $fh = fopen($tempfile, "r");
-  $template = fread($fh, filesize($tempfile));
+    //Create the body from a template
+    $tempfile = "$confroot/$templates/$template_email_newpassword";
+    $fh = fopen($tempfile, "r");
+    $template = fread($fh, filesize($tempfile));
 
-  //Replace the tags
-  $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
-  $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
-  $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
-  $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
-  $template = str_replace('[$COMPANY_URL]', $company_url, $template);
-  $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
-  $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
-  $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
-  //--
-  $template = str_replace('[$USERNAME]', $email, $template);
-  $template = str_replace('[$EMAIL]', $email, $template);
-  $template = str_replace('[$PASSWORD]', $password, $template);
-  $template = str_replace('[$EXTERNAL_START_LINK]', $link_external_start, $template);
+    //Replace the tags
+    $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
+    $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
+    $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
+    $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
+    $template = str_replace('[$COMPANY_URL]', $company_url, $template);
+    $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
+    $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
+    $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
+    //--
+    $template = str_replace('[$USERNAME]', $email, $template);
+    $template = str_replace('[$EMAIL]', $email, $template);
+    $template = str_replace('[$PASSWORD]', $password, $template);
+    $template = str_replace('[$EXTERNAL_START_LINK]', $link_external_start, $template);
 
-  //Trim all lines to 70 characters
-  $body = wordwrap($template, 70);
-  fclose($fh);
+    //Trim all lines to 70 characters
+    $body = wordwrap($template, 70);
+    fclose($fh);
 
-  //Set headers for HTML email
-  $headers = 'MIME-Version: 1.0' . "\n";
-  $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
+    //Set headers for HTML email
+    $headers = 'MIME-Version: 1.0' . "\n";
+    $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
 
-  //Set the other headers
-  $headers .= "To: <$email>" . "\n";
-  $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
+    //Set the other headers
+    $headers .= "To: <$email>" . "\n";
+    $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
 
-  //Send it
-  mail($email, "Web Transfer - New Password", $body, $headers);
+    //Send it
+    mail($email, "Web Transfer - New Password", $body, $headers);
 
-  return(TRUE);
+    return (TRUE);
 }
 
 
@@ -1460,37 +1570,37 @@ function send_new_password_email($email = NULL, $password = NULL)
 function set_password($uid = NULL, $password = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure arguments aren't empty
-  if($uid == NULL) {
-    loggit(2,"User ID argument blank or corrupt: [$uid]");
-    return(FALSE);
-  }
-  if($password == NULL) {
-    loggit(2,"Password argument blank or corrupt: [$password]");
-    return(FALSE);
-  }
+    //Make sure arguments aren't empty
+    if ($uid == NULL) {
+        loggit(2, "User ID argument blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ($password == NULL) {
+        loggit(2, "Password argument blank or corrupt: [$password]");
+        return (FALSE);
+    }
 
-  //Let's hash the password
-  $bcrypt = new Bcrypt();
-  $pwdhash = $bcrypt->hash($password);
-  $timestamp = time();
+    //Let's hash the password
+    $bcrypt = new Bcrypt();
+    $pwdhash = $bcrypt->hash($password);
+    $timestamp = time();
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "UPDATE $table_user SET password=?,lastpasschange=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("sss", $pwdhash,$timestamp,$uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $stmt = "UPDATE $table_user SET password=?,lastpasschange=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sss", $pwdhash, $timestamp, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Password changed to: [hashed:$pwdhash] for user: [$uid]");
-  return(TRUE);
+    //Return
+    loggit(1, "Password changed to: [hashed:$pwdhash] for user: [$uid]");
+    return (TRUE);
 }
 
 
@@ -1498,32 +1608,32 @@ function set_password($uid = NULL, $password = NULL)
 function set_passphrase($uid = NULL, $passphrase = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure arguments aren't empty
-  if($uid == NULL) {
-    loggit(2,"User ID argument blank or corrupt: [$uid]");
-    return(FALSE);
-  }
-  if($passphrase == NULL) {
-    loggit(2,"Passphrase argument blank or corrupt: [$passphrase]");
-    return(FALSE);
-  }
+    //Make sure arguments aren't empty
+    if ($uid == NULL) {
+        loggit(2, "User ID argument blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ($passphrase == NULL) {
+        loggit(2, "Passphrase argument blank or corrupt: [$passphrase]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "UPDATE $table_user SET passphrase=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ss", $passphrase,$uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $stmt = "UPDATE $table_user SET passphrase=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $passphrase, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Passphrase changed to: [$passphrase] for user: [$uid]");
-  return(TRUE);
+    //Return
+    loggit(1, "Passphrase changed to: [$passphrase] for user: [$uid]");
+    return (TRUE);
 }
 
 
@@ -1531,36 +1641,36 @@ function set_passphrase($uid = NULL, $passphrase = NULL)
 function set_email($uid = NULL, $email = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure arguments aren't empty
-  if($uid == NULL) {
-    loggit(2,"User ID argument blank or corrupt: [$uid]");
-    return(FALSE);
-  }
-  if($email == NULL) {
-    loggit(2,"Email argument blank or corrupt: [$email]");
-    return(FALSE);
-  }
+    //Make sure arguments aren't empty
+    if ($uid == NULL) {
+        loggit(2, "User ID argument blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ($email == NULL) {
+        loggit(2, "Email argument blank or corrupt: [$email]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Change any alias mappings for this email address
-  //change_alias_mapping(get_email_from_uid($uid), $email);
+    //Change any alias mappings for this email address
+    //change_alias_mapping(get_email_from_uid($uid), $email);
 
-  //Look for the email address in the user table
-  $stmt = "UPDATE $table_user SET email=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ss", $email,$uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the email address in the user table
+    $stmt = "UPDATE $table_user SET email=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $email, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
 
-  //Return
-  loggit(1,"Email address changed to: [$email] for user: [$uid]");
-  return(TRUE);
+    //Return
+    loggit(1, "Email address changed to: [$email] for user: [$uid]");
+    return (TRUE);
 }
 
 
@@ -1568,95 +1678,95 @@ function set_email($uid = NULL, $email = NULL)
 function set_name($uid = NULL, $name = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure arguments aren't empty
-  if($uid == NULL) {
-    loggit(2,"User ID argument blank or corrupt: [$uid]");
-    return(FALSE);
-  }
-  if($name == NULL) {
-    loggit(2,"Name argument blank or corrupt: [$email]");
-    return(FALSE);
-  }
+    //Make sure arguments aren't empty
+    if ($uid == NULL) {
+        loggit(2, "User ID argument blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ($name == NULL) {
+        loggit(2, "Name argument blank or corrupt: [$email]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Change any alias mappings for this email address
-  //change_alias_mapping(get_email_from_uid($uid), $email);
+    //Change any alias mappings for this email address
+    //change_alias_mapping(get_email_from_uid($uid), $email);
 
-  //Look for the email address in the user table
-  $stmt = "UPDATE $table_user SET name=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ss", $name,$uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the email address in the user table
+    $stmt = "UPDATE $table_user SET name=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $name, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
 
-  //Return
-  loggit(1,"Name changed to: [$name] for user: [$uid]");
-  return(TRUE);
+    //Return
+    loggit(1, "Name changed to: [$name] for user: [$uid]");
+    return (TRUE);
 }
 
 
 //Send email address change notice
 function send_email_change_notice($email = NULL, $oldemail = NULL)
 {
-  //Get the big vars list
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Get the big vars list
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Check all the params
-  if($email == NULL) {
-    loggit(2, "Didn't provide an email address: [$email]");
-    return(FALSE);
-  }
-  if($oldemail == NULL) {
-    loggit(2, "Didn't provide an old email: [$oldemail]");
-    return(FALSE);
-  }
+    //Check all the params
+    if ($email == NULL) {
+        loggit(2, "Didn't provide an email address: [$email]");
+        return (FALSE);
+    }
+    if ($oldemail == NULL) {
+        loggit(2, "Didn't provide an old email: [$oldemail]");
+        return (FALSE);
+    }
 
-  //Create the body from a template
-  $tempfile = "$confroot/$templates/$template_email_emailchange";
-  $fh = fopen($tempfile, "r");
-  $template = fread($fh, filesize($tempfile));
+    //Create the body from a template
+    $tempfile = "$confroot/$templates/$template_email_emailchange";
+    $fh = fopen($tempfile, "r");
+    $template = fread($fh, filesize($tempfile));
 
-  //Replace the tags
-  $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
-  $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
-  $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
-  $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
-  $template = str_replace('[$COMPANY_URL]', $company_url, $template);
-  $template = str_replace('[$COMPANY_HELP_PHONE]', $company_help_phone, $template);
-  $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
-  $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
-  $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
-  //--
-  $template = str_replace('[$USERNAME]', $email, $template);
-  $template = str_replace('[$EMAIL]', $email, $template);
-  $template = str_replace('[$OLDEMAIL]', $oldemail, $template);
-  $template = str_replace('[$TIMESTAMP]', strftime("%b %e, %Y - %l:%M %P", time()), $template);
+    //Replace the tags
+    $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
+    $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
+    $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
+    $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
+    $template = str_replace('[$COMPANY_URL]', $company_url, $template);
+    $template = str_replace('[$COMPANY_HELP_PHONE]', $company_help_phone, $template);
+    $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
+    $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
+    $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
+    //--
+    $template = str_replace('[$USERNAME]', $email, $template);
+    $template = str_replace('[$EMAIL]', $email, $template);
+    $template = str_replace('[$OLDEMAIL]', $oldemail, $template);
+    $template = str_replace('[$TIMESTAMP]', strftime("%b %e, %Y - %l:%M %P", time()), $template);
 
-  //Trim all lines to 70 characters
-  $body = wordwrap($template, 70);
-  fclose($fh);
+    //Trim all lines to 70 characters
+    $body = wordwrap($template, 70);
+    fclose($fh);
 
-  //Set headers for HTML email
-  $headers = 'MIME-Version: 1.0' . "\n";
-  $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
+    //Set headers for HTML email
+    $headers = 'MIME-Version: 1.0' . "\n";
+    $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
 
-  //Set the other headers
-  $headers .= "To: <$email>" . "\n";
-  $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
+    //Set the other headers
+    $headers .= "To: <$email>" . "\n";
+    $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
 
-  //Send it
-  mail($email, "Web Transfer - Email Address Change", $body, $headers);
+    //Send it
+    mail($email, "Web Transfer - Email Address Change", $body, $headers);
 
-  return(TRUE);
+    return (TRUE);
 }
 
 
@@ -1664,32 +1774,32 @@ function send_email_change_notice($email = NULL, $oldemail = NULL)
 function set_question_by_user_id($uid = NULL, $question = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure arguments aren't empty
-  if($uid == NULL) {
-    loggit(2,"User ID argument blank or corrupt: [$uid]");
-    return(FALSE);
-  }
-  if($question == NULL) {
-    loggit(2,"Question argument blank or corrupt: [$email]");
-    return(FALSE);
-  }
+    //Make sure arguments aren't empty
+    if ($uid == NULL) {
+        loggit(2, "User ID argument blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ($question == NULL) {
+        loggit(2, "Question argument blank or corrupt: [$email]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "UPDATE $table_user SET question=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ss", $question,$uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $stmt = "UPDATE $table_user SET question=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $question, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Question changed to: [$question] for user: [$uid]");
-  return(TRUE);
+    //Return
+    loggit(1, "Question changed to: [$question] for user: [$uid]");
+    return (TRUE);
 }
 
 
@@ -1697,32 +1807,32 @@ function set_question_by_user_id($uid = NULL, $question = NULL)
 function set_answer_by_user_id($uid = NULL, $answer = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure arguments aren't empty
-  if($uid == NULL) {
-    loggit(2,"User ID argument blank or corrupt: [$uid]");
-    return(FALSE);
-  }
-  if($answer == NULL) {
-    loggit(2,"Answer argument blank or corrupt: [$answer]");
-    return(FALSE);
-  }
+    //Make sure arguments aren't empty
+    if ($uid == NULL) {
+        loggit(2, "User ID argument blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ($answer == NULL) {
+        loggit(2, "Answer argument blank or corrupt: [$answer]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "UPDATE $table_user SET answer=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ss", $answer,$uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $stmt = "UPDATE $table_user SET answer=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $answer, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Answer changed to: [$answer] for user: [$uid]");
-  return(TRUE);
+    //Return
+    loggit(1, "Answer changed to: [$answer] for user: [$uid]");
+    return (TRUE);
 }
 
 
@@ -1730,68 +1840,68 @@ function set_answer_by_user_id($uid = NULL, $answer = NULL)
 function set_identity_by_user_id($uid = NULL, $identity = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure arguments aren't empty
-  if($uid == NULL) {
-    loggit(2,"User ID argument blank or corrupt: [$uid]");
-    return(FALSE);
-  }
-  if($identity == NULL) {
-    loggit(2,"Identity argument blank or corrupt: [$identity]");
-    return(FALSE);
-  }
+    //Make sure arguments aren't empty
+    if ($uid == NULL) {
+        loggit(2, "User ID argument blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ($identity == NULL) {
+        loggit(2, "Identity argument blank or corrupt: [$identity]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "UPDATE $table_user SET name=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ss", $identity,$uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $stmt = "UPDATE $table_user SET name=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $identity, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Identity changed to: [$identity] for user: [$uid]");
-  return(TRUE);
+    //Return
+    loggit(1, "Identity changed to: [$identity] for user: [$uid]");
+    return (TRUE);
 }
 
 
 //Get an old user's name from the old database
 function get_old_user_name_by_id($olduid = NULL)
 {
-  //If olduid is zero then balk
-  if($olduid == NULL) {
-    loggit(2,"Old userid was malformed or blank: [$olduid]");
-    return(FALSE);
-  }
+    //If olduid is zero then balk
+    if ($olduid == NULL) {
+        loggit(2, "Old userid was malformed or blank: [$olduid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbolduser,$dboldpass,$dboldname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbolduser, $dboldpass, $dboldname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT name FROM $table_old_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $olduid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if(($rows = $sql->num_rows()) != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad old username lookup.  Should only be 1 row returned.  Instead there were: [$rows]");
-    return(FALSE);
-  }
-  $sql->bind_result($cname) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT name FROM $table_old_user WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $olduid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if (($rows = $sql->num_rows()) != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad old username lookup.  Should only be 1 row returned.  Instead there were: [$rows]");
+        return (FALSE);
+    }
+    $sql->bind_result($cname) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning [$cname] for old username lookup with: [$olduid]");
-  return($cname);
+    loggit(1, "Returning [$cname] for old username lookup with: [$olduid]");
+    return ($cname);
 
 }
 
@@ -1799,41 +1909,41 @@ function get_old_user_name_by_id($olduid = NULL)
 //Check this user's login credentials against the old user database
 function check_old_credentials($username = NULL, $password = NULL)
 {
-  //If username is zero then balk
-  if($username == NULL) {
-    loggit(2,"Username was malformed or blank: [$username]");
-    return(FALSE);
-  }
-  //If password is zero then balk
-  if($password == NULL) {
-    loggit(2,"Password was malformed or blank: [$password]");
-    return(FALSE);
-  }
+    //If username is zero then balk
+    if ($username == NULL) {
+        loggit(2, "Username was malformed or blank: [$username]");
+        return (FALSE);
+    }
+    //If password is zero then balk
+    if ($password == NULL) {
+        loggit(2, "Password was malformed or blank: [$password]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbolduser,$dboldpass,$dboldname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbolduser, $dboldpass, $dboldname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT id,name FROM $table_old_user WHERE username=? AND password=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ss", $username, $password) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if(($rows = $sql->num_rows()) != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad credential check.  Should only be 1 row returned.  Instead there were: [$rows]");
-    return(FALSE);
-  }
-  $sql->bind_result($cid,$cname) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT id,name FROM $table_old_user WHERE username=? AND password=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $username, $password) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if (($rows = $sql->num_rows()) != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad credential check.  Should only be 1 row returned.  Instead there were: [$rows]");
+        return (FALSE);
+    }
+    $sql->bind_result($cid, $cname) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning [$cid] for old login check with: [$username | $password]");
-  return($cid);
+    loggit(1, "Returning [$cid] for old login check with: [$username | $password]");
+    return ($cid);
 
 }
 
@@ -1841,61 +1951,61 @@ function check_old_credentials($username = NULL, $password = NULL)
 //Check that this session was validly checked against the old user database
 function is_old_user()
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //See if the cookie even exists first
-  if(empty($_COOKIE[$oldusercookie])) {
-    loggit(2,"No valid cookie found: [$oldusercookie]");
-    return(FALSE);
-  } else {
-    $olduserid = substr($_COOKIE[$oldusercookie], 17, 5);
-    if(old_user_exists($olduserid) != FALSE) {
-      return($_COOKIE[$oldusercookie]);
+    //See if the cookie even exists first
+    if (empty($_COOKIE[$oldusercookie])) {
+        loggit(2, "No valid cookie found: [$oldusercookie]");
+        return (FALSE);
     } else {
-      loggit(2,"The session in the cookie didn't contain a valid old user id: [".$_COOKIE[$oldusercookie]." | $olduserid]");
-      return(FALSE);
+        $olduserid = substr($_COOKIE[$oldusercookie], 17, 5);
+        if (old_user_exists($olduserid) != FALSE) {
+            return ($_COOKIE[$oldusercookie]);
+        } else {
+            loggit(2, "The session in the cookie didn't contain a valid old user id: [" . $_COOKIE[$oldusercookie] . " | $olduserid]");
+            return (FALSE);
+        }
     }
-  }
 
-  //Fallback is always FALSE
-  return(FALSE);
+    //Fallback is always FALSE
+    return (FALSE);
 }
 
 
 //Check if the given user id actually exists in the old users table
 function old_user_exists($uid = NULL)
 {
-  //If uid is zero then balk
-  if($uid == NULL) {
-    loggit(2,"Can't lookup this user id: [$uid]");
-    return(FALSE);
-  }
+    //If uid is zero then balk
+    if ($uid == NULL) {
+        loggit(2, "Can't lookup this user id: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbolduser,$dboldpass,$dboldname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbolduser, $dboldpass, $dboldname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT id,name FROM $table_old_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Too many records returned for user: [$uid]");
-    return(FALSE);
-  }
-  $sql->bind_result($userid,$cname) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT id,name FROM $table_old_user WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Too many records returned for user: [$uid]");
+        return (FALSE);
+    }
+    $sql->bind_result($userid, $cname) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"User exists: [$userid | $cname]");
-  return($cname);
+    loggit(1, "User exists: [$userid | $cname]");
+    return ($cname);
 }
 
 
@@ -1903,125 +2013,125 @@ function old_user_exists($uid = NULL)
 function set_old_user_as_imported($olduid = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure arguments aren't empty
-  if($olduid == NULL) {
-    loggit(2,"Old user ID argument blank or corrupt: [$olduid]");
-    return(FALSE);
-  }
+    //Make sure arguments aren't empty
+    if ($olduid == NULL) {
+        loggit(2, "Old user ID argument blank or corrupt: [$olduid]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "INSERT INTO $table_olduser_import (id,imported) VALUES(?,1)";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $olduid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $stmt = "INSERT INTO $table_olduser_import (id,imported) VALUES(?,1)";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $olduid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Marked old user: [$olduid] as imported.");
-  return(TRUE);
+    //Return
+    loggit(1, "Marked old user: [$olduid] as imported.");
+    return (TRUE);
 }
 
 
 //Check if an old user has already been imported into the new system
 function check_old_user_import_status($olduid = NULL)
 {
-  //If olduid is zero then balk
-  if($olduid == NULL) {
-    loggit(2,"Old userid is either zero or blank: [$olduid]");
-    return(FALSE);
-  }
+    //If olduid is zero then balk
+    if ($olduid == NULL) {
+        loggit(2, "Old userid is either zero or blank: [$olduid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT * FROM $table_olduser_import WHERE id=? AND imported=1") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $olduid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() <> 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"No records returned for old user: [$olduid]");
-    return(FALSE);
-  }
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT * FROM $table_olduser_import WHERE id=? AND imported=1") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $olduid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() <> 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "No records returned for old user: [$olduid]");
+        return (FALSE);
+    }
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"User already imported: [$olduid]");
-  return(TRUE);
+    loggit(1, "User already imported: [$olduid]");
+    return (TRUE);
 }
 
 
 //Send a new password message to the user
 function send_password_reset_email($email = NULL)
 {
-  //Get the big vars list
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Get the big vars list
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Check all the params
-  if($email == NULL) {
-    loggit(2, "Didn't provide an email address: [$email|$name|$url]");
-    return(FALSE);
-  }
+    //Check all the params
+    if ($email == NULL) {
+        loggit(2, "Didn't provide an email address: [$email|$name|$url]");
+        return (FALSE);
+    }
 
-  //Check if the user exists.  If not then balk
-  if(!user_exist(get_user_id_from_email($email))) {
-    loggit(2, "Password reset requested for a non-existent user: [$email]");
-    return(FALSE);
-  }
+    //Check if the user exists.  If not then balk
+    if (!user_exist(get_user_id_from_email($email))) {
+        loggit(2, "Password reset requested for a non-existent user: [$email]");
+        return (FALSE);
+    }
 
-  //Generate a new password for this user
-  $password = random_gen(9);
-  set_password(get_user_id_from_email($email), $password);
+    //Generate a new password for this user
+    $password = random_gen(9);
+    set_password(get_user_id_from_email($email), $password);
 
-  //Create the body from a template
-  $tempfile = "$confroot/$templates/$template_email_reset_password";
-  $fh = fopen($tempfile, "r");
-  $template = fread($fh, filesize($tempfile));
+    //Create the body from a template
+    $tempfile = "$confroot/$templates/$template_email_reset_password";
+    $fh = fopen($tempfile, "r");
+    $template = fread($fh, filesize($tempfile));
 
-  //Replace the tags
-  $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
-  $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
-  $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
-  $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
-  $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
-  $template = str_replace('[$COMPANY_URL]', $company_url, $template);
-  $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
-  $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
-  $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
-  //--
-  $template = str_replace('[$USERNAME]', $email, $template);
-  $template = str_replace('[$EMAIL]', $email, $template);
-  $template = str_replace('[$NEW_PASSWORD]', $password, $template);
+    //Replace the tags
+    $template = str_replace('[$COMPANY_NAME]', $company_name, $template);
+    $template = str_replace('[$EMAIL_BGCOLOR]', $template_email_bgcolor, $template);
+    $template = str_replace('[$EMAIL_TEXT_COLOR]', $template_email_text_color, $template);
+    $template = str_replace('[$EMAIL_LINK_COLOR]', $template_email_link_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_BGCOLOR]', $template_email_header_bgcolor, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT_COLOR]', $template_email_header_text_color, $template);
+    $template = str_replace('[$EMAIL_HEADER_TEXT]', $template_email_header_text, $template);
+    $template = str_replace('[$COMPANY_URL]', $company_url, $template);
+    $template = str_replace('[$COMPANY_SHORT_NAME]', $company_short_name, $template);
+    $template = str_replace('[$COMPANY_PRIVACY_POLICY_URL]', $company_privacy_policy_url, $template);
+    $template = str_replace('[$COMPANY_SECURITY_POLICY_URL]', $company_security_policy_url, $template);
+    //--
+    $template = str_replace('[$USERNAME]', $email, $template);
+    $template = str_replace('[$EMAIL]', $email, $template);
+    $template = str_replace('[$NEW_PASSWORD]', $password, $template);
 
-  //Trim all lines to 70 characters
-  $body = wordwrap($template, 70);
-  fclose($fh);
+    //Trim all lines to 70 characters
+    $body = wordwrap($template, 70);
+    fclose($fh);
 
-  //Set headers for HTML email
-  $headers = 'MIME-Version: 1.0' . "\n";
-  $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
+    //Set headers for HTML email
+    $headers = 'MIME-Version: 1.0' . "\n";
+    $headers .= 'Content-Type: text/html; charset=iso-8859-1' . "\n";
 
-  //Set the other headers
-  $headers .= "To: <$email>" . "\n";
-  $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
+    //Set the other headers
+    $headers .= "To: <$email>" . "\n";
+    $headers .= "From: $email_fromname <$email_filemaster>" . "\n\n";
 
-  //Send it
-  mail($email, "Web Transfer - New Password", $body, $headers);
+    //Send it
+    mail($email, "Web Transfer - New Password", $body, $headers);
 
-  return($password);
+    return ($password);
 
 }
 
@@ -2029,57 +2139,57 @@ function send_password_reset_email($email = NULL)
 //Get the user id that goes with this email address
 function get_email_from_alias($alias = NULL, &$mappedto = NULL)
 {
-  //bypass this function for now
-  return(FALSE);
+    //bypass this function for now
+    return (FALSE);
 
-  //If alias is blank then balk
-  if($alias == NULL) {
-    loggit(2,"Bad alias argument: [$alias]");
-    return(FALSE);
-  }
+    //If alias is blank then balk
+    if ($alias == NULL) {
+        loggit(2, "Bad alias argument: [$alias]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Set the mappedto [out] argument to match the email address we are checking for initially
-  //to cut down on potential programming errors when calling this function
-  $mappedto = $alias;
+    //Set the mappedto [out] argument to match the email address we are checking for initially
+    //to cut down on potential programming errors when calling this function
+    $mappedto = $alias;
 
-  //Look for the mapping in the alias table
-  $sql=$dbh->prepare("SELECT mapsto FROM $table_alias WHERE alias=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $alias) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  $returned = $sql->num_rows();
+    //Look for the mapping in the alias table
+    $sql = $dbh->prepare("SELECT mapsto FROM $table_alias WHERE alias=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $alias) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    $returned = $sql->num_rows();
 
-  //Something screwy happened if more than one row is returned
-  if($returned > 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad alias lookup attempt: [$alias].  Too many records returned.");
-    return(FALSE);
-  }
+    //Something screwy happened if more than one row is returned
+    if ($returned > 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad alias lookup attempt: [$alias].  Too many records returned.");
+        return (FALSE);
+    }
 
-  //If no rows were returned then this email had no alias mappings
-  if($returned < 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"This email has no aliases: [$alias]");
-    return(FALSE);
-  }
+    //If no rows were returned then this email had no alias mappings
+    if ($returned < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "This email has no aliases: [$alias]");
+        return (FALSE);
+    }
 
-  //One row was returned so return the mapped email address
-  $sql->bind_result($email) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+    //One row was returned so return the mapped email address
+    $sql->bind_result($email) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Log and leave
-  loggit(1,"Email address: [$alias] is an alias pointing to: [$email].");
-  $mappedto = $email;
-  return(TRUE);
+    //Log and leave
+    loggit(1, "Email address: [$alias] is an alias pointing to: [$email].");
+    $mappedto = $email;
+    return (TRUE);
 }
 
 
@@ -2087,63 +2197,63 @@ function get_email_from_alias($alias = NULL, &$mappedto = NULL)
 function change_alias_mapping($oldemail = NULL, $newemail = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure arguments aren't empty
-  if($oldemail == NULL) {
-    loggit(2,"The old email argument blank or corrupt: [$oldemail]");
-    return(FALSE);
-  }
-  if($newemail == NULL) {
-    loggit(2,"The new email argument blank or corrupt: [$newemail]");
-    return(FALSE);
-  }
+    //Make sure arguments aren't empty
+    if ($oldemail == NULL) {
+        loggit(2, "The old email argument blank or corrupt: [$oldemail]");
+        return (FALSE);
+    }
+    if ($newemail == NULL) {
+        loggit(2, "The new email argument blank or corrupt: [$newemail]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the old email address in the alias table
-  $stmt = "UPDATE $table_alias SET mapsto=? WHERE mapsto=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ss", $newemail,$oldemail) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the old email address in the alias table
+    $stmt = "UPDATE $table_alias SET mapsto=? WHERE mapsto=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $newemail, $oldemail) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Email alias mapping changed from: [$oldemail] to: [$newemail]");
-  return(TRUE);
+    //Return
+    loggit(1, "Email alias mapping changed from: [$oldemail] to: [$newemail]");
+    return (TRUE);
 }
 
 
 //Get a list of users that aren't activated yet
 function get_inactive_users()
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Find users that are not marked active
-  $users = array();
-  $count = 0;
-  $stmt = "SELECT id FROM $table_user WHERE active=0";
-  $sql=$dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_result($id) or loggit(2, "MySql error: ".$dbh->error);
+    //Find users that are not marked active
+    $users = array();
+    $count = 0;
+    $stmt = "SELECT id FROM $table_user WHERE active=0";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($id) or loggit(2, "MySql error: " . $dbh->error);
 
-  while($sql->fetch()) {
-    $users[$count] = $id;
-    $count++;
-  }
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    while ($sql->fetch()) {
+        $users[$count] = $id;
+        $count++;
+    }
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  $usercount = count($users);
+    $usercount = count($users);
 
-  loggit(1,"Returning [$usercount] inactive users.");
-  return($users);
+    loggit(1, "Returning [$usercount] inactive users.");
+    return ($users);
 }
 
 
@@ -2151,32 +2261,32 @@ function get_inactive_users()
 function log_browser_by_user_id($uid = NULL, $browser = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure uid isn't empty
-  if($uid == NULL) {
-    loggit(2,"The user id was corrupt or blank: [$uid]");
-    return(FALSE);
-  }
-  if($browser == NULL) {
-    loggit(2,"The browser string was corrupt or blank: [$browser]");
-    return(FALSE);
-  }
+    //Make sure uid isn't empty
+    if ($uid == NULL) {
+        loggit(2, "The user id was corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+    if ($browser == NULL) {
+        loggit(2, "The browser string was corrupt or blank: [$browser]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the uid in the session table
-  $stmt = "UPDATE $table_user SET browser=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ss", $browser, $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the uid in the session table
+    $stmt = "UPDATE $table_user SET browser=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $browser, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Made the user active for: [$uid]");
-  return(TRUE);
+    //Return
+    loggit(1, "Made the user active for: [$uid]");
+    return (TRUE);
 }
 
 
@@ -2184,28 +2294,28 @@ function log_browser_by_user_id($uid = NULL, $browser = NULL)
 function set_user_as_admin($uid = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure uid isn't empty
-  if($uid == NULL) {
-    loggit(2,"The user id was corrupt or blank: [$uid]");
-    return(FALSE);
-  }
+    //Make sure uid isn't empty
+    if ($uid == NULL) {
+        loggit(2, "The user id was corrupt or blank: [$uid]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the uid in the session table
-  $stmt = "UPDATE $table_user SET admin=1 WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the uid in the session table
+    $stmt = "UPDATE $table_user SET admin=1 WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Made user: [$uid] an admin!");
-  return(TRUE);
+    //Return
+    loggit(1, "Made user: [$uid] an admin!");
+    return (TRUE);
 }
 
 
@@ -2213,67 +2323,67 @@ function set_user_as_admin($uid = NULL)
 function unset_user_as_admin($uid = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure uid isn't empty
-  if($uid == NULL) {
-    loggit(2,"The user id was corrupt or blank: [$uid]");
-    return(FALSE);
-  }
+    //Make sure uid isn't empty
+    if ($uid == NULL) {
+        loggit(2, "The user id was corrupt or blank: [$uid]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the uid in the session table
-  $stmt = "UPDATE $table_user SET admin=0 WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the uid in the session table
+    $stmt = "UPDATE $table_user SET admin=0 WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Return
-  loggit(1,"Disabled admin status for user: [$uid]!");
-  return(TRUE);
+    //Return
+    loggit(1, "Disabled admin status for user: [$uid]!");
+    return (TRUE);
 }
 
 
 //Return an array of all the prefs for this user
 function get_user_prefs($uid = NULL, $noinit = FALSE)
 {
-  //Check parameters
-  if($uid == NULL) {
-    loggit(2,"User id given is blank or corrupt: [$uid]");
-    return(FALSE);
-  }
-
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
-
-  //Connect to the database server
-  $dbh=new mysqli_Extended($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
-
-  //Look for the sid in the session table
-  $sql=$dbh->prepare("SELECT * FROM $table_prefs WHERE uid=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if the session is valid
-  if($sql->num_rows() != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"This user has no prefs: [$uid].");
-    if( $noinit == TRUE ) {
-      return(FALSE);
-    } else {
-      return( init_user_prefs($uid) );
+    //Check parameters
+    if ($uid == NULL) {
+        loggit(2, "User id given is blank or corrupt: [$uid]");
+        return (FALSE);
     }
-  }
-  $prefs = $sql->fetch_assoc();
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
 
-  loggit(1,"Returning pref array for user: [$uid]");
-  return($prefs);
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli_Extended($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT * FROM $table_prefs WHERE uid=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "This user has no prefs: [$uid].");
+        if ($noinit == TRUE) {
+            return (FALSE);
+        } else {
+            return (init_user_prefs($uid));
+        }
+    }
+    $prefs = $sql->fetch_assoc();
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning pref array for user: [$uid]");
+    return ($prefs);
 }
 
 
@@ -2281,31 +2391,31 @@ function get_user_prefs($uid = NULL, $noinit = FALSE)
 function init_user_prefs($uid = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Make sure uid isn't empty
-  if($uid == NULL) {
-    loggit(2,"The given user id is blank or corrupt: [$uid]");
-    return(FALSE);
-  }
+    //Make sure uid isn't empty
+    if ($uid == NULL) {
+        loggit(2, "The given user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "INSERT IGNORE INTO $table_prefs (uid,sourceurlrt,sourceurlrss,maxlist,lastshortcode,stylesheet) VALUES (?,1,1,?,'1',?)";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("sds", $uid, $default_max_list, $default_style_sheet) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the sid in the session table
+    $stmt = "INSERT IGNORE INTO $table_prefs (uid,sourceurlrt,sourceurlrss,maxlist,lastshortcode,stylesheet) VALUES (?,1,1,?,'1',?)";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sds", $uid, $default_max_list, $default_style_sheet) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Now get the prefs we just made
-  $prefs = get_user_prefs($uid, TRUE);
+    //Now get the prefs we just made
+    $prefs = get_user_prefs($uid, TRUE);
 
-  //Log and return
-  loggit(1,"Initialized a default set of prefs for user: [$uid]");
-  return($prefs);
+    //Log and return
+    loggit(1, "Initialized a default set of prefs for user: [$uid]");
+    return ($prefs);
 }
 
 
@@ -2313,146 +2423,148 @@ function init_user_prefs($uid = NULL)
 function set_user_prefs($uid = NULL, $prefs = NULL)
 {
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Check params
-  if($uid == NULL) {
-    loggit(2,"The given user id is blank or corrupt: [$uid]");
-    return(FALSE);
-  }
-  if($prefs == NULL) {
-    loggit(2,"The prefs array is blank or corrupt: [$prefs]");
-    return(FALSE);
-  }
+    //Check params
+    if ($uid == NULL) {
+        loggit(2, "The given user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ($prefs == NULL) {
+        loggit(2, "The prefs array is blank or corrupt: [$prefs]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the sid in the session table
-  $stmt = "UPDATE $table_prefs
-	   SET publicdefault=?,
-	       publicrss=?,
-	       publicopml=?,
-               sourceurlrt=?,
-               sourceurlrss=?,
-               stylesheet=?,
-               linkblog=?,
-               maxlist=?,
-	       s3bucket=?,
-	       s3key=?,
-	       s3secret=?,
-	       s3cname=?,
-               twitterkey=?,
-               twittersecret=?,
-               twittertoken=?,
-               twittertokensecret=?,
-               urlshortener=?,
-	       avatarurl=?,
-               riverheadlinecart=?,
-               homepagelink=?,
-	       s3shortbucket=?,
-	       lastshortcode=?,
-               shortcart=?,
-	       riverhours=?,
-	       tweetcart=?,
-               microblogtitle=?,
-	       cartularytitle=?,
-	       mbfilename=?,
-               cartfilename=?,
-	       mobilehidebigpics=?,
-               mbarchivecss=?,
-	       mobilehidepics=?,
-               mblinkhome=?,
-               mbreturnhome=?,
-               maxriversize=?,
-               maxriversizemobile=?,
-               timezone=?,
-               fulltextriver=?,
-	       cartinriver=?,
-               staticarticles=?,
-	       collapseriver=?,
-               hideme=?,
-               pubrivertemplate=?,
-               opensubs=?,
-               publicriver=?,
-               pubriverfile=?,
-               pubrivertitle=?,
-			   rivercolumns=?
+    //Look for the sid in the session table
+    $stmt = "UPDATE $table_prefs
+	         SET  publicdefault=?,
+                  publicrss=?,
+                  publicopml=?,
+                  sourceurlrt=?,
+                  sourceurlrss=?,
+                  stylesheet=?,
+                  linkblog=?,
+                  maxlist=?,
+                  s3bucket=?,
+                  s3key=?,
+                  s3secret=?,
+                  s3cname=?,
+                  twitterkey=?,
+                  twittersecret=?,
+                  twittertoken=?,
+                  twittertokensecret=?,
+                  urlshortener=?,
+                  avatarurl=?,
+                  riverheadlinecart=?,
+                  homepagelink=?,
+                  s3shortbucket=?,
+                  lastshortcode=?,
+                  shortcart=?,
+                  riverhours=?,
+                  tweetcart=?,
+                  microblogtitle=?,
+                  cartularytitle=?,
+                  mbfilename=?,
+                  cartfilename=?,
+                  mobilehidebigpics=?,
+                  mbarchivecss=?,
+                  mobilehidepics=?,
+                  mblinkhome=?,
+                  mbreturnhome=?,
+                  maxriversize=?,
+                  maxriversizemobile=?,
+                  timezone=?,
+                  fulltextriver=?,
+                  cartinriver=?,
+                  staticarticles=?,
+                  collapseriver=?,
+                  hideme=?,
+                  pubrivertemplate=?,
+                  opensubs=?,
+                  publicriver=?,
+                  pubriverfile=?,
+                  pubrivertitle=?,
+                  rivercolumns=?,
+                  usetotp=?
            WHERE uid=?";
 
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssds",
-                                $prefs['publicdefault'],
-				$prefs['publicrss'],
-				$prefs['publicopml'],
-				$prefs['sourceurlrt'],
-				$prefs['sourceurlrss'],
-				$prefs['stylesheet'],
-				$prefs['linkblog'],
-				$prefs['maxlist'],
-				$prefs['s3bucket'],
-				$prefs['s3key'],
-				$prefs['s3secret'],
-				$prefs['s3cname'],
-				$prefs['twitterkey'],
-				$prefs['twittersecret'],
-				$prefs['twittertoken'],
-				$prefs['twittertokensecret'],
-				$prefs['urlshortener'],
-				$prefs['avatarurl'],
-				$prefs['riverheadlinecart'],
-			        $prefs['homepagelink'],
-				$prefs['s3shortbucket'],
-				$prefs['lastshortcode'],
-				$prefs['shortcart'],
-				$prefs['riverhours'],
-				$prefs['tweetcart'],
-				$prefs['microblogtitle'],
-				$prefs['cartularytitle'],
-			        $prefs['mbfilename'],
-                                $prefs['cartfilename'],
-				$prefs['mobilehidebigpics'],
-                                $prefs['mbarchivecss'],
-				$prefs['mobilehidepics'],
-				$prefs['mblinkhome'],
-				$prefs['mbreturnhome'],
-				$prefs['maxriversize'],
-				$prefs['maxriversizemobile'],
-                                $prefs['timezone'],
-                                $prefs['fulltextriver'],
-				$prefs['cartinriver'],
-				$prefs['staticarticles'],
-				$prefs['collapseriver'],
-			        $prefs['hideme'],
-				$prefs['pubrivertemplate'],
-                                $prefs['opensubs'],
-                                $prefs['publicriver'],
-                                $prefs['pubriverfile'],
-				$prefs['pubrivertitle'],
-				$prefs['rivercolumns'],
-				$uid
-  ) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdds",
+        $prefs['publicdefault'],
+        $prefs['publicrss'],
+        $prefs['publicopml'],
+        $prefs['sourceurlrt'],
+        $prefs['sourceurlrss'],
+        $prefs['stylesheet'],
+        $prefs['linkblog'],
+        $prefs['maxlist'],
+        $prefs['s3bucket'],
+        $prefs['s3key'],
+        $prefs['s3secret'],
+        $prefs['s3cname'],
+        $prefs['twitterkey'],
+        $prefs['twittersecret'],
+        $prefs['twittertoken'],
+        $prefs['twittertokensecret'],
+        $prefs['urlshortener'],
+        $prefs['avatarurl'],
+        $prefs['riverheadlinecart'],
+        $prefs['homepagelink'],
+        $prefs['s3shortbucket'],
+        $prefs['lastshortcode'],
+        $prefs['shortcart'],
+        $prefs['riverhours'],
+        $prefs['tweetcart'],
+        $prefs['microblogtitle'],
+        $prefs['cartularytitle'],
+        $prefs['mbfilename'],
+        $prefs['cartfilename'],
+        $prefs['mobilehidebigpics'],
+        $prefs['mbarchivecss'],
+        $prefs['mobilehidepics'],
+        $prefs['mblinkhome'],
+        $prefs['mbreturnhome'],
+        $prefs['maxriversize'],
+        $prefs['maxriversizemobile'],
+        $prefs['timezone'],
+        $prefs['fulltextriver'],
+        $prefs['cartinriver'],
+        $prefs['staticarticles'],
+        $prefs['collapseriver'],
+        $prefs['hideme'],
+        $prefs['pubrivertemplate'],
+        $prefs['opensubs'],
+        $prefs['publicriver'],
+        $prefs['pubriverfile'],
+        $prefs['pubrivertitle'],
+        $prefs['rivercolumns'],
+        $prefs['usetotp'],
+        $uid
+    ) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //Log and return
-  loggit(1,"Set prefs for user: [$uid]");
-  return(TRUE);
+    //Log and return
+    loggit(1, "Set prefs for user: [$uid]");
+    return (TRUE);
 }
 
 
 //Retrieve a list of all the users in the database
 function get_users($max = NULL)
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the
-  $sqltxt = "SELECT $table_user.id,
+    //Look for the
+    $sqltxt = "SELECT $table_user.id,
                     $table_user.name,
                     $table_user.email,
                     $table_user.lastlogin,
@@ -2466,179 +2578,179 @@ function get_users($max = NULL)
 	     LEFT JOIN $table_prefs ON $table_user.id = $table_prefs.uid
              ORDER BY $table_user.name DESC";
 
-  if( !empty($max) && is_numeric($max) ) {
-    $sqltxt .= " LIMIT $max";
-  }
+    if (!empty($max) && is_numeric($max)) {
+        $sqltxt .= " LIMIT $max";
+    }
 
-  loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if there were any feeds for this user
-  if($sql->num_rows() < 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"There are no users in the system.");
-    return(array());
-  }
+    //See if there were any feeds for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "There are no users in the system.");
+        return (array());
+    }
 
-  $sql->bind_result($uid,$uname,$uemail,$ulastlogin,$ustage,$uactive,$ubadlogins,$uusername,$uadmin,$uavatarurl) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_result($uid, $uname, $uemail, $ulastlogin, $ustage, $uactive, $ubadlogins, $uusername, $uadmin, $uavatarurl) or loggit(2, "MySql error: " . $dbh->error);
 
-  $users = array();
-  $count = 0;
-  while($sql->fetch()){
-    $users[$count] = array( 'id' => $uid,
-                            'name' => $uname,
-                            'email' => $uemail,
-                            'lastlogin' => $ulastlogin,
-                            'stage' => $ustage,
-                            'active' => $uactive,
-                            'badlogins' => $ubadlogins,
-                            'username' => $uusername,
-                            'sopmlurl' => get_social_outline_url($uid),
-                            'avatarurl' => $uavatarurl,
-                            'admin' => $uadmin );
-    $count++;
-  }
+    $users = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $users[$count] = array('id' => $uid,
+            'name' => $uname,
+            'email' => $uemail,
+            'lastlogin' => $ulastlogin,
+            'stage' => $ustage,
+            'active' => $uactive,
+            'badlogins' => $ubadlogins,
+            'username' => $uusername,
+            'sopmlurl' => get_social_outline_url($uid),
+            'avatarurl' => $uavatarurl,
+            'admin' => $uadmin);
+        $count++;
+    }
 
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning: [$count] users in the system.");
-  return($users);
+    loggit(1, "Returning: [$count] users in the system.");
+    return ($users);
 }
 
 
 //Retrieve a list of all the admin users
 function get_admin_users($max = NULL)
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the
-  $sqltxt = "SELECT id,name,email,lastlogin,stage,username FROM $table_user WHERE admin=1 ORDER BY name DESC";
+    //Look for the
+    $sqltxt = "SELECT id,name,email,lastlogin,stage,username FROM $table_user WHERE admin=1 ORDER BY name DESC";
 
-  if( !empty($max) && is_numeric($max) ) {
-    $sqltxt .= " LIMIT $max";
-  }
+    if (!empty($max) && is_numeric($max)) {
+        $sqltxt .= " LIMIT $max";
+    }
 
-  loggit(1, "[$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if there were any feeds for this user
-  if($sql->num_rows() < 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"There are no admin users in the system.");
-    return(FALSE);
-  }
+    //See if there were any feeds for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "There are no admin users in the system.");
+        return (FALSE);
+    }
 
-  $sql->bind_result($uid,$uname,$uemail,$ulastlogin,$ustage,$uusername) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_result($uid, $uname, $uemail, $ulastlogin, $ustage, $uusername) or loggit(2, "MySql error: " . $dbh->error);
 
-  $users = array();
-  $count = 0;
-  while($sql->fetch()){
-    $users[$count] = array( 'id' => $uid, 'name' => $uname, 'email' => $uemail, 'lastlogin' => $ulastlogin, 'stage' => $ustage, 'username' => $uusername );
-    $count++;
-  }
+    $users = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $users[$count] = array('id' => $uid, 'name' => $uname, 'email' => $uemail, 'lastlogin' => $ulastlogin, 'stage' => $ustage, 'username' => $uusername);
+        $count++;
+    }
 
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning: [$count] admin users in the system.");
-  return($users);
+    loggit(1, "Returning: [$count] admin users in the system.");
+    return ($users);
 }
 
 
 //Return true or false if the user has valid S3 credentials
 function s3_is_enabled($uid = NULL)
 {
-  //Check parameters
-  if( empty($uid) ) {
-    loggit(2,"User id given is blank or corrupt: [$uid]");
-    return(FALSE);
-  }
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "User id given is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Get user prefs
-  $prefs = get_user_prefs($uid);
+    //Get user prefs
+    $prefs = get_user_prefs($uid);
 
-  //Check credentials
-  if(!empty($prefs['s3bucket']) && !empty($prefs['s3key']) && !empty($prefs['s3secret']) ) {
-    return(TRUE);
-  }
+    //Check credentials
+    if (!empty($prefs['s3bucket']) && !empty($prefs['s3key']) && !empty($prefs['s3secret'])) {
+        return (TRUE);
+    }
 
-  //At least one pref was bad
-  return(FALSE);
+    //At least one pref was bad
+    return (FALSE);
 }
 
 
 //Return true or false if the system has valid S3 credentials
 function sys_s3_is_enabled()
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Check credentials
-  if( !empty($s3_sys_key) && !empty($s3_sys_secret) && !empty($s3_sys_bucket) ) {
-    loggit(1, "S3 is enabled for this system.");
-    return(TRUE);
-  }
+    //Check credentials
+    if (!empty($s3_sys_key) && !empty($s3_sys_secret) && !empty($s3_sys_bucket)) {
+        loggit(1, "S3 is enabled for this system.");
+        return (TRUE);
+    }
 
-  //At least one pref was bad
-  loggit(1, "S3 is NOT enabled for this system.");
-  return(FALSE);
+    //At least one pref was bad
+    loggit(1, "S3 is NOT enabled for this system.");
+    return (FALSE);
 }
 
 
 //Return true or false if the user has valid twitter credentials
 function twitter_is_enabled($uid = NULL)
 {
-  //Check parameters
-  if( empty($uid) ) {
-    loggit(2,"User id given is blank or corrupt: [$uid]");
-    return(FALSE);
-  }
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "User id given is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Get user prefs
-  $prefs = get_user_prefs($uid);
+    //Get user prefs
+    $prefs = get_user_prefs($uid);
 
-  //Check credentials
-  if(!empty($prefs['twitterkey']) && !empty($prefs['twittersecret']) && !empty($prefs['twittertoken']) && !empty($prefs['twittertokensecret']) ) {
-    loggit(1, "Twitter is enabled for user: [$uid].");
-    return(TRUE);
-  }
+    //Check credentials
+    if (!empty($prefs['twitterkey']) && !empty($prefs['twittersecret']) && !empty($prefs['twittertoken']) && !empty($prefs['twittertokensecret'])) {
+        loggit(1, "Twitter is enabled for user: [$uid].");
+        return (TRUE);
+    }
 
-  //At least one pref was bad
-  loggit(1, "Twitter is NOT enabled for user: [$uid].");
-  return(FALSE);
+    //At least one pref was bad
+    loggit(1, "Twitter is NOT enabled for user: [$uid].");
+    return (FALSE);
 }
 
 
 //Return true or false if the system has valid twitter credentials
 function sys_twitter_is_enabled()
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Check credentials
-  if(!empty($tw_sys_key) && !empty($tw_sys_secret) && !empty($tw_sys_token) && !empty($tw_sys_tokensecret) ) {
-    loggit(1, "Twitter is enabled for this system.");
-    return(TRUE);
-  }
+    //Check credentials
+    if (!empty($tw_sys_key) && !empty($tw_sys_secret) && !empty($tw_sys_token) && !empty($tw_sys_tokensecret)) {
+        loggit(1, "Twitter is enabled for this system.");
+        return (TRUE);
+    }
 
-  //At least one pref was bad
-  loggit(1, "Twitter is NOT enabled for this system.");
-  return(FALSE);
+    //At least one pref was bad
+    loggit(1, "Twitter is NOT enabled for this system.");
+    return (FALSE);
 }
 
 
@@ -2646,139 +2758,141 @@ function sys_twitter_is_enabled()
 function set_activation_stage($uid = NULL, $stagenum = NULL)
 {
 
-  //Includes
-  //include get_cfg_var("transfer_conf").'/includes/env.php';
-  global $dbhost,$dbuser,$dbpass,$dbname,$table_user;
+    //Includes
+    //include get_cfg_var("transfer_conf").'/includes/env.php';
+    global $dbhost, $dbuser, $dbpass, $dbname, $table_user;
 
-  //Make sure uid isn't empty
-  if($uid == NULL) {
-    loggit(2,"User id given is either blank or corrupt: [$uid]");
-    return(FALSE);
-  }
-  //Make sure stagenum isn't empty
-  if($stagenum == NULL) {
-    loggit(2,"Stage number given is either blank or corrupt: [$stagenum]");
-    return(FALSE);
-  }
+    //Make sure uid isn't empty
+    if ($uid == NULL) {
+        loggit(2, "User id given is either blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    //Make sure stagenum isn't empty
+    if ($stagenum == NULL) {
+        loggit(2, "Stage number given is either blank or corrupt: [$stagenum]");
+        return (FALSE);
+    }
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the uid in the user table
-  $stmt = "UPDATE $table_user SET stage=? WHERE id=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("ds", $stagenum, $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the uid in the user table
+    $stmt = "UPDATE $table_user SET stage=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ds", $stagenum, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  //If the stage number is greater than 1, activate the user
-  if($stagenum > 3) {
-    loggit(1,"The stage requested was greater than 3, so we are activating user: [$uid].");
-    activate_user($uid);
-  }
+    //If the stage number is greater than 1, activate the user
+    if ($stagenum > 3) {
+        loggit(1, "The stage requested was greater than 3, so we are activating user: [$uid].");
+        activate_user($uid);
+    }
 
-  //Return
-  loggit(1,"Set user: [$uid] to activation stage: [$stagenum].");
-  return(TRUE);
+    //Return
+    loggit(1, "Set user: [$uid] to activation stage: [$stagenum].");
+    return (TRUE);
 }
 
 
 //Get the activation stage for this user
 function get_activation_stage($uid = NULL)
 {
-  //If user id is blank then balk
-  if($uid == NULL) {
-    loggit(2,"User id given was blank or corrupt: [$uid]");
-    return(FALSE);
-  }
+    //If user id is blank then balk
+    if ($uid == NULL) {
+        loggit(2, "User id given was blank or corrupt: [$uid]");
+        return (FALSE);
+    }
 
-  //Includes
-  //include get_cfg_var("transfer_conf").'/includes/env.php';
-  global $dbhost,$dbuser,$dbpass,$dbname,$table_user;
+    //Includes
+    //include get_cfg_var("transfer_conf").'/includes/env.php';
+    global $dbhost, $dbuser, $dbpass, $dbname, $table_user;
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the question in the user table
-  $sql=$dbh->prepare("SELECT stage FROM $table_user WHERE id=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $uid) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the question in the user table
+    $sql = $dbh->prepare("SELECT stage FROM $table_user WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if we got a value
-  $returned = $sql->num_rows();
-  if($returned != 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"Bad stage lookup for: [$uid].  Returned too many or too few: [$returned].");
-    return(FALSE);
-  }
+    //See if we got a value
+    $returned = $sql->num_rows();
+    if ($returned != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad stage lookup for: [$uid].  Returned too many or too few: [$returned].");
+        return (FALSE);
+    }
 
-  $sql->bind_result($stage) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_result($stage) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning stage: [$stage] for uid: [$uid]");
-  return($stage);
+    loggit(1, "Returning stage: [$stage] for uid: [$uid]");
+    return ($stage);
 }
 
 
 //Assemble key S3 info for a given user and return it as an array
-function get_s3_info($uid = NULL) {
+function get_s3_info($uid = NULL)
+{
 
-  if( empty($uid) ) {
-    loggit(2, "The user id was empty: [$uid].");
-    return(FALSE);
-  }
+    if (empty($uid)) {
+        loggit(2, "The user id was empty: [$uid].");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Globals
-  $s3info = array();
+    //Globals
+    $s3info = array();
 
-  //Get the user's prefs
-  $prefs = get_user_prefs($uid);
-  $uname = get_username_from_uid($uid);
+    //Get the user's prefs
+    $prefs = get_user_prefs($uid);
+    $uname = get_username_from_uid($uid);
 
-  if( s3_is_enabled($uid) ) {
+    if (s3_is_enabled($uid)) {
         $s3info['sys'] = FALSE;
-	$s3info['key'] = $prefs['s3key'];
+        $s3info['key'] = $prefs['s3key'];
         $s3info['secret'] = $prefs['s3secret'];
         $s3info['bucket'] = $prefs['s3bucket'];
         $s3info['cname'] = $prefs['s3cname'];
         loggit(1, "User: [$uid] has s3 info.  Returning it.");
-        return($s3info);
-  }
+        return ($s3info);
+    }
 
-  if( sys_s3_is_enabled($uid) ) {
+    if (sys_s3_is_enabled($uid)) {
         $s3info['sys'] = TRUE;
-	$s3info['key'] = $s3_sys_key;
+        $s3info['key'] = $s3_sys_key;
         $s3info['secret'] = $s3_sys_secret;
-        $s3info['bucket'] = preg_replace('{/$}', '', $s3_sys_bucket)."/".$uname;
+        $s3info['bucket'] = preg_replace('{/$}', '', $s3_sys_bucket) . "/" . $uname;
         $s3info['cname'] = $s3_sys_cname;
         $s3info['uname'] = $uname;
         loggit(1, "User: [$uid] has no s3 info, so using system fallback credentials.");
-        return($s3info);
-  }
+        return ($s3info);
+    }
 
-  loggit(1, "No valid S3 credentials could be assembled for user: [$uid].");
-  return(FALSE);
+    loggit(1, "No valid S3 credentials could be assembled for user: [$uid].");
+    return (FALSE);
 }
 
 
 //Assemble key S3 info for the default system credentials and return in an array
-function get_sys_s3_info() {
+function get_sys_s3_info()
+{
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Globals
-  $s3info = array();
+    //Globals
+    $s3info = array();
 
-  //Assemble the array of info
-  if( sys_s3_is_enabled() ) {
+    //Assemble the array of info
+    if (sys_s3_is_enabled()) {
         $s3info['sys'] = TRUE;
-	$s3info['key'] = $s3_sys_key;
+        $s3info['key'] = $s3_sys_key;
         $s3info['secret'] = $s3_sys_secret;
         $s3info['bucket'] = preg_replace('{/$}', '', $s3_sys_bucket);
         $s3info['backup'] = preg_replace('{/$}', '', $s3_sys_backup);
@@ -2790,136 +2904,136 @@ function get_sys_s3_info() {
         $s3info['rivertitle'] = $s3_sys_server_river_title;
         $s3info['redirectbucket'] = $s3_sys_server_redirect_bucket;
         //loggit(3, "DEBUG: ".print_r($s3info, TRUE));
-        return($s3info);
-  }
+        return ($s3info);
+    }
 
-  loggit(1, "No system s3 info could be assembled.");
-  return(FALSE);
+    loggit(1, "No system s3 info could be assembled.");
+    return (FALSE);
 }
 
 
 //Check if a flag is set in the flags table
 function sys_flag_is_set($flag = NULL)
 {
-  //Check parameters
-  if( empty($flag) ) {
-    loggit(2,"The flag name is blank or corrupt: [$flag]");
-    return(FALSE);
-  }
+    //Check parameters
+    if (empty($flag)) {
+        loggit(2, "The flag name is blank or corrupt: [$flag]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the url in the feed table
-  $sql=$dbh->prepare("SELECT value FROM $table_flag WHERE name=?") or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $flag) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
-  //See if any rows came back
-  if($sql->num_rows() < 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(3,"The [$flag] flag is not set.");
-    return(FALSE);
-  }
-  $sql->bind_result($flagval) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->fetch() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the url in the feed table
+    $sql = $dbh->prepare("SELECT value FROM $table_flag WHERE name=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $flag) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if any rows came back
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(3, "The [$flag] flag is not set.");
+        return (FALSE);
+    }
+    $sql->bind_result($flagval) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(3,"The: [$flag] flag is set with value: [$flagval].");
-  return($flagval);
+    loggit(3, "The: [$flag] flag is set with value: [$flagval].");
+    return ($flagval);
 }
 
 
 //Set a flag value in the flags table
 function set_sys_flag($flag = NULL, $flagval = NULL, $setby = NULL)
 {
-  //Check parameters
-  if( empty($flag) ) {
-    loggit(2,"The flag name is blank or corrupt: [$flag]");
-    return(FALSE);
-  }
-  if( $flagval == NULL ) {
-    loggit(2,"The flag value is blank or corrupt: [$flagval]");
-    return(FALSE);
-  }
-  if( empty($setby) ) {
-    $setby = 'sys';
-  }
+    //Check parameters
+    if (empty($flag)) {
+        loggit(2, "The flag name is blank or corrupt: [$flag]");
+        return (FALSE);
+    }
+    if ($flagval == NULL) {
+        loggit(2, "The flag value is blank or corrupt: [$flagval]");
+        return (FALSE);
+    }
+    if (empty($setby)) {
+        $setby = 'sys';
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Timestamp
-  $tstamp = time();
+    //Timestamp
+    $tstamp = time();
 
-  //Look for the url in the feed table
-  $stmt = "INSERT INTO $table_flag (name,value,timeset,setby) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE value=?,timeset=?,setby=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("sdssdds", $flag, $flagval, $tstamp, $setby, $flagval, $tstamp, $setby) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the url in the feed table
+    $stmt = "INSERT INTO $table_flag (name,value,timeset,setby) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE value=?,timeset=?,setby=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sdssdds", $flag, $flagval, $tstamp, $setby, $flagval, $tstamp, $setby) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(3,"Set flag: [$flag] with value: [$flagval].");
-  return(TRUE);
+    loggit(3, "Set flag: [$flag] with value: [$flagval].");
+    return (TRUE);
 }
 
 
 //Remove a flag in the flags table
 function delete_sys_flag($flag = NULL)
 {
-  //Check parameters
-  if( empty($flag) ) {
-    loggit(2,"The flag name is blank or corrupt: [$flag]");
-    return(FALSE);
-  }
+    //Check parameters
+    if (empty($flag)) {
+        loggit(2, "The flag name is blank or corrupt: [$flag]");
+        return (FALSE);
+    }
 
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Timestamp
-  $tstamp = time();
+    //Timestamp
+    $tstamp = time();
 
-  //Look for the url in the feed table
-  $stmt = "DELETE FROM $table_flag WHERE name=?";
-  $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->bind_param("s", $flag) or loggit(2, "MySql error: ".$dbh->error);
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    //Look for the url in the feed table
+    $stmt = "DELETE FROM $table_flag WHERE name=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $flag) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(3,"Deleted flag: [$flag].");
-  return(TRUE);
+    loggit(3, "Deleted flag: [$flag].");
+    return (TRUE);
 }
 
 
 //Search for users who's names or emails contain a certain string
 function search_users($query = NULL, $max = NULL)
 {
-  //Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
 
-  //Assemble sql
-  $colnames = array(
-    "$table_user.name",
-    "$table_user.email"
-  );
-  $qsql = build_search_sql($query, $colnames);
+    //Assemble sql
+    $colnames = array(
+        "$table_user.name",
+        "$table_user.email"
+    );
+    $qsql = build_search_sql($query, $colnames);
 
-  //Connect to the database server
-  $dbh=new mysqli($dbhost,$dbuser,$dbpass,$dbname) or loggit(2, "MySql error: ".$dbh->error);
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Look for the
-  $sqltxt = "SELECT $table_user.id,
+    //Look for the
+    $sqltxt = "SELECT $table_user.id,
                     $table_user.name,
                     $table_user.email,
                     $table_prefs.avatarurl
@@ -2928,52 +3042,52 @@ function search_users($query = NULL, $max = NULL)
              WHERE active=1
   ";
 
-  //Append search criteria
-  $sqltxt .= $qsql['text'];
+    //Append search criteria
+    $sqltxt .= $qsql['text'];
 
-  //Sorting
-  $sqltxt .= " ORDER BY $table_user.name DESC";
+    //Sorting
+    $sqltxt .= " ORDER BY $table_user.name DESC";
 
-  //Limit
-  if( !empty($max) && is_numeric($max) ) {
-    $sqltxt .= " LIMIT $max";
-  }
+    //Limit
+    if (!empty($max) && is_numeric($max)) {
+        $sqltxt .= " LIMIT $max";
+    }
 
-  loggit(3, "USERs: [$sqltxt]");
-  $sql=$dbh->prepare($sqltxt) or loggit(2, "MySql error: ".$dbh->error);
+    loggit(3, "USERs: [$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
 
-  //Adjust bindings
-  $ref    = new ReflectionClass('mysqli_stmt');
-  $method = $ref->getMethod("bind_param");
-  $method->invokeArgs($sql, $qsql['bind']);
+    //Adjust bindings
+    $ref = new ReflectionClass('mysqli_stmt');
+    $method = $ref->getMethod("bind_param");
+    $method->invokeArgs($sql, $qsql['bind']);
 
-  $sql->execute() or loggit(2, "MySql error: ".$dbh->error);
-  $sql->store_result() or loggit(2, "MySql error: ".$dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
 
-  //See if there were any feeds for this user
-  if($sql->num_rows() < 1) {
-    $sql->close()
-      or loggit(2, "MySql error: ".$dbh->error);
-    loggit(2,"There are no users in the system.");
-    return(FALSE);
-  }
+    //See if there were any feeds for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "There are no users in the system.");
+        return (FALSE);
+    }
 
-  $sql->bind_result($uid,$uname,$uemail,$uavatarurl) or loggit(2, "MySql error: ".$dbh->error);
+    $sql->bind_result($uid, $uname, $uemail, $uavatarurl) or loggit(2, "MySql error: " . $dbh->error);
 
-  $users = array();
-  $count = 0;
-  while($sql->fetch()){
-    $users[$count] = array( 'id' => $uid,
-                            'name' => $uname,
-                            'email' => $uemail,
-                            'sopmlurl' => get_social_outline_url($uid),
-                            'avatarurl' => $uavatarurl
-    );
-    $count++;
-  }
+    $users = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $users[$count] = array('id' => $uid,
+            'name' => $uname,
+            'email' => $uemail,
+            'sopmlurl' => get_social_outline_url($uid),
+            'avatarurl' => $uavatarurl
+        );
+        $count++;
+    }
 
-  $sql->close() or loggit(2, "MySql error: ".$dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-  loggit(1,"Returning: [$count] users that fit search.");
-  return($users);
+    loggit(1, "Returning: [$count] users that fit search.");
+    return ($users);
 }

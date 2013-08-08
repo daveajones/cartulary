@@ -3,6 +3,7 @@
 <?
 
 //Make sure the session type is 1
+$sid = $_COOKIE[$sidcookie];
 $sesstype = get_session_type($sid);
 if( $sesstype != 1 ) {
     header("Location: /");

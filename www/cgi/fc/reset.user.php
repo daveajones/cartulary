@@ -16,7 +16,7 @@ $userId = $_REQUEST['userId'];
 $userId = substr($userId, strlen("reset_"));
 
 //Make sure we have some user id input to use
-if(empty($userId)) {
+if(empty($userId) || $userId == "none") {
   //Log it
   loggit(2,"The user id was missing.");
   $jsondata['status'] = "false";

@@ -764,6 +764,36 @@ function activate_user($uid = NULL)
 }
 
 
+//Disable two-factor authentication for a user
+function disable_totp($uid = NULL)
+{
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Make sure uid isn't empty
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the sid in the session table
+    $stmt = "UPDATE $table_prefs SET usetotp=0 WHERE uid=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+
+    //Return
+    loggit(1, "Disabled totp for user: [$uid]");
+    return (TRUE);
+}
+
+
 //Make a user record inactive
 function deactivate_user($uid = NULL)
 {

@@ -85,7 +85,7 @@
                 </li>
 		<li class="privacy"><input name="hideme" type="checkbox" <?if ($prefs['hideme'] == 1) echo "checked ";?>/> I don't want to be found in directory searches.</li>
         <li class="privacy"><input name="usetotp" type="checkbox" <?if ($prefs['usetotp'] == 1) echo "checked ";?>/> I want to use two-factor authentication to log in.</li>
-            <?if ( !empty($utps16) ) {
+            <?if ( $prefs['usetotp'] == 1 && !empty($utps16) ) {
                 $b32 = new Base32;
                 $utps32 = $b32->encode( $utps16, true);?>
                 <br/>Google Authenticator:

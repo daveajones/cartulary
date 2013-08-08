@@ -28,10 +28,12 @@ if(empty($userId)) {
 //Get the user's name so we can intelligently respond to the deleter
 $userName = get_user_name_from_uid($userId);
 
-//Delete the user
+//Create a new password
 $newPassword = random_gen(12);
 set_password($userId, $newPassword);
-send_new_password_email(get_email_from_uid($userId), $newPassword);
+
+//Disable two-factor auth for this user
+disable_totp($userId);
 
 //Log it
 loggit(1,"Password reset for user: [$userId].");

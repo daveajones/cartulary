@@ -8,7 +8,8 @@ freedomController.v1.river.statics  = {
 	pathToStreamList	: "#stream .stream-list",
 	lsRiverDataKey		: "riverdata",
 	lsRiverDataPullTime : "riverpulltime",
-	lsStickyDataKey		: "stickydata"
+	lsStickyDataKey		: "stickydata",
+    lsSessionIdKey      : "sessionid",
 };
 
 freedomController.v1.river.methods = (function() {
@@ -22,10 +23,21 @@ var pathToStreamList = freedomController.v1.river.statics.pathToStreamList;
 var lsRiverDataKey   = freedomController.v1.river.statics.lsRiverDataKey;
 var lsRiverDataPullTime  = freedomController.v1.river.statics.lsRiverDataPullTime;
 var lsStickyDataKey  = freedomController.v1.river.statics.lsStickyDataKey;
+var lsSessionIdKey   = freedomController.v1.river.statics.lsSessionIdKey;
+
 
 //----- River functions -----
 function _searchPostLoad() {
-	_rebindEverything();
+	return _rebindEverything();
+}
+
+function _removeSessionData() {
+    sessionStorage.removeItem(lsStickyDataKey);
+    sessionStorage.removeItem(lsRiverDataKey);
+    sessionStorage.removeItem(lsRiverDataPullTime);
+    sessionStorage.removeItem(lsSessionIdKey);
+
+    return true;
 }
 
 function _rebindEverything(elid) {
@@ -72,7 +84,7 @@ function _isAvatar(url) {
     if ( url.indexOf('twimg.com/profile_images') != -1 ) { return true; }
 
     return false;
-};
+}
 
 function _getBodyText(html) {
 	var breakToken = '_______break_______',
@@ -89,7 +101,7 @@ function _countEnclosuresOfType(enclosures, typecheck) {
 	});
 
 	return cnt;
-};
+}
 
 function _isImage(url, type) {
     if ( type.indexOf('image') != -1 ) {  return true;  }
@@ -99,7 +111,7 @@ function _isImage(url, type) {
     if ( url.indexOf('.gif')   != -1 ) {  return true;  }
 
 	return false;
-};
+}
 
 function _isAudio(url, type) {
     if ( type.indexOf('audio') != -1 ) {  return true;  }
@@ -110,7 +122,7 @@ function _isAudio(url, type) {
     if ( url.indexOf('.wma')   != -1 ) {  return true;  }
 
 	return false;
-};
+}
 
 function _isVideo(url, type) {
     if ( type.indexOf('video') != -1 ) {  return true;  }
@@ -121,18 +133,18 @@ function _isVideo(url, type) {
     if ( url.indexOf('.wmv')   != -1 ) {  return true;  }
 
 	return false;
-};
+}
 
 function _isIframe(url, type) {
     if ( type.indexOf('text/html') != -1 ) {  return true;  }
     if ( type.indexOf('application/pdf') != -1 ) {  return true;   }
 
 	return false;
-};
+}
 
 function _getMediaType(type) {
     return type.split('/')[0];
-};
+}
 
 function _getEnclosureSize(bytes) {
 	//_____via http://blog.elctech.com/2009/01/06/convert-filesize-bytes-to-readable-string-in-javascript/
@@ -141,7 +153,7 @@ function _getEnclosureSize(bytes) {
     e = Math.floor(Math.log(bytes) / Math.log(1024));
     t = (bytes / Math.pow(1024, Math.floor(e))).toFixed(2) + " " + s[e];
     return t;
-};
+}
 
 function _clearActiveFeeds() {
 
@@ -189,11 +201,11 @@ function _getDomain(url) {
 	}
     }
     return domain;
-};
+}
 
 function _getFavicon(url) {
 	return 'http://www.google.com/s2/favicons?domain=' + _getDomain(url);
-};
+}
 
 function _focusFirstVisibleArticle() {
 	$(pathToStreamItem).each(function(index) {
@@ -789,7 +801,7 @@ function _buildRiver(cached) {
 
 	//Get the data and show it
 	console.log("build river from cache? " + cached);
-	$.when(_getRiverStickyItems(cached), _getRiverItems(cached)).done(function() {
+	$.when( _getRiverStickyItems(cached), _getRiverItems(cached) ).done(function() {
 		//Bindings
 		_rebindEverything();
 
@@ -878,6 +890,7 @@ function _populateGridSticky(cols) {
 			})();
 			<?}?>
 		}
+
 	});
 
 	return false;
@@ -928,6 +941,7 @@ function _populateGrid(cols) {
 					});
 				})();
 			}
+
 		});
     });
 
@@ -1055,6 +1069,7 @@ function _calculateColumnCount() {
 
 return {
         searchPostLoad      	: _searchPostLoad,
+        removeSessionData       : _removeSessionData,
 		rebindEverything		: _rebindEverything,
 		showOnlyItems			: _showOnlyItems,
 		showAllItems			: _showAllItems,

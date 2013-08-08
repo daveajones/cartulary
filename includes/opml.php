@@ -1643,6 +1643,7 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
         $sopmlurl = $mysopml . '?uid=' . $uid;
         $carturl = $articlespage . '-rss?uid=' . $uid;
         $blogurl = $microblogpage . '-rss?uid=' . $uid;
+        $bloghtml = "";
     }
 
     //Build titles

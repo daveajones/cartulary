@@ -17,4 +17,11 @@ This is primarily a security release.  The most important things are:
   reset on them and two-factor will be disabled as part of that process.  Once they get
   in they can set it all back up.
 
-  
+  So, basically after you run this upgrade, make sure you do:
+  sudo apt-get install ntp
+  sudo apt-get install php5-gd
+
+- Clearing session data on logout.  We store copies of the sticky and non-sticky rivers in
+  sessionStorage.  These values are now cleared upon logout.
+
+- Cleaned up the code in the php API files and split a lot of stuff out into other files.

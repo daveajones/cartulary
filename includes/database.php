@@ -1,8 +1,16 @@
-<?
+<?php
+//########################################################################################
+// API for managing database schema
+//########################################################################################
+
+
 //A list of database schema updates for each version
-$cg_database_version = 22;
+$cg_database_version = 23;
 $cg_database_updates = array();
 
+
+//----------------------------------------------------------------------------------------------------------------
+// Database change statements ------------------------------------------------------------------------------------
 //Version 0 to 1 -------------------------------------------------------------------------------------------------
 $cg_database_updates[0][] = <<<CGDB0001
  CREATE TABLE IF NOT EXISTS `dbversion` (
@@ -88,7 +96,7 @@ $cg_database_updates[8][] = <<<CGDB0018
 CGDB0018;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 9 to 10 -------------------------------------------------------------------------------------------------
+//Version 9 to 10 ------------------------------------------------------------------------------------------------
 $cg_database_updates[9][] = <<<CGDB0019
  ALTER TABLE `prefs` ADD `collapseriver` TINYINT NOT NULL DEFAULT '0' COMMENT 'Show duplicate origin items in a threaded view?'
 CGDB0019;
@@ -97,7 +105,7 @@ $cg_database_updates[9][] = <<<CGDB0020
 CGDB0020;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 10 to 11 -------------------------------------------------------------------------------------------------
+//Version 10 to 11 -----------------------------------------------------------------------------------------------
 $cg_database_updates[10][] = <<<CGDB0021
  ALTER TABLE `sopmlfeeds` ADD `link` VARCHAR( 700 ) NOT NULL COMMENT 'The feed link element.'
 CGDB0021;
@@ -106,7 +114,7 @@ $cg_database_updates[10][] = <<<CGDB0022
 CGDB0022;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 11 to 12 -------------------------------------------------------------------------------------------------
+//Version 11 to 12 -----------------------------------------------------------------------------------------------
 $cg_database_updates[11][] = <<<CGDB0023
  CREATE TABLE IF NOT EXISTS `servers` (
   `guid` varchar(64) NOT NULL DEFAULT '' COMMENT 'A globally unique guid.',
@@ -122,7 +130,7 @@ $cg_database_updates[11][] = <<<CGDB0025
 CGDB0025;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 12 to 13 -------------------------------------------------------------------------------------------------
+//Version 12 to 13 -----------------------------------------------------------------------------------------------
 $cg_database_updates[12][] = <<<CGDB0026
  ALTER TABLE `sopmlitems` ADD `position` INT NOT NULL DEFAULT '0' COMMENT 'The item''s position in the document.',
  ADD `level` INT NOT NULL DEFAULT '0' COMMENT 'The item''s indentation level.',
@@ -133,7 +141,7 @@ $cg_database_updates[12][] = <<<CGDB0027
 CGDB0027;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 13 to 14 -------------------------------------------------------------------------------------------------
+//Version 13 to 14 -----------------------------------------------------------------------------------------------
 $cg_database_updates[13][] = <<<CGDB0028
  ALTER TABLE `prefs` CHANGE `publicdefault` `publicdefault` TINYINT( 4 ) NOT NULL DEFAULT '1' COMMENT 'Should articles be public by default?',
  CHANGE `maxlist` `maxlist` INT( 11 ) NOT NULL DEFAULT '20' COMMENT 'Max number of entries to show by default.',
@@ -148,7 +156,7 @@ $cg_database_updates[13][] = <<<CGDB0029
 CGDB0029;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 14 to 15 -------------------------------------------------------------------------------------------------
+//Version 14 to 15 -----------------------------------------------------------------------------------------------
 $cg_database_updates[14][] = <<<CGDB0030
  ALTER TABLE `nfitems` ADD `media` TINYINT NOT NULL DEFAULT '0' COMMENT 'Does this item contain attached media?'
 CGDB0030;
@@ -166,7 +174,7 @@ $cg_database_updates[14][] = <<<CGDB0034
 CGDB0034;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 15 to 16 -------------------------------------------------------------------------------------------------
+//Version 15 to 16 -----------------------------------------------------------------------------------------------
 $cg_database_updates[15][] = <<<CGDB0035
  ALTER TABLE `prefs` ADD `hideme` TINYINT NOT NULL DEFAULT '0' COMMENT 'Hide this user from directory searches?'
 CGDB0035;
@@ -175,7 +183,7 @@ $cg_database_updates[15][] = <<<CGDB0036
 CGDB0036;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 16 to 17 -------------------------------------------------------------------------------------------------
+//Version 16 to 17 -----------------------------------------------------------------------------------------------
 $cg_database_updates[16][] = <<<CGDB0037
  ALTER TABLE `newsfeeds` CHANGE  `lastcheck`  `lastcheck` INT NOT NULL COMMENT  'Last time this feed was scanned.'
 CGDB0037;
@@ -193,7 +201,7 @@ $cg_database_updates[16][] = <<<CGDB0041
 CGDB0041;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 17 to 18 -------------------------------------------------------------------------------------------------
+//Version 17 to 18 -----------------------------------------------------------------------------------------------
 $cg_database_updates[17][] = <<<CGDB0042
  ALTER TABLE `prefs` ADD `pubrivertemplate` VARCHAR( 128 ) NOT NULL COMMENT 'Template url for public rivers.',
  ADD `opensubs` TINYINT NOT NULL DEFAULT '0' COMMENT 'Allow open subscriptions',
@@ -201,65 +209,72 @@ $cg_database_updates[17][] = <<<CGDB0042
  ADD `pubriverfile` VARCHAR( 32 ) NOT NULL DEFAULT 'river.html' COMMENT 'The file name to use for public river',
  ADD `pubrivertitle` VARCHAR( 128 ) NOT NULL DEFAULT 'My Public River' COMMENT 'The public river title.'
 CGDB0042;
-
 $cg_database_updates[17][] = <<<CGDB0043
  INSERT INTO `dbversion` ( `version` ) VALUES ( '18' )
 CGDB0043;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 18 to 19 -------------------------------------------------------------------------------------------------
+//Version 18 to 19 -----------------------------------------------------------------------------------------------
 $cg_database_updates[18][] = <<<CGDB0044
  ALTER TABLE `prefs` ADD `rivercolumns` INT NOT NULL DEFAULT '0' COMMENT 'Number of columns on river page.'
 CGDB0044;
-
 $cg_database_updates[18][] = <<<CGDB0045
  INSERT INTO `dbversion` ( `version` ) VALUES ( '19' )
 CGDB0045;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 19 to 20 -------------------------------------------------------------------------------------------------
+//Version 19 to 20 -----------------------------------------------------------------------------------------------
 $cg_database_updates[19][] = <<<CGDB0046
  ALTER TABLE `microblog` ADD `target` VARCHAR( 700 ) NOT NULL COMMENT 'Url of target individual for this post.'
 CGDB0046;
-
 $cg_database_updates[19][] = <<<CGDB0047
  ALTER TABLE `nfitems` ADD `target` VARCHAR( 700 ) NOT NULL COMMENT 'Url of target individual for this post.'
 CGDB0047;
-
 $cg_database_updates[19][] = <<<CGDB0048
  INSERT INTO `dbversion` ( `version` ) VALUES ( '20' )
 CGDB0048;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 20 to 21 -------------------------------------------------------------------------------------------------
+//Version 20 to 21 -----------------------------------------------------------------------------------------------
 $cg_database_updates[20][] = <<<CGDB0049
  UPDATE `prefs` SET stylesheet = '' WHERE 1
 CGDB0049;
-
 $cg_database_updates[20][] = <<<CGDB0050
  INSERT INTO `dbversion` ( `version` ) VALUES ( '21' )
 CGDB0050;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 21 to 22 -------------------------------------------------------------------------------------------------
+//Version 21 to 22 -----------------------------------------------------------------------------------------------
 $cg_database_updates[21][] = <<<CGDB0051
  ALTER TABLE `prefs` CHANGE `cartinriver` `cartinriver` TINYINT( 4 ) NOT NULL DEFAULT '0' COMMENT 'Show cartulized articles in a modal.'
 CGDB0051;
-
 $cg_database_updates[21][] = <<<CGDB0052
  INSERT INTO `dbversion` ( `version` ) VALUES ( '22' )
 CGDB0052;
 //----------------------------------------------------------------------------------------------------------------
 
+//Version 22 to 23 -----------------------------------------------------------------------------------------------
+$cg_database_updates[22][] = <<<CGDB0053
+ ALTER TABLE `users` ADD `totpseed` VARCHAR( 40 ) NOT NULL COMMENT 'Seed for totp calculation.'
+CGDB0053;
+$cg_database_updates[22][] = <<<CGDB0054
+ ALTER TABLE `prefs` ADD `usetotp` TINYINT NOT NULL DEFAULT '0' COMMENT 'Enable TOTP challenge at login?'
+CGDB0054;
+$cg_database_updates[22][] = <<<CGDB0055
+ ALTER TABLE `sessions` ADD `type` INT NOT NULL DEFAULT '0' COMMENT 'What type of session is this?'
+CGDB0055;
+$cg_database_updates[22][] = <<<CGDB0056
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '23' )
+CGDB0056;
+//----------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------
 
-?>
 
 
+//----------------------------------------------------------------------------------------------------------------
+// Database utility functions
 
-<?
-// ----- Database utility functions
 
-//_______________________________________________________________________________________
 //Check for the current database version
 function get_database_version()
 {
@@ -295,7 +310,6 @@ function get_database_version()
 }
 
 
-//_______________________________________________________________________________________
 //Apply updates to the database to bring it to the current version
 function apply_all_database_updates()
 {
@@ -359,7 +373,7 @@ function apply_all_database_updates()
   return(FALSE);
 }
 
-//_______________________________________________________________________________________
+
 //Check if the database actually has a good schema
 function check_database_sanity()
 {
@@ -395,6 +409,3 @@ function check_database_sanity()
   loggit(3,"Users table present. Database schema appears sane.");
   return( TRUE );
 }
-
-
-?>

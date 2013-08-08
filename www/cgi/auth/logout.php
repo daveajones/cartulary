@@ -12,7 +12,21 @@ expire_session($sid);
 
 //Log it
 loggit(1,"User logged out: [$sid]");
-
-// Redirect to the start page
-header("Location: $startpage");
 ?>
+<?include "$confroot/$templates/$template_html_prehead"?>
+<head>
+    <?include "$confroot/$templates/$template_html_meta"?>
+    <?include "$confroot/$templates/$template_html_styles"?>
+    <?include "$confroot/$templates/$template_html_scripts"?>
+</head>
+<?include "$confroot/$templates/$template_html_posthead"?>
+<body>
+</body>
+<?include "$confroot/$templates/$template_html_postbody"?>
+<script>
+    $(document).ready(function() {
+        freedomController.v1.river.methods.removeSessionData();
+        window.location = '<?echo $startpage?>';
+    });
+</script>
+</html>

@@ -94,6 +94,40 @@ if($uid == FALSE) {
   badlogin_reset($email);
 }
 
+//See if 2-factor auth is enabled for this user
+$prefs = get_user_prefs($uid);
+if( $prefs['usetotp'] == 1 ) {
+    if( isset($_POST['totp']) && !empty($_POST['totp']) ) {
+        $totpcode = $_POST['totp'];
+        $gcode = calculate_totp(get_totp_seed_from_uid($uid));
+        if( $totpcode != $gcode ) {
+            $jsondata['status'] = "false";
+            $jsondata['description'] = "Incorrect validation code.";
+            echo json_encode($jsondata);
+            exit(1);
+        }
+    } else {
+        //Make a new type 1 session designating a temp 2-factor session
+        if( ($sid = new_session($uid, 1)) == FALSE ) {
+            loggit(2,"Could not create session: [$uid]");
+            if( $type == 'json' ) {
+                $jsondata['status'] = "false";
+                $jsondata['description'] = "Session creation error.";
+                echo json_encode($jsondata);
+            } else {
+                header ("Location: $loginerrorpage?code=4");
+            }
+            exit(1);
+        }
+        //Make a cookie for this session
+        setcookie($sidcookie, $sid, 0, "/");
+        $jsondata['goloc'] = $twofactorpage;
+        $jsondata['status'] = "true";
+        $jsondata['description'] = "Two-factor validation code required.";
+        echo json_encode($jsondata);
+        exit(1);
+    }
+}
 
 dologin:
 

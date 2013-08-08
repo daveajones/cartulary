@@ -1,0 +1,34 @@
+#Release Notes - Freedom Controller v0.5.1
+
+
+This is primarily a security release.  The most important things are:
+
+- Cleaned up some non-validating of the $max variable in sql statements coming from cgi
+  scripts.  It's clumsy to use prepared statement placeholders for this type of thing, but
+  the input still MUST be checked for validity.  So now it is.  As far as I can tell with
+  my own eyes there is no more non-validated sql.  Everything is either a prepared statement
+  or gets validated before inclusion.
+
+- Two-factor authentication is now available in the prefs page.  For now, it only works with
+  the Google authenticator mobile app.  For it to work properly, your server MUST be in sync
+  with the rest of the world time-wise.  If you're on Ubuntu, just install the ntpd daemon
+  (apt-get install ntpd) and you're gold.  If, for some reason, you have a user that forgets
+  his/her time code, you can reset them in the user admin page.  Just do a normal password
+  reset on them and two-factor will be disabled as part of that process.  Once they get
+  in they can set it all back up.
+
+  So, basically after you run this upgrade, make sure you do:
+  sudo apt-get install ntp
+  sudo apt-get install php5-gd
+
+- Clearing session data on logout.  We store copies of the sticky and non-sticky rivers in
+  sessionStorage.  These values are now cleared upon logout.
+
+- Cleaned up the code in the php API files and split a lot of stuff out into other files.
+
+- There is also a sample template if you want to run a pure ssl server - meaning users
+  who hit port 80 get bounced to 443.  The file is in "templates/apache-secure.conf" if you
+  want to use it.  You'll have to take care of all the key/cert generation yourself through
+  the normal means.  These days SSL is a very good idea.  Especially when transmitting things
+  like two-factor authentication seed values and qr codes.  You really want that going
+  over an encrypted channel.

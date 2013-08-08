@@ -62,7 +62,9 @@ if ( isset($_POST['publicriver']) ) { $publicriver = 1; } else { $publicriver = 
 if ( isset($_POST['pubriverfile']) ) { $pubriverfile = $_POST['pubriverfile']; } else { $pubriverfile = ""; };
 if ( isset($_POST['pubrivertitle']) ) { $pubrivertitle = $_POST['pubrivertitle']; } else { $pubrivertitle = ""; };
 if ( isset($_POST['rivercolumns']) ) { $rivercolumns = $_POST['rivercolumns']; } else { $rivercolumns = ""; };
+if ( isset($_POST['usetotp']) ) { $usetotp = 1; } else { $usetotp = 0; };
 $jsondata = array();
+$jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
 
 //Clean the input of any whitespace since it was probably a cut/paste accident
@@ -649,6 +651,17 @@ if( $rivercolumns > 9 || !is_numeric($rivercolumns) ) {
   exit(1);
 }
 $prefs['rivercolumns'] = $rivercolumns;
+
+$jsondata['prefname'] = "usetotp";
+if( ($usetotp < 0) || ($usetotp > 1) ) {
+    //Log it
+    loggit(2,"The value for usetotp pref was not within acceptable range: [$usetotp]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Value of pref is out of range.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['usetotp'] = $usetotp;
 //--------------------------------------------------------
 //--------------------------------------------------------
 
@@ -709,6 +722,12 @@ if( $publicriver == 1 && (
     build_public_river($uid);
 }
 
+//If the TOTP seed value is blank or it had been disabled, generate a new one
+$utps16 = get_totp_seed_from_uid($uid);
+if( empty($utps16) || ($oldprefs['usetotp'] != $prefs['usetotp']) ) {
+    set_user_totp_seed($uid);
+    $jsondata['goloc'] = "/prefs?ts=".time();
+}
 
 //Rebuild static files
 build_blog_rss_feed($uid);

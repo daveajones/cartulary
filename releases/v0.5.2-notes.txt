@@ -25,3 +25,10 @@ This is primarily a security release.  The most important things are:
   sessionStorage.  These values are now cleared upon logout.
 
 - Cleaned up the code in the php API files and split a lot of stuff out into other files.
+
+- There is also a sample template if you want to run a pure ssl server - meaning users
+  who hit port 80 get bounced to 443.  The file is in "templates/apache-secure.conf" if you
+  want to use it.  You'll have to take care of all the key/cert generation yourself through
+  the normal means.  These days SSL is a very good idea.  Especially when transmitting things
+  like two-factor authentication seed values and qr codes.  You really want that going
+  over an encrypted channel.

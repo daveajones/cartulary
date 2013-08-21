@@ -22,7 +22,7 @@
 .icon-retweet-1 { display:inline-block; background:url('/images/glyph/glyphicons_080_retweet.png') 3px 5px no-repeat; width:30px; height:30px; border:none; outline:none; }
 .icon-hyperlink { display:inline-block; background:url('/images/glyph/glyphicons_050_link.png') 6px 0 no-repeat; width: 30px; height:30px; border:none; outline:none; }
 .icon-hyperlink-small { display:inline-block; background:url('/images/glyph/glyphicons_halflings_065_share.png') 3px 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
-.icon-unsticky { display:inline-block; background:url('/images/glyph/glyphicons_238_pin_20deg.png') 0 0 no-repeat; width: 30px; height:30px; border:none;  outline:none; }
+.icon-unsticky { display:inline-block; background:url('/images/glyph/glyphicons_238_pin_20deg.png') 5px 5px no-repeat; width: 40px; height:40px; border:none;  outline:none; }
 .icon-prefs { display:inline-block; background:url('/images/glyph/glyphicons_halflings_135_wrench.png') 0 0 no-repeat; width: 20px; height:20px; border:none;  outline:none; }
 .icon-logout { display:inline-block; background:url('/images/glyph/glyphicons_halflings_016_off.png') 0 0 no-repeat; width: 20px; height:20px; border:none;  outline:none; }
 .icon-filter { display:inline-block; background:url('/images/glyph/glyphicons_320_filter.png') 0 2px no-repeat; width: 30px; height:30px; border:none;  outline:none; }

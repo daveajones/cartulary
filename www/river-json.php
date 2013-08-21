@@ -18,4 +18,5 @@
 
 ?>
 <?header("Content-Type: text/plain");?>
-<?echo format_json( "onGetRiverStream($jsondata)" );?>
+<?//echo format_json( "onGetRiverStream($jsondata)" );?>
+<?echo "onGetRiverStream($jsondata)";?>

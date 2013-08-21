@@ -279,8 +279,16 @@ $cg_database_updates[23][] = <<<CGDB0057
  ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='A list of ip addresses that are not allowed.';
 CGDB0057;
 $cg_database_updates[23][] = <<<CGDB0058
- INSERT INTO `dbversion` ( `version` ) VALUES ( '24' )
+ CREATE TABLE IF NOT EXISTS `registration` (
+  `ip` varchar(15) NOT NULL COMMENT 'IP address to ban.',
+  `attempts` int(11) NOT NULL COMMENT 'How many attempts so far.',
+  `lastattempt` int(11) NOT NULL COMMENT 'Last time registration was attempted.',
+  PRIMARY KEY (`ip`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Track registration attempts for shenanigans.';
 CGDB0058;
+$cg_database_updates[23][] = <<<CGDB0059
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '24' )
+CGDB0059;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

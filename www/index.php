@@ -30,8 +30,7 @@
 
 		//Register button
 		$('#aRegister').click( function() {
-			$('#loginForm').attr('action', '/cgi/auth/register');
-			$('#loginForm').submit();
+            window.location = "<?echo $opensignuppage?>";
 			return false;
 		});
 

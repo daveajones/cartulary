@@ -684,6 +684,48 @@ function get_user_id_from_email($email = NULL)
 }
 
 
+//Get the user id that goes with this username
+function get_user_id_from_username($username = NULL)
+{
+    //If username is blank then balk
+    if (empty($username)) {
+        loggit(2, "Can't get the uid from this username: [$username]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the matching username in the user table
+    $sql = $dbh->prepare("SELECT id FROM $table_user WHERE username=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $username) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    $returned = $sql->num_rows();
+    if ($returned > 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad user id lookup attempt: [$username].  Too many records returned.");
+        return (FALSE);
+    }
+    if ($returned < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "No user exists with this email: [$username]");
+        return ("none");
+    }
+    $sql->bind_result($uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning user id: [$uid] for username: [$username]");
+    return ($uid);
+}
+
+
 //Check if the given user record has been activated
 function is_user_active($uid = NULL)
 {

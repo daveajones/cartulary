@@ -276,7 +276,7 @@ $cg_database_updates[23][] = <<<CGDB0057
   `reason` int(11) NOT NULL COMMENT 'Reason code for the ban.',
   `expires` int(11) NOT NULL COMMENT 'Time the ban expires.',
   PRIMARY KEY (`ip`)
- ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='A list of ip addresses that are not allowed.';
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='A list of ip addresses that are not allowed.'
 CGDB0057;
 $cg_database_updates[23][] = <<<CGDB0058
  CREATE TABLE IF NOT EXISTS `registration` (
@@ -284,7 +284,7 @@ $cg_database_updates[23][] = <<<CGDB0058
   `attempts` int(11) NOT NULL COMMENT 'How many attempts so far.',
   `lastattempt` int(11) NOT NULL COMMENT 'Last time registration was attempted.',
   PRIMARY KEY (`ip`)
- ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Track registration attempts for shenanigans.';
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Track registration attempts for shenanigans.'
 CGDB0058;
 $cg_database_updates[23][] = <<<CGDB0059
  INSERT INTO `dbversion` ( `version` ) VALUES ( '24' )

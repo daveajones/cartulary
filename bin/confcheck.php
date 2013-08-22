@@ -42,6 +42,7 @@
     $l_rsscloud = 0;
     $l_peoplesearch = 1;
 	$l_opensignup = 0;
+    $l_opensignupphrase = "";
 	$l_backupencrypt = 0;
 	$l_backupencryptpassword = "";
 
@@ -88,6 +89,9 @@
         if( isset($cg_opensignup) ) {
 	  		$l_opensignup = $cg_opensignup;
 		}
+        if( isset($cg_opensignup_phrase) ) {
+            $l_opensignupphrase = $cg_opensignup_phrase;
+        }
 		if( isset($cg_backup_encrypt) ) {
 			$l_backupencrypt = $cg_backup_encrypt;
 		}
@@ -267,6 +271,7 @@
 	if( $l_opensignup == 1 ) {
 	    $template = str_replace('cg_opensignup=0', 'cg_opensignup=1', $template);
 	}
+    $template = str_replace('cg_opensignup_phrase="opensignupphrase"', 'cg_opensignup_phrase="'.$l_opensignupphrase.'"', $template);
 
     //Eliminate the newinstall flag if it's set
     if( !isset($cartularynewinstall) ) {

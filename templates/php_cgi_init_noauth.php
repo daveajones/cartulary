@@ -12,7 +12,7 @@
   require_once "$confroot/$includes/articles.php";
   require_once "$confroot/$includes/subscribe.php";
   require_once "$confroot/$includes/outline.php";
-
+  require_once "$confroot/$includes/net.php";
 
   //Discover what kind of device this is
   $g_device = get_device_type();

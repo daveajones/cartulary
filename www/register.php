@@ -29,11 +29,13 @@ $tree_location = "Registration";
                     $('h3.msg').html('<img src="/images/spinner.gif" /> Submitting...');
                 },
                 success:        function(data) {
+                    $('h3.msg').removeClass('text-success').addClass('text-error');
                     if(data.status == "false") {
                         $('h3.msg').html( data.description );
                     } else {
+                        $('h3.msg').removeClass('text-error').addClass('text-success');
                         $('h3.msg').html( data.description );
-                        //window.location = data.goloc;
+                        $('a.gologin').show();
                     }
                     $('#btnRegister').attr('disabled', false);
                 },
@@ -72,6 +74,7 @@ $tree_location = "Registration";
         </fieldset>
     </form>
     <h3 class="msg text-error"></h3>
+    <a class="gologin btn btn-success hide" href="/">Login Page</a>
 </div>
 
 <?//--- Include the footer bar html fragments -----------?>

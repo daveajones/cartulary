@@ -238,7 +238,7 @@
 	</form>
 
         <div style="display:none;">
-        <form id="frmUploadAvatar" name="uploadAvatar" action="/cgi/auth/setavatar" method="POST"<?if($device=="android") {?> enctype="multipart/form-data"<?}?>>
+        <form id="frmUploadAvatar" name="uploadAvatar" action="/cgi/auth/setavatar" method="POST" enctype="multipart/form-data">
 		<input id="fileAvatar" name="avatarFile" type="file" />
 		<input id="btnAvatarUpload" name="avatarSubmit" type="submit" value="Post File" />
         </form>

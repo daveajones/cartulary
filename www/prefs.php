@@ -45,8 +45,8 @@
 	<fieldset>
 	<h3>Change Password</h3>
 	<ul>
-	 	<li>Password: <input name="password1" class="urlinput" type="text" value="" /></li>
-		<li>Confirm: <input name="password2" class="urlinput" type="text" value="" /></li>
+	 	<li>Password: <input name="password1" class="urlinput" type="password" value="" /></li>
+		<li>Confirm: <input name="password2" class="urlinput" type="password" value="" /></li>
 		<div class="buttonline">
 		<img class="imgSpinner imgSpinnerPwd" src="/images/spinner.gif" />
 		<button id="btnPwdSubmit" class="btn" type="submit">Change</button>

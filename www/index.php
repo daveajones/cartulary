@@ -75,7 +75,7 @@
     <center>
 	<div id="divLoginInner">
 	    <form id="loginForm" action="/cgi/auth/login" method="post" class="<?if ($g_platform != "mobile"){?>form-horizontal<?}?>">
-		<input id="txtUsername" name="email" class="txtinput required" placeholder="Username" type="text" />
+		<input id="txtUsername" name="email" class="txtinput required" placeholder="Email" type="text" />
 		<input id="txtPassword" name="password" class="txtinput required password" placeholder="Password" type="password" />
 		<input type="hidden" name="type" value="json" />
 

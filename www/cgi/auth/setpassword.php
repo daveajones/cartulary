@@ -8,8 +8,19 @@ $jsondata = array();
 $jsondata['prefname'] = "";
 
 // Get the input
+$password0 = $_POST['password0'];
 $password1 = $_POST['password1'];
 $password2 = $_POST['password2'];
+
+// Is the old one correct?
+if( !check_credentials($g_myemail, $password0) ) {
+    //Log it
+    loggit(2,"Old password was wrong: [$password0]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "The old password was wrong.";
+    echo json_encode($jsondata);
+    exit(1);
+}
 
 // Do the passwords match
 if($password1 != $password2) {

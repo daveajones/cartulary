@@ -8,6 +8,7 @@
   //Track the river scan time
   $tstart = time();
 
+
   //Do we want to scan error feeds or normal feeds?
   $action = "";
   if( in_array("error", $argv) ) {
@@ -22,6 +23,7 @@
   }
 
   //Get the feed list
+  $ufeeds = get_updated_feeds();
   if( $action == "error" ) {
     $feeds = get_error_feeds();
   } else
@@ -30,6 +32,14 @@
   } else {
     $feeds = get_all_feeds();
   }
+
+  //Also poll any feeds that have been marked as updated
+  if( ($ufeeds != FALSE) && (count($ufeeds) > 0) ) {
+    loggit(1, "Updated feeds found. Merging them in.");
+    $newfeeds = array_merge($ufeeds, $feeds);
+    $feeds = $newfeeds;
+  }
+
   $totalfeeds = count($feeds);
   $totaltime = $totalfeeds * 3;
 
@@ -123,4 +133,3 @@
   cronHelper::unlock();
   }
   exit(0);
-?>

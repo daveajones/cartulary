@@ -604,7 +604,7 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
 
 /* --------------------------------------------------- */
 /* ----- Body and other major elements ----- */
-body {  background:#555;  }
+body {  background:#ddd;  }
 .container {
   width: 90%;
   max-width:960px;

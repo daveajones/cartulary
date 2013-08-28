@@ -2561,11 +2561,12 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                   pubriverfile=?,
                   pubrivertitle=?,
                   rivercolumns=?,
-                  usetotp=?
+                  usetotp=?,
+                  hidesublist=?
            WHERE uid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdds",
+    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssddds",
         $prefs['publicdefault'],
         $prefs['publicrss'],
         $prefs['publicopml'],
@@ -2615,6 +2616,7 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
         $prefs['pubrivertitle'],
         $prefs['rivercolumns'],
         $prefs['usetotp'],
+        $prefs['hidesublist'],
         $uid
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);

@@ -63,6 +63,7 @@ if ( isset($_POST['pubriverfile']) ) { $pubriverfile = $_POST['pubriverfile']; }
 if ( isset($_POST['pubrivertitle']) ) { $pubrivertitle = $_POST['pubrivertitle']; } else { $pubrivertitle = ""; };
 if ( isset($_POST['rivercolumns']) ) { $rivercolumns = $_POST['rivercolumns']; } else { $rivercolumns = ""; };
 if ( isset($_POST['usetotp']) ) { $usetotp = 1; } else { $usetotp = 0; };
+if ( isset($_POST['hidesublist']) ) { $hidesublist = 1; } else { $hidesublist = 0; };
 $jsondata = array();
 $jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
@@ -662,6 +663,18 @@ if( ($usetotp < 0) || ($usetotp > 1) ) {
     exit(1);
 }
 $prefs['usetotp'] = $usetotp;
+
+$jsondata['prefname'] = "hidesublist";
+if( ($hidesublist < 0) || ($hidesublist > 1) ) {
+    //Log it
+    loggit(2,"The value for hidesublist pref was not within acceptable range: [$hidesublist]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Value of pref is out of range.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['hidesublist'] = $hidesublist;
+loggit(3, "HIDESUBLIST: [$hidesublist]");
 //--------------------------------------------------------
 //--------------------------------------------------------
 

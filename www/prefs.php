@@ -84,8 +84,8 @@
 		    ?>
 		    </select>
                 </li>
-		<li class="privacy"><input name="hideme" type="checkbox" <?if ($prefs['hideme'] == 1) echo "checked ";?>/> I don't want to be found in directory searches.</li>
-        <li class="privacy"><input name="usetotp" type="checkbox" <?if ($prefs['usetotp'] == 1) echo "checked ";?>/> I want to use two-factor authentication to log in.</li>
+		<li class="privacy"><label class="checkbox inline"><input name="hideme" type="checkbox" <?if ($prefs['hideme'] == 1) echo "checked ";?>/> I don't want to be found in directory searches.</label></li>
+        <li class="privacy"><label class="checkbox inline"><input name="usetotp" type="checkbox" <?if ($prefs['usetotp'] == 1) echo "checked ";?>/> I want to use two-factor authentication to log in.</label></li>
             <?if ( $prefs['usetotp'] == 1 && !empty($utps16) ) {
                 $b32 = new Base32;
                 $utps32 = $b32->encode( $utps16, true);?>
@@ -124,7 +124,8 @@
 	<div class="divPrefSubmit pull-right divPrefRiver"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Subscriptions</h3>
 	<ul>
-		<li class="privacy"><input name="opensubs" type="checkbox" <?if ($prefs['opensubs'] == 1) echo "checked ";?>/> Allow open subscriptions.</li>
+        <li class="privacy"><label class="checkbox inline"><input name="hidesublist" type="checkbox" <?if ($prefs['hidesublist'] == 1) echo "checked ";?>/> I don't want my subscription list in my social outline.</label></li>
+		<li class="privacy"><label class="checkbox inline"><input name="opensubs" type="checkbox" <?if ($prefs['opensubs'] == 1) echo "checked ";?>/> Allow open subscriptions.</label></li>
 	</ul>
 	</div>
 
@@ -136,13 +137,13 @@
 		<li>I want: <input id="riverhours" class="hourinput" name="riverhours" type="text" value="<?echo $prefs['riverhours']?>" /> hours worth of items listed in my river.</li>
 		<li>But, never show more than: <input class="hourinput" name="maxriversize" type="text" value="<?echo $prefs['maxriversize']?>" /> items at a time.</li>
 		<li>And, never show more than: <input class="hourinput" name="maxriversizemobile" type="text" value="<?echo $prefs['maxriversizemobile']?>" /> items while on mobile.</li>
-		<li><input name="riverheadlinecart" type="checkbox" <?if ($prefs['riverheadlinecart'] == 1) echo "checked ";?>/> I want headlines to cartulize by default in the river.</li>
-		<li><input name="cartinriver" type="checkbox" <?if ($prefs['cartinriver'] == 1) echo "checked ";?>/> Don't use in-river cartulizing while on mobile.</li>
-		<li><input name="mobilehidebigpics" type="checkbox" <?if ($prefs['mobilehidebigpics'] == 1) echo "checked ";?>/> Hide large image/video enclosures in the river when on mobile.</li>
-		<li><input name="mobilehidepics" type="checkbox" <?if ($prefs['mobilehidepics'] == 1) echo "checked ";?>/> Hide body images/videos in the river when on mobile.</li>
-		<li><input name="fulltextriver" type="checkbox" <?if ($prefs['fulltextriver'] == 1) echo "checked ";?>/> I want to see the full text of each item.</li>
-		<li><input name="collapseriver" type="checkbox" <?if ($prefs['collapseriver'] == 1) echo "checked ";?>/> Collapse similar items into a threaded view.</li>
-		<li class="privacy"><input id="chkPubriver" name="publicriver" type="checkbox" <?if ($prefs['publicriver'] == 1) echo "checked ";?>/> I want a public river.</li>
+		<li><label class="checkbox inline"><input name="riverheadlinecart" type="checkbox" <?if ($prefs['riverheadlinecart'] == 1) echo "checked ";?>/> I want headlines to cartulize by default in the river.</label></li>
+		<li><label class="checkbox inline"><input name="cartinriver" type="checkbox" <?if ($prefs['cartinriver'] == 1) echo "checked ";?>/> Don't use in-river cartulizing while on mobile.</label></li>
+		<li><label class="checkbox inline"><input name="mobilehidebigpics" type="checkbox" <?if ($prefs['mobilehidebigpics'] == 1) echo "checked ";?>/> Hide large image/video enclosures in the river when on mobile.</label></li>
+		<li><label class="checkbox inline"><input name="mobilehidepics" type="checkbox" <?if ($prefs['mobilehidepics'] == 1) echo "checked ";?>/> Hide body images/videos in the river when on mobile.</label></li>
+		<li><label class="checkbox inline"><input name="fulltextriver" type="checkbox" <?if ($prefs['fulltextriver'] == 1) echo "checked ";?>/> I want to see the full text of each item.</label></li>
+		<li><label class="checkbox inline"><input name="collapseriver" type="checkbox" <?if ($prefs['collapseriver'] == 1) echo "checked ";?>/> Collapse similar items into a threaded view.</label></li>
+		<li class="privacy"><label class="checkbox inline"><input id="chkPubriver" name="publicriver" type="checkbox" <?if ($prefs['publicriver'] == 1) echo "checked ";?>/> I want a public river.</label></li>
 		<div id="divPubriver" class="hide">
 			<li>My public river's file name should be: <input id="pubriverfile" name="pubriverfile" type="text" value="<?echo $prefs['pubriverfile']?>" /></li>
 			<li>My custom public river template url is: <input id="pubrivertemplate" class="urlinput" name="pubrivertemplate" type="text" value="<?echo $prefs['pubrivertemplate']?>" /></li>
@@ -161,9 +162,9 @@
 	        <div class="control-group">
 			<li>I'd rather use an external linkblog located at: <input name="linkblog" class="urlinput" type="text" value="<?echo $prefs['linkblog']?>" /> (url)</li>
 		</div>
-		<li><input name="mblinkhome" type="checkbox" <?if ($prefs['mblinkhome'] == 1) echo "checked ";?>/> I want my microblog RSS link element to point to my homepage.</li>
-		<li class="privacy"><input name="publicrss" type="checkbox" <?if ($prefs['publicrss'] == 1) echo "checked ";?>/> I want my microblog RSS feed to be private.</li>
-		<li><input name="mbreturnhome" type="checkbox" <?if ($prefs['mbreturnhome'] == 1) echo "checked ";?>/> I want to go back to the home page after posting.</li>
+		<li><label class="checkbox inline"><input name="mblinkhome" type="checkbox" <?if ($prefs['mblinkhome'] == 1) echo "checked ";?>/> I want my microblog RSS link element to point to my homepage.</label></li>
+		<li class="privacy"><label class="checkbox inline"><input name="publicrss" type="checkbox" <?if ($prefs['publicrss'] == 1) echo "checked ";?>/> I want my microblog RSS feed to be private.</label></li>
+		<li><label class="checkbox inline"><input name="mbreturnhome" type="checkbox" <?if ($prefs['mbreturnhome'] == 1) echo "checked ";?>/> I want to go back to the home page after posting.</label></li>
 	</ul>
 	</div>
 
@@ -173,11 +174,11 @@
 	<ul>
 		<li>My article archive title should be: <input name="cartularytitle" class="urlinput" type="text" value="<?echo $prefs['cartularytitle']?>" /></li>
 		<li>I want my article archive feed filename to be: <input id="cartfilename" name="cartfilename" type="text" value="<?echo $prefs['cartfilename']?>" /></li>
-		<li><input name="tweetcart" type="checkbox" <?if ($prefs['tweetcart'] == 1) echo "checked ";?>/> I want the articles I save to be tweeted.</li>
-		<li><input name="shortcart" type="checkbox" <?if ($prefs['shortcart'] == 1) echo "checked ";?>/> I want articles that I cartulize to have their url's shortened also.</li>
-		<li class="privacy"><input name="publicdefault" type="checkbox" <?if ($prefs['publicdefault'] == 1) echo "checked ";?>/> I want my article archive RSS feed to be private.</li>
-		<li class="privacy"><input name="publicopml" type="checkbox" <?if ($prefs['publicopml'] == 1) echo "checked ";?>/> I want my article archive OPML file to be private.</li>
-		<li><input name="staticarticles" type="checkbox" <?if ($prefs['staticarticles'] == 1) echo "checked ";?>/> I want a static version of each article stored in S3.</li>
+		<li><label class="checkbox inline"><input name="tweetcart" type="checkbox" <?if ($prefs['tweetcart'] == 1) echo "checked ";?>/> I want the articles I save to be tweeted.</label></li>
+		<li><label class="checkbox inline"><input name="shortcart" type="checkbox" <?if ($prefs['shortcart'] == 1) echo "checked ";?>/> I want articles that I cartulize to have their url's shortened also.</label></li>
+		<li class="privacy"><input name="publicdefault" type="checkbox" <?if ($prefs['publicdefault'] == 1) echo "checked ";?>/> I want my article archive RSS feed to be private.</label></li>
+		<li class="privacy"><input name="publicopml" type="checkbox" <?if ($prefs['publicopml'] == 1) echo "checked ";?>/> I want my article archive OPML file to be private.</label></li>
+		<li><label class="checkbox inline"><input name="staticarticles" type="checkbox" <?if ($prefs['staticarticles'] == 1) echo "checked ";?>/> I want a static version of each article stored in S3.</label></li>
 	</ul>
 	</div>
 
@@ -185,9 +186,9 @@
 	<div class="divPrefSubmit pull-right divPrefLinks"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Links</h3>
 	<ul>
-		<li><input name="sourceurlrt" type="checkbox" <?if ($prefs['sourceurlrt'] == 1) echo "checked ";?>/> I want RT links to use the original source url.</li>
-		<li><input name="sourceurlrss" type="checkbox" <?if ($prefs['sourceurlrss'] == 1) echo "checked ";?>/> I want RSS feed links to point to the original source url.</li>
-        </ul>
+		<li><label class="checkbox inline"><input name="sourceurlrt" type="checkbox" <?if ($prefs['sourceurlrt'] == 1) echo "checked ";?>/> I want RT links to use the original source url.</label></li>
+		<li><label class="checkbox inline"><input name="sourceurlrss" type="checkbox" <?if ($prefs['sourceurlrss'] == 1) echo "checked ";?>/> I want RSS feed links to point to the original source url.</label></li>
+    </ul>
 	</div>
 
 	<div class="divPrefPane">

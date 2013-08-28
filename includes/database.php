@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 24;
+$cg_database_version = 25;
 $cg_database_updates = array();
 
 
@@ -289,6 +289,15 @@ CGDB0058;
 $cg_database_updates[23][] = <<<CGDB0059
  INSERT INTO `dbversion` ( `version` ) VALUES ( '24' )
 CGDB0059;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 24 to 25 -----------------------------------------------------------------------------------------------
+$cg_database_updates[22][] = <<<CGDB0060
+ ALTER TABLE `prefs` ADD `hidesublist` TINYINT NOT NULL DEFAULT '0' COMMENT 'No sub list on social outline?'
+CGDB0060;
+$cg_database_updates[22][] = <<<CGDB0061
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '25' )
+CGDB0061;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

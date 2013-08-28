@@ -32,12 +32,14 @@ $tree_location = "Registration";
                     $('h3.msg').removeClass('text-success').addClass('text-error');
                     if(data.status == "false") {
                         $('h3.msg').html( data.description );
+                        $('#btnRegister').attr('disabled', false);
                     } else {
                         $('h3.msg').removeClass('text-error').addClass('text-success');
                         $('h3.msg').html( data.description );
+                        $('h3.newpassword').html('Password: ' + data.password);
+                        $('div.regsuccess').show();
                         $('a.gologin').show();
                     }
-                    $('#btnRegister').attr('disabled', false);
                 },
                 error:			function(x, t, m) {
                     $('#btnRegister').attr('disabled', false);
@@ -74,7 +76,10 @@ $tree_location = "Registration";
         </fieldset>
     </form>
     <h3 class="msg text-error"></h3>
-    <a class="gologin btn btn-success hide" href="/">Login Page</a>
+    <div class="regsuccess hide">
+      <h3 class="newpassword"></h3>
+      <a class="gologin btn btn-success" href="/">Login Page</a>
+    </div>
 </div>
 
 <?//--- Include the footer bar html fragments -----------?>

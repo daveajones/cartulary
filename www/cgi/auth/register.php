@@ -106,9 +106,10 @@ set_registration_attempts($_SERVER['REMOTE_ADDR'], -1);
 //--------------------------------------------------------------------------------
 //Give feedback that all went well
 $jsondata['id'] = $newuid;
+$jsondata['email'] = $email;
 $jsondata['password'] = $password;
 $jsondata['status'] = "true";
-$jsondata['description'] = "User: [$email] registered with password: [$password].";
+$jsondata['description'] = "User registered successfully.";
 echo json_encode($jsondata);
 
 exit(0);

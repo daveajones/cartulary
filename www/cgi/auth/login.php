@@ -183,6 +183,7 @@ if(is_user_active($uid)) {
 } else {
   //Log it
   loggit(3,"Redirecting new user: [$email | $uid] with sid: [$sid] to the activation page: [$activatepage].");
+  setcookie($newusercookie, $newusercookie, 0, "/");
 
   //Set the activation stage
   $stg = get_activation_stage($uid);

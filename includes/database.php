@@ -292,10 +292,10 @@ CGDB0059;
 //----------------------------------------------------------------------------------------------------------------
 
 //Version 24 to 25 -----------------------------------------------------------------------------------------------
-$cg_database_updates[22][] = <<<CGDB0060
+$cg_database_updates[24][] = <<<CGDB0060
  ALTER TABLE `prefs` ADD `hidesublist` TINYINT NOT NULL DEFAULT '0' COMMENT 'No sub list on social outline?'
 CGDB0060;
-$cg_database_updates[22][] = <<<CGDB0061
+$cg_database_updates[24][] = <<<CGDB0061
  INSERT INTO `dbversion` ( `version` ) VALUES ( '25' )
 CGDB0061;
 //----------------------------------------------------------------------------------------------------------------

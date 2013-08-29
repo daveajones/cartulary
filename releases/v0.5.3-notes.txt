@@ -1,0 +1,28 @@
+#Release Notes - Freedom Controller v0.5.3
+
+
+New features:
+
+- Open Registration.  There is a new flag in the cartulary.conf file called "cg_opensignup".  If you set
+  this flag to 1, your server will allow other people to create their own user accounts through a new
+  registration page.
+
+  For security, there is another setting called "cg_opensignup_phrase" that you will need to set.  This
+  phrase is required to be put in upon registering.  It'd be a good idea to change it periodically.
+
+  Again, for security, only 1 successful registration per ip address is allowed per 48 hours.  And, only
+  4 un-successful attempts are allowed per 48 hours.
+
+- Hiding your subscription list from your social outline.   Some people might not want the list of what
+  they subscribe to being public.  So, from the prefs page you can now set the "I don't want my subscription
+  list in my social outline" checkbox.  Setting this will eliminate the "Stuff I Follow" section from your
+  social outline.
+
+Improvements:
+
+- Removed feed scanning from the buildrivers script.  It would get very bogged down when someone brought in
+  a bunch of new feeds.
+
+- Fixed a caching bug on mobile with stickies coming back.
+
+- A bunch of other, smaller bug fixes.

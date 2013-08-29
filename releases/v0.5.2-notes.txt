@@ -1,4 +1,4 @@
-#Release Notes - Freedom Controller v0.5.1
+#Release Notes - Freedom Controller v0.5.2
 
 
 This is primarily a security release.  The most important things are:

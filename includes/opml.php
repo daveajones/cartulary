@@ -1710,6 +1710,9 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
           </outline>";
 
     //Sub list
+    //Should we even build it?
+    if( $prefs['hidesublist'] == 0 ) {
+    loggit(3, "User: [$uid] doesn't want their subscription list shown.");
     $opml .= "
 
           <outline text=\"Stuff I Follow\">";
@@ -1735,6 +1738,7 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
     }
     $opml .= "
           </outline>";
+    }
 
     $opml .= "
       </body>\n";
@@ -1798,6 +1802,12 @@ function build_reading_list($title = NULL, $uid = NULL, $oid = NULL, $nos3 = FAL
     //Get username
     $username = get_user_name_from_uid($uid);
     $prefs = get_user_prefs($uid);
+
+    //Should we even build it?
+    if( $prefs['hidesublist'] == 1 ) {
+        loggit(2, "User: [$uid] doesn't want their subscription list shown.");
+        return (TRUE);
+    }
 
     //The feed string
     $opml = '<?xml version="1.0" encoding="ISO-8859-1"?>' . "\n";

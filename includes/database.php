@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 23;
+$cg_database_version = 25;
 $cg_database_updates = array();
 
 
@@ -266,6 +266,38 @@ CGDB0055;
 $cg_database_updates[22][] = <<<CGDB0056
  INSERT INTO `dbversion` ( `version` ) VALUES ( '23' )
 CGDB0056;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 23 to 24 -----------------------------------------------------------------------------------------------
+$cg_database_updates[23][] = <<<CGDB0057
+ CREATE TABLE IF NOT EXISTS `banned` (
+  `ip` varchar(15) NOT NULL COMMENT 'IP address to ban.',
+  `added` int(11) NOT NULL COMMENT 'Time the ban was added.',
+  `reason` int(11) NOT NULL COMMENT 'Reason code for the ban.',
+  `expires` int(11) NOT NULL COMMENT 'Time the ban expires.',
+  PRIMARY KEY (`ip`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='A list of ip addresses that are not allowed.'
+CGDB0057;
+$cg_database_updates[23][] = <<<CGDB0058
+ CREATE TABLE IF NOT EXISTS `registration` (
+  `ip` varchar(15) NOT NULL COMMENT 'IP address to ban.',
+  `attempts` int(11) NOT NULL COMMENT 'How many attempts so far.',
+  `lastattempt` int(11) NOT NULL COMMENT 'Last time registration was attempted.',
+  PRIMARY KEY (`ip`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Track registration attempts for shenanigans.'
+CGDB0058;
+$cg_database_updates[23][] = <<<CGDB0059
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '24' )
+CGDB0059;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 24 to 25 -----------------------------------------------------------------------------------------------
+$cg_database_updates[24][] = <<<CGDB0060
+ ALTER TABLE `prefs` ADD `hidesublist` TINYINT NOT NULL DEFAULT '0' COMMENT 'No sub list on social outline?'
+CGDB0060;
+$cg_database_updates[24][] = <<<CGDB0061
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '25' )
+CGDB0061;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

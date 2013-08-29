@@ -49,6 +49,17 @@ function create_user($email = NULL, $silent = NULL, $inside = NULL, $active = NU
     //Generate a unique username on this system
     $emparts = split("@", $email);
     $username = $emparts[0] . random_gen(4);
+    $tuid = get_user_id_from_username($username);
+    $tc = 0;
+    while( $tuid != "none" && $tuid != FALSE ) {
+        $username = $emparts[0] . random_gen(4);
+        $tuid = get_user_id_from_username($username);
+        $tc++;
+        if($tc > 10) {
+            loggit(2, "Tried 10 times to create a user but couldn't: [$email | $username].");
+            return(FALSE);
+        }
+    }
 
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);

@@ -36,7 +36,7 @@
             box-shadow: 0px 0px 10px rgba(20, 20, 20, 0.2);
 } 
 .pageContentWrapper.River #stream #stream-items .stream-list .article.sticky {
-    margin-top:12px;
+    margin-top:17px;
 }
 .pageContentWrapper.River #stream #stream-items .stream-list .article .byline {
 	display:none;
@@ -48,6 +48,9 @@
 .pageContentWrapper.River #stream #stream-items .stream-list .article h3 a {
 	color:#111;
 }
+.pageContentWrapper.River #stream #stream-items .stream-list .article.sticky h3 {
+    margin-top:19px;
+}
 .pageContentWrapper.River #stream #stream-items .stream-list .article .description {
     font-size:16px;
 	margin:17px;
@@ -56,8 +59,10 @@
 }
 .pageContentWrapper.River #stream #stream-items .stream-list .article .aUnSticky {
 	position:absolute;
-    top:-14px;
-    left:50%;
+    top:-19px;
+    left:49%;
+    width:40px;
+    height:40px;
 }
 .pageContentWrapper.River #stream #stream-items .stream-list .article a.jumpTop {
   display:inline-block;

@@ -1156,6 +1156,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
     require_once "$confroot/$libraries/s3/S3.php";
+    require_once "$confroot/$includes/opml.php";
 
     $username = get_user_name_from_uid($uid);
     $prefs = get_user_prefs($uid);
@@ -1197,6 +1198,19 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
         $cssexternal = FALSE;
     }
 
+    //Build urls
+    if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
+        $sopmlurl = get_s3_url($uid, NULL, $default_social_outline_file_name);
+        $carturl = get_s3_url($uid, NULL, get_cartulary_feed_filename($uid));
+        $blogurl = get_s3_url($uid, NULL, get_microblog_feed_filename($uid));
+        $bloghtml = get_s3_url($uid, NULL, get_microblog_html_filename($uid));
+    } else {
+        $sopmlurl = $mysopml . '?uid=' . $uid;
+        $carturl = $articlespage . '-rss?uid=' . $uid;
+        $blogurl = $microblogpage . '-rss?uid=' . $uid;
+        $bloghtml = "";
+    }
+
     //The feed string
     $html = '<!DOCTYPE html>' . "\n";
     $html .= '<html><head>';
@@ -1204,7 +1218,9 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
     $html .= "\n
       <title>$title</title>
       <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
-      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0\">";
+      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0\">
+      <link rel=\"alternate\" type=\"application/rss+xml\" title=\"RSS\" href=\"$blogurl\" />";
+
 
     if ($cssexternal == TRUE) {
         $html .= "\n      <link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"$css\" />";
@@ -1228,7 +1244,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
     }
 
     $html .= "\n
-      <h1>$title <small>(<a href=\"" . $homelink . "\">Homepage</a>)</small>";
+      <h1>$title <small>(<a href=\"" . $homelink . "\">Homepage</a> | <a href=\"" . $blogurl . "\">RSS</a>)</small>";
 
 
     $html .= "</h1>

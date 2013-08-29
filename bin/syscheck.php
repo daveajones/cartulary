@@ -52,15 +52,18 @@
           $healthy = FALSE;
         }
 
-	//Check external ip address and update redirect bucket
-	if( !empty($s3_sys_server_redirect_bucket) && !empty($cg_external_ip_reflector_url) ) {
-	  $exip = get_external_ip_address($cg_external_ip_reflector_url);
-          if( !set_bucket_redirect($s3_sys_server_redirect_bucket, $exip) ) {
-            loggit(2, "Error setting bucket: [$s3_sys_server_redirect_bucket] to redirect to host: [$exip].");
-	  } else {
-            loggit(3, "Set bucket: [$s3_sys_server_redirect_bucket] to redirect to host: [$exip].");
-	  }
-	}
+        //Check external ip address and update redirect bucket
+        if( !empty($s3_sys_server_redirect_bucket) && !empty($cg_external_ip_reflector_url) ) {
+          $exip = get_external_ip_address($cg_external_ip_reflector_url);
+              if( !set_bucket_redirect($s3_sys_server_redirect_bucket, $exip) ) {
+                loggit(2, "Error setting bucket: [$s3_sys_server_redirect_bucket] to redirect to host: [$exip].");
+          } else {
+                loggit(3, "Set bucket: [$s3_sys_server_redirect_bucket] to redirect to host: [$exip].");
+          }
+        }
+
+        //Expire old registration attempt bans
+        reset_registration_attempt_counters();
 
         //Calculate how long it took
         $took = time() - $tstart;

@@ -57,9 +57,14 @@ $(document).ready( function() {
 	if( rdpt == "undefined" || (nowt - rdpt) > 300 ) {
 		freedomController.v1.river.methods.buildRiver(false);
 	} else {
-		freedomController.v1.river.methods.buildRiver(true);
+		freedomController.v1.river.methods.buildRiver(false);
 	}
 	console.log("time since last river pull [" + (nowt - rdpt) + "]");
+
+    //Point new users to the prefs page
+    if( $.removeCookie('cartularynewuser') ) {
+        showMessage("You can go to the prefs page to set up your avatar and other goodies. Just click your name in the menu bar.", true, 30);
+    }
 });
 
 

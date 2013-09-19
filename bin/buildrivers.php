@@ -14,21 +14,23 @@
   	foreach($users as $user) {
           $rtstart = time();
           $prefs = get_user_prefs($user['id']);
-	  if( river_updated($user['id']) ) {
-	    if( $prefs['collapseriver'] == 1) {
-     	      build_river_json2( $user['id'], NULL, TRUE );
-	    } else {
-     	      build_river_json( $user['id'], NULL, TRUE );
-	    }
-	  } else {
-	    if( $prefs['collapseriver'] == 1) {
-       	      build_river_json2( $user['id'] );
-	    } else {
-     	      build_river_json( $user['id'] );
-	    }
-	  }
+
+          if( river_updated($user['id']) ) {
+            if( $prefs['collapseriver'] == 1) {
+                  build_river_json2( $user['id'], NULL, TRUE );
+            } else {
+                  build_river_json( $user['id'], NULL, TRUE );
+            }
+          } else {
+            if( $prefs['collapseriver'] == 1) {
+                  build_river_json2( $user['id'] );
+            } else {
+                  build_river_json( $user['id'] );
+            }
+          }
+
     	  echo "Built river for user: [".$user['id']." | ".$user['name']." | ".(time() - $rtstart)."].\n";
-    	  loggit(1, "Built river for user: [".$user['id']." | ".$user['name']." | ".(time() - $tstart)."].");
+    	  loggit(3, "Built river for user: [".$user['id']." | ".$user['name']." | ".(time() - $rtstart)."].");
   	}
 
   	//Calculate how long it took to build the rivers

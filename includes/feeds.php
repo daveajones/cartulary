@@ -2999,34 +2999,38 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     //Put this built river in the database
     update_river($uid, $doutput, $moutput, $newhash);
 
-    //If we can get some sane S3 credentials then let's go
-    if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
-        //First we get all the key info
-        $s3info = get_s3_info($uid);
+    //If we can get some sane S3 credentials and the user wants a public river then let's go
+    if ($prefs['publicriver'] == 1) {
+        if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
+            //First we get all the key info
+            $s3info = get_s3_info($uid);
 
-        //Subpath?  Must begin with a slash
-        $subpath = "";
+            //Subpath?  Must begin with a slash
+            $subpath = "";
 
-        //Put the desktop file
-        $filename = $default_river_json_file_name;
-        $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
-        if (!$s3res) {
-            loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-            //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-        } else {
-            $s3url = get_s3_url($uid, $subpath, $filename);
-            loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+            //Put the desktop file
+            $filename = $default_river_json_file_name;
+            $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+            }
+            //Put the mobile file
+            $filename = $default_river_json_mobile_file_name;
+            $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote mobile river to S3 at url: [$s3url].");
+            }
         }
-        //Put the mobile file
-        $filename = $default_river_json_mobile_file_name;
-        $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
-        if (!$s3res) {
-            loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-            //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-        } else {
-            $s3url = get_s3_url($uid, $subpath, $filename);
-            loggit(1, "Wrote mobile river to S3 at url: [$s3url].");
-        }
+    } else {
+        loggit(3, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");
@@ -4253,34 +4257,38 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     //Put this built river in the database
     update_river($uid, $doutput, $moutput, $newhash);
 
-    //If we can get some sane S3 credentials then let's go
-    if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
-        //First we get all the key info
-        $s3info = get_s3_info($uid);
+    //If we can get some sane S3 credentials, and the user wants a public river then let's go
+    if ($prefs['publicriver'] == 1) {
+        if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
+            //First we get all the key info
+            $s3info = get_s3_info($uid);
 
-        //Subpath?  Must begin with a slash
-        $subpath = "";
+            //Subpath?  Must begin with a slash
+            $subpath = "";
 
-        //Put the desktop file
-        $filename = $default_river_json_file_name;
-        $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
-        if (!$s3res) {
-            loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-            //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-        } else {
-            $s3url = get_s3_url($uid, $subpath, $filename);
-            loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+            //Put the desktop file
+            $filename = $default_river_json_file_name;
+            $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+            }
+            //Put the mobile file
+            $filename = $default_river_json_mobile_file_name;
+            $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote mobile river to S3 at url: [$s3url].");
+            }
         }
-        //Put the mobile file
-        $filename = $default_river_json_mobile_file_name;
-        $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
-        if (!$s3res) {
-            loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-            //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-        } else {
-            $s3url = get_s3_url($uid, $subpath, $filename);
-            loggit(1, "Wrote mobile river to S3 at url: [$s3url].");
-        }
+    } else {
+        loggit(3, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");

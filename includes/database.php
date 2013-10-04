@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 25;
+$cg_database_version = 26;
 $cg_database_updates = array();
 
 
@@ -299,8 +299,89 @@ $cg_database_updates[24][] = <<<CGDB0061
  INSERT INTO `dbversion` ( `version` ) VALUES ( '25' )
 CGDB0061;
 //----------------------------------------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------------------------------------
 
+//Version 25 to 26 -----------------------------------------------------------------------------------------------
+$cg_database_updates[25][] = <<<CGDB0062
+ ALTER TABLE `nfitemprops` DROP FOREIGN KEY `nfitemprops_ibfk_2`
+CGDB0062;
+$cg_database_updates[25][] = <<<CGDB0063
+ CREATE TABLE nfitems_new LIKE nfitems
+CGDB0063;
+$cg_database_updates[25][] = <<<CGDB0064
+ ALTER TABLE nfitems_new ADD newid BIGINT FIRST
+CGDB0064;
+$cg_database_updates[25][] = <<<CGDB0065
+ ALTER TABLE nfitems_new CHANGE `newid` `newid` BIGINT NOT NULL AUTO_INCREMENT, ADD UNIQUE INDEX(newid)
+CGDB0065;
+$cg_database_updates[25][] = <<<CGDB0066
+ INSERT INTO nfitems_new SELECT NULL, t.* FROM nfitems t ORDER BY t.timeadded
+CGDB0066;
+$cg_database_updates[25][] = <<<CGDB0067
+ RENAME TABLE nfitems TO nfitems_old
+CGDB0067;
+$cg_database_updates[25][] = <<<CGDB0068
+ RENAME TABLE nfitems_new TO nfitems
+CGDB0068;
+$cg_database_updates[25][] = <<<CGDB0069
+ ALTER TABLE nfitemprops ADD newitemid BIGINT FIRST
+CGDB0069;
+$cg_database_updates[25][] = <<<CGDB0070
+ UPDATE nfitemprops,nfitems SET nfitemprops.newitemid = nfitems.newid WHERE nfitemprops.itemid = nfitems.id
+CGDB0070;
+$cg_database_updates[25][] = <<<CGDB0071
+ ALTER TABLE nfitemprops CHANGE `newitemid` `newitemid` BIGINT NOT NULL, ADD INDEX(newitemid)
+CGDB0071;
+$cg_database_updates[25][] = <<<CGDB0072
+ DROP INDEX `id` ON nfitems
+CGDB0072;
+$cg_database_updates[25][] = <<<CGDB0073
+ ALTER TABLE nfitems DROP COLUMN `id`
+CGDB0073;
+$cg_database_updates[25][] = <<<CGDB0074
+ alter table nfitems change `newid` `id` BIGINT NOT NULL AUTO_INCREMENT, ADD UNIQUE INDEX(id)
+CGDB0074;
+$cg_database_updates[25][] = <<<CGDB0075
+ drop index `newid` on nfitems
+CGDB0075;
+$cg_database_updates[25][] = <<<CGDB0076
+ drop index `itemid` on nfitemprops
+CGDB0076;
+$cg_database_updates[25][] = <<<CGDB0077
+ drop index `PRIMARY` on nfitemprops
+CGDB0077;
+$cg_database_updates[25][] = <<<CGDB0078
+ alter table nfitemprops drop column `itemid`
+CGDB0078;
+$cg_database_updates[25][] = <<<CGDB0079
+ alter table nfitemprops change `newitemid` `itemid` BIGINT NOT NULL, ADD INDEX(itemid)
+CGDB0079;
+$cg_database_updates[25][] = <<<CGDB0080
+ drop index `newitemid` on nfitemprops
+CGDB0080;
+$cg_database_updates[25][] = <<<CGDB0081
+ create unique index itemuseridx ON nfitemprops (itemid,userid)
+CGDB0081;
+$cg_database_updates[25][] = <<<CGDB0082
+ drop table nfitems_old
+CGDB0082;
+$cg_database_updates[25][] = <<<CGDB0083
+ DELETE FROM nfitemprops WHERE NOT EXISTS ( SELECT * FROM nfitems WHERE nfitems.id = nfitemprops.itemid )
+CGDB0083;
+$cg_database_updates[25][] = <<<CGDB0084
+ ALTER TABLE `nfitemprops` ADD FOREIGN KEY ( `itemid` ) REFERENCES `cartulary`.`nfitems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0084;
+$cg_database_updates[25][] = <<<CGDB0085
+ DELETE FROM nfitems WHERE NOT EXISTS ( SELECT * FROM newsfeeds WHERE newsfeeds.id = nfitems.feedid )
+CGDB0085;
+$cg_database_updates[25][] = <<<CGDB0086
+ ALTER TABLE `nfitems` ADD FOREIGN KEY ( `feedid` ) REFERENCES `cartulary`.`newsfeeds` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0086;
+
+$cg_database_updates[25][] = <<<CGDB0087
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '26' )
+CGDB0087;
+//----------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------------------------------------------------

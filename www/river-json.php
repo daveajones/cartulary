@@ -10,7 +10,7 @@
   if( isset($_REQUEST['url']) ) {
     $jsondata = @file_get_contents($_REQUEST['url']);
   } else {
-        $jsondata = "onGetRiverStream(".get_river_as_json4($uid).")";
+        $jsondata = "onGetRiverStream(".get_river_as_json($uid).")";
   }
 
   $section = "River";

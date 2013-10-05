@@ -343,14 +343,14 @@ CGDB0074;
 $cg_database_updates[25][] = <<<CGDB0075
  drop index `newid` on nfitems
 CGDB0075;
-$cg_database_updates[25][] = <<<CGDB0076
- drop index `itemid` on nfitemprops
-CGDB0076;
+//$cg_database_updates[25][] = <<<CGDB0076
+// drop index `itemid` on nfitemprops
+//CGDB0076;
 $cg_database_updates[25][] = <<<CGDB0077
  drop index `PRIMARY` on nfitemprops
 CGDB0077;
 $cg_database_updates[25][] = <<<CGDB0078
- alter table nfitemprops drop column `itemid`
+ alter table nfitemprops DROP COLUMN `itemid`
 CGDB0078;
 $cg_database_updates[25][] = <<<CGDB0079
  alter table nfitemprops change `newitemid` `itemid` BIGINT NOT NULL, ADD INDEX(itemid)

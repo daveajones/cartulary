@@ -2410,7 +2410,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         $description = $cleaned['text'];
 
         //Attach extracted media tags as enclosures with correct type
-        if (count($cleaned['media']) > 0) {
+        if (is_array($cleaned['media']) && count($cleaned['media']) > 0) {
             foreach ($cleaned['media'] as $mediatag) {
                 $esize = "";
                 if ($mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video') {

@@ -36,6 +36,34 @@ function update_server_address($guid = NULL, $addr = NULL)
 }
 
 
+//Remove a server from the known servers table
+function remove_server($guid = NULL)
+{
+    //Check parameters
+    if (empty($guid)) {
+        loggit(2, "The server guid is blank or corrupt: [$guid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Database call
+    $stmt = "DELETE FROM $table_servers WHERE guid=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $guid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "Server: [$guid] has been removed.");
+    return (TRUE);
+}
+
+
 //Get all known servers
 function get_all_servers()
 {

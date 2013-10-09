@@ -65,9 +65,11 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     //Expire old registration attempt bans
     reset_registration_attempt_counters();
 
-    //Check for un-responsive servers
-    //Remove self-references in case we ended up with multiples
+    //Make sure we list our own server only once
     remove_server($cg_main_serverguid);
+    update_server_address($cg_main_serverguid, $system_fqdn);
+
+    //Check for dead servers
     $servers = get_all_servers();
     foreach( $servers as $server ) {
         //Make sure the server is still alive
@@ -80,9 +82,6 @@ if (($pid = cronHelper::lock()) !== FALSE) {
             remove_server($server['guid']);
         }
     }
-
-    //Now, make sure we list our own server only once
-    update_server_address($cg_main_serverguid, $system_fqdn);
 
     //Calculate how long it took
     $took = time() - $tstart;

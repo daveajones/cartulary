@@ -695,7 +695,7 @@ div.searchbar p.result-msg {
 /* ----- Show Article ----- */
 .pageContentWrapper.Articles #divPageArticle {
   position: relative;
-  *padding-top: 19px;
+  padding-top: 19px;
   width:600px;
   margin-left:auto;
   margin-right:auto;
@@ -755,7 +755,7 @@ div.searchbar p.result-msg {
 .pageContentWrapper.Microblog #divBlogPost {
   position: relative;
   padding:40px;
-  *padding-top: 19px;
+  padding-top: 19px;
   background-color: #fff;
   border: 1px solid #ddd;
 }
@@ -880,7 +880,7 @@ div.searchbar p.result-msg {
   position: relative;
   margin-top:10px;
   padding:20px;
-  *padding-top: 19px;
+  padding-top: 19px;
   background-color: #fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 0px;
@@ -913,7 +913,7 @@ div.searchbar p.result-msg {
   position: relative;
   margin-top:10px;
   padding:20px;
-  *padding-top: 19px;
+  padding-top: 19px;
   white-space: pre-line;
 }
 .pageContentWrapper.Microblog #divPostList li .padforenclosure {
@@ -952,7 +952,7 @@ div.searchbar p.result-msg {
   position: relative;
   margin-top:10px;
   padding:20px;
-  *padding-top: 19px;
+  padding-top: 19px;
   background-color: #fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 0px;
@@ -1003,7 +1003,7 @@ div.searchbar p.result-msg {
   position: relative;
   margin-top:10px;
   padding:20px;
-  *padding-top: 19px;
+  padding-top: 19px;
   white-space: pre-line;
 }
 .postList .postItem .postFooter {
@@ -1030,7 +1030,7 @@ div.searchbar p.result-msg {
   position: relative;
   text-align:right;
   padding:10px 10px 0;
-  *padding-top: 19px;
+  padding-top: 19px;
   background-color: #fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 0px;
@@ -1051,7 +1051,7 @@ div.searchbar p.result-msg {
   clear:both;
   margin-top:10px;
   padding:20px;
-  *padding-top:19px;
+  padding-top:19px;
   background-color:#fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 0px;
@@ -1386,16 +1386,47 @@ div.searchbar p.result-msg {
 
 /* --------------------------------------------------- */
 /* ----- The 'Me' Page ----- */
-.pageContentWrapper.Prefs #divMySocialOutline {
+.pageContentWrapper.Me #divMe {
   position: relative;
   padding:20px;
   margin-bottom:10px;
-  *padding-top: 19px;
-  background-color: #fff;
+  padding-top: 19px;
+  background-color:#fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 0px;
      -moz-border-radius: 0px;
           border-radius: 0px;
+}
+.pageContentWrapper.Me span.nameoverlay {
+    font-size: 40px;
+    text-shadow:0 0 3px #ddd;
+    position:absolute;
+    top: 160px;
+    left: 70px;
+}
+.pageContentWrapper.Me #divSopmlVcardInner img.avatar {
+  width:180px;
+  height:180px;
+  float:left;
+}
+.pageContentWrapper.Me #divSopmlVcardInner ul.defaultopml {
+  list-style-position: inside;
+  list-style-type: none;
+  float:left;
+  margin:20px;
+  margin-top:60px;
+}
+.pageContentWrapper.Me #divSopmlVcardList ul.buddylist {
+    list-style-position: inside;
+    list-style-type: none;
+    margin:20px;
+}
+.pageContentWrapper.Me #divSopmlVcardList ul.buddylist li {
+    margin-bottom:10px;
+}
+.pageContentWrapper.Me #divSopmlVcardList {
+    clear:both;
+    margin-top:30px;
 }
 /* --------------------------------------------------- */
 

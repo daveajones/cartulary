@@ -749,6 +749,32 @@ div.searchbar p.result-msg {
 /* --------------------------------------------------- */
 
 
+/* --------------------------------------------------- */
+/* ----- Editor Page ----- */
+.pageContentWrapper.Editor #divEditOutline {
+    background:white;
+    position: relative;
+    padding-top: 10px;
+    width:900px;
+    margin-left:auto;
+    margin-right:auto;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    min-height: 400px;
+}
+.pageContentWrapper.Editor #divEditOutline .divOutlinerContainer {
+    margin-top:30px;
+    padding-left:10px;
+}
+.pageContentWrapper.Editor #divEditOutline .title {
+    margin-top:8px;
+    border: none;
+    background: #eee;
+    width: 700px;
+}
+/* --------------------------------------------------- */
+
 
 /* --------------------------------------------------- */
 /* ----- Microblog ----- */

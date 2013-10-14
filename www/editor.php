@@ -119,7 +119,7 @@
         <div id="outliner"></div>
     </div>
 <?}else{?>
-    <center>You must have S3 enabled on either your server or in your user <a href="$prefspage">prefs</a> to use the editor.</center>
+    <center>You must have S3 enabled on either your server or in your user <a href="<?echo $prefspage?>">prefs</a> to use the editor.</center>
 <?}?>
 </div>
 

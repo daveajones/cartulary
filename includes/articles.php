@@ -90,6 +90,101 @@ function get_article($id = NULL, $uid = NULL)
 }
 
 
+//Retrieve an article from the repository
+function get_article_as_opml($id = NULL, $uid = NULL)
+{
+    //Check parameters
+    if ($id == NULL) {
+        loggit(2, "The article id given is corrupt or blank: [$id]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("SELECT id,title,url,shorturl,createdon,content,sourceurl,sourcetitle FROM $table_article WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $id) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Failed to retrieve article content for article id: [$id]");
+        return (FALSE);
+    }
+    $article = array();
+    $sql->bind_result($article['id'],
+        $article['title'],
+        $article['url'],
+        $article['shorturl'],
+        $article['createdon'],
+        $article['content'],
+        $article['sourceurl'],
+        $article['sourcetitle']
+    ) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //If a user id was given, get those details
+    if (!empty($uid)) {
+        $article['staticurl'] = get_article_static_url($id, $uid);
+    }
+
+    //Generate the opml structure
+    $opmlout = get_include_contents("$confroot/$templates/$template_opml_head");
+
+    $dacon = date("D, d M Y H:i:s O", $article['createdon']);
+    $uname = get_user_name_from_uid($uid);
+    $artitle = htmlspecialchars(trim(str_replace("\n", '', $article['title'])));
+    $arurl = xmlentities( $article['url'] );
+    $aiurl = xmlentities($system_url.$showarticlepage."?"."aid=".$article['id']);
+
+
+$opmlout .= <<<OPMLOUT1
+<head>
+    <title>$artitle</title>
+    <dateCreated>$dacon</dateCreated>
+    <dateModified>$dacon</dateModified>
+    <ownerName>$uname</ownerName>
+    <ownerId>$uid</ownerId>
+    <expansionState></expansionState>
+    <expansionState>1, 5</expansionState>
+    <vertScrollState>1</vertScrollState>
+    <windowTop>146</windowTop>
+    <windowLeft>107</windowLeft>
+    <windowBottom>468</windowBottom>
+    <windowRight>560</windowRight>
+</head>
+<body>
+<outline text="$artitle">
+    <outline text="$arurl" />
+    <outline text="$dacon" />
+    <outline text="$aiurl" />
+    <outline text="Content">
+OPMLOUT1;
+
+        foreach ( explode("</p>", trim( str_replace("\n", '', $article['content'] ))) as $line ) {
+            $opmlout .= "<outline text=\"".xmlentities(trim(str_replace("\n", '', $line)))."\" />";
+        }
+
+$opmlout .= <<<OPMLOUT2
+    </outline>
+</outline>
+</body>
+OPMLOUT2;
+
+    $opmlout .= get_include_contents("$confroot/$templates/$template_opml_feet");
+
+    loggit(1, "Returning opml for article id: [$id]");
+    return (str_replace("\n", "", str_replace('"', '\\"', $opmlout)));
+}
+
+
 //Retrieve an article's text analysis from the repository
 function get_article_analysis($id = NULL)
 {

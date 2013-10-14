@@ -21,7 +21,7 @@
 	}
 .concord .concord-node .concord-wrapper {
 	display: inline-block;
-	/* background: url('http://static.smallpicture.com/concord-assets/wedge.png') no-repeat 3px 8px; */
+	background: url('/images/wedge.png') no-repeat 3px 8px;
 	background-repeat: no-repeat;
 	position: relative;
 	padding-left: 20px;
@@ -54,16 +54,16 @@
 	color: silver;
 	}
 .concord .concord-node.collapsed > .concord-wrapper{
-	/* background-image: url('http://static.smallpicture.com/concord-assets/wedgeParent.png'); */
+	background-image: url('/images/wedgeParent.png');
 	}
 .concord .concord-node.concord-comment.collapsed > .concord-wrapper {
-	/* background-image: url('http://static.smallpicture.com/concord-assets/commentParent.png') !important; */
+	background-image: url('/images/commentParent.png') !important;
 	}
 .concord .concord-node.selected.collapsed > .concord-wrapper{
-	/* background-image: url('http://static.smallpicture.com/concord-assets/wedgeParentWhite.png'); */
+	background-image: url('/images/wedgeParentWhite.png');
 	}
 .concord .concord-node.concord-comment.selected.collapsed > .concord-wrapper {
-	/* background-image: url('http://static.smallpicture.com/concord-assets/commentParentWhite.png') !important; */
+	background-image: url('/images/commentParentWhite.png') !important;
 	}
 .concord .concord-node.selected.collapsed > .concord-wrapper.type-icon {
 	background-image: none;
@@ -132,12 +132,4 @@
 	background: url('http://static.smallpicture.com/concord-assets/wordpress128.png') no-repeat;
 	background-size: 100% auto;
 	}
-/** FONT AWESOME STYLES **/
-	li [class^="icon-"], .nav li [class^="icon-"], li [class*=" icon-"], .nav li [class*=" icon-"] {
-		display: inline-block;
-		width: 1.25em;
-		text-align: center;
-		}
-	a [class^="icon-"], a [class*=" icon-"] {
-		display: inline-block;
-		}
+

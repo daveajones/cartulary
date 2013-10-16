@@ -18,6 +18,11 @@ if( !s3_is_enabled($uid) && !sys_s3_is_enabled() ) {
   exit(1);
 }
 
+//Get the title
+if ( isset($_REQUEST['title']) ) {
+    $title = $_REQUEST['title'];
+}
+
 //Make sure we have a filename to use
 if ( isset($_REQUEST['filename']) ) {
     $filename = $_REQUEST['filename'];
@@ -43,7 +48,7 @@ if ( isset($_REQUEST['opml']) ) {
 };
 
 
-//Put the file in S3
+//Put the opml file in S3
 $s3info = get_s3_info($uid);
 $s3res = putInS3($opml, $filename, $s3info['bucket']."/exp", $s3info['key'], $s3info['secret'], "text/xml");
 if(!$s3res) {
@@ -56,9 +61,25 @@ if(!$s3res) {
   exit(1);
 } else {
   $s3url = get_s3_url($uid, "/exp/", $filename);
-  loggit(1, "Wrote feed to S3 at url: [$s3url].");
+  loggit(1, "Wrote opml to S3 at url: [$s3url].");
 }
 
+//Put the html file in S3
+$htmldata = process_opml_to_html($opml, $title);
+$htmlfilename = str_replace('.opml', '.html', $filename);
+$s3res = putInS3($htmldata, $htmlfilename, $s3info['bucket']."/exp", $s3info['key'], $s3info['secret'], "text/html");
+if(!$s3res) {
+    loggit(2, "Could not create S3 file: [$htmlfilename] for user: [$uid].");
+    loggit(3, "Could not create S3 file: [$htmlfilename] for user: [$uid].");
+    //Log it
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Error writing HTML to S3.";
+    echo json_encode($jsondata);
+    exit(1);
+} else {
+    $s3html = get_s3_url($uid, "/exp/", $htmlfilename);
+    loggit(1, "Wrote html to S3 at url: [$s3html].");
+}
 
 //Log it
 loggit(3,"Saved: [$filename] to S3 for user: [$uid]. ");
@@ -66,6 +87,7 @@ loggit(3,"Saved: [$filename] to S3 for user: [$uid]. ");
 //Give feedback that all went well
 $jsondata['status'] = "true";
 $jsondata['url'] = $s3url;
+$jsondata['html'] = $s3html;
 $jsondata['description'] = "File saved to S3.";
 echo json_encode($jsondata);
 

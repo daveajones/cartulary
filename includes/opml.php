@@ -2081,6 +2081,56 @@ function convert_opml_to_html($content = NULL, $max = NULL)
 }
 
 
+//Convert an opml document to html with processing
+function process_opml_to_html($content = NULL, $title = "")
+{
+    //Check params
+    if ($content == NULL) {
+        loggit(2, "The opml content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Parse it
+    libxml_use_internal_errors(true);
+    $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+    libxml_clear_errors();
+
+    //Roll through all of the outline nodes
+    $nodes = $x->xpath('//outline');
+    if (empty($nodes)) {
+        loggit(3, "This opml document is blank.");
+        return (-2);
+    }
+
+    //debug
+    //loggit(3, "OBJECT: ".print_r($nodes, TRUE) );
+
+    //Run through each node and convert it to an html element
+    $count = 0;
+    $html = "<!DOCTYPE html><html><head><style>body { width: 900px; margin:10px auto 10px; }div { margin-bottom:10px; }</style><title>$title</title></head><body><h3>$title</h3>";
+    foreach ($nodes as $entry) {
+        loggit(3, "DEBUG: ".print_r($entry, TRUE));
+
+        $text = (string)$entry->attributes()->text;
+        $name = (string)$entry->attributes()->name;
+        $link = (string)$entry->attributes()->url;
+        $type = (string)$entry->attributes()->type;
+
+        $html .= "<div>$text</div>\n";
+
+        $count++;
+    }
+    $html .= "</body></html>";
+
+    //Log and leave
+    loggit(3, "Got [$count] items from the opml document.");
+    return ($html);
+}
+
+
 //Retrieve a list of the social outlines for all the users in the database
 function get_social_outline_directory($query = NULL, $max = NULL)
 {

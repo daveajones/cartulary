@@ -16,6 +16,10 @@
   It all runs on a standard LAMP stack, and it supports multiple users.  So, if you're
   a techy person, you can run your own server for all your friends.
 
+  We have a google group for announcements, questions and install help here:
+
+  https://groups.google.com/forum/#!forum/sopml
+
 
 #### LICENSE:
   All original code in this package is currently licensend under the CDDL license.
@@ -23,6 +27,9 @@
   
   All non-original functions/libraries remain under their respective licenses or
   are listed with source attribution if the code is public domain or unlicensed.
+
+  Concord Outliner: GPL  (https://github.com/scripting/concord)
+  is the browser engine of Fargo: http://fargo.io
 
 
 #### INSTALL:

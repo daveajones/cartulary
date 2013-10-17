@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    var hoverTimer = null;
     var outliner = $('#outliner');
     var chkToggleRender = $('.rendertoggle');
 
@@ -33,16 +34,16 @@ $(document).ready(function () {
                 "title": title
             },
             dataType: "json",
-            beforeSubmit: function () {
-                $('.imgSpinner').show();
+            beforeSend: function () {
                 $('#btnOpmlSave').attr('disabled', true);
+                $('#btnOpmlSave').html('<i class="icon-spinner"></i>');
             },
             success: function (data) {
                 url = data.url;
                 updateOutlineInfo(url, data.html);
 
                 showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
-                $('.imgSpinner').hide();
+                $('#btnOpmlSave').html('Save');
                 $('#btnOpmlSave').attr('disabled', false);
             }
         });
@@ -82,6 +83,33 @@ $(document).ready(function () {
         }
     });
 
+    //Handle opacity on focus change
+    $('.divOutlineTitle input.title').on("focus", function() {
+        clearTimeout(hoverTimer);
+        $('.divOutlineTitle').removeClass('dim');
+    });
+    $('.divOutlineTitle input.title').on("blur", function() {
+        clearTimeout(hoverTimer);
+        hoverTimer = setTimeout(function() {
+            $('.divOutlineTitle').addClass('dim');
+        }, 3000);
+    });
+
+    //Full opacity on title hover
+    $('.divOutlineTitle').hover(
+        function() {
+            clearTimeout(hoverTimer);
+            $('.divOutlineTitle').removeClass('dim');
+        },
+        function() {
+            if( !$('.divOutlineTitle input.title').is(':focus') ) {
+                hoverTimer = setTimeout(function() {
+                    $('.divOutlineTitle').addClass('dim');
+                }, 3000);
+            }
+        }
+    )
+
     //Load up the outline
     outliner.concord({
         "prefs": {
@@ -95,10 +123,20 @@ $(document).ready(function () {
     });
     opXmlToOutline(initialOpmlText);
     title = opGetTitle();
-    $('.divOutlineTitle input.title').val(title);
+
     chkToggleRender.trigger('change');
     updateOutlineInfo(url, "");
-    if( badurl ) {
+    if( badurl == true ) {
         showMessage('Parse error. Please check the url.', false, 5);
+    }
+
+    hoverTimer = setTimeout(function() {
+        $('.divOutlineTitle').addClass('dim');
+    }, 5000);
+
+    if( title == "Untitled") {
+        $('.divOutlineTitle input.title').val('');
+    } else {
+        $('.divOutlineTitle input.title').val(title);
     }
 });

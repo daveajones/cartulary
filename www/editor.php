@@ -11,7 +11,7 @@
       if( $protpos <> 0 || $protpos === FALSE ) {
           $badurl = true;
       } else {
-          $opmldata = fetchUrl($url);
+          $opmldata = fetchUrl(get_final_url($url));
           if( !is_outline($opmldata) ) {
               $badurl = true;
           } else {
@@ -49,8 +49,9 @@
     var lasttitle = "";
     var filename = '<?echo $filename?>';
     var bufilename = '<?echo time()."-".$default_opml_export_file_name;?>';
+    var badurl = false;
     <?if( isset($badurl) ) {?>
-    var badurl = true;
+    badurl = true;
     <?}?>
     <?if( isset($opmldata) && !isset($badurl) ) {?>
     var initialOpmlText = '<?echo $opmldata?>';
@@ -71,13 +72,14 @@
 <?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
 
-<button id="openUrl" class="btn pull-right">Open</button>
+
 <div class="row" id="divEditOutline">
 <?if(s3_is_enabled($g_uid) || sys_s3_is_enabled()) {?>
     <div class="divOutlineTitle">
-        <img class="imgSpinner" src="/images/spinner.gif" /><button id="btnOpmlSave" class="btn btn-success">Save</button>
+        <button id="btnOpmlSave" class="btn btn-success" style="min-width:54px;">Save</button>
         as <input class="title" placeholder="Title" type="text" />
-        WYSIWYG? <input class="rendertoggle" type="checkbox" style="margin-top:0;" />
+        Render? <input class="rendertoggle" type="checkbox" style="margin-top:0;" />
+        <button id="openUrl" class="btn btn-primary pull-right" style="margin-top:8px;">Open</button>
     </div>
     <div class="outlineinfo pull-right"></div>
     <div class="divOutlinerContainer">

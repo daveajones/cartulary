@@ -8,7 +8,7 @@
 function is_outline($content = NULL)
 {
     //Check parameters
-    if ($content == NULL) {
+    if ( empty($content) ) {
         loggit(2, "The content to test is blank or corrupt: [$content]");
         return (FALSE);
     }

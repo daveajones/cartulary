@@ -751,6 +751,23 @@ div.searchbar p.result-msg {
 
 /* --------------------------------------------------- */
 /* ----- Editor Page ----- */
+body#bodyEditOutline {
+    background:white;
+}
+body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
+    width: 97%;
+}
+.pageContentWrapper.Editor .divOutlineTitle {
+    border-bottom:solid #dddddd 1px;
+    opacity:1.0;
+}
+.pageContentWrapper.Editor .divOutlineTitle.dim {
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+    opacity:0.3;
+}
 .pageContentWrapper.Editor #divEditOutline {
     background:white;
     position: relative;
@@ -773,10 +790,19 @@ div.searchbar p.result-msg {
     padding-left:10px;
 }
 .pageContentWrapper.Editor #divEditOutline .title {
+    box-shadow: inset 0px 3px 1px -1px white;
     margin-top:8px;
+    font-weight:bold;
+    font-size:20px;
     border: none;
-    background: #eee;
-    width: 700px;
+    outline:none;
+    border-bottom:solid black 1px;
+    background: white;
+    width: 600px;
+    height: 28px;
+}
+.pageContentWrapper.Editor #divEditOutline .title:focus, input:focus {
+    outline: 0;
 }
 /* --------------------------------------------------- */
 

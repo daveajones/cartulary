@@ -695,7 +695,7 @@ div.searchbar p.result-msg {
 /* ----- Show Article ----- */
 .pageContentWrapper.Articles #divPageArticle {
   position: relative;
-  *padding-top: 19px;
+  padding-top: 19px;
   width:600px;
   margin-left:auto;
   margin-right:auto;
@@ -749,13 +749,70 @@ div.searchbar p.result-msg {
 /* --------------------------------------------------- */
 
 
+/* --------------------------------------------------- */
+/* ----- Editor Page ----- */
+body#bodyEditOutline {
+    background:white;
+}
+body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
+    width: 97%;
+}
+.pageContentWrapper.Editor .divOutlineTitle {
+    border-bottom:solid #dddddd 1px;
+    opacity:1.0;
+}
+.pageContentWrapper.Editor .divOutlineTitle.dim {
+    -webkit-transition: all 0.7s ease;
+    -moz-transition: all 0.7s ease;
+    -o-transition: all 0.7s ease;
+    transition: all 0.7s ease;
+    opacity:0.1;
+}
+.pageContentWrapper.Editor #divEditOutline {
+    background:white;
+    position: relative;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width:900px;
+    margin-left:auto;
+    margin-right:auto;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    min-height: 400px;
+}
+.pageContentWrapper.Editor #divEditOutline div.outlineinfo {
+    text-align:right;
+    margin-right:10px;
+}
+.pageContentWrapper.Editor #divEditOutline .divOutlinerContainer {
+    margin-top:30px;
+    padding-left:10px;
+}
+.pageContentWrapper.Editor #divEditOutline .title {
+    box-shadow: inset 0px 3px 1px -1px white;
+    margin-top:8px;
+    font-weight:bold;
+    font-size:20px;
+    border: none;
+    outline:none;
+    border-bottom:solid black 1px;
+    background: white;
+    width: 600px;
+    height: 28px;
+}
+.pageContentWrapper.Editor #divEditOutline .title:focus, input:focus {
+    outline: 0;
+}
+/* --------------------------------------------------- */
+
 
 /* --------------------------------------------------- */
 /* ----- Microblog ----- */
 .pageContentWrapper.Microblog #divBlogPost {
   position: relative;
   padding:40px;
-  *padding-top: 19px;
+  padding-top: 19px;
   background-color: #fff;
   border: 1px solid #ddd;
 }
@@ -880,7 +937,7 @@ div.searchbar p.result-msg {
   position: relative;
   margin-top:10px;
   padding:20px;
-  *padding-top: 19px;
+  padding-top: 19px;
   background-color: #fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 0px;
@@ -913,7 +970,7 @@ div.searchbar p.result-msg {
   position: relative;
   margin-top:10px;
   padding:20px;
-  *padding-top: 19px;
+  padding-top: 19px;
   white-space: pre-line;
 }
 .pageContentWrapper.Microblog #divPostList li .padforenclosure {
@@ -952,7 +1009,7 @@ div.searchbar p.result-msg {
   position: relative;
   margin-top:10px;
   padding:20px;
-  *padding-top: 19px;
+  padding-top: 19px;
   background-color: #fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 0px;
@@ -1003,7 +1060,7 @@ div.searchbar p.result-msg {
   position: relative;
   margin-top:10px;
   padding:20px;
-  *padding-top: 19px;
+  padding-top: 19px;
   white-space: pre-line;
 }
 .postList .postItem .postFooter {
@@ -1030,7 +1087,7 @@ div.searchbar p.result-msg {
   position: relative;
   text-align:right;
   padding:10px 10px 0;
-  *padding-top: 19px;
+  padding-top: 19px;
   background-color: #fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 0px;
@@ -1051,7 +1108,7 @@ div.searchbar p.result-msg {
   clear:both;
   margin-top:10px;
   padding:20px;
-  *padding-top:19px;
+  padding-top:19px;
   background-color:#fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 0px;
@@ -1386,16 +1443,47 @@ div.searchbar p.result-msg {
 
 /* --------------------------------------------------- */
 /* ----- The 'Me' Page ----- */
-.pageContentWrapper.Prefs #divMySocialOutline {
+.pageContentWrapper.Me #divMe {
   position: relative;
   padding:20px;
   margin-bottom:10px;
-  *padding-top: 19px;
-  background-color: #fff;
+  padding-top: 19px;
+  background-color:#fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 0px;
      -moz-border-radius: 0px;
           border-radius: 0px;
+}
+.pageContentWrapper.Me span.nameoverlay {
+    font-size: 40px;
+    text-shadow:0 0 3px #ddd;
+    position:absolute;
+    top: 160px;
+    left: 70px;
+}
+.pageContentWrapper.Me #divSopmlVcardInner img.avatar {
+  width:180px;
+  height:180px;
+  float:left;
+}
+.pageContentWrapper.Me #divSopmlVcardInner ul.defaultopml {
+  list-style-position: inside;
+  list-style-type: none;
+  float:left;
+  margin:20px;
+  margin-top:60px;
+}
+.pageContentWrapper.Me #divSopmlVcardList ul.buddylist {
+    list-style-position: inside;
+    list-style-type: none;
+    margin:20px;
+}
+.pageContentWrapper.Me #divSopmlVcardList ul.buddylist li {
+    margin-bottom:10px;
+}
+.pageContentWrapper.Me #divSopmlVcardList {
+    clear:both;
+    margin-top:30px;
 }
 /* --------------------------------------------------- */
 

@@ -7,7 +7,7 @@
 MAILTO=""
 
 ##: The main feed aggregator (hard timeout after 8 minutes)
-0,10,20,30,40,50 * * * * root timeout 480 php [$CONF_ROOT]/bin/feedscan.php
+0,20,40 * * * * root timeout 1100 php [$CONF_ROOT]/bin/feedscan.php
 
 ##: Only scan high error feeds every 6 hours
 9  */6 * * * root timeout 480 php [$CONF_ROOT]/bin/feedscan.php error
@@ -25,7 +25,7 @@ MAILTO=""
 */15  * * * * root php [$CONF_ROOT]/bin/clean.php
 
 ##: Build main user rivers
-*/1  * * * * root php [$CONF_ROOT]/bin/buildrivers.php
+*/5  * * * * root php [$CONF_ROOT]/bin/buildrivers.php
 
 ##: Build alternate rivers
 */20  * * * * root php [$CONF_ROOT]/bin/buildsysrivers.php

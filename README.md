@@ -28,6 +28,9 @@
   All non-original functions/libraries remain under their respective licenses or
   are listed with source attribution if the code is public domain or unlicensed.
 
+  Concord Outliner: GPL  (https://github.com/scripting/concord)
+  is the browser engine of Fargo: http://fargo.io
+
 
 #### INSTALL:
   The software will run on any unix-like system with a LAMP stack fairly easily, but it 

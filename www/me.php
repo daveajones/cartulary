@@ -1,29 +1,6 @@
+<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_page_init.php"?>
 <?
-  // Includes
-  include get_cfg_var("cartulary_conf").'/includes/env.php';
-  include "$confroot/$includes/util.php";
-  include "$confroot/$includes/auth.php";
-  include "$confroot/$includes/feeds.php";
-  include "$confroot/$includes/opml.php";
-  include "$confroot/$includes/posts.php";
-  include "$confroot/$includes/articles.php";
-
-  // Valid session?  If not, get lost
-  if(!is_logged_in()) {
-    header("Location: $loginpage");
-    exit(0); 
-  }
-
-  //Who is this user?
-  $uid = get_user_id_from_sid(get_session_id());
-  if( isset($_REQUEST['uid']) && is_admin($uid) ) {
-    $uid = $_REQUEST['uid'];
-  }
-
-  //Get this users prefs
-  $prefs = get_user_prefs($uid);
-  $username = get_user_name_from_uid($uid);
-
   //Get feed locations
   if( s3_is_enabled($uid) || sys_s3_is_enabled() ) {
     $s3blogfeed = get_s3_url($uid, NULL, get_microblog_feed_filename($uid));
@@ -87,21 +64,22 @@ $(document).ready( function() {
 <?include "$confroot/$templates/$template_html_logotop"?>
 <?include "$confroot/$templates/$template_html_menubar"?>
 
-<div class="row page-header" id="divPageTitle">
-	<h1><?echo get_user_name_from_uid($uid)?><small><span id="message"></span></small></h1>
-</div>
-
-<div class="row" id="divMySocialOutline">
-	<div id="divSopmlVcard" class="hero-unit">
+<div class="row" id="divMe">
+	<div id="divSopmlVcard">
 
 		<div id="divSopmlVcardInner">
 		<img class="avatar" src="<?echo (!empty($prefs['avatarurl']) ? $prefs['avatarurl'] : $default_avatar_url)?>">
-		<h2><?echo get_user_name_from_uid($uid)?></h2>
-		<a href="<?echo $s3sopml?>">Social Outline Feed</a><br/>
-		<a href="<?echo $s3readlist?>">Reading List Feed</a>
+		<span class="nameoverlay"><?echo get_user_name_from_uid($uid)?></span>
+        <ul class="defaultopml">
+		<li><a href="<?echo $s3sopml?>">Social Outline Feed</a></li>
+		<li><a href="<?echo $s3readlist?>">Reading List Feed</a></li>
+        </ul>
 		</div>
 
+
+
 		<div id="divSopmlVcardList">
+        <div class="bodyspacer">&nbsp;</div>
 		<h3>My Stuff</h3>
 		<ul id="ulMyStuff">
 		  <li><a href="<?echo $s3blogfeed?>"><?echo $mbtitle?></a></li>
@@ -122,12 +100,12 @@ $(document).ready( function() {
    		  </div>
 
 		<h3>My Buddies</h3>
-		<ul>
+		<ul class="buddylist">
 		<?
 		$outlines = get_outlines($uid);
 		foreach($outlines as $outline) {
 		  if($outline['type'] == "sopml") {
-		    ?><li><img class="minitar" src="<?echo $outline['avatarurl']?>" alt="" /><a href="<?echo $outline['url']?>"><?echo $outline['ownername']?></a></li><?
+		    ?><li><img class="avatar64" src="<?echo $outline['avatarurl']?>" alt="" /><a href="<?echo $outline['url']?>"><?echo $outline['ownername']?></a></li><?
                   }
 		}
 		?>

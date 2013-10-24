@@ -1052,7 +1052,7 @@ function fetchUrlExtra($url, $timeout = 30)
 
     curl_close($curl);
 
-    loggit(3, "DEBUG: [" . $response . "]");
+    //loggit(3, "DEBUG: [" . print_r($response,TRUE) . "]");
 
     return $response;
 }

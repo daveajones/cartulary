@@ -8,7 +8,7 @@
 function is_outline($content = NULL)
 {
     //Check parameters
-    if ($content == NULL) {
+    if ( empty($content) ) {
         loggit(2, "The content to test is blank or corrupt: [$content]");
         return (FALSE);
     }
@@ -2077,6 +2077,117 @@ function convert_opml_to_html($content = NULL, $max = NULL)
 
     //Log and leave
     loggit(3, "Got [$count] items from the opml document.");
+    return ($html);
+}
+
+
+//Recursive function for parsing an entire outline structure into html format
+function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0)
+{
+
+    foreach ($x->children() as $child) {
+        $text = (string)$child->attributes()->text;
+        $name = (string)$child->attributes()->name;
+        $link = (string)$child->attributes()->url;
+        $type = (string)$child->attributes()->type;
+        $attr = (string)$child->attributes();
+
+        $classes = "outline $type";
+
+        if( (string)$child->getName() == "outline" ) {
+            if ($type == "link") {
+                $html .= "\n" . str_repeat('    ', $indent) . "<o class=\"$classes\"><a href=\"$link\" target=\"_blank\">" . (string)$child->attributes()->text . "</a>";
+            } else {
+                $html .= "\n" . str_repeat('    ', $indent) . "<o class=\"$classes\">" . (string)$child->attributes()->text . "";
+            }
+        }
+        $line = buildHtmlFromOpmlRecursive($child, $html, $indent + 1, $line + 1);
+        if( (string)$child->getName() == "outline" ) {
+            if ($type == "link") {
+                $html .= str_repeat('    ', $indent) ."</o>\n";
+            } else {
+                $html .= str_repeat('    ', $indent) ."</o>\n";
+            }
+        }
+    }
+
+    return ($line);
+}
+
+
+//Convert an opml document to html with processing
+function process_opml_to_html($content = NULL, $title = "")
+{
+    //Check params
+    if ($content == NULL) {
+        loggit(2, "The opml content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Parse it
+    libxml_use_internal_errors(true);
+    $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+    libxml_clear_errors();
+
+    //Roll through all of the outline nodes
+    $nodes = $x->xpath('//outline');
+    if (empty($nodes)) {
+        loggit(3, "This opml document is blank.");
+        return (-2);
+    }
+
+
+    buildHtmlFromOpmlRecursive($x, $body);
+    $html = <<<OPML2HTML1
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>$title</title>
+    <link href='http://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css'>
+    <style>
+    body { font-family: 'Noto Sans', serif; width: 900px; margin:40px auto 20px; }
+    o img.right256 { float:right; max-width: 256px; max-height: 256px; }
+    o { display:block; margin:20px auto 20px; }
+    o.title { font-weight:bold; font-size: 28px; line-height: 30px; margin-bottom: 30px; }
+    o.outline { font-size: 18px; line-height: 22px; }
+    o > o { margin-left: 20px; }
+    </style>
+  </head>
+  <body>
+
+    <o class="title">$title</o>
+    $body
+  </body>
+</html>
+OPML2HTML1;
+
+    //debug
+    //loggit(3, "OBJECT: ".print_r($nodes, TRUE) );
+
+    /*
+    //Run through each node and convert it to an html element
+    $count = 0;
+    $html = "<!DOCTYPE html><html><head><style>body { width: 900px; margin:10px auto 10px; }div { margin-bottom:10px; }</style><title>$title</title></head><body><h3>$title</h3>";
+    foreach ($nodes as $entry) {
+        loggit(3, "DEBUG: ".print_r($entry, TRUE));
+
+        $text = (string)$entry->attributes()->text;
+        $name = (string)$entry->attributes()->name;
+        $link = (string)$entry->attributes()->url;
+        $type = (string)$entry->attributes()->type;
+
+        $html .= "<div>$text</div>\n";
+
+        $count++;
+    }
+    $html .= "</body></html>";
+    */
+
+    //Log and leave
+    //loggit(3, "Got [$count] items from the opml document.");
     return ($html);
 }
 

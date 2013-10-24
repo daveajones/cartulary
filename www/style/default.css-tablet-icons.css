@@ -54,12 +54,13 @@
 .btnFeedFullText { display:inline-block; background:url('/images/glyph/glyphicons_halflings_049_text-height.png') 0 4px no-repeat; width:20px; height:20px; border:none; outline:none; }
 
 /* Navbar icons */
-.icon-nav-home { background:url('/images/glyph/glyphicons_020_home.png') 0px 0px no-repeat; width:30px; height:28px; border:0; }
-.icon-nav-home-lights { background:url('/images/glyph/glyphicons_020_home_lights.png') 0px 0px no-repeat; width:30px; height:28px; border:0; }
-.icon-nav-microblog { background:url('/images/glyph/glyphicons_309_comments.png') 3px 3px no-repeat; width:30px; height:28px; border:0; }
-.icon-nav-articles { background:url('/images/glyph/glyphicons_072_bookmark.png') 8px 1px no-repeat; width:30px; height:28px; border:0; }
-.icon-nav-media { background:url('/images/glyph/glyphicons_138_picture.png') 4px 2px no-repeat; width:30px; height:28px; border:0; }
-.icon-nav-subscribe { background:url('/images/glyph/glyphicons_397_rss.png') 3px 1px no-repeat; width:30px; height:28px; border:0; }
-.icon-nav-admin-user { background:url('/images/glyph/glyphicons_024_parents.png') 0px 1px no-repeat; width:30px; height:28px; border:0; }
-.icon-nav-admin-feed { background:url('/images/glyph/glyphicons_114_list.png') 0px 1px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-home { background:url('/images/glyph/glyphicons_020_home.png') 0px 0px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-home-lights { background:url('/images/glyph/glyphicons_020_home_lights.png') 0px 0px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-microblog { background:url('/images/glyph/glyphicons_309_comments.png') 3px 3px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-articles { background:url('/images/glyph/glyphicons_072_bookmark.png') 8px 1px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-media { background:url('/images/glyph/glyphicons_138_picture.png') 4px 2px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-subscribe { background:url('/images/glyph/glyphicons_397_rss.png') 3px 1px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-editor { background:url('/images/glyph/glyphicons_039_notes.png') 5px 0px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-admin-user { background:url('/images/glyph/glyphicons_024_parents.png') 0px 1px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-admin-feed { background:url('/images/glyph/glyphicons_114_list.png') 0px 1px no-repeat; width:30px; height:28px; border:0; }
 

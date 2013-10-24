@@ -247,6 +247,11 @@ function set_feed_item_properties($id = NULL, $uid = NULL, $props = array())
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
+    //Create the properties record to ensure that we have at least something in there
+    //since we use the properties table for river building
+    create_feed_item_properties($id, $uid);
+
+
     //Sticky bit?
     if (isset($props['sticky']) && $props['sticky'] == TRUE) {
         mark_feed_item_as_sticky($id, $uid);
@@ -267,6 +272,39 @@ function set_feed_item_properties($id = NULL, $uid = NULL, $props = array())
     }
 
     //loggit(1,"Returning feed item properties for item: [$id]");
+    return (TRUE);
+}
+
+
+//Create a blank property record for a feed item
+function create_feed_item_properties($iid = NULL, $uid = NULL)
+{
+    //Check parameters
+    if (empty($iid)) {
+        loggit(2, "The feed item id is blank or corrupt: [$iid]");
+        return (FALSE);
+    }
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Make the call
+    $stmt = "INSERT INTO $table_nfitemprop (itemid, userid) VALUES (?,?) ON DUPLICATE KEY UPDATE itemid=?";
+    $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
+    $sql->bind_param("dsd", $iid, $uid, $iid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $updcount = $sql->affected_rows;
+    $sql->close();
+
+    //Log and return
+    loggit(1, "Created item properties for: [$iid] for user: [$uid].");
     return (TRUE);
 }
 
@@ -359,7 +397,7 @@ function mark_feed_item_as_sticky($iid = NULL, $uid = NULL)
     //Now that we have a good id, put the article into the database
     $stmt = "INSERT INTO $table_nfitemprop (itemid, userid, sticky) VALUES (?,?,1) ON DUPLICATE KEY UPDATE sticky=1";
     $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
-    $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ds", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $updcount = $sql->affected_rows;
     $sql->close();
@@ -392,7 +430,7 @@ function unmark_feed_item_as_sticky($iid = NULL, $uid = NULL)
     //Now that we have a good id, put the article into the database
     $stmt = "UPDATE $table_nfitemprop SET sticky=0 WHERE itemid=? AND userid=?";
     $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
-    $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ds", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $updcount = $sql->affected_rows;
     $sql->close();
@@ -491,7 +529,7 @@ function mark_feed_item_as_hidden($iid = NULL, $uid = NULL)
     //Now that we have a good id, put the article into the database
     $stmt = "INSERT INTO $table_nfitemprop (itemid, userid, hidden) VALUES (?,?,1) ON DUPLICATE KEY UPDATE hidden=1";
     $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
-    $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ds", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $updcount = $sql->affected_rows;
     $sql->close();
@@ -524,7 +562,7 @@ function unmark_feed_item_as_hidden($iid = NULL, $uid = NULL)
     //Now that we have a good id, put the article into the database
     $stmt = "UPDATE $table_nfitemprop SET hidden=0 WHERE itemid=? AND userid=?";
     $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
-    $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ds", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $updcount = $sql->affected_rows;
     $sql->close();
@@ -623,7 +661,7 @@ function mark_feed_item_as_fulltext($iid = NULL, $uid = NULL)
     //Now that we have a good id, put the article into the database
     $stmt = "INSERT INTO $table_nfitemprop (itemid, userid, `fulltext`) VALUES (?,?,1) ON DUPLICATE KEY UPDATE `fulltext`=1";
     $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
-    $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ds", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $updcount = $sql->affected_rows;
     $sql->close();
@@ -656,7 +694,7 @@ function unmark_feed_item_as_fulltext($iid = NULL, $uid = NULL)
     //Now that we have a good id, put the article into the database
     $stmt = "UPDATE $table_nfitemprop SET `fulltext`=0 WHERE itemid=? AND userid=?";
     $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
-    $sql->bind_param("ss", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ds", $iid, $uid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $updcount = $sql->affected_rows;
     $sql->close();

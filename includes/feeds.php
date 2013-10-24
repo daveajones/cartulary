@@ -2169,7 +2169,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $media = 0;
 
     //Each item needs a unique id
-    $id = random_gen(128);
+    //$id = random_gen(128);
     $old = FALSE;
 
     //Find a publish date for the item
@@ -2191,7 +2191,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     }
 
     //Now that we have a good id, put the feed item into the database
-    $stmt = "INSERT INTO $table_nfitem (id,feedid,title,url,description,guid,timestamp,timeadded,enclosure,`purge`,sourceurl,sourcetitle,author,origin,media) VALUES (?,?,?,?,?,?,?,?,?,0,?,?,?,?,?)";
+    $stmt = "INSERT INTO $table_nfitem (feedid,title,url,description,guid,timestamp,timeadded,enclosure,`purge`,sourceurl,sourcetitle,author,origin,media) VALUES (?,?,?,?,?,?,?,?,0,?,?,?,?,?)";
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
     if ($format == "atom") {
         //-----ATOM--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2311,7 +2311,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
             $title = "";
         }
 
-        $sql->bind_param("ssssssddsssssd", $id, $fid, $title, $linkurl, $description, $item->id, $pubdate, $timeadded, $enclosure, $sourceurl, $sourcetitle, $author, $origin, $media) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("sssssddsssssd", $fid, $title, $linkurl, $description, $item->id, $pubdate, $timeadded, $enclosure, $sourceurl, $sourcetitle, $author, $origin, $media) or loggit(2, "MySql error: " . $dbh->error);
     } else {
         //-----RSS----------------------------------------------------------------------------------------------------------------------------------------------------
         $linkurl = $item->link;
@@ -2410,7 +2410,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         $description = $cleaned['text'];
 
         //Attach extracted media tags as enclosures with correct type
-        if (count($cleaned['media']) > 0) {
+        if (is_array($cleaned['media']) && count($cleaned['media']) > 0) {
             foreach ($cleaned['media'] as $mediatag) {
                 $esize = "";
                 if ($mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video') {
@@ -2462,11 +2462,14 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
             }
         }
 
-        $sql->bind_param("ssssssddsssssd", $id, $fid, $title, $linkurl, $description, $uniq, $pubdate, $timeadded, $enclosure, $sourceurl, $sourcetitle, $author, $origin, $media) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("sssssddsssssd", $fid, $title, $linkurl, $description, $uniq, $pubdate, $timeadded, $enclosure, $sourceurl, $sourcetitle, $author, $origin, $media) or loggit(2, "MySql error: " . $dbh->error);
     }
     $sql->execute() or loggit(3, $dbh->error);
-    $sql->close();
 
+
+    //Get the last item id that was generated
+    $id = $sql->insert_id;
+    $sql->close();
 
     //Set the item properties per user
     $fusers = get_feed_subscribers($fid);
@@ -2488,7 +2491,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     }
 
     //Log and return
-    loggit(3, "New feed item: [$id] for feed: [$fid].");
+    loggit(3, "New feed item for feed: [$fid].");
     return ($id);
 }
 
@@ -2999,34 +3002,38 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     //Put this built river in the database
     update_river($uid, $doutput, $moutput, $newhash);
 
-    //If we can get some sane S3 credentials then let's go
-    if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
-        //First we get all the key info
-        $s3info = get_s3_info($uid);
+    //If we can get some sane S3 credentials and the user wants a public river then let's go
+    if ($prefs['publicriver'] == 1) {
+        if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
+            //First we get all the key info
+            $s3info = get_s3_info($uid);
 
-        //Subpath?  Must begin with a slash
-        $subpath = "";
+            //Subpath?  Must begin with a slash
+            $subpath = "";
 
-        //Put the desktop file
-        $filename = $default_river_json_file_name;
-        $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
-        if (!$s3res) {
-            loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-            //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-        } else {
-            $s3url = get_s3_url($uid, $subpath, $filename);
-            loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+            //Put the desktop file
+            $filename = $default_river_json_file_name;
+            $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+            }
+            //Put the mobile file
+            $filename = $default_river_json_mobile_file_name;
+            $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote mobile river to S3 at url: [$s3url].");
+            }
         }
-        //Put the mobile file
-        $filename = $default_river_json_mobile_file_name;
-        $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
-        if (!$s3res) {
-            loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-            //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-        } else {
-            $s3url = get_s3_url($uid, $subpath, $filename);
-            loggit(1, "Wrote mobile river to S3 at url: [$s3url].");
-        }
+    } else {
+        loggit(3, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");
@@ -4253,34 +4260,777 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     //Put this built river in the database
     update_river($uid, $doutput, $moutput, $newhash);
 
-    //If we can get some sane S3 credentials then let's go
-    if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
-        //First we get all the key info
-        $s3info = get_s3_info($uid);
+    //If we can get some sane S3 credentials, and the user wants a public river then let's go
+    if ($prefs['publicriver'] == 1) {
+        if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
+            //First we get all the key info
+            $s3info = get_s3_info($uid);
 
-        //Subpath?  Must begin with a slash
-        $subpath = "";
+            //Subpath?  Must begin with a slash
+            $subpath = "";
 
-        //Put the desktop file
-        $filename = $default_river_json_file_name;
-        $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
-        if (!$s3res) {
-            loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-            //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-        } else {
-            $s3url = get_s3_url($uid, $subpath, $filename);
-            loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+            //Put the desktop file
+            $filename = $default_river_json_file_name;
+            $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+            }
+            //Put the mobile file
+            $filename = $default_river_json_mobile_file_name;
+            $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote mobile river to S3 at url: [$s3url].");
+            }
         }
-        //Put the mobile file
-        $filename = $default_river_json_mobile_file_name;
-        $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
-        if (!$s3res) {
-            loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
-            //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
-        } else {
-            $s3url = get_s3_url($uid, $subpath, $filename);
-            loggit(1, "Wrote mobile river to S3 at url: [$s3url].");
+    } else {
+        loggit(3, "Skipping S3 upload of river json since user wants it private.");
+    }
+
+    loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");
+    loggit(1, "Returning: [$mrcount] items in user: [$uid]'s mobile river.");
+    return ($jsonriver);
+}
+
+
+//Build a json array of feed items that will be the river for this user
+function build_river_json3($uid = NULL, $max = NULL, $force = FALSE, $mobile = FALSE)
+{
+    //Check parameters
+    if ($uid == NULL) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/s3/S3.php";
+    require_once "$confroot/$includes/opml.php";
+
+    loggit(3, "DEBUG: build_river_json3($uid, $max, $force, $mobile)");
+
+    //Get the users prefs
+    $prefs = get_user_prefs($uid);
+    if (!$prefs) {
+        loggit(2, "Couldn't get prefs for user: [$uid]");
+        return (FALSE);
+    }
+
+    //For a good collapsed river, you really need at least 24 hours of data to work with
+    //If the user has their riverhours set below 24, we just use 24 the non-collapsed
+    //river is unaffected by this
+    if ($prefs['riverhours'] < 24) {
+        $start = time() - (24 * 3600);
+    } else {
+        $start = time() - ($prefs['riverhours'] * 3600);
+    }
+    $dmax = $prefs['maxriversize'];
+    $mmax = $prefs['maxriversizemobile'];
+
+    //The river array
+    $river = array();
+    $driver = array();
+    $mriver = array();
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Assemble query
+    $sqltxt = "SELECT
+                    $table_nfitemprop.itemid,
+                    $table_nfitem.title,
+                    $table_nfitem.url,
+                    $table_nfitem.timestamp,
+                    $table_nfitem.feedid,
+                    $table_nfitem.timeadded,
+                    $table_nfitem.enclosure,
+                    $table_nfitem.description,
+                    $table_nfitem.guid,
+                    $table_nfitem.origin,
+                    $table_nfitem.sourceurl,
+                    $table_nfitem.sourcetitle,
+                    $table_nfitem.author,
+                    $table_nfitemprop.sticky,
+                    $table_nfitemprop.hidden,
+                    $table_nfitemprop.`fulltext`
+               FROM
+                    $table_nfitemprop
+               INNER JOIN
+                    $table_nfitem ON $table_nfitem.id = $table_nfitemprop.itemid
+               WHERE
+                    $table_nfitemprop.userid=?
+               AND
+                    $table_nfitem.timeadded > ?
+               AND
+                    $table_nfitem.`old` = 0
+    ";
+    $sqltxt .= " ORDER BY $table_nfitemprop.itemid DESC";
+    //loggit(3, $sqltxt);
+
+    //Make sure to set the LIMIT to the higher of the two max values, so we cover both
+    if ($max == NULL) {
+        $max = $dmax;
+        if ($mmax > $dmax) {
+            $max = $mmax;
         }
+    }
+    //$sqltxt .= " LIMIT $max";
+
+    //Execute the query
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sd", $uid, $start) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any items returned
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "The user: [$uid] has an empty river.");
+        return (FALSE);
+    }
+
+    $sql->bind_result($id, $title, $url, $timestamp, $feedid,
+        $timeadded, $enclosure, $description,
+        $guid, $origin, $sourceurl, $sourcetitle,
+        $author, $sticky, $hidden, $fulltext) or loggit(2, "MySql error: " . $dbh->error);
+
+
+    // ----- Begin building the river. -----
+    $origins = array();
+    $forigins = array();
+    $fcount = -1;
+    $icount = 0;
+    $ticount = 0;
+    $drcount = 0;
+    $mrcount = 0;
+    $firstid = "";
+    $lastfeedid = "";
+    $pubdate = time();
+    while ($sql->fetch()) {
+        $feed = get_feed_info($feedid);
+
+        //Save the time stamp of the first item to use as a pubdate
+        if ($firstid == "" && $sticky != 1 && $hidden != 1) {
+            $pubdate = $timeadded;
+            $firstid = $id;
+        }
+
+        //Keep track of which feed we're in along the way
+        if ($lastfeedid != $feedid) {
+            //If the last feed was blank then remove it from the array
+            if ($fcount >= 0 && empty($river[$fcount]['item'])) {
+                array_splice($river, $fcount);
+            } else {
+                $fcount++;
+            }
+            $icount = 0;
+            $lastfeedid = $feedid;
+
+            //Insert a new array that will contain the feed
+            $newfeed = array(
+                'feedId' => $feedid,
+                'feedIndex' => $fcount,
+                'feedUrl' => $feed['url'],
+                'websiteUrl' => $feed['link'],
+                'feedTitle' => $feed['title'],
+                'feedDescription' => '',
+                'feedSticky' => 0,
+                'feedHidden' => 0,
+                'feedFullText' => 0,
+                'itemIndex' => $ticount,
+                'whenLastUpdate' => date("D, d M Y H:i:s O", $feed['lastupdate'])
+            );
+
+            //Check if this feed is linked to an outline this user subscribes to
+            $oid = get_feed_outline_by_user($feedid, $uid);
+            if ($oid != FALSE) {
+                $ou = get_outline_info($oid);
+                $newfeed['linkedOutlineId'] = $oid;
+                if (!empty($ou['type'])) {
+                    $newfeed['linkedOutlineType'] = $ou['type'];
+                }
+                if (!empty($ou['title'])) {
+                    $newfeed['linkedOutlineTitle'] = $ou['title'];
+                }
+                if (!empty($ou['url'])) {
+                    $newfeed['linkedOutlineUrl'] = $ou['url'];
+                }
+                if (!empty($ou['ownername'])) {
+                    $newfeed['ownerName'] = $ou['ownername'];
+                }
+                if (!empty($ou['avatarurl'])) {
+                    $newfeed['avatarUrl'] = $ou['avatarurl'];
+                }
+            }
+
+            //Does this feed have an avatar url?
+            if (!empty($feed['avatarurl'])) {
+                $newfeed['avatarUrl'] = $feed['avatarurl'];
+            }
+
+            //Start a sub-array in this feed array to hold items
+            $newfeed['item'] = array();
+            $river[$fcount] = $newfeed;
+        }
+        // ----- End Feed section -----
+
+
+        // ----- Start Item section -----
+        //Construct item body
+        if ($prefs['fulltextriver'] == 0) {
+            if ($fulltext == 1) {
+                $itembody = $description;
+            } else
+                if (strlen($description) > 300) {
+                    $itembody = truncate_text($description, 300) . "...";
+                } else {
+                    $itembody = $description;
+                }
+        } else {
+            $itembody = $description;
+        }
+
+        //Fill in the details of this item
+        $newitem = array(
+            'index' => $ticount,
+            'body' => $itembody,
+            'permaLink' => $url,
+            'guid' => $guid,
+            'pubDate' => date("D, d M Y H:i:s O", $timeadded),
+            'title' => $title,
+            'link' => $url,
+            'id' => $id
+        );
+
+        //Is there an author attribution?
+        if (!empty($author)) {
+            $newitem['author'] = $author;
+        }
+
+        //Does this item specify a source attribution?
+        if (!empty($sourceurl)) {
+            $newitem['sourceurl'] = $sourceurl;
+        }
+        if (!empty($sourcetitle)) {
+            $newitem['sourcetitle'] = $sourcetitle;
+        }
+
+        //Set the sticky bit
+        if ($sticky == 1) {
+            $newitem['sticky'] = 1;
+        }
+
+        //Set the hidden bit
+        if ($hidden == 1) {
+            $newitem['hidden'] = 1;
+        }
+
+        //Set the full text bit
+        if ($fulltext == 1) {
+            $newitem['fullText'] = 1;
+        }
+
+        //Is there an origin?
+        if (!empty($origin)) {
+            $newitem['origin'] = $origin;
+        } else {
+            $newitem['origin'] = $feed['url'] . "|" . $guid;
+        }
+
+        //Are there any enclosures?
+        $enclosures = unserialize($enclosure);
+        if ($enclosures != FALSE) {
+            if (!empty($enclosures)) {
+                if (!empty($enclosures[0]['url'])) {
+                    $newitem['enclosure'] = $enclosures;
+                }
+            }
+        }
+
+        //We base where to stick the item on the origin.  If the origin of this new item
+        //is the same as the origin of an existing item we've already put into the river
+        //then we insert this new item as a sub-item of that existing one.
+        //If we haven't seen this origin before, then we just put it in as a new standard
+        //river item.
+        $floc = isset($forigins[$newitem['origin']]['feedindex']) ? $forigins[$newitem['origin']]['feedindex'] : FALSE;
+
+        //echo "DEBUG: [$fcount] [".$newitem['origin']."]\n";
+
+        if ($floc !== FALSE) {
+            $iloc = $forigins[(string)$newitem['origin']]['itemindex'];
+            $newitem['index'] = @count($river[$floc]['item'][$iloc]['subitem']);
+            $newitem['avatarUrl'] = @$newfeed['avatarUrl'];
+            $newitem['feedTitle'] = @$newfeed['feedTitle'];
+            $river[$floc]['item'][$iloc]['subitem'][] = $newitem;
+        } else {
+            $river[$fcount]['item'][$icount] = $newitem;
+            $forigins[(string)$newitem['origin']]['feedindex'] = $fcount;
+            $forigins[(string)$newitem['origin']]['itemindex'] = $icount;
+            $icount++;
+        }
+        // ----- End Item Section -----
+
+        $ticount++;
+        if ($ticount == $dmax) {
+            $dfcut = $fcount;
+        }
+        if ($ticount == $mmax) {
+            $mfcut = $fcount;
+        }
+
+        //We're building two rivers here.  One for desktop and one for mobile
+        //if( $ticount <= $dmax ) {  $driver = $river; $drcount++;  }
+        //if( $ticount <= $mmax ) {  $mriver = $river; $mrcount++;  }
+
+        //Break out if we hit max
+        //if( $ticount >= $max ) { break; }
+    }
+
+    if (isset($dfcut)) {
+        $driver = array_slice($river, 0, $dfcut);
+    } else {
+        $driver = $river;
+    }
+    if (isset($mfcut)) {
+        $mriver = array_slice($river, 0, $mfcut);
+    } else {
+        $mriver = $river;
+    }
+
+    $sql->close();
+
+    //Debugging
+    //echo "-- forigins --------------------------\n";
+    //echo print_r($forigins, TRUE)."\n";
+    //echo "-- origins ---------------------------\n";
+    //echo print_r($origins, TRUE)."\n";
+    //echo "--------------------------------------\n";
+
+    //Encapsulate the river
+    $doutput['updatedFeeds']['updatedFeed'] = $driver;
+    $moutput['updatedFeeds']['updatedFeed'] = $mriver;
+
+    //Add metadata
+    $doutput['metadata'] = array(
+        "docs" => "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html",
+        "whenGMT" => date("D, d M Y H:i:s O", $pubdate),
+        "whenLocal" => date("D, d M Y H:i:s O", $pubdate),
+        "version" => "3",
+        "secs" => "1",
+        "firstId" => $firstid,
+        "lastBuildDate" => time()
+    );
+    $moutput['metadata'] = array(
+        "docs" => "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html",
+        "whenGMT" => date("D, d M Y H:i:s O", $pubdate),
+        "whenLocal" => date("D, d M Y H:i:s O", $pubdate),
+        "version" => "3",
+        "secs" => "1",
+        "firstId" => $firstid,
+        "lastBuildDate" => time()
+    );
+
+    //Json encode the river
+    $djsonriver = "onGetRiverStream(" . json_encode($doutput) . ")";
+    $mjsonriver = "onGetRiverStream(" . json_encode($moutput) . ")";
+
+    //Let's return the river asked for
+    $jsonriver = $djsonriver;
+    if ($mobile == TRUE) {
+        $jsonriver = $mjsonriver;
+    }
+
+    //Let's be smart about this and not re-publish a river that hasn't changed
+    $pubriver = get_river_info($uid);
+    $newhash = md5(serialize($driver));
+
+    //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
+    //loggit(3, "River hash: NEW: [$newhash]");
+
+    if ($pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
+        //loggit(3, "User: [$uid]'s river has not changed. No need to publish.");
+        return ($jsonriver);
+    }
+
+    //Put this built river in the database
+    update_river($uid, $doutput, $moutput, $newhash);
+
+    //If we can get some sane S3 credentials, and the user wants a public river then let's go
+    if ($prefs['publicriver'] == 1) {
+        if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
+            //First we get all the key info
+            $s3info = get_s3_info($uid);
+
+            //Subpath?  Must begin with a slash
+            $subpath = "";
+
+            //Put the desktop file
+            $filename = $default_river_json_file_name;
+            $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+            }
+            //Put the mobile file
+            $filename = $default_river_json_mobile_file_name;
+            $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote mobile river to S3 at url: [$s3url].");
+            }
+        }
+    } else {
+        loggit(3, "Skipping S3 upload of river json since user wants it private.");
+    }
+
+    loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");
+    loggit(1, "Returning: [$mrcount] items in user: [$uid]'s mobile river.");
+    return ($jsonriver);
+}
+
+
+//Build a json array of feed items that will be the river for this user
+function build_river_json4($uid = NULL, $max = NULL, $force = FALSE, $mobile = FALSE)
+{
+    //Check parameters
+    if ($uid == NULL) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/s3/S3.php";
+    require_once "$confroot/$includes/opml.php";
+
+    //Get the users prefs
+    $prefs = get_user_prefs($uid);
+    if (!$prefs) {
+        loggit(2, "Couldn't get prefs for user: [$uid]");
+        return (FALSE);
+    }
+    $start = time() - ($prefs['riverhours'] * 3600);
+    $dmax = $prefs['maxriversize'];
+    $mmax = $prefs['maxriversizemobile'];
+
+    //The river array
+    $river = array();
+    $driver = array();
+    $mriver = array();
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Assemble query
+    $sqltxt = "SELECT
+                    $table_nfitemprop.itemid,
+                    $table_nfitem.title,
+                    $table_nfitem.url,
+                    $table_nfitem.timestamp,
+                    $table_nfitem.feedid,
+                    $table_nfitem.timeadded,
+                    $table_nfitem.enclosure,
+                    $table_nfitem.description,
+                    $table_nfitem.guid,
+                    $table_nfitem.origin,
+                    $table_nfitem.sourceurl,
+                    $table_nfitem.sourcetitle,
+                    $table_nfitem.author,
+                    $table_nfitemprop.sticky,
+                    $table_nfitemprop.hidden,
+                    $table_nfitemprop.`fulltext`
+               FROM
+                    $table_nfitemprop
+               INNER JOIN
+                    $table_nfitem ON $table_nfitem.id = $table_nfitemprop.itemid
+               WHERE
+                    $table_nfitemprop.userid=?
+               AND
+                    $table_nfitem.timeadded > ?
+               AND
+                    $table_nfitem.`old` = 0";
+    //loggit(3, $sqltxt);
+
+    //Make sure to set the LIMIT to the higher of the two max values, so we cover both
+    if ($max == NULL) {
+        $max = $dmax;
+        if ($mmax > $dmax) {
+            $max = $mmax;
+        }
+    }
+    $sqltxt .= " LIMIT $max";
+
+    //Execute the query
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sd", $uid, $start) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any items returned
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "The user: [$uid] has an empty river.");
+        return (FALSE);
+    }
+
+    $sql->bind_result($id, $title, $url, $timestamp, $feedid,
+        $timeadded, $enclosure, $description,
+        $guid, $origin, $sourceurl, $sourcetitle,
+        $author, $sticky, $hidden,
+        $fulltext) or loggit(2, "MySql error: " . $dbh->error);
+
+    $fcount = -1;
+    $icount = 0;
+    $ticount = 0;
+    $drcount = 0;
+    $mrcount = 0;
+    $firstid = "";
+    $lastfeedid = "";
+    $pubdate = time();
+    while ($sql->fetch()) {
+        $feed = get_feed_info($feedid);
+
+        //Save the time stamp of the first item to use as a pubdate
+        if ($firstid == "" && $sticky != 1 && $hidden != 1) {
+            $pubdate = $timeadded;
+            $firstid = $id;
+        }
+
+        //Keep track of which feed we're in along the way
+        if ($lastfeedid != $feedid) {
+            $fcount++;
+            $icount = 0;
+            $lastfeedid = $feedid;
+
+            //Insert a new array that will contain the feed
+            $river[$fcount] = array(
+                'feedId' => $feedid,
+                'feedUrl' => $feed['url'],
+                'websiteUrl' => $feed['link'],
+                'feedTitle' => $feed['title'],
+                'feedDescription' => '',
+                'feedSticky' => $sticky,
+                'feedHidden' => $hidden,
+                'feedFullText' => $fulltext,
+                'itemIndex' => $ticount,
+                'whenLastUpdate' => date("D, d M Y H:i:s O", $feed['lastupdate'])
+            );
+
+            //Check if this feed is linked to an outline this user subscribes to
+            $oid = get_feed_outline_by_user($feedid, $uid);
+            if ($oid != FALSE) {
+                $ou = get_outline_info($oid);
+                $river[$fcount]['linkedOutlineId'] = $oid;
+                if (!empty($ou['type'])) {
+                    $river[$fcount]['linkedOutlineType'] = $ou['type'];
+                }
+                if (!empty($ou['title'])) {
+                    $river[$fcount]['linkedOutlineTitle'] = $ou['title'];
+                }
+                if (!empty($ou['url'])) {
+                    $river[$fcount]['linkedOutlineUrl'] = $ou['url'];
+                }
+                if (!empty($ou['ownername'])) {
+                    $river[$fcount]['ownerName'] = $ou['ownername'];
+                }
+                if (!empty($ou['avatarurl'])) {
+                    $river[$fcount]['avatarUrl'] = $ou['avatarurl'];
+                }
+            }
+
+            //Does this feed have an avatar url?
+            if (!empty($feed['avatarurl'])) {
+                $river[$fcount]['avatarUrl'] = $feed['avatarurl'];
+            }
+
+            //Start a sub-array in this feed array to hold items
+            $river[$fcount]['item'] = array();
+
+        }
+
+        //Construct item body
+        if ($prefs['fulltextriver'] == 0) {
+            if ($fulltext == 1) {
+                $itembody = $description;
+            } else
+                if (strlen($description) > 300) {
+                    $itembody = truncate_text($description, 300) . "...";
+                } else {
+                    $itembody = $description;
+                }
+        } else {
+            $itembody = $description;
+        }
+
+        //Fill in the details of this item
+        $river[$fcount]['item'][$icount] = array(
+            'index' => $ticount,
+            'body' => $itembody,
+            'permaLink' => $url,
+            'guid' => $guid,
+            'pubDate' => date("D, d M Y H:i:s O", $timeadded),
+            'title' => $title,
+            'link' => $url,
+            'id' => $id
+        );
+
+        //Is there an author attribution?
+        if (!empty($author)) {
+            $river[$fcount]['item'][$icount]['author'] = $author;
+        }
+
+        //Does this item specify a source attribution?
+        if (!empty($sourceurl)) {
+            $river[$fcount]['item'][$icount]['sourceurl'] = $sourceurl;
+        }
+        if (!empty($sourcetitle)) {
+            $river[$fcount]['item'][$icount]['sourcetitle'] = $sourcetitle;
+        }
+
+        //Is there an origin?
+        if (!empty($origin)) {
+            $river[$fcount]['item'][$icount]['origin'] = $origin;
+        } else {
+            $river[$fcount]['item'][$icount]['origin'] = $feed['url'] . "|" . $guid;
+        }
+
+        //Set the sticky bit
+        if ($sticky == 1) {
+            $river[$fcount]['item'][$icount]['sticky'] = 1;
+        }
+
+        //Set the hidden bit
+        if ($hidden == 1) {
+            $river[$fcount]['item'][$icount]['hidden'] = 1;
+        }
+
+        //Set the full text bit
+        if ($fulltext == 1) {
+            $river[$fcount]['item'][$icount]['fullText'] = 1;
+        }
+
+        //Are there any enclosures?
+        $enclosures = unserialize($enclosure);
+        if ($enclosures != FALSE) {
+            if (!empty($enclosures)) {
+                if (!empty($enclosures[0]['url'])) {
+                    $river[$fcount]['item'][$icount]['enclosure'] = $enclosures;
+                }
+            }
+        }
+
+        //We're building two rivers here.  One for desktop and one for mobile
+        if ($ticount <= $dmax) {
+            $driver = $river;
+            $drcount++;
+        }
+        if ($ticount <= $mmax) {
+            $mriver = $river;
+            $mrcount++;
+        }
+
+        $icount++;
+        $ticount++;
+    }
+
+    $sql->close();
+
+    //Encapsulate the river
+    $doutput['updatedFeeds']['updatedFeed'] = $driver;
+    $moutput['updatedFeeds']['updatedFeed'] = $mriver;
+
+    //Add metadata
+    $doutput['metadata'] = array(
+        "docs" => "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html",
+        "whenGMT" => date("D, d M Y H:i:s O", $pubdate),
+        "whenLocal" => date("D, d M Y H:i:s O", $pubdate),
+        "version" => "3",
+        "secs" => "1",
+        "firstId" => $firstid,
+        "lastBuildDate" => time()
+    );
+    $moutput['metadata'] = array(
+        "docs" => "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html",
+        "whenGMT" => date("D, d M Y H:i:s O", $pubdate),
+        "whenLocal" => date("D, d M Y H:i:s O", $pubdate),
+        "version" => "3",
+        "secs" => "1",
+        "firstId" => $firstid,
+        "lastBuildDate" => time()
+    );
+
+    //Json encode the river
+    $djsonriver = "onGetRiverStream(" . json_encode($doutput) . ")";
+    $mjsonriver = "onGetRiverStream(" . json_encode($moutput) . ")";
+
+    //Let's return the river asked for
+    $jsonriver = $djsonriver;
+    if ($mobile == TRUE) {
+        $jsonriver = $mjsonriver;
+    }
+
+    //Let's be smart about this and not re-publish a river that hasn't changed
+    $pubriver = get_river_info($uid);
+    $newhash = md5(serialize($driver));
+
+    //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
+    //loggit(3, "River hash: NEW: [$newhash]");
+
+    if ($pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
+        loggit(1, "User: [$uid]'s river has not changed. No need to publish.");
+        return ($jsonriver);
+    }
+
+    //Put this built river in the database
+    update_river($uid, $doutput, $moutput, $newhash);
+
+    //If we can get some sane S3 credentials and the user wants a public river then let's go
+    if ($prefs['publicriver'] == 1) {
+        if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
+            //First we get all the key info
+            $s3info = get_s3_info($uid);
+
+            //Subpath?  Must begin with a slash
+            $subpath = "";
+
+            //Put the desktop file
+            $filename = $default_river_json_file_name;
+            $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+            }
+            //Put the mobile file
+            $filename = $default_river_json_mobile_file_name;
+            $s3res = putInS3(gzencode($mjsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+            if (!$s3res) {
+                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+            } else {
+                $s3url = get_s3_url($uid, $subpath, $filename);
+                loggit(1, "Wrote mobile river to S3 at url: [$s3url].");
+            }
+        }
+    } else {
+        loggit(3, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");

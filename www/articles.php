@@ -110,10 +110,11 @@
 			<?if($platform == "mobile") {?><a class="aDeleteArticle" href='<?echo $deletearticlecgi."?"."aid=".$article['id'];?>'><img class="icon-remove" src="/images/blank.gif" alt="" /></a><?}?>
                         <input class="exparticle" id="chkArticle<?echo $acount?>" type="checkbox" name="articles[]" value="<?echo $article['id']?>" /> <a href='<?echo $showarticlepage."?"."aid=".$article['id'];?>'><?echo $article['title']?></a>
 			<?if($platform != "mobile") {?>
-                          [
+                &nbsp;
+                           <a href="<?echo $editorpage?>?aid=<?echo $article['id']?>"><img class="icon-editor-small" src="/images/blank.gif" alt="" /></a>
                            <a href="<?echo $article['url']?>"><img class="icon-extlink-small" src="/images/blank.gif" alt="" /></a>
                            <a class="aDeleteArticle" href='<?echo $deletearticlecgi."?"."aid=".$article['id'];?>'><img class="icon-remove-small" src="/images/blank.gif" alt="" /></a>
-                          ]
+
 			<?}?>
                         </div>
                 </li>

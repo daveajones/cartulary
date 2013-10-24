@@ -1,0 +1,26 @@
+#Release Notes - Freedom Controller v0.5.4
+
+
+This release has two focuses:  database/speed improvements and baking in the Concord outliner.
+
+- A big table change.  The relations between nfitems table and the nfitemprops table is now such that
+ we can use the nfitemprops table as a lookup table to build rivers very quickly.  This essentially
+ eliminates the need for the multiple table JOIN approach that was being used and speeds river build
+ time way up.  It's still a little too slow for real-time building, so we still pre-build them every
+ 5 minutes.  Hopefully I can continue to improve the speed enough to make real-time feasible.
+
+- Concord!  Since Dave Winer released his Concord outliner under the GPL it just makes sense to bake
+ it into Freedom Controller.  To that end there is a new Editor page in the menu bar.  You can create
+ new outlines and save them as OPML/HTML directly into your S3 bucket.  You can also export a batch of
+ saved articles straight into the editor for easy editing.  This would be good if you wanted to take an
+ article you had saved and mark it up.  This is just scratching the surface.  Expect lots more work on
+ the editor in the future.  Thanks Dave!
+
+- Brought back the "Me" page and called it Profile.  It's listed under the user menu if you click on your
+ avatar.  You can use this page to publish feeds to your social outline.
+
+- Other changes:
+    - rssCloud is now off by default.  It's rapidly disappearing from the net in favor of pubsubhubbubb.
+    - Changed the way we poll other FC servers to ensure that we don't end up with dead or multiple
+      copies of the same server in the list.
+    - Some other bug fixes.

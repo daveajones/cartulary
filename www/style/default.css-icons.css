@@ -38,6 +38,7 @@
 .icon-text-height { display:inline-block; background:url('/images/glyph/glyphicons_halflings_049_text_height.png') 0 2px no-repeat; width: 20px; height:20px; border:none;  outline:none; }
 .icon-text-width { display:inline-block; background:url('/images/glyph/glyphicons_halflings_050_text_width.png') 0 2px no-repeat; width: 20px; height:20px; border:none;  outline:none; }
 .icon-edit { display:inline-block; background:url('/images/glyph/glyphicons_halflings_135_wrench.png') 3px 0 no-repeat; width: 30px; height:30px; border:none;  outline:none; }
+.icon-editor-small { display:inline-block; background:url('/images/glyph/glyphicons_halflings_064_edit.png') 2px 2px no-repeat; width: 20px; height:20px; border:none;  outline:none; }
 .icon-delete { display:inline-block; background:url('/images/glyph/glyphicons_halflings_087_remove-circle.png') 3px 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
 .icon-reset { display:inline-block; background:url('/images/glyph/glyphicons_halflings_030_refresh.png') 3px 0 no-repeat; width: 30px; height:30px; border:none; outline:none; }
 .icon-play { display:inline-block; background:url('/images/glyph/glyphicons_173_play@2x.png') 0 0 no-repeat; width: 34px; height:34px; border:none; outline:none; }

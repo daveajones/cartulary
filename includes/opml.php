@@ -2081,6 +2081,40 @@ function convert_opml_to_html($content = NULL, $max = NULL)
 }
 
 
+//Recursive function for parsing an entire outline structure into html format
+function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0)
+{
+
+    foreach ($x->children() as $child) {
+        $text = (string)$child->attributes()->text;
+        $name = (string)$child->attributes()->name;
+        $link = (string)$child->attributes()->url;
+        $type = (string)$child->attributes()->type;
+        $attr = (string)$child->attributes();
+
+        $classes = "outline $type";
+
+        if( (string)$child->getName() == "outline" ) {
+            if ($type == "link") {
+                $html .= "\n" . str_repeat('    ', $indent) . "<o class=\"$classes\"><a href=\"$link\" target=\"_blank\">" . (string)$child->attributes()->text . "</a>";
+            } else {
+                $html .= "\n" . str_repeat('    ', $indent) . "<o class=\"$classes\">" . (string)$child->attributes()->text . "";
+            }
+        }
+        $line = buildHtmlFromOpmlRecursive($child, $html, $indent + 1, $line + 1);
+        if( (string)$child->getName() == "outline" ) {
+            if ($type == "link") {
+                $html .= str_repeat('    ', $indent) ."</o>\n";
+            } else {
+                $html .= str_repeat('    ', $indent) ."</o>\n";
+            }
+        }
+    }
+
+    return ($line);
+}
+
+
 //Convert an opml document to html with processing
 function process_opml_to_html($content = NULL, $title = "")
 {
@@ -2105,9 +2139,35 @@ function process_opml_to_html($content = NULL, $title = "")
         return (-2);
     }
 
+
+    buildHtmlFromOpmlRecursive($x, $body);
+    $html = <<<OPML2HTML1
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>$title</title>
+    <link href='http://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css'>
+    <style>
+    body { font-family: 'Noto Sans', serif; width: 900px; margin:40px auto 20px; }
+    o img.right256 { float:right; max-width: 256px; max-height: 256px; }
+    o { display:block; margin:20px auto 20px; }
+    o.title { font-weight:bold; font-size: 28px; line-height: 30px; margin-bottom: 30px; }
+    o.outline { font-size: 18px; line-height: 22px; }
+    o > o { margin-left: 20px; }
+    </style>
+  </head>
+  <body>
+
+    <o class="title">$title</o>
+    $body
+  </body>
+</html>
+OPML2HTML1;
+
     //debug
     //loggit(3, "OBJECT: ".print_r($nodes, TRUE) );
 
+    /*
     //Run through each node and convert it to an html element
     $count = 0;
     $html = "<!DOCTYPE html><html><head><style>body { width: 900px; margin:10px auto 10px; }div { margin-bottom:10px; }</style><title>$title</title></head><body><h3>$title</h3>";
@@ -2124,9 +2184,10 @@ function process_opml_to_html($content = NULL, $title = "")
         $count++;
     }
     $html .= "</body></html>";
+    */
 
     //Log and leave
-    loggit(3, "Got [$count] items from the opml document.");
+    //loggit(3, "Got [$count] items from the opml document.");
     return ($html);
 }
 

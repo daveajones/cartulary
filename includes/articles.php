@@ -136,7 +136,9 @@ function get_article_as_opml($id = NULL, $uid = NULL)
     }
 
     //Generate the opml structure
-    $opmlout = get_include_contents("$confroot/$templates/$template_opml_head");
+    ob_start();
+    include "$confroot/$templates/$template_opml_head";
+    $opmlout = ob_get_clean();
 
     $dacon = date("D, d M Y H:i:s O", $article['createdon']);
     $uname = get_user_name_from_uid($uid);
@@ -161,26 +163,21 @@ $opmlout .= <<<OPMLOUT1
     <windowRight>560</windowRight>
 </head>
 <body>
-<outline text="$artitle">
-    <outline text="$arurl" />
-    <outline text="$dacon" />
-    <outline text="$aiurl" />
-    <outline text="Content">
 OPMLOUT1;
 
-        foreach ( explode("</p>", trim( str_replace("\n", '', $article['content'] ))) as $line ) {
-            $opmlout .= "<outline text=\"".xmlentities(trim(str_replace("\n", '', $line)))."\" />";
-        }
+    foreach ( explode("</p>", trim( str_replace("\n", '', $article['content'] ))) as $line ) {
+        $opmlout .= "<outline text=\"\"></outline><outline text=\"".xmlentities(trim(strip_tags(str_replace("\n", '', $line), '<a><img>')))."\" />";
+    }
 
 $opmlout .= <<<OPMLOUT2
-    </outline>
-</outline>
 </body>
 OPMLOUT2;
 
-    $opmlout .= get_include_contents("$confroot/$templates/$template_opml_feet");
+    ob_start();
+    include "$confroot/$templates/$template_opml_feet";
+    $opmlout .= ob_get_clean();
 
-    loggit(1, "Returning opml for article id: [$id]");
+    loggit(3, "Returning opml for article id: [$id]");
     return (str_replace("\n", "", str_replace('"', '\\"', $opmlout)));
 }
 

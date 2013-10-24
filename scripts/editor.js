@@ -9,7 +9,7 @@ $(document).ready(function () {
         title = $('.divOutlineTitle input.title').val();
 
         //Get a file name
-        if (filename == "" || (title != lasttitle)) {
+        if (filename == "") {
             if (title != "") {
                 filename = title.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
             } else {
@@ -30,6 +30,7 @@ $(document).ready(function () {
             url: '/cgi/in/save.opml',
             data: {
                 "opml": opml,
+                "mode" : mode,
                 "filename": filename,
                 "title": title
             },
@@ -132,7 +133,7 @@ $(document).ready(function () {
 
     hoverTimer = setTimeout(function() {
         $('.divOutlineTitle').addClass('dim');
-    }, 5000);
+    }, 7000);
 
     if( title == "Untitled") {
         $('.divOutlineTitle input.title').val('');

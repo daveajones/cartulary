@@ -1,31 +1,43 @@
 <?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
 <?include "$confroot/$templates/php_page_init.php"?>
 <?
-  // See if we have a valid url to get source xml from
-  $url = trim($_REQUEST['url']);
-  if( !empty($url) ) {
-      $filename = basename($url);
+  // See if we have a valid article id or url to get source xml from
+  $mode = "";
+  $filename = "";
+  $url = "";
+  $aid = trim($_REQUEST['aid']);
 
-      //Get opml data and clean it
-      $protpos = stripos($url, 'http');
-      if( $protpos <> 0 || $protpos === FALSE ) {
-          $badurl = true;
-      } else {
-          $opmldata = fetchUrl(get_final_url($url));
-          if( !is_outline($opmldata) ) {
+  if( !empty($aid) ) {
+      $mode = "article";
+      $opmldata = get_article_as_opml($aid, $g_uid);
+  } else {
+      //This wasn't an article edit request, so let's try and pull an external url
+      $url = trim($_REQUEST['url']);
+      if( !empty($url) ) {
+          $filename = basename($url);
+
+          //Get opml data and clean it
+          $protpos = stripos($url, 'http');
+          if( $protpos <> 0 || $protpos === FALSE ) {
               $badurl = true;
           } else {
-              $opmldata = preg_replace("/\ +\n\n\ +/", "\n\n", $opmldata);
-              $opmldata = preg_replace("/\n\ +\n/", "\n\n", $opmldata);
-              $opmldata = preg_replace("/[\r\n]\n+/", "\n\n", $opmldata);
-              $opmldata = preg_replace("/\r?\n/", "", $opmldata);
-              $opmldata = preg_replace("/\n/", "", $opmldata);
-              $opmldata = preg_replace("/\'/", "\\\'", $opmldata);
+              $opmldata = fetchUrl(get_final_url($url));
+              if( !is_outline($opmldata) ) {
+                  $badurl = true;
+              }
           }
       }
-  } else {
-      $filename = "";
   }
+
+  //Clean opml
+if( !empty($opmldata) ) {
+    $opmldata = preg_replace("/\ +\n\n\ +/", "\n\n", $opmldata);
+    $opmldata = preg_replace("/\n\ +\n/", "\n\n", $opmldata);
+    $opmldata = preg_replace("/[\r\n]\n+/", "\n\n", $opmldata);
+    $opmldata = preg_replace("/\r?\n/", "", $opmldata);
+    $opmldata = preg_replace("/\n/", "", $opmldata);
+    $opmldata = preg_replace("/\'/", "\\\'", $opmldata);
+}
 
   $section = "Editor";
   $tree_location = "Edit Outline";
@@ -44,6 +56,7 @@
 <script src="/script/bootbox.min.js"></script>
 <script>
     //Globals
+    var mode = '<?echo $mode?>';
     var url = '<?echo $url?>';
     var title = "";
     var lasttitle = "";
@@ -77,8 +90,8 @@
 <?if(s3_is_enabled($g_uid) || sys_s3_is_enabled()) {?>
     <div class="divOutlineTitle">
         <button id="btnOpmlSave" class="btn btn-success" style="min-width:54px;">Save</button>
-        as <input class="title" placeholder="Title" type="text" />
-        Render? <input class="rendertoggle" type="checkbox" style="margin-top:0;" />
+        &nbsp;&nbsp; as &nbsp;&nbsp;<input class="title" placeholder="Title" type="text" />
+        WYSIWYG? <input class="rendertoggle" type="checkbox" style="margin-top:0;" <?if($mode == "article") { echo "checked"; }?> />
         <button id="openUrl" class="btn btn-primary pull-right" style="margin-top:8px;">Open</button>
     </div>
     <div class="outlineinfo pull-right"></div>

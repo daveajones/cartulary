@@ -64,6 +64,11 @@ $(document).ready( function () {
         });
 	})();
 
+    //Side drawer handler
+    $('#slideout > .drawertab').click(function() {
+        $('#slideout').toggleClass('open');
+        return false;
+    });
 
 	//Bindings
 	freedomController.v1.people.methods.bindSocialOutlineLinks( "body" );

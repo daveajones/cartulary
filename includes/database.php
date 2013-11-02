@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 26;
+$cg_database_version = 27;
 $cg_database_updates = array();
 
 
@@ -380,6 +380,15 @@ CGDB0086;
 $cg_database_updates[25][] = <<<CGDB0087
  INSERT INTO `dbversion` ( `version` ) VALUES ( '26' )
 CGDB0087;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 26 to 27 -----------------------------------------------------------------------------------------------
+$cg_database_updates[26][] = <<<CGDB0088
+  ALTER TABLE `prefs` ADD `analyticscode` VARCHAR( 767 ) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT 'Analytics code to use in html pages.'
+CGDB0088;
+$cg_database_updates[26][] = <<<CGDB0089
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '27' )
+CGDB0089;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

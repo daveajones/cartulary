@@ -326,6 +326,7 @@
 
 /* --------------------------------------------------- */
 /* ----- Search ----- */
+li.menubar-search-container { display:none; }
 div.searchbar {
   background-color: #FBF0D9;
   color: #5F4B32;
@@ -611,9 +612,44 @@ div.searchbar p.result-msg {
 
 /* --------------------------------------------------- */
 /* ----- Navbar ----- */
-#divMainMenu .navbar {  margin-top:10px;  }
+#divMainMenu { display:none; }
+#divMainMenu .navbar {  margin-top:0px;  }
 #divSearchMenu .navbar {  margin-top:5px;  }
 .btnCloseSearchResults {  float:right;  }
+    .pageContentWrapper { padding-top:40px; }
+    .drawertab { height: 30px; }
+    .drawertab .hamburger { margin-left:-1px; max-height: 5px; width: 20px; font-weight:bold; }
+    #slideout ul { list-style-type: none; padding: 0; margin:0; }
+    #slideout li { display:block; list-style-type: none; width: 44px; height: 44px; }
+    #slideout.open li {  padding:20px 10px 0px 20px; }
+    #slideout {
+        position: fixed;
+        z-index:100;
+        top: 0px;
+        left: 0;
+        background:#eee;
+        -webkit-transition-duration: 0.3s;
+        -moz-transition-duration: 0.3s;
+        -o-transition-duration: 0.3s;
+        transition-duration: 0.3s;
+    }
+    #slideout_inner {
+        position: fixed;
+        z-index:101;
+        top: 0px;
+        left: -44px;
+        background:#eee;
+        -webkit-transition-duration: 0.3s;
+        -moz-transition-duration: 0.3s;
+        -o-transition-duration: 0.3s;
+        transition-duration: 0.3s;
+    }
+    #slideout.open {
+        left: 74px;
+    }
+    #slideout.open #slideout_inner {
+        left: 0;
+    }
 /* --------------------------------------------------- */
 
 

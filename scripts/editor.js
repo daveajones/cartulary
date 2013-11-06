@@ -2,9 +2,23 @@ $(document).ready(function () {
     var hoverTimer = null;
     var outliner = $('#outliner');
     var chkToggleRender = $('.rendertoggle');
+    var menubar = $('#menubarEditor');
+
+    //New button
+    menubar.find('.menuNew').click(function() {
+        mode = "";
+        url = "";
+        title = "";
+        lasttitle = "";
+        filename = '';
+        bufilename = title.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
+        $('.divOutlineTitle input.title').val('').focus();
+        opXmlToOutline(initialOpmltext);
+        updateOutlineInfo(url, "");
+    })
 
     //Save button
-    $('#btnOpmlSave').click(function () {
+    menubar.find('.menuSave').click(function () {
         //Grab the current title
         title = $('.divOutlineTitle input.title').val();
 
@@ -36,10 +50,12 @@ $(document).ready(function () {
             },
             dataType: "json",
             beforeSend: function () {
+                //Disable the save button and show a spinner
                 $('#btnOpmlSave').attr('disabled', true);
                 $('#btnOpmlSave').html('<i class="icon-spinner"></i>');
             },
             success: function (data) {
+                //Show returned info and re-enable the save button
                 url = data.url;
                 updateOutlineInfo(url, data.html);
 
@@ -52,8 +68,9 @@ $(document).ready(function () {
         return false;
     });
 
-    //Open by Url button
-    $('#openUrl').click(function() {
+
+    //Open button
+    menubar.find('.menuOpen').click(function() {
         bootbox.prompt("What url to open?", function(result) {
             if (result !== null) {
                 window.location = "/editor?url=" + result;
@@ -63,26 +80,18 @@ $(document).ready(function () {
         return false;
     });
 
-    //Display outline info
-    function updateOutlineInfo(url, html) {
-        $('div.outlineinfo').html('');
-        if (url != "") {
-            $('div.outlineinfo').html('<a href="' + url + '">OPML</a>');
-            if( html != "") {
-                $('div.outlineinfo').append('<br/><a href="' + html + '">HTML</a>');
-            }
-        }
-        return true;
-    }
 
     //Toggle render mode
-    chkToggleRender.change(function () {
-        if ( $(this).is(':checked') ) {
-            console.log('T: ' + outliner.concord().op.setRenderMode(true));
+    chkToggleRender.click(function () {
+        if ( $(this).parent().hasClass('active') ) {
+            console.log('T: ' + outliner.concord().op.setRenderMode(false));
+            $(this).parent().removeClass('active');
         } else {
-            console.log('F: ' + outliner.concord().op.setRenderMode(false));
+            console.log('F: ' + outliner.concord().op.setRenderMode(true));
+            $(this).parent().addClass('active');
         }
     });
+
 
     //Handle opacity on focus change
     $('.divOutlineTitle input.title').on("focus", function() {
@@ -95,6 +104,7 @@ $(document).ready(function () {
             $('.divOutlineTitle').addClass('dim');
         }, 3000);
     });
+
 
     //Full opacity on title hover
     $('.divOutlineTitle').hover(
@@ -114,10 +124,10 @@ $(document).ready(function () {
     //Load up the outline
     outliner.concord({
         "prefs": {
-            "outlineFont": "Georgia",
+            "outlineFont": "Calibri",
             "outlineFontSize": 18,
             "outlineLineHeight": 24,
-            "renderMode": chkToggleRender.is(':checked'),
+            "renderMode": chkToggleRender.parent().hasClass('active'),
             "readonly": false,
             "typeIcons": appTypeIcons
         },
@@ -125,19 +135,55 @@ $(document).ready(function () {
     opXmlToOutline(initialOpmlText);
     title = opGetTitle();
 
-    chkToggleRender.trigger('change');
+
+    //Refresh the outliner info pane
     updateOutlineInfo(url, "");
     if( badurl == true ) {
         showMessage('Parse error. Please check the url.', false, 5);
     }
 
+
+    //Dim the title area when not in use
     hoverTimer = setTimeout(function() {
         $('.divOutlineTitle').addClass('dim');
     }, 7000);
 
+
+    //Set a title
     if( title == "Untitled") {
         $('.divOutlineTitle input.title').val('');
     } else {
         $('.divOutlineTitle input.title').val(title);
     }
+
+
+    //Hot keys
+    key('ctrl+l', function() {
+        editorToolAddLink();
+    })
 });
+
+
+function editorToolAddLink() {
+    var outliner = $('#outliner');
+    bootbox.prompt("Type the target link.", function(result) {
+        if (result !== null) {
+            console.log(result);
+            outliner.concord().op.link(result);
+        }
+    });
+    return false;
+}
+
+
+//Display outline info
+function updateOutlineInfo(url, html) {
+    $('#menubarEditor .outlineinfo').html('');
+    if (url != "") {
+        $('#menubarEditor .outlineinfo').html('<li><a target="_blank" href="' + url + '">OPML</a></li>');
+        if( html != "") {
+            $('#menubarEditor .outlineinfo').append('<li><a target="_blank" href="' + html + '">HTML</a></li>');
+        }
+    }
+    return true;
+}

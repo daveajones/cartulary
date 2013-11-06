@@ -85,16 +85,13 @@ if( !empty($opmldata) ) {
 <?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
 
-
 <div class="row" id="divEditOutline">
 <?if(s3_is_enabled($g_uid) || sys_s3_is_enabled()) {?>
     <div class="divOutlineTitle">
-        <button id="btnOpmlSave" class="btn btn-success" style="min-width:54px;">Save</button>
-        &nbsp;&nbsp; as &nbsp;&nbsp;<input class="title" placeholder="Title" type="text" />
-        WYSIWYG? <input class="rendertoggle" type="checkbox" style="margin-top:0;" <?if($mode == "article") { echo "checked"; }?> />
-        <button id="openUrl" class="btn btn-primary pull-right" style="margin-top:8px;">Open</button>
+        <input class="title" placeholder="Title" type="text" />
     </div>
     <div class="outlineinfo pull-right"></div>
+
     <div class="divOutlinerContainer">
         <div id="outliner"></div>
     </div>

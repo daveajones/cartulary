@@ -88,7 +88,26 @@
             </ul>
         <?//}?>
     </div>
+    </div>
+
+    <?if($section == "Editor"){?>
+    <div id="menubarEditor" style="z-index: -1;margin-top:44px;" class="navbar <?if($g_platform != "mobile"){?>navbar-fixed-top<?} else {?>navbar-static-top<?}?>">
+        <div class="navbar-inner">
+            <ul class="nav menubar">
+                <li><a class="menuNew" href="#" title="New">New</a></li>
+                <li><a class="menuOpen" href="#" title="Open">Open</a></li>
+                <li><a class="menuSave" href="#" title="Save">Save</a></li>
+                <li><a class="menuBlog" href="#" title="Blog">Blog</a></li>
+                <li class="divider-vertical34"></li>
+                <li><a class="menuStyle" href="#" title="Style">Style</a></li>
+                <li class="<?if($mode == "article"){echo "active";}?>"><a class="rendertoggle" href="#" title="Toggle html rendering">WYSIWYG</a></li>
+            </ul>
+            <ul class="nav pull-right outlineinfo"></ul>
+        </div>
+    </div>
+    <?}?>
 </div>
-</div>
+
+
 
 <div class="pageContentWrapper <?echo $section?>">

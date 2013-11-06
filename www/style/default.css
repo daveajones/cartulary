@@ -19,7 +19,11 @@ li.menubar-search-container { display:none; }
   border-right: 1px solid #f2f2f2;
   border-left: 1px solid #efefef;
 }
-
+.navbar .divider-vertical34 {
+    height: 34px;
+    border-right: 1px solid #f2f2f2;
+    border-left: 1px solid #efefef;
+}
 #slideout {
     display:none;
     position: fixed;
@@ -787,9 +791,10 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     width: 97%;
 }
 .pageContentWrapper.Editor .divOutlineTitle {
-    border-bottom:solid #dddddd 1px;
+    /* border-bottom:solid #dddddd 1px; */
     opacity:1.0;
 }
+/*
 .pageContentWrapper.Editor .divOutlineTitle.dim {
     -webkit-transition: all 0.7s ease;
     -moz-transition: all 0.7s ease;
@@ -797,6 +802,11 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     transition: all 0.7s ease;
     opacity:0.1;
 }
+*/
+    .pageContentWrapper.Editor #divEditOutline li.concord-node {
+        margin-bottom:10px;
+
+    }
 .pageContentWrapper.Editor #divEditOutline {
     background:white;
     position: relative;
@@ -815,17 +825,16 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     margin-right:10px;
 }
 .pageContentWrapper.Editor #divEditOutline .divOutlinerContainer {
-    margin-top:30px;
+    margin-top:40px;
     padding-left:10px;
 }
 .pageContentWrapper.Editor #divEditOutline .title {
     box-shadow: inset 0px 3px 1px -1px white;
-    margin-top:8px;
+    margin-top:18px;
     font-weight:bold;
     font-size:20px;
     border: none;
     outline:none;
-    border-bottom:solid black 1px;
     background: white;
     width: 600px;
     height: 28px;

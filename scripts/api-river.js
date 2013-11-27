@@ -121,7 +121,7 @@ function _isImage(url, type) {
     if ( url.indexOf('.jpg')   != -1 ) {  return true;  }
     if ( url.indexOf('.jpeg')   != -1 ) {  return true;  }
     if ( url.indexOf('.png')   != -1 ) {  return true;  }
-    if ( url.indexOf('.gif')   != -1 ) {  return true;  }
+    //if ( url.indexOf('.gif')   != -1 ) {  return true;  }
 
 	return false;
 }
@@ -229,6 +229,7 @@ function _getDomain(url) {
 
 
 function _getFavicon(url) {
+    return '#';
 	return 'http://www.google.com/s2/favicons?domain=' + _getDomain(url);
 }
 
@@ -704,7 +705,8 @@ function _bindStickyLinks(elid) {
 								}
 
 								//Remove the item
-								$('#' + id).remove();
+                                $('#' + id).removeClass('sticky').addClass('unsticky');
+								//$('#' + id).remove();
 								//_removeStickyItemLS(idx);
                         }
                 });
@@ -885,10 +887,10 @@ function _populateGridSticky(cols, data) {
 	var col = 1;
 
 	//Get data out of local storage
-	//var lsdata = sessionStorage.getItem(lsStickyDataKey);
-	//if( lsdata !== null ) {
-	//	data = JSON.parse(lsdata);
-	//}
+	var lsdata = sessionStorage.getItem(lsStickyDataKey);
+	if( lsdata !== null ) {
+		data = JSON.parse(lsdata);
+	}
 
 	$.each(data.data.items, function(i, item) {
 		//Add an index
@@ -946,10 +948,10 @@ function _populateGrid(cols, data) {
 	var col = 1;
 
 	//Get data out of local storage
-	//var lsdata = sessionStorage.getItem(lsRiverDataKey);
-	//if( lsdata !== null ) {
-	//	data = JSON.parse(lsdata);
-	//}
+	var lsdata = sessionStorage.getItem(lsRiverDataKey);
+	if( lsdata !== null ) {
+		data = JSON.parse(lsdata);
+	}
 
     $.each(data.updatedFeeds.updatedFeed, function(f, feed) {
 		//Add each discovered feed to the active feed sidebar
@@ -1009,7 +1011,7 @@ function _getRiverStickyItems(cached) {
 		dataType: "json",
 		success: function(data) {
 			//console.log('store data: ' + data);
-			//sessionStorage.setItem(lsStickyDataKey, JSON.stringify(data));
+			sessionStorage.setItem(lsStickyDataKey, JSON.stringify(data));
 			_populateGridSticky(_calculateColumnCount(), data);
 		},
 		error: function( x, y, z) {
@@ -1032,7 +1034,7 @@ function _getRiverItems(cached) {
 		dataType: "jsonp",
 		success: function(data) {
 			//console.log('store data: ' + data);
-			//sessionStorage.setItem(lsRiverDataKey, JSON.stringify(data));
+			sessionStorage.setItem(lsRiverDataKey, JSON.stringify(data));
 			_populateGrid(_calculateColumnCount(), data);
 		},
 		error: function( x, y, z) {

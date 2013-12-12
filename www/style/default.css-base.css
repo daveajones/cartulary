@@ -11,7 +11,7 @@ body > .container {  margin-top:80px;  }
 	.navbar-inner a.brand {  display:inline;  }
 }
 #divMainMenu #navsearch {  margin-top:8px;  }
-
+.dropdown { z-index: 2; }
 
 /* --------------------------------------------------- */
 /* ----- Buttons ------------------------------------- */

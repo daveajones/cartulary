@@ -32,7 +32,7 @@
 <div id="divMainMenu" class="row">
     <div id="divSearchResultsHook"></div>
     <div class="navbar <?if($g_platform != "mobile"){?>navbar-fixed-top<?} else {?>navbar-static-top<?}?>">
-    <div class="navbar-inner msganchor">
+    <div class="navbar-inner msganchor" style="z-index:2">
         <ul class="nav">
             <li <?if($section == "River"){echo "class='active'";}?>>      <a href="<?echo $newsriverpage?>" title="River">      <i class="icn-nav-home"></i></a></li>
             <li <?if($section == "Microblog"){echo "class='active'";}?>>  <a href="<?echo $microblogpage?>" title="Microblog">  <i class="icn-nav-microblog"></i></a></li>
@@ -90,17 +90,30 @@
     </div>
     </div>
 
+    <!-- Editor page sub-menu -->
     <?if($section == "Editor"){?>
-    <div id="menubarEditor" style="z-index: -1;margin-top:44px;" class="navbar <?if($g_platform != "mobile"){?>navbar-fixed-top<?} else {?>navbar-static-top<?}?>">
+    <div id="menubarEditor" style="z-index: 1;margin-top:44px;" class="navbar <?if($g_platform != "mobile"){?>navbar-fixed-top<?} else {?>navbar-static-top<?}?>">
         <div class="navbar-inner">
             <ul class="nav menubar">
                 <li><a class="menuNew" href="#" title="New">New</a></li>
                 <li><a class="menuOpen" href="#" title="Open">Open</a></li>
                 <li><a class="menuSave" href="#" title="Save">Save</a></li>
-                <li><a class="menuBlog" href="#" title="Blog">Blog</a></li>
+                <li><a class="menuPublish" href="#" title="Publish">Publish</a></li>
                 <li class="divider-vertical34"></li>
-                <li><a class="menuStyle" href="#" title="Style">Style</a></li>
+                <li class="dropdown menuType" title="What type of outline is this?">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Type <b class="caret"></b></a>
+                    <ul class="dropdown-menu" data-container="body">
+                        <li><a href="#" class="menuTypeSelection menuTypeOutline" title="A basic indented look." data-type="outline">Outline</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeDocument" title="A flat, fully expanded document." data-type="document">Document</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeIndex" title="A collapsible outline." data-type="index">Index</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeHtml" title="Renders as raw html." data-type="html">Html</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeRedirect" title="A meta-refresh redirect." data-type="redirect">Redirect</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeTabs" title="A tabbed view." data-type="tabs">Tabs</a></li>
+                    </ul>
+                </li>
                 <li class="<?if($mode == "article"){echo "active";}?>"><a class="rendertoggle" href="#" title="Toggle html rendering">WYSIWYG</a></li>
+                <li class="divider-vertical34"></li>
+                <li><a class="menuAddLink" href="#" title="Make selection a link.">Link</a></li>
             </ul>
             <ul class="nav pull-right outlineinfo"></ul>
         </div>

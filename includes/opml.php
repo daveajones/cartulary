@@ -2082,9 +2082,9 @@ function convert_opml_to_html($content = NULL, $max = NULL)
 
 
 //Recursive function for parsing an entire outline structure into html format
-function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0)
+function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $expansionState = array(), $expand = 1, $expanded = FALSE, &$parents, &$extrahtml)
 {
-
+    if( in_array('tabs', $parents) ) {  loggit(3, "DEBUG: ".print_r($parents, TRUE));  }
     foreach ($x->children() as $child) {
         $text = (string)$child->attributes()->text;
         $name = (string)$child->attributes()->name;
@@ -2092,31 +2092,117 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0)
         $type = (string)$child->attributes()->type;
         $attr = (string)$child->attributes();
 
-        $classes = "outline $type";
+        //Set up class strings for different conditions
+        $classes = "outline";
+        if( !empty($type) && $type != "outline" ) {
+            $classes .= " $type";
+        }
 
+        //Push the current type onto the stack
+        if( $type == "tabs" || $type == "html" ) {
+            array_push($parents, $type);
+        }
+
+        //If no expansionState value matches the current visible node count then add a collapsed class
+        $exco = "";
+        if( !in_array($expand, $expansionState) ) {  $exco .= " collapsed";  }
+
+        //If this is an outline node, open a tag for it
         if( (string)$child->getName() == "outline" ) {
             if ($type == "link") {
-                $html .= "\n" . str_repeat('    ', $indent) . "<o class=\"$classes\"><a href=\"$link\" target=\"_blank\">" . (string)$child->attributes()->text . "</a>";
+                $nodetext = "<a href=\"$link\" target=\"_blank\">" . (string)$child->attributes()->text . "</a>";
             } else {
-                $html .= "\n" . str_repeat('    ', $indent) . "<o class=\"$classes\">" . (string)$child->attributes()->text . "";
+                $nodetext = (string)$child->attributes()->text;
+            }
+
+            //Check for aspects of the outline node that might need more classes added for styling
+            if( stripos($nodetext, "<a") !== FALSE ) {
+                $classes .= " wanchor";
+            }
+            if( stripos($nodetext, "<img") !== FALSE ) {
+                $classes .= " wimg";
+            }
+
+            //Set an expanded class on outline nodes that match the expansionState counter
+            $parent = end(array_values($parents));
+            if ( $type == "tabs" ) {
+                $html .= "\n" . str_repeat('    ', $indent+1) . "<ul class=\"nav nav-tabs\" id=\"myTab\">";
+                $extrahtml .= "<div class=\"tab-content\">\n";
+            } else
+            if ( $parent == "tabs" ) {
+                array_push($parents, 'tab');
+                $tabid = 'tab'.stripText((string)$child->attributes()->text);
+                $html .= "\n" . str_repeat('    ', $indent+1) . "<li><a href=\"#$tabid\" data-toggle=\"tab\">$nodetext</a></li>";
+                $extrahtml .= "<div class=\"tab-pane\" id=\"$tabid\">\n";
+            } else
+            if ( in_array('tab', $parents) ) {
+                if( isset($child->outline) ) {
+                    $expandible = "<li class=\"ouwedge$exco\">&nbsp;</li>";
+                } else {
+                    $expandible = "<li class=\"ou $classes\"></li>";
+                    $exco = "";
+                }
+                $extrahtml .= "\n" . str_repeat('    ', $indent+1) . "<ul class=\"$classes\">$expandible<li class=\"o $classes$exco\">$nodetext";
+            } else {
+                if( isset($child->outline) ) {
+                    $expandible = "<li class=\"ouwedge$exco\">&nbsp;</li>";
+                } else {
+                    $expandible = "<li class=\"ou $classes\"></li>";
+                    $exco = "";
+                }
+                if( in_array('tab', $parents) ) {
+                    $extrahtml .= "\n" . str_repeat('    ', $indent+1) . "<ul class=\"$classes\">$expandible<li class=\"o $classes$exco\">$nodetext";
+                } else {
+                    $html .= "\n" . str_repeat('    ', $indent+1) . "<ul class=\"$classes\">$expandible<li class=\"o $classes$exco\">$nodetext";
+                }
+
             }
         }
-        $line = buildHtmlFromOpmlRecursive($child, $html, $indent + 1, $line + 1);
+
+        //If this is a
+        $lb = $line + 1;
+        $ne = $expand;
+        $ex = FALSE;
+        if( in_array($expand, $expansionState) ) {  $ex = TRUE;  }
+        if( $expanded || $ex ) {  $ne = $expand + 1;  }
+
+        list($line, $expand) = buildHtmlFromOpmlRecursive($child, $html, $indent + 1, $line + 1, $expansionState, $ne, $ex, $parents, $extrahtml);
+
+
+        //If this is an outline node, close the open tag.  We take care to keep the html looking good, so don't add spaces
+        //to the end of single line node tags
+        $indention = $indent+1;
+        if( $lb == $line ) {  $indention = 0;  }
         if( (string)$child->getName() == "outline" ) {
-            if ($type == "link") {
-                $html .= str_repeat('    ', $indent) ."</o>\n";
+            if ($type == "tabs") {
+                $html .= str_repeat('    ', $indention) ."</ul>\n";
+                $extrahtml .= str_repeat('    ', $indention) ."</div>\n";
+            } else
+            if ($parent == "tabs") {
+                array_pop($parents);
+                $html .= str_repeat('    ', $indention) ."\n";
+                $extrahtml .= str_repeat('    ', $indention) ."</div>\n";
+            } else
+            if (in_array('tab', $parents)) {
+                $extrahtml .= str_repeat('    ', $indention) ."</li></ul>\n";
             } else {
-                $html .= str_repeat('    ', $indent) ."</o>\n";
+                $html .= str_repeat('    ', $indention) ."</li></ul>\n";
             }
+        }
+
+        if( $indent == 0 && $ex == FALSE ) {  $expand++;  }
+        if( $type == "tabs" || $type == "html" ) {
+            array_pop($parents);
         }
     }
 
-    return ($line);
+
+    return(array($line, $expand));
 }
 
 
 //Convert an opml document to html with processing
-function process_opml_to_html($content = NULL, $title = "")
+function process_opml_to_html($content = NULL, $title = "", $username = NULL)
 {
     //Check params
     if ($content == NULL) {
@@ -2127,10 +2213,21 @@ function process_opml_to_html($content = NULL, $title = "")
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
+    //Get byline if a username was given
+    if( !empty($username) ) {
+        $byline = '<div class="obyline">by '.$username.'</div>';
+    }
+
     //Parse it
     libxml_use_internal_errors(true);
     $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
     libxml_clear_errors();
+
+    //Get an author name if one exists
+    $authorname = (string)$x->head->ownerName;
+    if( !empty($authorname) ) {
+        $byline = '<div class="obyline">by '.$authorname.'</div>';
+    }
 
     //Roll through all of the outline nodes
     $nodes = $x->xpath('//outline');
@@ -2139,27 +2236,65 @@ function process_opml_to_html($content = NULL, $title = "")
         return (-2);
     }
 
+    //Get the expansion state
+    $expansionState = explode(',', (string)$x->head->expansionState);
+    $serialES = (string)$x->head->expansionState;
+    $parents = array();
 
-    buildHtmlFromOpmlRecursive($x, $body);
+    buildHtmlFromOpmlRecursive($x->body, $body, 0, 1, $expansionState, NULL, NULL, $parents, $extrabody);
     $html = <<<OPML2HTML1
 <!DOCTYPE html>
 <html>
   <head>
     <title>$title</title>
-    <link href='http://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css' />
+    <link href='//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css' rel='stylesheet' type='text/css' />
     <style>
     body { font-family: 'Noto Sans', serif; width: 900px; margin:40px auto 20px; }
-    o img.right256 { float:right; max-width: 256px; max-height: 256px; }
-    o { display:block; margin:20px auto 20px; }
-    o.title { font-weight:bold; font-size: 28px; line-height: 30px; margin-bottom: 30px; }
-    o.outline { font-size: 18px; line-height: 22px; }
-    o > o { margin-left: 20px; }
+    div.otitle { font-weight:bold; font-size: 28px; line-height: 30px; margin-bottom: 20px; }
+    div.obyline { font-size: 14px; margin-left:3px; margin-bottom: 40px; }
+
+    ul { list-style-type:none; list-style-position:inside; padding-left:0px; }
+    li { list-style-type:none; }
+
+    li.o { display:inline-block; float:left; font-size: 18px; line-height: 24px; max-width:95%; }
+
+    li.ouwedge { background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QwJFjoSFDd3KQAAAJhJREFUKM+9kCESgzAQRV+DquQCBVNdPBfocAqOwDV6DG4AJromnuqaMj1AwCExm5l0GiYovtq/+//+2YWjcAJIy+oDZDv0ozU6V0LqnSE1gAKwRj+BPmLoRYfymg0wbxhmmQOQuGL5vqfz5boA94DpYY3ufh7hIy2rAbh5rZc1uvA1KrC1ifB/kxzbCm3d8bEkt30MpRyLFdXdKFaW+5X5AAAAAElFTkSuQmCC) 0px 7px no-repeat; display:inline-block; float:left; clear:both; padding-right:13px; }
+    li.ouwedge.collapsed { background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QwJFjkvZ3Jo+wAAAIdJREFUKM9jYCAXCFp7PRC09nIgVj0TlJZnYGDYL2jttUHQ2kuBWE0w4M/AwHBB0NqrAZ8mRqjz/mORu8jAwFDw/ui2A6RogoGFUM0fcDkPG4hnYGC4gM9PuGwyQBZgwaMYp5+wafrIwMDQ8P7otgm4TEPXtBFq+gN87oVpesjAwJCAzSlUAwDgjSci5nmpKgAAAABJRU5ErkJggg==) 0px 6px no-repeat;  }
+
+    li.ou { display:inline-block; float:left; clear:both; padding:0px; margin:0px; }
+    li.o li.ouwedge { margin-left: 20px;  }
+    li.ou + li.o { margin:8px; padding:0px; }
+
+    ul.wimg { clear:none; }
+    ul.wimg li.ou { clear:none; float:inherit; }
+
+    .collapsed li  { display:none; }
     </style>
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('li.ouwedge').click(function() {
+            $(this).toggleClass('collapsed');
+            $(this).next().toggleClass('collapsed');
+            if( $(this).next().hasClass('collapsed') ) {
+                $(this).next().find('li.o').addClass('collapsed');
+                $(this).next().find('li.ouwedge').addClass('collapsed');
+            }
+            return false;
+        });
+        $('#myTab a:first').tab('show');
+    });
+    </script>
+    <meta name="opmlExpansionState" content="$serialES" />
   </head>
   <body>
 
-    <o class="title">$title</o>
+    <div class="otitle">$title</div>
+    $byline
     $body
+    $extrabody
   </body>
 </html>
 OPML2HTML1;

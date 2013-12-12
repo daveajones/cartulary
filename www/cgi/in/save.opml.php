@@ -65,7 +65,7 @@ if(!$s3res) {
 }
 
 //Put the html file in S3
-$htmldata = process_opml_to_html($opml, $title);
+$htmldata = process_opml_to_html($opml, $title, get_user_name_from_uid($uid));
 $htmlfilename = str_replace('.opml', '.html', $filename);
 $s3res = putInS3($htmldata, $htmlfilename, $s3info['bucket']."/exp", $s3info['key'], $s3info['secret'], "text/html");
 if(!$s3res) {

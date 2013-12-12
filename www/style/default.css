@@ -800,16 +800,7 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     /* border-bottom:solid #dddddd 1px; */
     opacity:1.0;
 }
-/*
-.pageContentWrapper.Editor .divOutlineTitle.dim {
-    -webkit-transition: all 0.7s ease;
-    -moz-transition: all 0.7s ease;
-    -o-transition: all 0.7s ease;
-    transition: all 0.7s ease;
-    opacity:0.1;
-}
-*/
-    .pageContentWrapper.Editor #divEditOutline li.concord-node {
+.pageContentWrapper.Editor #divEditOutline li.concord-node {
         margin-bottom:10px;
 
     }

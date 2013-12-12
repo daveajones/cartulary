@@ -3,6 +3,8 @@ $(document).ready(function () {
     var outliner = $('#outliner');
     var chkToggleRender = $('.rendertoggle');
     var menubar = $('#menubarEditor');
+    var elTitle = $('.divOutlineTitle input.title');
+
 
     //New button
     menubar.find('.menuNew').click(function() {
@@ -12,15 +14,18 @@ $(document).ready(function () {
         lasttitle = "";
         filename = '';
         bufilename = title.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
-        $('.divOutlineTitle input.title').val('').focus();
+        elTitle.val('').focus();
         opXmlToOutline(initialOpmltext);
         updateOutlineInfo(url, "");
-    })
+
+        //Set root node type menu text
+        getRootNodeType();
+    });
 
     //Save button
     menubar.find('.menuSave').click(function () {
         //Grab the current title
-        title = $('.divOutlineTitle input.title').val();
+        title = elTitle.val();
 
         //Get a file name
         if (filename == "") {
@@ -81,6 +86,15 @@ $(document).ready(function () {
     });
 
 
+    //Type dropdown button
+    menubar.find('.menuType .menuTypeSelection').click(function() {
+        menubar.find('.menuType > a.dropdown-toggle').html('Type (' + $(this).html() + ') <b class="caret"></b>');
+        opFirstSummit();
+        opSetOneAtt('type', $(this).attr('data-type'));
+        return true;
+    });
+
+
     //Toggle render mode
     chkToggleRender.click(function () {
         if ( $(this).parent().hasClass('active') ) {
@@ -93,12 +107,19 @@ $(document).ready(function () {
     });
 
 
+    //Toolbox buttons
+    menubar.find('.menuAddLink').click( function() {
+       editorToolAddLink();
+       return false;
+    });
+
+
     //Handle opacity on focus change
-    $('.divOutlineTitle input.title').on("focus", function() {
+    elTitle.on("focus", function() {
         clearTimeout(hoverTimer);
         $('.divOutlineTitle').removeClass('dim');
     });
-    $('.divOutlineTitle input.title').on("blur", function() {
+    elTitle.on("blur", function() {
         clearTimeout(hoverTimer);
         hoverTimer = setTimeout(function() {
             $('.divOutlineTitle').addClass('dim');
@@ -142,6 +163,8 @@ $(document).ready(function () {
         showMessage('Parse error. Please check the url.', false, 5);
     }
 
+    //Set up the root node type correctly
+    getRootNodeType();
 
     //Dim the title area when not in use
     hoverTimer = setTimeout(function() {
@@ -151,16 +174,18 @@ $(document).ready(function () {
 
     //Set a title
     if( title == "Untitled") {
-        $('.divOutlineTitle input.title').val('');
+        elTitle.val('');
     } else {
-        $('.divOutlineTitle input.title').val(title);
+        elTitle.val(title);
     }
 
 
     //Hot keys
-    key('ctrl+l', function() {
+    key('ctrl+y', function() {
         editorToolAddLink();
     })
+
+
 });
 
 
@@ -176,13 +201,27 @@ function editorToolAddLink() {
 }
 
 
+//Get root node type and set menu text
+function getRootNodeType() {
+    var rootnodetype;
+
+    opFirstSummit();
+    rootnodetype = opGetOneAtt('type');
+    if( typeof(rootnodetype) == "undefined" )  {  rootnodetype = "outline";  }
+    $('#menubarEditor').find('.menuType > a.dropdown-toggle').html('Type (' + rootnodetype + ') <b class="caret"></b>');
+    return true;
+}
+
+
 //Display outline info
 function updateOutlineInfo(url, html) {
-    $('#menubarEditor .outlineinfo').html('');
+    var elOutlineinfo = $('#menubarEditor').find('.outlineinfo');
+
+    elOutlineinfo.html('');
     if (url != "") {
-        $('#menubarEditor .outlineinfo').html('<li><a target="_blank" href="' + url + '">OPML</a></li>');
+        elOutlineinfo.html('<li><a target="_blank" href="' + url + '">OPML</a></li>');
         if( html != "") {
-            $('#menubarEditor .outlineinfo').append('<li><a target="_blank" href="' + html + '">HTML</a></li>');
+            elOutlineinfo.append('<li><a target="_blank" href="' + html + '">HTML</a></li>');
         }
     }
     return true;

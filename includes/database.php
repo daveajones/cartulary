@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 27;
+$cg_database_version = 28;
 $cg_database_updates = array();
 
 
@@ -389,6 +389,15 @@ CGDB0088;
 $cg_database_updates[26][] = <<<CGDB0089
  INSERT INTO `dbversion` ( `version` ) VALUES ( '27' )
 CGDB0089;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 27 to 28 -----------------------------------------------------------------------------------------------
+$cg_database_updates[27][] = <<<CGDB0090
+  ALTER TABLE `prefs` ADD `disqus_shortname` VARCHAR( 64 ) NOT NULL
+CGDB0090;
+$cg_database_updates[27][] = <<<CGDB0091
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '28' )
+CGDB0091;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

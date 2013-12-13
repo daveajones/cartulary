@@ -2562,11 +2562,13 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                   pubrivertitle=?,
                   rivercolumns=?,
                   usetotp=?,
-                  hidesublist=?
+                  hidesublist=?,
+                  analyticscode=?,
+                  disqus_shortname=?
            WHERE uid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssddds",
+    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsss",
         $prefs['publicdefault'],
         $prefs['publicrss'],
         $prefs['publicopml'],
@@ -2617,6 +2619,8 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
         $prefs['rivercolumns'],
         $prefs['usetotp'],
         $prefs['hidesublist'],
+        $prefs['analyticscode'],
+        $prefs['disqus_shortname'],
         $uid
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);

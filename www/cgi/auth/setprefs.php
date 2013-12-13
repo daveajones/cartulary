@@ -64,6 +64,8 @@ if ( isset($_POST['pubrivertitle']) ) { $pubrivertitle = $_POST['pubrivertitle']
 if ( isset($_POST['rivercolumns']) ) { $rivercolumns = $_POST['rivercolumns']; } else { $rivercolumns = ""; };
 if ( isset($_POST['usetotp']) ) { $usetotp = 1; } else { $usetotp = 0; };
 if ( isset($_POST['hidesublist']) ) { $hidesublist = 1; } else { $hidesublist = 0; };
+if ( isset($_POST['analyticscode']) ) { $analyticscode = $_POST['analyticscode']; } else { $analyticscode = ""; };
+if ( isset($_POST['disqus_shortname']) ) { $disqus_shortname = $_POST['disqus_shortname']; } else { $disqus_shortname = ""; };
 $jsondata = array();
 $jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
@@ -674,7 +676,28 @@ if( ($hidesublist < 0) || ($hidesublist > 1) ) {
     exit(1);
 }
 $prefs['hidesublist'] = $hidesublist;
-loggit(3, "HIDESUBLIST: [$hidesublist]");
+
+$jsondata['prefname'] = "analyticscode";
+if( strlen($analyticscode) > 760 ) {
+    //Log it
+    loggit(2,"The value for analytics code pref was too long: [$analyticscode]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max analytics code length is 760 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['analyticscode'] = $analyticscode;
+
+$jsondata['prefname'] = "disqus_shortname";
+if( strlen($disqus_shortname) > 64 ) {
+    //Log it
+    loggit(2,"The value for disqus shortname was too long: [$disqus_shortname]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max disqus shortname length is 64 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['disqus_shortname'] = $disqus_shortname;
 //--------------------------------------------------------
 //--------------------------------------------------------
 

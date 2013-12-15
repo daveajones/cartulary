@@ -194,7 +194,7 @@ function _addActiveFeed(feedId, feedTitle, feedUrl, urlForIcon, type, position) 
 			feedImg = urlForIcon;
 			imgClass = 'avatar48';
 		} else {
-			feedImg = _getFavicon(urlForIcon);
+			//feedImg = _getFavicon(urlForIcon);
 			imgClass = 'favicon';
 		}
 		if( position == 'top' ) {

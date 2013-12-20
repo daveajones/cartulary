@@ -58,6 +58,7 @@ if( !empty($opmldata) ) {
     //Globals
     var mode = '<?echo $mode?>';
     var url = '<?echo $url?>';
+    var htmlurl = "";
     var title = "";
     var lasttitle = "";
     var filename = '<?echo $filename?>';

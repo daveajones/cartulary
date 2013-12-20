@@ -2,6 +2,8 @@ $(document).ready(function () {
     var hoverTimer = null;
     var outliner = $('#outliner');
     var chkToggleRender = $('.rendertoggle');
+    var chkDisqusInclude = $('.menuDisqusToggle');
+    var includeDisqus = false;
     var menubar = $('#menubarEditor');
     var elTitle = $('.divOutlineTitle input.title');
 
@@ -10,6 +12,7 @@ $(document).ready(function () {
     menubar.find('.menuNew').click(function() {
         mode = "";
         url = "";
+        htmlurl = "";
         title = "";
         lasttitle = "";
         filename = '';
@@ -51,6 +54,7 @@ $(document).ready(function () {
                 "opml": opml,
                 "mode" : mode,
                 "filename": filename,
+                "disqus" : includeDisqus,
                 "title": title
             },
             dataType: "json",
@@ -62,6 +66,7 @@ $(document).ready(function () {
             success: function (data) {
                 //Show returned info and re-enable the save button
                 url = data.url;
+                htmlurl = data.html;
                 updateOutlineInfo(url, data.html);
 
                 showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
@@ -73,6 +78,19 @@ $(document).ready(function () {
         return false;
     });
 
+    //Publish button
+    menubar.find('.menuPublish').click(function () {
+       if( isEmpty(url) ) {
+           showMessage("You must save the document first.", false, 3);
+           return(false);
+       }
+       $('#divEditOutline .ouitem').remove();
+       $('#divEditOutline').append('<div class="ouitem hide"><div class="header"><a class="articlelink" href="' + htmlurl + '">' + title + '</a></div></div>');
+       $('#divEditOutline .ouitem').append('<div class="footer"><span class="source"><a class="articlelink" href=""></a></span></div>');
+       $('#divEditOutline .ouitem .footer').append('<span class="origin">' + url + '</span>');
+       newMicroblogPostWindow( '#divEditOutline .ouitem' );
+       return(false);
+    });
 
     //Open button
     menubar.find('.menuOpen').click(function() {
@@ -85,15 +103,12 @@ $(document).ready(function () {
         return false;
     });
 
-
     //Type dropdown button
     menubar.find('.menuType .menuTypeSelection').click(function() {
         menubar.find('.menuType > a.dropdown-toggle').html('Type (' + $(this).html() + ') <b class="caret"></b>');
-        opFirstSummit();
         opSetOneAtt('type', $(this).attr('data-type'));
         return true;
     });
-
 
     //Toggle render mode
     chkToggleRender.click(function () {
@@ -106,13 +121,22 @@ $(document).ready(function () {
         }
     });
 
+    //Toggle disqus comments in html
+    chkDisqusInclude.click(function () {
+        if ( $(this).parent().hasClass('active') ) {
+            $(this).parent().removeClass('active');
+            includeDisqus = false;
+        } else {
+            $(this).parent().addClass('active');
+            includeDisqus = true;
+        }
+    });
 
     //Toolbox buttons
     menubar.find('.menuAddLink').click( function() {
        editorToolAddLink();
        return false;
     });
-
 
     //Handle opacity on focus change
     elTitle.on("focus", function() {
@@ -125,7 +149,6 @@ $(document).ready(function () {
             $('.divOutlineTitle').addClass('dim');
         }, 3000);
     });
-
 
     //Full opacity on title hover
     $('.divOutlineTitle').hover(
@@ -144,6 +167,9 @@ $(document).ready(function () {
 
     //Load up the outline
     outliner.concord({
+        "callbacks": {
+            "opCursorMoved": opCursorMovedCallback
+        },
         "prefs": {
             "outlineFont": "Calibri",
             "outlineFontSize": 18,
@@ -207,7 +233,7 @@ function getRootNodeType() {
 
     opFirstSummit();
     rootnodetype = opGetOneAtt('type');
-    if( typeof(rootnodetype) == "undefined" )  {  rootnodetype = "outline";  }
+    if( typeof(rootnodetype) == "undefined" )  {  rootnodetype = "not set";  }
     $('#menubarEditor').find('.menuType > a.dropdown-toggle').html('Type (' + rootnodetype + ') <b class="caret"></b>');
     return true;
 }
@@ -225,4 +251,15 @@ function updateOutlineInfo(url, html) {
         }
     }
     return true;
+}
+
+
+//When a new node is clicked on, this callback fires
+function opCursorMovedCallback (op) {
+    var nodetype = op.attributes.getOne('type');
+
+    if( typeof(nodetype) == "undefined" )  {  nodetype = "not set";  }
+    $('#menubarEditor').find('.menuType > a.dropdown-toggle').html('Type (' + nodetype + ') <b class="caret"></b>');
+    return true;
+
 }

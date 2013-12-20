@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 28;
+$cg_database_version = 29;
 $cg_database_updates = array();
 
 
@@ -398,6 +398,21 @@ CGDB0090;
 $cg_database_updates[27][] = <<<CGDB0091
  INSERT INTO `dbversion` ( `version` ) VALUES ( '28' )
 CGDB0091;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 28 to 29 -------------------------------------------------------------------------------------------------
+$cg_database_updates[28][] = <<<CGDB0092
+ CREATE TABLE IF NOT EXISTS `recentfiles` (
+  `id` bigint(20) NOT NULL DEFAULT '0' COMMENT 'Standard id',
+  `userid` varchar(64) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'User file belongs to.',
+  `url` varchar(767) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Url the file is stored at.',
+  `time` int(11) NOT NULL DEFAULT '0' COMMENT 'Time of last save.',
+  PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Recently edited files.'
+CGDB0092;
+$cg_database_updates[28][] = <<<CGDB0093
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '29' )
+CGDB0093;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

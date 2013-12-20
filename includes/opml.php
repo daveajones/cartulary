@@ -2089,7 +2089,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
         $text = (string)$child->attributes()->text;
         $name = (string)$child->attributes()->name;
         $link = (string)$child->attributes()->url;
-        $type = (string)$child->attributes()->type;
+        $type = strtolower((string)$child->attributes()->type);
         $attr = (string)$child->attributes();
 
         //Set up class strings for different conditions
@@ -2099,7 +2099,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
         }
 
         //Push the current type onto the stack
-        if( $type == "tabs" || $type == "html" ) {
+        if( $type == "tabs" || $type == "html" || $type == "document" ) {
             array_push($parents, $type);
         }
 
@@ -2202,7 +2202,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
 
 
 //Convert an opml document to html with processing
-function process_opml_to_html($content = NULL, $title = "", $username = NULL)
+function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisqus = FALSE)
 {
     //Check params
     if ($content == NULL) {
@@ -2213,9 +2213,17 @@ function process_opml_to_html($content = NULL, $title = "", $username = NULL)
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
+    $prefs = get_user_prefs($uid);
+    $analyticscode = $prefs['analyticscode'];
+    $disqus = "";
+    if( $dodisqus && !empty($prefs['disqus_shortname']) ) {
+        $disqus = $cg_disqus_embed;
+        $disqus = str_replace('[SHORTNAME]', $prefs['disqus_shortname'], $disqus);
+    }
+
     //Get byline if a username was given
-    if( !empty($username) ) {
-        $byline = '<div class="obyline">by '.$username.'</div>';
+    if( !empty($uid) ) {
+        $byline = '<div class="obyline">by '.get_user_name_from_uid($uid).'</div>';
     }
 
     //Parse it
@@ -2247,30 +2255,46 @@ function process_opml_to_html($content = NULL, $title = "", $username = NULL)
 <html>
   <head>
     <title>$title</title>
+    <meta charset="UTF-8">
     <link href='http://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css' />
     <link href='//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css' rel='stylesheet' type='text/css' />
     <style>
-    body { font-family: 'Noto Sans', serif; width: 900px; margin:40px auto 20px; }
-    div.otitle { font-weight:bold; font-size: 28px; line-height: 30px; margin-bottom: 20px; }
-    div.obyline { font-size: 14px; margin-left:3px; margin-bottom: 40px; }
+        body { font-family: 'Noto Sans', serif; width: 900px; margin:40px auto 20px; }
+        div.otitle { font-weight:bold; font-size: 28px; line-height: 30px; margin-bottom: 20px; }
+        div.obyline { font-size: 14px; margin-left:3px; margin-bottom: 40px; }
 
-    ul { list-style-type:none; list-style-position:inside; padding-left:0px; }
-    li { list-style-type:none; }
+        ul { list-style-type:none; list-style-position:inside; padding:0px; margin:0px; }
+        li { list-style-type:none; padding:0px; margin:0px; }
 
-    li.o { display:inline-block; float:left; font-size: 18px; line-height: 24px; max-width:95%; }
+        li.o { display:inline-block; float:left; font-size: 18px; line-height: 24px; max-width:95%; }
 
-    li.ouwedge { background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QwJFjoSFDd3KQAAAJhJREFUKM+9kCESgzAQRV+DquQCBVNdPBfocAqOwDV6DG4AJromnuqaMj1AwCExm5l0GiYovtq/+//+2YWjcAJIy+oDZDv0ozU6V0LqnSE1gAKwRj+BPmLoRYfymg0wbxhmmQOQuGL5vqfz5boA94DpYY3ufh7hIy2rAbh5rZc1uvA1KrC1ifB/kxzbCm3d8bEkt30MpRyLFdXdKFaW+5X5AAAAAElFTkSuQmCC) 0px 7px no-repeat; display:inline-block; float:left; clear:both; padding-right:13px; }
-    li.ouwedge.collapsed { background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QwJFjkvZ3Jo+wAAAIdJREFUKM9jYCAXCFp7PRC09nIgVj0TlJZnYGDYL2jttUHQ2kuBWE0w4M/AwHBB0NqrAZ8mRqjz/mORu8jAwFDw/ui2A6RogoGFUM0fcDkPG4hnYGC4gM9PuGwyQBZgwaMYp5+wafrIwMDQ8P7otgm4TEPXtBFq+gN87oVpesjAwJCAzSlUAwDgjSci5nmpKgAAAABJRU5ErkJggg==) 0px 6px no-repeat;  }
+        li.ouwedge { background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QwJFjoSFDd3KQAAAJhJREFUKM+9kCESgzAQRV+DquQCBVNdPBfocAqOwDV6DG4AJromnuqaMj1AwCExm5l0GiYovtq/+//+2YWjcAJIy+oDZDv0ozU6V0LqnSE1gAKwRj+BPmLoRYfymg0wbxhmmQOQuGL5vqfz5boA94DpYY3ufh7hIy2rAbh5rZc1uvA1KrC1ifB/kxzbCm3d8bEkt30MpRyLFdXdKFaW+5X5AAAAAElFTkSuQmCC) 0px 7px no-repeat; display:inline-block; float:left; clear:both; padding-right:13px; }
+        li.ouwedge.collapsed { background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QwJFjkvZ3Jo+wAAAIdJREFUKM9jYCAXCFp7PRC09nIgVj0TlJZnYGDYL2jttUHQ2kuBWE0w4M/AwHBB0NqrAZ8mRqjz/mORu8jAwFDw/ui2A6RogoGFUM0fcDkPG4hnYGC4gM9PuGwyQBZgwaMYp5+wafrIwMDQ8P7otgm4TEPXtBFq+gN87oVpesjAwJCAzSlUAwDgjSci5nmpKgAAAABJRU5ErkJggg==) 0px 6px no-repeat;  }
 
-    li.ou { display:inline-block; float:left; clear:both; padding:0px; margin:0px; }
-    li.o li.ouwedge { margin-left: 20px;  }
-    li.ou + li.o { margin:8px; padding:0px; }
+        li.ou { display:inline-block; float:left; clear:both; padding:0px; margin:0px; }
+        li.o li.ouwedge { margin-left: 20px;  }
+        li.ou + li.o { margin:8px; padding:0px; }
 
-    ul.wimg { clear:none; }
-    ul.wimg li.ou { clear:none; float:inherit; }
+        ul.wimg { clear:none; }
+        ul.wimg li.ou { clear:none; float:inherit; }
 
-    .collapsed li  { display:none; }
+        .collapsed li { display:none; }
+        div.ocomments iframe {  margin-top:80px;  }
     </style>
+  </head>
+
+  <body>
+    <div class="otitle">$title</div>
+    $byline
+    <div class="obody">
+        $body
+        $extrabody
+    </div>
+
+    <div class="ocomments">
+        <div id="disqus_thread"></div>
+    </div>
+
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
     <script>
@@ -2287,42 +2311,12 @@ function process_opml_to_html($content = NULL, $title = "", $username = NULL)
         $('#myTab a:first').tab('show');
     });
     </script>
-    <meta name="opmlExpansionState" content="$serialES" />
-  </head>
-  <body>
-
-    <div class="otitle">$title</div>
-    $byline
-    $body
-    $extrabody
+    $disqus
+    $analyticscode
   </body>
 </html>
 OPML2HTML1;
 
-    //debug
-    //loggit(3, "OBJECT: ".print_r($nodes, TRUE) );
-
-    /*
-    //Run through each node and convert it to an html element
-    $count = 0;
-    $html = "<!DOCTYPE html><html><head><style>body { width: 900px; margin:10px auto 10px; }div { margin-bottom:10px; }</style><title>$title</title></head><body><h3>$title</h3>";
-    foreach ($nodes as $entry) {
-        loggit(3, "DEBUG: ".print_r($entry, TRUE));
-
-        $text = (string)$entry->attributes()->text;
-        $name = (string)$entry->attributes()->name;
-        $link = (string)$entry->attributes()->url;
-        $type = (string)$entry->attributes()->type;
-
-        $html .= "<div>$text</div>\n";
-
-        $count++;
-    }
-    $html .= "</body></html>";
-    */
-
-    //Log and leave
-    //loggit(3, "Got [$count] items from the opml document.");
     return ($html);
 }
 

@@ -121,7 +121,7 @@ function _isImage(url, type) {
     if ( url.indexOf('.jpg')   != -1 ) {  return true;  }
     if ( url.indexOf('.jpeg')   != -1 ) {  return true;  }
     if ( url.indexOf('.png')   != -1 ) {  return true;  }
-    //if ( url.indexOf('.gif')   != -1 ) {  return true;  }
+    if ( url.indexOf('.gif')   != -1 ) {  return true;  }
 
 	return false;
 }
@@ -184,17 +184,15 @@ function _clearActiveFeeds() {
 
 function _addActiveFeed(feedId, feedTitle, feedUrl, urlForIcon, type, position) {
 	if( platform == "mobile" ) {  return false;  }
-
     var activeFeedsObj = $('#divActiveFeeds');
-    var feedIdObj = activeFeedsObj.find('ul.feedlist li.' + feedId);
 
-	if( feedIdObj.length < 1  ) {
+	if( activeFeedsObj.find('ul.feedlist li.' + feedId).length < 1  ) {
 		var feedImg = '/images/blank.gif';
 		if( type == 'person' ) {
 			feedImg = urlForIcon;
 			imgClass = 'avatar48';
 		} else {
-			//feedImg = _getFavicon(urlForIcon);
+			feedImg = _getFavicon(urlForIcon);
 			imgClass = 'favicon';
 		}
 		if( position == 'top' ) {
@@ -202,8 +200,8 @@ function _addActiveFeed(feedId, feedTitle, feedUrl, urlForIcon, type, position) 
 		} else {
 			activeFeedsObj.find('ul.feedlist').append('<li class="' + type + ' ' + feedId + '">' + feedTitle + ' <img class="'+ imgClass +'" src="' + feedImg + '" /></li>');
 		}
-		feedIdObj.unbind('click');
-		feedIdObj.click(function () {
+        activeFeedsObj.find('ul.feedlist li.' + feedId).unbind('click');
+        activeFeedsObj.find('ul.feedlist li.' + feedId).click(function () {
 			_showOnlyItems(feedId, feedTitle);
 			return false;
 		});

@@ -174,6 +174,7 @@ li.menubar-search-container { display:none; }
   clear:both;
   margin:20px auto 0;
   max-width: 100%;
+  width:100%;
 }
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .encpicture2 {
   display:inline-block;
@@ -790,6 +791,10 @@ div.searchbar p.result-msg {
 
 /* --------------------------------------------------- */
 /* ----- Editor Page ----- */
+.submenuEditor {
+    z-index: 2;
+    margin-top:44px;
+}
 body#bodyEditOutline {
     background:white;
 }
@@ -803,19 +808,53 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
 .pageContentWrapper.Editor #divEditOutline li.concord-node {
         margin-bottom:10px;
 
-    }
+}
 .pageContentWrapper.Editor #divEditOutline {
-    background:white;
-    position: relative;
-    margin-top: 20px;
-    padding-bottom: 10px;
-    width:900px;
-    margin-left:auto;
-    margin-right:auto;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;
-    border-radius: 0px;
-    min-height: 400px;
+     background:white;
+     position: relative;
+     margin-top: 20px;
+     padding-bottom: 10px;
+     width:900px;
+     margin-left:auto;
+     margin-right:auto;
+     -webkit-border-radius: 0px;
+     -moz-border-radius: 0px;
+     border-radius: 0px;
+     min-height: 400px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen {
+    background: #eee;
+    color:#333;
+    font-size:160%;
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:0;
+    overflow:hidden;
+    z-index:1;
+    transition: height 500ms;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.165);
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open {
+    height:40%;
+    padding-top:120px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open .recentfilesopen {
+    list-style-type: none;
+    margin-left:60px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open .recentfilesopen li {
+    margin-bottom:10px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open .sheetclose {
+    margin-right:30px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open div.openbyurl {
+    margin-left:20px;
+    position:absolute;
+    bottom:0;
+    margin-bottom:20px;
 }
 .pageContentWrapper.Editor #divEditOutline div.outlineinfo {
     text-align:right;
@@ -826,7 +865,7 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     padding-left:10px;
 }
 .pageContentWrapper.Editor #divEditOutline .title {
-    box-shadow: inset 0px 3px 1px -1px white;
+    box-shadow: inset 0 3px 1px -1px white;
     margin-top:18px;
     font-weight:bold;
     font-size:20px;

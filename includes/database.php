@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 29;
+$cg_database_version = 31;
 $cg_database_updates = array();
 
 
@@ -413,6 +413,24 @@ CGDB0092;
 $cg_database_updates[28][] = <<<CGDB0093
  INSERT INTO `dbversion` ( `version` ) VALUES ( '29' )
 CGDB0093;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 29 to 30 -----------------------------------------------------------------------------------------------
+$cg_database_updates[29][] = <<<CGDB0094
+  ALTER TABLE  `recentfiles` ADD  `title` VARCHAR( 512 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT  'Title of the file.' AFTER  `url`
+CGDB0094;
+$cg_database_updates[29][] = <<<CGDB0095
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '30' )
+CGDB0095;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 30 to 31 -----------------------------------------------------------------------------------------------
+$cg_database_updates[30][] = <<<CGDB0096
+  ALTER TABLE `recentfiles` ADD UNIQUE ( `url` )
+CGDB0096;
+$cg_database_updates[30][] = <<<CGDB0097
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '31' )
+CGDB0097;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

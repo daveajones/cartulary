@@ -87,6 +87,9 @@ if(!$s3res) {
     loggit(1, "Wrote html to S3 at url: [$s3html].");
 }
 
+//Update recent file table
+update_recent_file($uid, $s3url, $title);
+
 //Log it
 loggit(3,"Saved: [$filename] to S3 for user: [$uid]. ");
 

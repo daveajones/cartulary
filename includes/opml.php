@@ -2280,6 +2280,7 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
 
         .collapsed li { display:none; }
         div.ocomments iframe {  margin-top:80px;  }
+        .tab-content {  min-height:300px;  }
     </style>
   </head>
 
@@ -2321,31 +2322,99 @@ OPML2HTML1;
 }
 
 
-//Retrieve a list of the social outlines for all the users in the database
-function get_social_outline_directory($query = NULL, $max = NULL)
+//Return a list of files recently edited by this user in the editor
+function get_recent_files($uid = NULL, $max = NULL)
 {
-    //Includes
-    include get_cfg_var("cartulary_conf") . '/includes/env.php';
-    require_once "$confroot/$includes/auth.php";
-
-    //Get a list of all matching local users
-    $users = search_users($query, $max);
-
-    //Loop through and get the url for each social outline, but only if the user
-    //has not marked themselves as private
-    $sol = array();
-    if (!empty($users)) {
-        foreach ($users as $user) {
-            $prefs = get_user_prefs($user['id']);
-            if ($prefs['hideme'] != 1 && $user['email'] != "cartulary@localhost") {
-                $sol[] = array(
-                    'name' => $user['name'],
-                    'url' => $user['sopmlurl'],
-                    'avatarurl' => $user['avatarurl']
-                );
-            }
-        }
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
     }
 
-    return ($sol);
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT title, url, time FROM $table_recentfiles WHERE userid=?";
+
+    $sqltxt .= " ORDER BY time DESC";
+
+    if (!empty($max) && is_numeric($max)) {
+        $sqltxt .= " LIMIT $max";
+    } else {
+        $sqltxt .= " LIMIT $default_max_list";
+    }
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No files returned for: [$uid] with the given criteria.");
+        return (array());
+    }
+
+    $sql->bind_result($ftitle, $furl, $ftime) or loggit(2, "MySql error: " . $dbh->error);
+
+    $files = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $files[$count] = array('title' => $ftitle,
+            'url' => $furl,
+            'time' => $ftime
+        );
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning: [$count] files for user: [$uid]");
+    return ($files);
+}
+
+
+//Update a file into the recent files table
+function update_recent_file($uid = NULL, $url = NULL, $title = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if (empty($url)) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+    if (empty($title)) {
+        $title = "Edited at - ".time();
+        loggit(1, "No title for file, so generating one: [$title]");
+    }
+
+    //Timestamp
+    $time = time();
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Database call
+    $stmt = "INSERT INTO $table_recentfiles (userid, url, title, time) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE title=?, time=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sssdsd", $uid, $url, $title, $time, $title, $time) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "User: [$uid] edited a file: [$url] at: [$title].");
+    return (TRUE);
 }

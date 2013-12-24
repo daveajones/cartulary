@@ -1,6 +1,7 @@
 $(document).ready(function () {
     var hoverTimer = null;
     var outliner = $('#outliner');
+    var sheetopen = $('#divEditSheetOpen');
     var chkToggleRender = $('.rendertoggle');
     var chkDisqusInclude = $('.menuDisqusToggle');
     var includeDisqus = false;
@@ -10,19 +11,7 @@ $(document).ready(function () {
 
     //New button
     menubar.find('.menuNew').click(function() {
-        mode = "";
-        url = "";
-        htmlurl = "";
-        title = "";
-        lasttitle = "";
-        filename = '';
-        bufilename = title.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
-        elTitle.val('').focus();
-        opXmlToOutline(initialOpmltext);
-        updateOutlineInfo(url, "");
-
-        //Set root node type menu text
-        getRootNodeType();
+        window.location = "/editor";
     });
 
     //Save button
@@ -60,8 +49,8 @@ $(document).ready(function () {
             dataType: "json",
             beforeSend: function () {
                 //Disable the save button and show a spinner
-                $('#btnOpmlSave').attr('disabled', true);
-                $('#btnOpmlSave').html('<i class="icon-spinner"></i>');
+                menubar.find('.menuSave').attr('disabled', true);
+                menubar.find('.menuSave').html('<i class="icon-spinner"></i> Saving...');
             },
             success: function (data) {
                 //Show returned info and re-enable the save button
@@ -70,8 +59,8 @@ $(document).ready(function () {
                 updateOutlineInfo(url, data.html);
 
                 showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
-                $('#btnOpmlSave').html('Save');
-                $('#btnOpmlSave').attr('disabled', false);
+                menubar.find('.menuSave').html('Save');
+                menubar.find('.menuSave').attr('disabled', false);
             }
         });
 
@@ -94,19 +83,60 @@ $(document).ready(function () {
 
     //Open button
     menubar.find('.menuOpen').click(function() {
-        bootbox.prompt("What url to open?", function(result) {
-            if (result !== null) {
-                window.location = "/editor?url=" + result;
+
+        //Make the ajax call
+        $.ajax({
+            type: 'POST',
+            url: '/cgi/out/get.recentfiles',
+            dataType: "json",
+            success: function (data) {
+                //Clear the table for new data
+                $('.recentfilesopen').empty();
+
+                //Iterate
+                $.each(data.files, function(i, item) {
+                    var re = /\.$/;
+                    var newtitle = item.title.replace(re, "").toLowerCase();
+                    $('.recentfilesopen').append('<li>You worked on "<a href="/editor?url='+ item.url +'">' + newtitle + '</a>" ' + prettyDate(item.time * 1000).toLowerCase() + '.</li>')
+                });
+
+                //Open the dropdown sheet
+                sheetopen.toggleClass('open');
             }
         });
 
         return false;
     });
 
+    //Close sheet button
+    sheetopen.find('a.sheetclose').click( function() {
+        sheetopen.toggleClass('open');
+    });
+
+    //Open by url button
+    sheetopen.find('a.openbyurl').click( function() {
+         bootbox.prompt("What url to open?", function(result) {
+            if (result !== null) {
+                window.location = "/editor?url=" + result;
+            }
+         });
+    });
+
     //Type dropdown button
     menubar.find('.menuType .menuTypeSelection').click(function() {
+        var thistype = $(this).attr('data-type');
+
         menubar.find('.menuType > a.dropdown-toggle').html('Type (' + $(this).html() + ') <b class="caret"></b>');
-        opSetOneAtt('type', $(this).attr('data-type'));
+        if( thistype == 'link' || thistype == 'redirect' ) {
+            bootbox.prompt("What url to point to?", function(result) {
+                if (result !== null) {
+                    opSetOneAtt('type', thistype);
+                    opSetOneAtt('url', result);
+                }
+            });
+        } else {
+            opSetOneAtt('type', thistype);
+        }
         return true;
     });
 

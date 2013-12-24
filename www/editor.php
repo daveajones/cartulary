@@ -5,14 +5,19 @@
   $mode = "";
   $filename = "";
   $url = "";
-  $aid = trim($_REQUEST['aid']);
+  $aid = "";
+  if(isset($_REQUEST['aid'])) {
+      $aid = trim($_REQUEST['aid']);
+  }
 
   if( !empty($aid) ) {
       $mode = "article";
       $opmldata = get_article_as_opml($aid, $g_uid);
   } else {
       //This wasn't an article edit request, so let's try and pull an external url
-      $url = trim($_REQUEST['url']);
+      if(isset($_REQUEST['url'])) {
+          $url = trim($_REQUEST['url']);
+      }
       if( !empty($url) ) {
           $filename = basename($url);
 
@@ -85,6 +90,11 @@ if( !empty($opmldata) ) {
 
 <?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
+<div id="divEditSheetOpen">
+    <a class="sheetclose pull-right" href="#"> X </a>
+    <ul class="recentfilesopen"></ul>
+    <div class="openbyurl">or <a class="openbyurl" href="#">open</a> by url.</div>
+</div>
 
 <div class="row" id="divEditOutline">
 <?if(s3_is_enabled($g_uid) || sys_s3_is_enabled()) {?>

@@ -227,8 +227,7 @@ function _getDomain(url) {
 
 
 function _getFavicon(url) {
-    return '#';
-	return 'http://www.google.com/s2/favicons?domain=' + _getDomain(url);
+	return '//www.google.com/s2/favicons?domain=' + _getDomain(url);
 }
 
 

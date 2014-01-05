@@ -806,7 +806,7 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     opacity:1.0;
 }
 .pageContentWrapper.Editor #divEditOutline li.concord-node {
-        margin-bottom:10px;
+        /* margin-bottom:10px; */
 
 }
 .pageContentWrapper.Editor #divEditOutline {
@@ -837,10 +837,14 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.165);
 }
 .pageContentWrapper.Editor #divEditSheetOpen.open {
-    height:40%;
+    height:50%;
     padding-top:120px;
 }
+.pageContentWrapper.Editor #divEditSheetOpen .recentfilesopen {
+    display:none;
+}
 .pageContentWrapper.Editor #divEditSheetOpen.open .recentfilesopen {
+    display:block;
     list-style-type: none;
     margin-left:60px;
 }
@@ -852,8 +856,42 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
 }
 .pageContentWrapper.Editor #divEditSheetOpen.open div.openbyurl {
     margin-left:20px;
-    position:absolute;
-    bottom:0;
+    margin-bottom:20px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate {
+    background: #eee;
+    color:#333;
+    font-size:160%;
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:0;
+    overflow:hidden;
+    z-index:1;
+    transition: height 500ms;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.165);
+}
+.pageContentWrapper.Editor #divEditSheetTemplate .templateopen {
+    display:none;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open {
+    height:50%;
+    padding-top:120px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open .templateopen {
+    display:block;
+    list-style-type: none;
+    margin-left:60px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open .templateopen li {
+    margin-bottom:10px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open .sheetclose {
+    margin-right:30px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open div.openbyurl {
+    margin-left:20px;
     margin-bottom:20px;
 }
 .pageContentWrapper.Editor #divEditOutline div.outlineinfo {

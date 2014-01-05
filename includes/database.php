@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 31;
+$cg_database_version = 34;
 $cg_database_updates = array();
 
 
@@ -400,7 +400,7 @@ $cg_database_updates[27][] = <<<CGDB0091
 CGDB0091;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 28 to 29 -------------------------------------------------------------------------------------------------
+//Version 28 to 29 -----------------------------------------------------------------------------------------------
 $cg_database_updates[28][] = <<<CGDB0092
  CREATE TABLE IF NOT EXISTS `recentfiles` (
   `id` bigint(20) NOT NULL DEFAULT '0' COMMENT 'Standard id',
@@ -431,6 +431,49 @@ CGDB0096;
 $cg_database_updates[30][] = <<<CGDB0097
  INSERT INTO `dbversion` ( `version` ) VALUES ( '31' )
 CGDB0097;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 31 to 32 -----------------------------------------------------------------------------------------------
+$cg_database_updates[31][] = <<<CGDB0098
+  ALTER TABLE `recentfiles` ADD  `outline` LONGTEXT CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT  'The actual outline content.'
+CGDB0098;
+$cg_database_updates[31][] = <<<CGDB0099
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '32' )
+CGDB0099;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 32 to 33 -----------------------------------------------------------------------------------------------
+$cg_database_updates[32][] = <<<CGDB0100
+ CREATE TABLE IF NOT EXISTS `redirect` (
+  `id` bigint(20) NOT NULL DEFAULT '0' COMMENT 'Standard id',
+  `host` varchar(767) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Host name for redirection.',
+  `url` varchar(767) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Url the file is stored at.',
+  `userid` varchar(64) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'User id that created file.',
+  `hits` bigint(20) NOT NULL DEFAULT '0' COMMENT 'Time of last save.'
+  PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Redirector table.'
+CGDB0100;
+$cg_database_updates[32][] = <<<CGDB0101
+  ALTER TABLE `redirect` ADD UNIQUE ( `host` )
+CGDB0101;
+$cg_database_updates[32][] = <<<CGDB0102
+  ALTER TABLE `redirect` ADD INDEX ( `userid` )
+CGDB0102;
+$cg_database_updates[32][] = <<<CGDB0103
+  ALTER TABLE `redirect` ADD FOREIGN KEY ( `userid` ) REFERENCES `cartulary`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0103;
+$cg_database_updates[32][] = <<<CGDB0104
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '33' )
+CGDB0104;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 33 to 34 -----------------------------------------------------------------------------------------------
+$cg_database_updates[33][] = <<<CGDB0105
+  ALTER TABLE `recentfiles` ADD FOREIGN KEY ( `userid` ) REFERENCES `cartulary`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0105;
+$cg_database_updates[33][] = <<<CGDB0106
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '34' )
+CGDB0106;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

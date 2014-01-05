@@ -10,7 +10,7 @@ $jsondata = array();
 
 //Pull a list of recently edited files for this user
 $files = get_recent_files($g_uid, 10);
-loggit(3, "DEBUG: ".print_r($files, TRUE));
+
 
 //--------------------------------------------------------------------------------
 //Give feedback that all went well

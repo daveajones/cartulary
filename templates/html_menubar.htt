@@ -98,6 +98,8 @@
                 <li><a class="menuNew" href="#" title="New">New</a></li>
                 <li><a class="menuOpen" href="#" title="Open">Open</a></li>
                 <li><a class="menuSave" href="#" title="Save">Save</a></li>
+                <li><a class="menuSaveAs" href="#" title="Save As">Save As</a></li>
+                <li><a class="menuTemplate" href="#" title="Apply a template.">Template</a></li>
                 <li><a class="menuPublish" href="#" title="Publish">Publish</a></li>
                 <li class="divider-vertical34"></li>
                 <li class="<?if($mode == "article"){echo "active";}?>"><a class="rendertoggle" href="#" title="Toggle html rendering">WYSIWYG</a></li>
@@ -110,10 +112,13 @@
                         <li><a href="#" class="menuTypeSelection menuTypeHtml" title="Renders as raw html." data-type="html">Html</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeRedirect" title="A meta-refresh redirect." data-type="redirect">Redirect</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeTabs" title="A tabbed view." data-type="tabs">Tabs</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeMenu" title="A menu bar structure." data-type="menu">Menu</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeLink" title="Link to a url." data-type="link">Link</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeReplace" title="Insert a replacement node." data-type="replace">Replace</a></li>
                     </ul>
                 </li>
-                <li><a class="menuDisqusToggle" href="#" title="Include Disqus comments in rendered version?">Disqus</a></li>
+                <?if(!empty($myprefs['disqus_shortname'])) { ?><li><a class="menuDisqusToggle" href="#" title="Include Disqus comments in rendered version?">Disqus</a></li><?}?>
+                <li class="<?if(!empty($rhost)){echo "active";}?>"><a class="menuRedirect" href="#" <?if(!empty($rhost)){echo "data-redirect=\"".$rhost."\"";}?> title="Set a dns redirect for this document.">Redirect<?if(!empty($rhost)){echo ": ".$rhost;}?></a></li>
                 <li class="divider-vertical34"></li>
                 <li><a class="menuAddLink" href="#" title="Make selection a link."><i class="icon-link"></i></a></li>
             </ul>

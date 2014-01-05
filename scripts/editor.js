@@ -2,6 +2,7 @@ $(document).ready(function () {
     var hoverTimer = null;
     var outliner = $('#outliner');
     var sheetopen = $('#divEditSheetOpen');
+    var sheettemplate = $('#divEditSheetTemplate');
     var chkToggleRender = $('.rendertoggle');
     var chkDisqusInclude = $('.menuDisqusToggle');
     var includeDisqus = false;
@@ -14,7 +15,15 @@ $(document).ready(function () {
         window.location = "/editor";
     });
 
-    //Save button
+    //Save buttons
+    menubar.find('.menuSaveAs').click(function () {
+        bootbox.prompt("What file name do you want to use?", function(result) {
+            if (result !== null) {
+                filename = result.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
+                menubar.find('.menuSave').trigger('click');
+            }
+        });
+    });
     menubar.find('.menuSave').click(function () {
         //Grab the current title
         title = elTitle.val();
@@ -43,6 +52,7 @@ $(document).ready(function () {
                 "opml": opml,
                 "mode" : mode,
                 "filename": filename,
+                "redirect" : redirect,
                 "disqus" : includeDisqus,
                 "title": title
             },
@@ -56,7 +66,7 @@ $(document).ready(function () {
                 //Show returned info and re-enable the save button
                 url = data.url;
                 htmlurl = data.html;
-                updateOutlineInfo(url, data.html);
+                updateOutlineInfo(url, data.html, redirect);
 
                 showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
                 menubar.find('.menuSave').html('Save');
@@ -97,7 +107,7 @@ $(document).ready(function () {
                 $.each(data.files, function(i, item) {
                     var re = /\.$/;
                     var newtitle = item.title.replace(re, "").toLowerCase();
-                    $('.recentfilesopen').append('<li>You worked on "<a href="/editor?url='+ item.url +'">' + newtitle + '</a>" ' + prettyDate(item.time * 1000).toLowerCase() + '.</li>')
+                    $('.recentfilesopen').append('<li><a href="/editor?url='+ item.url +'">' + newtitle + '</a> ' + prettyDate(item.time * 1000).toLowerCase() + '.</li>');
                 });
 
                 //Open the dropdown sheet
@@ -108,18 +118,108 @@ $(document).ready(function () {
         return false;
     });
 
-    //Close sheet button
-    sheetopen.find('a.sheetclose').click( function() {
-        sheetopen.toggleClass('open');
+    //Template button
+    menubar.find('.menuTemplate').click(function() {
+        //Make the ajax call to get the recent file list
+        $.ajax({
+            type: 'POST',
+            url: '/cgi/out/get.recentfiles',
+            dataType: "json",
+            success: function (data) {
+                //Clear the table for new data
+                $('.templateopen').empty();
+
+                //Iterate
+                $.each(data.files, function(i, item) {
+                    var re = /\.$/;
+                    var newtitle = item.title.replace(re, "").toLowerCase();
+                    //Add an entry for each url returned
+                    $('.templateopen').append('<li><a href="#" data-url="'+ item.url +'">' + newtitle + '</a> ' + prettyDate(item.time * 1000).toLowerCase() + '.</li>');
+                });
+
+                //Link apply function to each file link
+                $('.templateopen li a').click(function() {
+                    var geturl = $(this).data('url');
+                    sheettemplate.removeClass('open');
+                    applyTemplate(geturl);
+                    return false;
+                });
+
+                //Open the dropdown sheet
+                sheettemplate.toggleClass('open');
+            }
+        });
+
+        return false;
     });
 
-    //Open by url button
+    //Redirect button
+    menubar.find('.menuRedirect').click(function() {
+        bootbox.prompt("What url should redirect to this document?", function(result) {
+            if (result !== null) {
+                //Store the xml data
+                var opml = opOutlineToXml();
+                redirect = result;
+
+                //Make the ajax call
+                $.ajax({
+                    type: 'POST',
+                    url: '/cgi/in/save.opml',
+                    data: {
+                        "opml": opml,
+                        "mode" : mode,
+                        "filename": filename,
+                        "disqus" : includeDisqus,
+                        "redirect" : redirect,
+                        "title": title
+                    },
+                    dataType: "json",
+                    beforeSend: function () {
+                        //Disable the save button and show a spinner
+                        menubar.find('.menuSave').attr('disabled', true);
+                        menubar.find('.menuSave').html('<i class="icon-spinner"></i> Saving...');
+                    },
+                    success: function (data) {
+                        //Show returned info and re-enable the save button
+                        url = data.url;
+                        htmlurl = data.html;
+                        updateOutlineInfo(url, data.html, result);
+
+                        showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
+                        menubar.find('.menuSave').html('Save');
+                        menubar.find('.menuSave').attr('disabled', false);
+                    }
+                });
+            }
+        });
+
+        //Put an existing value in the input box
+        setTimeout(function() {
+            $('input.bootbox-input').val(redirect);
+        }, 500);
+    });
+
+    //Close sheet button
+    $('div.sheet a.sheetclose').click( function() {
+        $('div.sheet').removeClass('open');
+    });
+
+    //Open file by url button
     sheetopen.find('a.openbyurl').click( function() {
          bootbox.prompt("What url to open?", function(result) {
             if (result !== null) {
                 window.location = "/editor?url=" + result;
             }
          });
+    });
+
+    //Open template by url button
+    sheettemplate.find('a.openbyurl').click( function() {
+        bootbox.prompt("Url of the template to use?", function(result) {
+            if (result !== null) {
+                applyTemplate(result);
+            }
+        });
     });
 
     //Type dropdown button
@@ -193,12 +293,13 @@ $(document).ready(function () {
                 }, 3000);
             }
         }
-    )
+    );
 
     //Load up the outline
     outliner.concord({
         "callbacks": {
-            "opCursorMoved": opCursorMovedCallback
+            "opCursorMoved": opCursorMovedCallback,
+            "opExpand": opExpandCallback
         },
         "prefs": {
             "outlineFont": "Calibri",
@@ -214,7 +315,7 @@ $(document).ready(function () {
 
 
     //Refresh the outliner info pane
-    updateOutlineInfo(url, "");
+    updateOutlineInfo(url, "", redirect);
     if( badurl == true ) {
         showMessage('Parse error. Please check the url.', false, 5);
     }
@@ -245,6 +346,7 @@ $(document).ready(function () {
 });
 
 
+//Linkify some text in the outline
 function editorToolAddLink() {
     var outliner = $('#outliner');
     bootbox.prompt("Type the target link.", function(result) {
@@ -256,6 +358,76 @@ function editorToolAddLink() {
     return false;
 }
 
+//Apply a template overlay on to this file
+function applyTemplate(urltoget) {
+    //Call out and get the url
+    $.ajax({
+        type: 'POST',
+        url: '/cgi/out/get.url.json',
+        data: {
+            "url": urltoget
+        },
+        dataType: "json",
+        success: function (data) {
+            var inserted = false;
+
+            //First collapse everything
+            opCollapseEverything();
+
+            //Go to the very top of the outline and wrap what we have into a single node
+            opFirstSummit();
+            opInsert("[##ORIGINAL##]", "up");
+            opFirstSummit();
+            opDemote();
+            opCollapseEverything();
+
+            //Now read this collapsed everything node into an xml string
+            original = opCursorToXml();
+
+            //Blow away the outline
+            opWipe();
+
+            //Now bring in the template outline
+            opInsertXml(data.data);
+
+            //Find the template placeholder
+            opFirstSummit();
+            opVisitAll( function(op) {
+                if( op.attributes.getOne('type') == "replace" ) {
+                    var cursor = op.getCursor();
+
+                    //Remove replace type
+                    op.attributes.removeOne('type');
+
+                    //Put the original xml back in
+                    op.insertXml(original, "up");
+                    op.setCursor(cursor);
+                    op.deleteLine();
+
+                    (function() {
+                        opFirstSummit();
+                        opVisitAll( function(op) {
+                            if( op.getLineText() == "[##ORIGINAL##]" ) {
+                                var cursor = op.getCursor();
+                                op.expand();
+                                op.promote();
+                                op.setCursor(cursor);
+                                op.deleteLine();
+                                opFirstSummit();
+                                op.deleteLine();
+                                return false;
+                            }
+                        });
+                    }) ();
+
+                    inserted = true;
+
+                    return false;
+                }
+            });
+        }
+    });
+}
 
 //Get root node type and set menu text
 function getRootNodeType() {
@@ -268,9 +440,8 @@ function getRootNodeType() {
     return true;
 }
 
-
 //Display outline info
-function updateOutlineInfo(url, html) {
+function updateOutlineInfo(url, html, redirect) {
     var elOutlineinfo = $('#menubarEditor').find('.outlineinfo');
 
     elOutlineinfo.html('');
@@ -280,9 +451,13 @@ function updateOutlineInfo(url, html) {
             elOutlineinfo.append('<li><a target="_blank" href="' + html + '">HTML</a></li>');
         }
     }
+
+    if ( redirect != "" ) {
+        $('#menubarEditor').find('.menuRedirect').html("Redirect: " + redirect);
+        $('#menubarEditor').find('.menuRedirect').parent().addClass('active');
+    }
     return true;
 }
-
 
 //When a new node is clicked on, this callback fires
 function opCursorMovedCallback (op) {
@@ -290,6 +465,17 @@ function opCursorMovedCallback (op) {
 
     if( typeof(nodetype) == "undefined" )  {  nodetype = "not set";  }
     $('#menubarEditor').find('.menuType > a.dropdown-toggle').html('Type (' + nodetype + ') <b class="caret"></b>');
+
     return true;
 
+}
+
+//Handle expansion requests for nodes
+function opExpandCallback (op) {
+    var nodetype = op.attributes.getOne('type');
+    if(nodetype == "link" || nodetype == "redirect") {
+        gotourl = op.attributes.getOne('url');
+        window.open(gotourl);
+    }
+    return true;
 }

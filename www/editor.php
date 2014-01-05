@@ -1,11 +1,14 @@
 <?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
 <?include "$confroot/$templates/php_page_init.php"?>
+<?require_once "$confroot/$includes/net.php";?>
 <?
   // See if we have a valid article id or url to get source xml from
   $mode = "";
   $filename = "";
   $url = "";
+  $redirect = "";
   $aid = "";
+  $rhost = "";
   if(isset($_REQUEST['aid'])) {
       $aid = trim($_REQUEST['aid']);
   }
@@ -19,7 +22,7 @@
           $url = trim($_REQUEST['url']);
       }
       if( !empty($url) ) {
-          $filename = basename($url);
+          $filename = stripText(basename($url), FALSE, "\.");
 
           //Get opml data and clean it
           $protpos = stripos($url, 'http');
@@ -30,6 +33,18 @@
               if( !is_outline($opmldata) ) {
                   $badurl = true;
               }
+          }
+
+          //Set the redirect host for this document
+          loggit(3, "DEBUG: Url to open - [".$url."]");
+          $lookurl = str_replace('/opml/', '/html/', $url);
+          $lookurl = str_replace('.opml', '.html', $lookurl);
+          loggit(3, "DEBUG: Redirect url to look for - [".$lookurl."]");
+          $rhost = get_redirection_host_name_by_url($lookurl);
+          if( empty($rhost) && preg_match('/http.*\.opml/i', $url) ) {
+              $nurl = preg_replace('/\.(opml)$/i', '.html', $url);
+              $rhost = get_redirection_host_name_by_url($nurl);
+              loggit(3, "DEBUG: $nurl");
           }
       }
   }
@@ -65,6 +80,7 @@ if( !empty($opmldata) ) {
     var url = '<?echo $url?>';
     var htmlurl = "";
     var title = "";
+    var redirect = '<?echo $rhost?>';
     var lasttitle = "";
     var filename = '<?echo $filename?>';
     var bufilename = '<?echo time()."-".$default_opml_export_file_name;?>';
@@ -90,10 +106,16 @@ if( !empty($opmldata) ) {
 
 <?//--- Stuff between the title and content --?>
 <?include "$confroot/$templates/$template_html_precontent"?>
-<div id="divEditSheetOpen">
+<div id="divEditSheetOpen" class="sheet">
     <a class="sheetclose pull-right" href="#"> X </a>
+    <div class="openbyurl"><a class="openbyurl" href="#">Open</a> by url or...</div>
     <ul class="recentfilesopen"></ul>
-    <div class="openbyurl">or <a class="openbyurl" href="#">open</a> by url.</div>
+</div>
+
+<div id="divEditSheetTemplate" class="sheet">
+    <a class="sheetclose pull-right" href="#"> X </a>
+    <div class="openbyurl"><a class="openbyurl" href="#">Open</a> by url or...</div>
+    <ul class="templateopen"></ul>
 </div>
 
 <div class="row" id="divEditOutline">

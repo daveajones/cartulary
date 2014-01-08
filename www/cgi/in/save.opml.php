@@ -95,7 +95,7 @@ if(!$s3res) {
 }
 
 //Update recent file table
-update_recent_file($uid, $s3url, $title);
+update_recent_file($uid, $s3url, $title, $opml);
 
 //Update the redirector table
 if( !empty($rhost) ) {

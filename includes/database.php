@@ -435,7 +435,7 @@ CGDB0097;
 
 //Version 31 to 32 -----------------------------------------------------------------------------------------------
 $cg_database_updates[31][] = <<<CGDB0098
-  ALTER TABLE `recentfiles` ADD  `outline` LONGTEXT CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT  'The actual outline content.'
+  ALTER TABLE `recentfiles` ADD  `outline` LONGTEXT CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL COMMENT  'The actual outline content.'
 CGDB0098;
 $cg_database_updates[31][] = <<<CGDB0099
  INSERT INTO `dbversion` ( `version` ) VALUES ( '32' )

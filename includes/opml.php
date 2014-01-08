@@ -2369,7 +2369,7 @@ function get_social_outline_directory($query = NULL, $max = NULL)
 
 
 //Return a list of files recently edited by this user in the editor
-function get_recent_files($uid = NULL, $max = NULL, $text = NULL)
+function get_recent_files($uid = NULL, $max = NULL)
 {
     //Check parameters
     if (empty($uid)) {
@@ -2428,7 +2428,7 @@ function get_recent_files($uid = NULL, $max = NULL, $text = NULL)
 
 
 //Update a file into the recent files table
-function update_recent_file($uid = NULL, $url = NULL, $title = NULL)
+function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "")
 {
     //Check parameters
     if (empty($uid)) {
@@ -2454,13 +2454,94 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Database call
-    $stmt = "INSERT INTO $table_recentfiles (userid, url, title, time) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE title=?, time=?";
+    $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE title=?, time=?, outline=?";
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("sssdsd", $uid, $url, $title, $time, $title, $time) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ssssdsds", $uid, $url, $title, $outline, $time, $title, $time, $outline) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
     //Log and return
     loggit(3, "User: [$uid] edited a file: [$url] at: [$title].");
     return (TRUE);
+}
+
+
+//Search for editor files that match query
+function search_editor_files($uid = NULL, $query = NULL, $max = NULL)
+{
+    //Check parameters
+    if ($uid == NULL) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+    if ($query == NULL) {
+        loggit(2, "The query given is corrupt or blank: [$query]");
+        return (FALSE);
+    }
+
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Build the sql bindings
+    $colnames = array(
+        "$table_recentfiles.url",
+        "$table_recentfiles.title",
+        "$table_recentfiles.outline"
+    );
+    $qsql = build_search_sql($query, $colnames);
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT url, title, outline
+	           FROM $table_recentfiles
+	           WHERE userid=?
+    ";
+
+    //Append search criteria
+    $sqltxt .= $qsql['text'];
+
+    //Limit
+    if (!empty($max) && is_numeric($max)) {
+        $sqltxt .= " LIMIT $max";
+    }
+
+    //loggit(3, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Adjust bindings
+    $newsetup = "s" . $qsql['bind'][0];
+    $qsql['bind'][0] = & $newsetup;
+    array_splice($qsql['bind'], 1, 0, array(&$uid));
+
+    $ref = new ReflectionClass('mysqli_stmt');
+    $method = $ref->getMethod("bind_param");
+    $method->invokeArgs($sql, $qsql['bind']);
+
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No editor files returned for user: [$uid] with given criteria.");
+        return (FALSE);
+    }
+
+    $sql->bind_result($furl, $ftitle, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+
+    $files = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $files[$count] = array('url' => $furl, 'title' => $ftitle, 'outline' => $foutline);
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(3, "Returning: [$count] editor files for user: [$uid]");
+    return ($files);
 }

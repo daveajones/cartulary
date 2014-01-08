@@ -47,6 +47,8 @@ if( $section == "articles" ) {
   $results = search_feeds($uid, $query, $query['max']);
 } elseif( $section == "people" ) {
   $results = get_social_outline_directory($query, $query['max']);
+} elseif( $section == "editor" ) {
+  $results = search_editor_files($uid, $query, NULL);
 } else {
   //Log it
   loggit(2, "Given section:[$section] not searchable.");

@@ -449,7 +449,7 @@ $cg_database_updates[32][] = <<<CGDB0100
   `host` varchar(767) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Host name for redirection.',
   `url` varchar(767) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Url the file is stored at.',
   `userid` varchar(64) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'User id that created file.',
-  `hits` bigint(20) NOT NULL DEFAULT '0' COMMENT 'Time of last save.'
+  `hits` bigint(20) NOT NULL DEFAULT '0' COMMENT 'Time of last save.',
   PRIMARY KEY (`id`)
  ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Redirector table.'
 CGDB0100;

@@ -15,6 +15,7 @@
 <script type="text/javascript" src="/script/keymaster.min.js"></script>
 <!-- Global custom -->
 <script>
+<?include "$confroot/$scripts/global-env.js"?>
 <?include "$confroot/$scripts/global-custom.js"?>
 </script>
 <!-- Freedom Controller API -->

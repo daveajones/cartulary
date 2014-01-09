@@ -290,3 +290,113 @@ function reset_registration_attempt_counters($time = NULL)
     loggit(3, "Deleted: [$delcount] expired registration bans.");
     return ($delcount);
 }
+
+
+//Get a redirection address for a given host name
+function get_redirection_url_by_host_name($host = NULL)
+{
+    //Check parameters
+    if (empty($host)) {
+        loggit(2, "The host address is blank or corrupt: [$host]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Database call
+    $sql = $dbh->prepare("SELECT url FROM $table_redirect WHERE host=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $host) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if any rows came back
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No redirect known.");
+        return ("");
+    }
+    $sql->bind_result($url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch();
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+
+    loggit(3, "Returning url: [$url] for host: [$host].");
+    return ($url);
+}
+
+
+//Get a redirection host name for a given destination url
+function get_redirection_host_name_by_url($url = NULL)
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "The destination url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Database call
+    $sql = $dbh->prepare("SELECT host FROM $table_redirect WHERE url=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if any rows came back
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(3, "No redirect found for: [$url].");
+        return ("");
+    }
+    $sql->bind_result($host) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch();
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+
+    loggit(3, "Returning host: [$host] for url: [$url].");
+    return ($host);
+}
+
+
+//Add a redirection url to the redirector table
+function update_redirection_host_name_by_url($url = NULL, $host = NULL, $uid = NULL)
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+    if (empty($host)) {
+        loggit(2, "The host is blank or corrupt: [$host]");
+        return (FALSE);
+    }
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Database call
+    $stmt = "INSERT INTO $table_redirect (host, url, userid) VALUES (?,?,?) ON DUPLICATE KEY UPDATE url=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ssss", $host, $url, $uid, $url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "Updated: [$host -> $url] redirection.");
+    return (TRUE);
+}

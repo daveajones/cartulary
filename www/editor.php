@@ -83,6 +83,7 @@ if( !empty($opmldata) ) {
     var redirect = '<?echo $rhost?>';
     var lasttitle = "";
     var filename = '<?echo $filename?>';
+    var oldfilename = "";
     var bufilename = '<?echo time()."-".$default_opml_export_file_name;?>';
     var badurl = false;
     <?if( isset($badurl) ) {?>

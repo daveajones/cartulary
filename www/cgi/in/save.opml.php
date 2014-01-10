@@ -48,6 +48,12 @@ if ( isset($_REQUEST['filename']) ) {
     exit(1);
 };
 
+//Do we have an old filename? If so, this is a file name change
+$oldfilename = "";
+if ( isset($_REQUEST['oldfilename']) ) {
+    $oldfilename = $_REQUEST['oldfilename'];
+};
+
 //Get the opml data
 if ( isset($_REQUEST['opml']) ) {
   $opml = $_REQUEST['opml'];
@@ -77,6 +83,12 @@ if(!$s3res) {
   loggit(1, "Wrote opml to S3 at url: [$s3url].");
 }
 
+//Assemble an old url if we had an old filename
+$s3oldurl = "";
+if ( !empty($oldfilename) ) {
+    $s3oldurl = get_s3_url($uid, "/opml/", $oldfilename);
+};
+
 //Put the html file in S3
 $htmldata = process_opml_to_html($opml, $title, $uid, $disqus, $s3url);
 $htmlfilename = str_replace('.opml', '.html', $filename);
@@ -95,7 +107,7 @@ if(!$s3res) {
 }
 
 //Update recent file table
-update_recent_file($uid, $s3url, $title, $opml);
+update_recent_file($uid, $s3url, $title, $opml, $s3oldurl);
 
 //Update the redirector table
 if( !empty($rhost) ) {

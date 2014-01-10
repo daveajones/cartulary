@@ -2428,7 +2428,7 @@ function get_recent_files($uid = NULL, $max = NULL)
 
 
 //Update a file into the recent files table
-function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "")
+function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $oldurl = "")
 {
     //Check parameters
     if (empty($uid)) {
@@ -2454,9 +2454,16 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Database call
-    $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE title=?, time=?, outline=?";
-    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("ssssdsds", $uid, $url, $title, $outline, $time, $title, $time, $outline) or loggit(2, "MySql error: " . $dbh->error);
+    if( empty($oldurl) ) {
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE title=?, time=?, outline=?";
+        $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssdsds", $uid, $url, $title, $outline, $time, $title, $time, $outline) or loggit(2, "MySql error: " . $dbh->error);
+    } else {
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?";
+        $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssdsdss", $uid, $oldurl, $title, $outline, $time, $title, $time, $outline, $url) or loggit(2, "MySql error: " . $dbh->error);
+        loggit(3, "User: [$uid] changed old url: [$oldurl] to new url: [$url].");
+    }
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 

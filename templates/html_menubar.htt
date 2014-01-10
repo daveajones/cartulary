@@ -97,8 +97,8 @@
             <ul class="nav menubar">
                 <li><a class="menuNew" href="#" title="New">New</a></li>
                 <li><a class="menuOpen" href="#" title="Open">Open</a></li>
-                <li><a class="menuSave" href="#" title="Save">Save</a></li>
-                <li><a class="menuSaveAs" href="#" title="Save As">Save As</a></li>
+                <li><a class="menuSave saves" href="#" title="Save">Save</a></li>
+                <li><a class="menuSaveAs saves" href="#" title="Save As">Rename</a></li>
                 <li><a class="menuTemplate" href="#" title="Apply a template.">Template</a></li>
                 <li><a class="menuPublish" href="#" title="Publish">Publish</a></li>
                 <li class="divider-vertical34"></li>

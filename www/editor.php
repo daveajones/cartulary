@@ -122,7 +122,7 @@ if( !empty($opmldata) ) {
 <div class="row" id="divEditOutline">
 <?if(s3_is_enabled($g_uid) || sys_s3_is_enabled()) {?>
     <div class="divOutlineTitle">
-        <input class="title" placeholder="Title" type="text" />
+        <input class="rendertitle" checked="checked" type="checkbox" /> <input class="title" placeholder="Title" type="text" />
     </div>
     <div class="outlineinfo pull-right"></div>
 

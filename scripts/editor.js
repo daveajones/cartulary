@@ -332,18 +332,25 @@ function saveFile( ftitle, fname, fmode, fredirect, fdisqus, fopml, foldname ) {
     var _foldname = (typeof foldname === "undefined") ? "" : foldname;
     var menubar = $('#menubarEditor');
 
+    //Render the title and byline?
+    var rendertitle = true;
+    if( !$('.rendertitle').is(':checked') ) {
+        rendertitle = false;
+    }
+
     //Make the ajax call
     $.ajax({
         type: 'POST',
         url: '/cgi/in/save.opml',
         data: {
-            "opml": fopml,
+            "opml" : fopml,
             "mode" : fmode,
             "oldfilename" : _foldname,
-            "filename": fname,
+            "filename" : fname,
             "redirect" : fredirect,
             "disqus" : fdisqus,
-            "title": ftitle
+            "title" : ftitle,
+            "rendertitle" : rendertitle
         },
         dataType: "json",
         beforeSend: function () {

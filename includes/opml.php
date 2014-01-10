@@ -2210,7 +2210,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
 
 
 //Convert an opml document to html with processing
-function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisqus = FALSE, $opmlurl = "")
+function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisqus = FALSE, $opmlurl = "", $rendertitle = TRUE)
 {
     //Check params
     if ($content == NULL) {
@@ -2227,6 +2227,11 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
     if( $dodisqus && !empty($prefs['disqus_shortname']) ) {
         $disqus = $cg_disqus_embed;
         $disqus = str_replace('[SHORTNAME]', $prefs['disqus_shortname'], $disqus);
+    }
+
+    //Get the title
+    if( !empty($title) ) {
+        $titleline = '<div class="otitle">'.$title.'</div>';
     }
 
     //Get byline if a username was given
@@ -2262,6 +2267,12 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
     $expansionState = explode(',', (string)$x->head->expansionState);
     $serialES = (string)$x->head->expansionState;
     $parents = array();
+
+    //Was title rendering set to false?
+    if( $rendertitle == FALSE ) {
+        $titleline = "";
+        $byline = "";
+    }
 
     buildHtmlFromOpmlRecursive($x->body, $body, 0, 1, $expansionState, NULL, NULL, $parents, $extrabody);
     $html = <<<OPML2HTML1
@@ -2303,7 +2314,7 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
   </head>
 
   <body>
-    <div class="otitle">$title</div>
+    $titleline
     $byline
     <div class="obody">
         $body

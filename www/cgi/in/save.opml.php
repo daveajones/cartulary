@@ -24,6 +24,13 @@ if ( isset($_REQUEST['title']) ) {
     $title = $_REQUEST['title'];
 }
 
+//Render the title?
+$rendertitle = TRUE;
+if ( isset($_REQUEST['rendertitle']) && $_REQUEST['rendertitle'] == "false" ) {
+     $rendertitle = FALSE;
+}
+loggit(3, "DEBUG: [".$_REQUEST['rendertitle']."]");
+
 //Get the redirect source
 $rhost = "";
 if ( isset($_REQUEST['redirect']) && !empty($_REQUEST['redirect']) ) {
@@ -90,7 +97,7 @@ if ( !empty($oldfilename) ) {
 };
 
 //Put the html file in S3
-$htmldata = process_opml_to_html($opml, $title, $uid, $disqus, $s3url);
+$htmldata = process_opml_to_html($opml, $title, $uid, $disqus, $s3url, $rendertitle);
 $htmlfilename = str_replace('.opml', '.html', $filename);
 $s3res = putInS3($htmldata, $htmlfilename, $s3info['bucket']."/html", $s3info['key'], $s3info['secret'], "text/html");
 if(!$s3res) {

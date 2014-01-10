@@ -19,8 +19,19 @@ $(document).ready(function () {
     menubar.find('.menuSaveAs').click(function () {
         bootbox.prompt("What file name do you want to use?", function(result) {
             if (result !== null) {
+                //Grab the current title
+                title = elTitle.val();
+
+                //Set a title
+                opSetTitle(title);
+                lasttitle = title;
+
+                //Get the filenames sorted
+                oldfilename = filename;
                 filename = result.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
-                menubar.find('.menuSave').trigger('click');
+
+                //Save the file
+                saveFile(title, filename, mode, redirect, includeDisqus, opOutlineToXml(), oldfilename);
             }
         });
     });
@@ -29,6 +40,7 @@ $(document).ready(function () {
         title = elTitle.val();
 
         //Get a file name
+        oldfilename = "";
         if (filename == "") {
             if (title != "") {
                 filename = title.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
@@ -41,38 +53,8 @@ $(document).ready(function () {
         opSetTitle(title);
         lasttitle = title;
 
-        //Store the xml data
-        var opml = opOutlineToXml();
-
-        //Make the ajax call
-        $.ajax({
-            type: 'POST',
-            url: '/cgi/in/save.opml',
-            data: {
-                "opml": opml,
-                "mode" : mode,
-                "filename": filename,
-                "redirect" : redirect,
-                "disqus" : includeDisqus,
-                "title": title
-            },
-            dataType: "json",
-            beforeSend: function () {
-                //Disable the save button and show a spinner
-                menubar.find('.menuSave').attr('disabled', true);
-                menubar.find('.menuSave').html('<i class="icon-spinner"></i> Saving...');
-            },
-            success: function (data) {
-                //Show returned info and re-enable the save button
-                url = data.url;
-                htmlurl = data.html;
-                updateOutlineInfo(url, data.html, redirect);
-
-                showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
-                menubar.find('.menuSave').html('Save');
-                menubar.find('.menuSave').attr('disabled', false);
-            }
-        });
+        //Save the file
+        saveFile(title, filename, mode, redirect, includeDisqus, opOutlineToXml());
 
         return false;
     });
@@ -345,6 +327,45 @@ $(document).ready(function () {
 
 });
 
+//Save a file
+function saveFile( ftitle, fname, fmode, fredirect, fdisqus, fopml, foldname ) {
+    var _foldname = (typeof foldname === "undefined") ? "" : foldname;
+    var menubar = $('#menubarEditor');
+
+    //Make the ajax call
+    $.ajax({
+        type: 'POST',
+        url: '/cgi/in/save.opml',
+        data: {
+            "opml": fopml,
+            "mode" : fmode,
+            "oldfilename" : _foldname,
+            "filename": fname,
+            "redirect" : fredirect,
+            "disqus" : fdisqus,
+            "title": ftitle
+        },
+        dataType: "json",
+        beforeSend: function () {
+            //Disable the save button and show a spinner
+            menubar.find('.saves').attr('disabled', true);
+            menubar.find('.saves').html('<i class="icon-spinner"></i> Saving...');
+        },
+        success: function (data) {
+            //Show returned info and re-enable the save button
+            url = data.url;
+            htmlurl = data.html;
+            updateOutlineInfo(url, data.html, redirect);
+
+            showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
+            menubar.find('.menuSave').html('Save');
+            menubar.find('.menuSaveAs').html('Rename');
+            menubar.find('.saves').attr('disabled', false);
+        }
+    });
+
+    return true;
+}
 
 //Linkify some text in the outline
 function editorToolAddLink() {

@@ -182,10 +182,19 @@
 	</ul>
 	</div>
 
+    <div class="divPrefPane">
+        <div class="divPrefSubmit pull-right divPrefMicroblog"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
+        <h3>Editor</h3>
+        <ul>
+            <li>My disqus shortname is: <input name="disqus_shortname" class="urlinput" type="text" value="<?echo $prefs['disqus_shortname']?>" /></li>
+        </ul>
+    </div>
+
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefLinks"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Links</h3>
 	<ul>
+        <li>I want analytics code on my pages and links:<br/><textarea name="analyticscode" style="width:600px;height:200px;"></textarea></li>
 		<li><label class="checkbox inline"><input name="sourceurlrt" type="checkbox" <?if ($prefs['sourceurlrt'] == 1) echo "checked ";?>/> I want RT links to use the original source url.</label></li>
 		<li><label class="checkbox inline"><input name="sourceurlrss" type="checkbox" <?if ($prefs['sourceurlrss'] == 1) echo "checked ";?>/> I want RSS feed links to point to the original source url.</label></li>
     </ul>

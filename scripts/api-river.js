@@ -2,18 +2,19 @@
 // ----- River API -----
 freedomController.v1.river = {};
 freedomController.v1.river.statics  = {
-    riverJsonUrl        : "<?echo $cg_riverjs_url?>",
+    riverJsonUrl        : "/river-json",
 	pathToStreamItem	: "#stream .stream-list .article",
 	pathToActiveItem	: "#stream .stream-list .article.activeItem",
 	pathToStreamList	: "#stream .stream-list",
 	lsRiverDataKey		: "riverdata",
 	lsRiverDataPullTime : "riverpulltime",
 	lsStickyDataKey		: "stickydata",
-    lsSessionIdKey      : "sessionid",
+    lsSessionIdKey      : "sessionid"
 };
 
 freedomController.v1.river.methods = (function() {
 //-----------------------------------------------------------------------------------
+
 
 //----- River globals -----
 var riverJsonUrl     = freedomController.v1.river.statics.riverJsonUrl;
@@ -31,6 +32,7 @@ function _searchPostLoad() {
 	return _rebindEverything();
 }
 
+
 function _removeSessionData() {
     sessionStorage.removeItem(lsStickyDataKey);
     sessionStorage.removeItem(lsRiverDataKey);
@@ -40,44 +42,52 @@ function _removeSessionData() {
     return true;
 }
 
+
 function _rebindEverything(elid) {
-    var elid = (typeof elid === "undefined") ? "" : elid;		
+    var _elid = (typeof elid === "undefined") ? "" : elid;
 
 	//Bind microblog links
-	_bindMicroblogLinks(elid);
+	_bindMicroblogLinks(_elid);
 	
 	//Bind cartulize links
-	_bindCartLinks(elid);
+	_bindCartLinks(_elid);
 	
 	//Bind sticky links
-	_bindStickyLinks(elid);
+	_bindStickyLinks(_elid);
 
 	//Bind enclosure links
-	_bindEnclosureLinks(elid);
+	_bindEnclosureLinks(_elid);
 
 	//Bind embed activation links
-	_bindEmbedActivations(elid);
+	_bindEmbedActivations(_elid);
 
 	return false;
 }
 
+
 function _showOnlyItems( klass, title ) {
+    var streamObj = $('#stream');
+
 	_showAllItems();
     $(pathToStreamItem).not('.' + klass).hide();
-	$('#stream').prepend('<div class="filternotice">Currently showing only items from '+title+'.<a class="removefilter">Show all</a></div>');
-	$('#stream').addClass('filtered');
-	$('#stream div.filternotice a.removefilter').click(function() {
+	streamObj.prepend('<div class="filternotice">Currently showing only items from '+title+'.<a class="removefilter">Show all</a></div>');
+	streamObj.addClass('filtered');
+	streamObj.find('div.filternotice a.removefilter').click(function() {
 		_showAllItems();
 		return false;
 	});
 	$('html, body').animate({ scrollTop: '0px' }, 300); 		
 }
 
+
 function _showAllItems() {
-	$('#stream div.filternotice').remove();
-	$('#stream').removeClass('filtered');
+    var streamObj = $('#stream');
+
+	streamObj.find(' div.filternotice').remove();
+	streamObj.removeClass('filtered');
 	$(pathToStreamItem).show();
 }
+
 
 function _isAvatar(url) {
     if ( url.indexOf('gravatar') != -1 ) { return true; }
@@ -86,11 +96,13 @@ function _isAvatar(url) {
     return false;
 }
 
+
 function _getBodyText(html) {
 	var breakToken = '_______break_______',
     lineBreakedHtml = html.replace(/<br\s?\/?>/gi, breakToken).replace(/<p\.*?>(.*?)<\/p>/gi, breakToken + '$1' + breakToken);
     return $('<div>').html(lineBreakedHtml).text().replace(new RegExp(breakToken, 'g'), '\n');
 }
+
 
 function _countEnclosuresOfType(enclosures, typecheck) {
 	var cnt = 0;
@@ -103,6 +115,7 @@ function _countEnclosuresOfType(enclosures, typecheck) {
 	return cnt;
 }
 
+
 function _isImage(url, type) {
     if ( type.indexOf('image') != -1 ) {  return true;  }
     if ( url.indexOf('.jpg')   != -1 ) {  return true;  }
@@ -112,6 +125,7 @@ function _isImage(url, type) {
 
 	return false;
 }
+
 
 function _isAudio(url, type) {
     if ( type.indexOf('audio') != -1 ) {  return true;  }
@@ -124,6 +138,7 @@ function _isAudio(url, type) {
 	return false;
 }
 
+
 function _isVideo(url, type) {
     if ( type.indexOf('video') != -1 ) {  return true;  }
     if ( url.indexOf('.mp4')   != -1 ) {  return true;  }
@@ -135,6 +150,7 @@ function _isVideo(url, type) {
 	return false;
 }
 
+
 function _isIframe(url, type) {
     if ( type.indexOf('text/html') != -1 ) {  return true;  }
     if ( type.indexOf('application/pdf') != -1 ) {  return true;   }
@@ -142,9 +158,11 @@ function _isIframe(url, type) {
 	return false;
 }
 
+
 function _getMediaType(type) {
     return type.split('/')[0];
 }
+
 
 function _getEnclosureSize(bytes) {
 	//_____via http://blog.elctech.com/2009/01/06/convert-filesize-bytes-to-readable-string-in-javascript/
@@ -155,17 +173,20 @@ function _getEnclosureSize(bytes) {
     return t;
 }
 
+
 function _clearActiveFeeds() {
 
-	$('#divActiveFeeds ul.feedlist').empty();
+	$('#divActiveFeeds').find('ul.feedlist').empty();
 
 	return true;
 }
 
+
 function _addActiveFeed(feedId, feedTitle, feedUrl, urlForIcon, type, position) {
 	if( platform == "mobile" ) {  return false;  }
+    var activeFeedsObj = $('#divActiveFeeds');
 
-	if( $('#divActiveFeeds ul.feedlist li.' + feedId).length < 1  ) {
+	if( activeFeedsObj.find('ul.feedlist li.' + feedId).length < 1  ) {
 		var feedImg = '/images/blank.gif';
 		if( type == 'person' ) {
 			feedImg = urlForIcon;
@@ -175,12 +196,12 @@ function _addActiveFeed(feedId, feedTitle, feedUrl, urlForIcon, type, position) 
 			imgClass = 'favicon';
 		}
 		if( position == 'top' ) {
-			$('#divActiveFeeds ul.feedlist').prepend('<li class="' + type + ' ' + feedId + '">' + feedTitle + ' <img class="'+ imgClass +'" src="' + feedImg + '" /></li>');
+			activeFeedsObj.find('ul.feedlist').prepend('<li class="' + type + ' ' + feedId + '">' + feedTitle + ' <img class="'+ imgClass +'" src="' + feedImg + '" /></li>');
 		} else {
-			$('#divActiveFeeds ul.feedlist').append('<li class="' + type + ' ' + feedId + '">' + feedTitle + ' <img class="'+ imgClass +'" src="' + feedImg + '" /></li>');
+			activeFeedsObj.find('ul.feedlist').append('<li class="' + type + ' ' + feedId + '">' + feedTitle + ' <img class="'+ imgClass +'" src="' + feedImg + '" /></li>');
 		}
-		$('#divActiveFeeds ul.feedlist li.' + feedId).unbind('click');
-		$('#divActiveFeeds ul.feedlist li.' + feedId).click(function () {
+        activeFeedsObj.find('ul.feedlist li.' + feedId).unbind('click');
+        activeFeedsObj.find('ul.feedlist li.' + feedId).click(function () {
 			_showOnlyItems(feedId, feedTitle);
 			return false;
 		});
@@ -188,6 +209,7 @@ function _addActiveFeed(feedId, feedTitle, feedUrl, urlForIcon, type, position) 
 
 	return false;
 }
+
 
 function _getDomain(url) {
     var domain;
@@ -203,9 +225,11 @@ function _getDomain(url) {
     return domain;
 }
 
+
 function _getFavicon(url) {
-	return 'http://www.google.com/s2/favicons?domain=' + _getDomain(url);
+	return '//www.google.com/s2/favicons?domain=' + _getDomain(url);
 }
+
 
 function _focusFirstVisibleArticle() {
 	$(pathToStreamItem).each(function(index) {
@@ -214,9 +238,11 @@ function _focusFirstVisibleArticle() {
 			$(this).addClass("activeItem");
 			return false;
 		}
+        return false;
 	});
 	return false;
 }
+
 
 function _focusThisArticle(elid) {
 	//Put focus on an article by post id reference
@@ -226,6 +252,7 @@ function _focusThisArticle(elid) {
 	return false;
 }
 
+
 function _focusThisArticleFooter(elid) {
 	//Put focus on an article by post id, but scroll to it's footer
     $(pathToStreamItem + '.activeItem').removeClass("activeItem");
@@ -233,6 +260,7 @@ function _focusThisArticleFooter(elid) {
     $('html, body').animate({ scrollTop: $(pathToStreamItem + '#' + elid + ' .footer').offset().top - gPlatformMenubarTopOffset - 50 }, 300);
     return false;
 }
+
 
 function _focusPreviousArticle() {
 	if( $(pathToStreamItem + ".activeItem").length > 0 ) {
@@ -263,17 +291,20 @@ function _focusPreviousArticle() {
 			$(pathToStreamItem + ":eq("+(index - 1)+")").addClass("activeItem");
 			return false;
 		}
+        return false;
 	});
 	return false;
 }
+
 
 function _targetNextArticle() {
 	console.log('targetNextArticle');
 	return _focusNextArticle(true);
 }
 
+
 function _focusNextArticle(noscroll) {
-    var noscroll = (typeof noscroll === "undefined") ? false : noscroll;		
+    var _noscroll = (typeof noscroll === "undefined") ? false : noscroll;
 
 	if( $(pathToStreamItem + ".activeItem").length > 0 ) {
 		// get top positions and references to all articles
@@ -291,7 +322,7 @@ function _focusNextArticle(noscroll) {
 		});
 		$(pathToStreamItem + ".activeItem").removeClass("activeItem");
 		$(pathToStreamItem + '#' + pos[0].pid).addClass("activeItem");
-		if( noscroll === false ) {
+		if( _noscroll === false ) {
 			$('html, body').animate( { scrollTop: ($(pathToStreamItem + ".activeItem").offset().top - gPlatformMenubarTopOffset) }, 300); 
 		}
 		return false;	
@@ -300,7 +331,7 @@ function _focusNextArticle(noscroll) {
 	//If not, we target first visible + 1
 	$(pathToStreamItem).each(function(index) {
 		if( $(document).scrollTop() < $(this).offset().top ) {
-			if( noscroll === false ) {
+			if( _noscroll === false ) {
 				$('html, body').animate( { scrollTop: ($(pathToStreamItem + ":eq("+(index + 1)+")").offset().top - gPlatformMenubarTopOffset) }, 300); 
 			}
 			$(pathToStreamItem + ".activeItem").removeClass("activeItem");				
@@ -310,6 +341,7 @@ function _focusNextArticle(noscroll) {
 	});
 	return false;
 }
+
 
 function _focusPreviousFeed() {
 	if( $(pathToStreamItem + ".activeItem").length > 0 ) {
@@ -344,6 +376,7 @@ function _focusPreviousFeed() {
 
 	return false;
 }
+
 
 function _focusNextFeed() {
 	if( $(pathToStreamItem + ".activeItem").length > 0 ) {
@@ -467,18 +500,17 @@ function _bindMicroblogLinks(elid) {
 			});
 
 			//Add a twitter toggle if twitter is enabled
-			<?if( twitter_is_enabled($g_uid) ) {?>
-			$(pathToForm).append('<label class="checkbox tweetbox"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt="" /><input class="tweetcheck" name="tweet" type="checkbox" /></label>');
-			$(pathToForm + ' .tweeticon').unbind('click');
-			$(pathToForm + ' .tweeticon').bind('click', function() {
-				if( $(pathToForm + ' .tweetcheck').prop("checked") == false ) {
-					$(pathToForm + ' .tweetcheck').prop("checked", true);
-				} else {
-					$(pathToForm + ' .tweetcheck').prop("checked", false);
-				}
-    		});
-
-			<?}?>
+			if( cuTwitterIsEnabled ) {
+                $(pathToForm).append('<label class="checkbox tweetbox"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt="" /><input class="tweetcheck" name="tweet" type="checkbox" /></label>');
+                $(pathToForm + ' .tweeticon').unbind('click');
+                $(pathToForm + ' .tweeticon').bind('click', function() {
+                    if( $(pathToForm + ' .tweetcheck').prop("checked") == false ) {
+                        $(pathToForm + ' .tweetcheck').prop("checked", true);
+                    } else {
+                        $(pathToForm + ' .tweetcheck').prop("checked", false);
+                    }
+                });
+            }
 
 			//Submit buttons go in the div and we'll trigger form submission from outside
 			$(pathToForm).append('<a class="btn btn-success mbsubmit ' + postId + '" href="#">Post</a> <a class="btn btn-error mbcancel ' + postId + '" href="#">Cancel</a>');
@@ -562,6 +594,7 @@ function _bindMicroblogLinks(elid) {
         return true;
 }
 
+
 function _bindCartLinks(elid) {
 	    var elid = (typeof elid === "undefined") ? "" : elid;		
 
@@ -627,6 +660,7 @@ function _bindCartLinks(elid) {
         return true;
 }
 
+
 function _bindStickyLinks(elid) {
 	    var elid = (typeof elid === "undefined") ? "" : elid;		
 
@@ -664,12 +698,13 @@ function _bindStickyLinks(elid) {
 								//If this is the last item from this feed/owner, remove the active feed from the sidebar
 								console.log('unsticky: ' + fid);
 								if( $(pathToStreamItem + '.' + fid).length < 1  ) {
-									$('#divActiveFeeds ul.feedlist li.' + fid).remove();
+									$('#divActiveFeeds').find('ul.feedlist li.' + fid).remove();
 								}
 
 								//Remove the item
-								$('#' + id).remove();
-								_removeStickyItemLS(idx);
+                                $('#' + id).removeClass('sticky').addClass('unsticky');
+								//$('#' + id).remove();
+								//_removeStickyItemLS(idx);
                         }
                 });
 
@@ -696,22 +731,27 @@ function _bindStickyLinks(elid) {
 		return false;
 }
 
+
 function _getStreamWidth() {
 	var viewportWidth = $(window).width();
 	var sidebarWidth = $('#stream-sidebar-right').width();
 	return ((viewportWidth - sidebarWidth) - 80);
 }
 
+
 function _sortGrid(sizeOnly) {
     var sizeOnly = (typeof sizeOnly === "undefined") ? false : sizeOnly;
 	var streamWidth = _getStreamWidth();
 	var colcount = _calculateColumnCount();
+    var streamWrapObj = $('#stream-wrap');
+    var streamObj = $('#stream');
+    var streamItemsObj = streamObj.find('#stream-items');
 	
 	//Build the columns
 	if( sizeOnly == false ) {
-		$('#stream #stream-items .col').remove();
+		streamItemsObj.find('.col').remove();
     	for( c = 1 ; c <= colcount ; c++ ) {
-        	$('#stream #stream-items').append('<div class="col col' + c + '"><div class="stream-list"></div></div>');
+        	streamItemsObj.append('<div class="col col' + c + '"><div class="stream-list"></div></div>');
     	}
 	}
 
@@ -729,45 +769,46 @@ function _sortGrid(sizeOnly) {
 	}
 
 	//Reset some values
-	$('#stream #stream-items .col').addClass('span3');
-	$('#stream').css('margin-left', 'auto');
-	$('#stream').css('margin-right', 'auto');
-	$('#stream .stream-list').css('max-width', '600px');
-	$('#stream #stream-items .col').css('max-width', '600px');
-	$('#stream-wrap').css('width', streamWidth + 'px');
+	streamItemsObj.find('.col').addClass('span3');
+	streamObj.css('margin-left', 'auto');
+	streamObj.css('margin-right', 'auto');
+	streamObj.find('.stream-list').css('max-width', '600px');
+	streamItemsObj.find('.col').css('max-width', '600px');
+	streamWrapObj.css('width', streamWidth + 'px');
 
 	//Size the grid
 	if( colcount == 1 ) {
-		$('#stream').css('width', '800px');
-		$('#stream .stream-list').css('width', '600px');
-		$('#stream #stream-items .col').css('width', '600px');
-		$('#stream-wrap').css('width', '');
+		streamObj.css('width', '800px');
+		streamObj.find('.stream-list').css('width', '600px');
+        streamItemsObj.find('.col').css('width', '600px');
+		streamWrapObj.css('width', '');
 	} else
 	if( colcount == 2 ) {
-		$('#stream').css('width', Math.min(1500, (streamWidth * .99).toFixed()) + 'px');
-		$('#stream .stream-list').css('width', (streamWidth * .47).toFixed() + 'px');
-		$('#stream #stream-items .col').css('width', (streamWidth * .47).toFixed() + 'px');
+		streamObj.css('width', Math.min(1500, (streamWidth * .99).toFixed()) + 'px');
+        streamObj.find('.stream-list').css('width', (streamWidth * .47).toFixed() + 'px');
+        streamItemsObj.find('.col').css('width', (streamWidth * .47).toFixed() + 'px');
 	} else
 	if( colcount == 3 ) {
-		$('#stream').css('width', Math.min(2000, (streamWidth * .99).toFixed()) + 'px');
-		$('#stream .stream-list').css('width', (streamWidth * .30).toFixed() + 'px');
-		$('#stream #stream-items .col').css('width', (streamWidth * .30).toFixed() + 'px');
+		streamObj.css('width', Math.min(2000, (streamWidth * .99).toFixed()) + 'px');
+        streamObj.find('.stream-list').css('width', (streamWidth * .30).toFixed() + 'px');
+        streamItemsObj.find('.col').css('width', (streamWidth * .30).toFixed() + 'px');
 	} else
 	if( colcount == 4 ) {
-		$('#stream').css('width', Math.min(2500, (streamWidth * .99).toFixed()) + 'px');
-		$('#stream .stream-list').css('width', (streamWidth * .22).toFixed() + 'px');
-		$('#stream #stream-items .col').css('width', (streamWidth * .22).toFixed() + 'px');
+		streamObj.css('width', Math.min(2500, (streamWidth * .99).toFixed()) + 'px');
+        streamObj.find('.stream-list').css('width', (streamWidth * .22).toFixed() + 'px');
+        streamItemsObj.find('.col').css('width', (streamWidth * .22).toFixed() + 'px');
 	} else
 	if( colcount == 5 ) {
-		$('#stream').css('width', Math.min(3000, (streamWidth * .99).toFixed()) + 'px');
-		$('#stream .stream-list').css('width', (streamWidth * .17).toFixed() + 'px');
-		$('#stream #stream-items .col').css('width', (streamWidth * .17).toFixed() + 'px');
+		streamObj.css('width', Math.min(3000, (streamWidth * .99).toFixed()) + 'px');
+        streamObj.find('.stream-list').css('width', (streamWidth * .17).toFixed() + 'px');
+        streamItemsObj.find('.col').css('width', (streamWidth * .17).toFixed() + 'px');
 	} else {
-		$('#stream .stream-list').css('width', '');
+        streamObj.find('.stream-list').css('width', '');
 	}
 
 	return colcount;
 }
+
 
 function _resizeGrid() {
 	console.log('resize grid');
@@ -775,18 +816,21 @@ function _resizeGrid() {
 	return _buildRiver(true);
 }
 
+
 function _changeStreamNotice(notice, hide) {
     var hide = (typeof hide === "undefined") ? false : hide;
+    var noticeObj = $('#stream').find('p.notice');
 
-	$('#stream p.notice').html(notice);
+	noticeObj.html(notice);
 	if( hide == false ) {
-		$('#stream p.notice').show();	
+		noticeObj.show();
 	} else {
-		$('#stream p.notice').hide();		
+		noticeObj.hide();
 	}
 
 	return true;
 }
+
 
 function _buildRiver(cached) {
     var cached = (typeof cached === "undefined") ? false : cached;
@@ -817,32 +861,32 @@ function _buildRiver(cached) {
 		}
 
 		//Re-trigger masonry when viewport is resized on desktop browsers
-		<?if( $g_platform != "mobile" && $g_platform != "tablet" ) {?>
-		$(window).off('debouncedresize');
-    	$(window).on('debouncedresize', function( event ){
-			if( $(pathToStreamList).length != _calculateColumnCount() ) {
-				console.log('reflowing grid');
-				freedomController.v1.river.methods.resizeGrid();  	
-			} else {
-				console.log('no re-flow needed');
-				_sortGrid(true);
-			}
-    	});
-		<?}?>
+		if( platform != "mobile" && platform != "tablet" ) {
+            $(window).off('debouncedresize');
+            $(window).on('debouncedresize', function( event ){
+                if( $(pathToStreamList).length != _calculateColumnCount() ) {
+                    console.log('reflowing grid');
+                    freedomController.v1.river.methods.resizeGrid();
+                } else {
+                    console.log('no re-flow needed');
+                    _sortGrid(true);
+                }
+            });
+        }
 
 	});
 
 	return true;
 }
 
-function _populateGridSticky(cols) {
+
+function _populateGridSticky(cols, data) {
 	var col = 1;
 
 	//Get data out of local storage
 	var lsdata = sessionStorage.getItem(lsStickyDataKey);
 	if( lsdata !== null ) {
 		data = JSON.parse(lsdata);
-		console.log(data);
 	}
 
 	$.each(data.data.items, function(i, item) {
@@ -878,17 +922,17 @@ function _populateGridSticky(cols) {
 			}
 
 			//Add a swipe handler for mobile
-			<?if( $g_platform == "mobile" ) {?>
-			(function() {
-				$(pathToStreamItem + '#' + item.id).swipe('destroy');
-				$(pathToStreamItem + '#' + item.id).swipe({
-					swipeRight: function() {
-						$(pathToStreamItem + '#' + item.id).hide();
-						$(pathToStreamItem + '#' + item.id + ' .aUnSticky').trigger('click');
-					}
-				});
-			})();
-			<?}?>
+			if( platform == "mobile") {
+                (function() {
+                    $(pathToStreamItem + '#' + item.id).swipe('destroy');
+                    $(pathToStreamItem + '#' + item.id).swipe({
+                        swipeRight: function() {
+                            $(pathToStreamItem + '#' + item.id).hide();
+                            $(pathToStreamItem + '#' + item.id + ' .aUnSticky').trigger('click');
+                        }
+                    });
+                })();
+            }
 		}
 
 	});
@@ -896,7 +940,8 @@ function _populateGridSticky(cols) {
 	return false;
 }
 
-function _populateGrid(cols) {
+
+function _populateGrid(cols, data) {
 	var col = 1;
 
 	//Get data out of local storage
@@ -948,6 +993,7 @@ function _populateGrid(cols) {
 	return false;
 }
 
+
 function _getRiverStickyItems(cached) {
 	var timestamp = Math.round(new Date().getTime() / 1000);
 
@@ -961,15 +1007,16 @@ function _getRiverStickyItems(cached) {
 		url: '/cgi/out/list.river.sticky?ts=' + timestamp,
 		dataType: "json",
 		success: function(data) {
-			console.log('store data: ' + data);
+			//console.log('store data: ' + data);
 			sessionStorage.setItem(lsStickyDataKey, JSON.stringify(data));
-			_populateGridSticky(_calculateColumnCount());
+			_populateGridSticky(_calculateColumnCount(), data);
 		},
 		error: function( x, y, z) {
 			_changeStreamNotice('Error: ' + x.responseText);
 		}
 	});
 }
+
 
 function _getRiverItems(cached) {
 	if( cached == true ) {
@@ -983,9 +1030,9 @@ function _getRiverItems(cached) {
 		jsonpCallback: 'onGetRiverStream',
 		dataType: "jsonp",
 		success: function(data) {
-			console.log('store data: ' + data);
+			//console.log('store data: ' + data);
 			sessionStorage.setItem(lsRiverDataKey, JSON.stringify(data));
-			_populateGrid(_calculateColumnCount());
+			_populateGrid(_calculateColumnCount(), data);
 		},
 		error: function( x, y, z) {
 			_changeStreamNotice('Error: ' + x.responseText);
@@ -993,6 +1040,7 @@ function _getRiverItems(cached) {
 	});
 
 }
+
 
 function _removeStickyItemLS(index) {
 	//Get data out of local storage
@@ -1005,6 +1053,7 @@ function _removeStickyItemLS(index) {
 	}
 	return true;
 }
+
 
 function _bindEnclosureLinks(elid) {
     var elid = (typeof elid === "undefined") ? "" : elid;		
@@ -1022,6 +1071,7 @@ function _bindEnclosureLinks(elid) {
     return true;
 }
 
+
 function _bindEmbedActivations(elid) {
     var elid = (typeof elid === "undefined") ? "" : elid;		
 
@@ -1038,6 +1088,7 @@ function _bindEmbedActivations(elid) {
 	return true;
 };
 
+
 function _makePostSticky(elid, pid, idx, fid) {
 	$(elid).addClass('sticky');
     $(elid).append('<a class="aUnSticky" href="#" data-idx="' + idx + '" data-id="' + pid + '" data-feedid="' + fid + '"><img class="icon-unsticky" src="/images/blank.gif" alt="" /></a>');
@@ -1045,12 +1096,13 @@ function _makePostSticky(elid, pid, idx, fid) {
 	return true;
 }
 
+
 function _calculateColumnCount() {
 	if( platform == "mobile" || platform == "tablet" ) {  return 1;  }
 
-	<?if($g_prefs['rivercolumns'] > 0) {?>
-	return <?echo $g_prefs['rivercolumns']?>;
-	<?}?>
+	if( cuRiverColumnCount > 0 ) {
+	    return cuRiverColumnCount;
+	}
 
 	var streamWidth = _getStreamWidth();
 
@@ -1064,6 +1116,7 @@ function _calculateColumnCount() {
 	
 	return colcount;
 }
+
 
 //-----------------------------------------------------------------------------------
 

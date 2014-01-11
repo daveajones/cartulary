@@ -1,5 +1,6 @@
 /* --------------------------------------------------- */
 /* ----- Menus --------------------------------------- */
+li.menubar-search-container { display:none; }
 .navbar-inner {
   border:none;
   background-color: #fafafa;
@@ -18,6 +19,37 @@
   border-right: 1px solid #f2f2f2;
   border-left: 1px solid #efefef;
 }
+.navbar .divider-vertical34 {
+    height: 34px;
+    border-right: 1px solid #f2f2f2;
+    border-left: 1px solid #efefef;
+}
+#slideout {
+    display:none;
+    position: fixed;
+    top: 40px;
+    left: 0;
+    -webkit-transition-duration: 0.3s;
+    -moz-transition-duration: 0.3s;
+    -o-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+}
+#slideout_inner {
+    position: fixed;
+    top: 40px;
+    left: -250px;
+    -webkit-transition-duration: 0.3s;
+    -moz-transition-duration: 0.3s;
+    -o-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+}
+#slideout.open {
+    left: 250px;
+}
+#slideout.open #slideout_inner {
+    left: 0;
+}
+
 /* --------------------------------------------------- */
 
 
@@ -32,6 +64,7 @@
 .avatar128 {  height:128px;  }
 .riverminitar {  float:right;  max-height:64px;  max-width:64px;  }
 .rivermicrotar {  float:right;  max-height:48px;  max-width:48px;  }
+.favicon {  max-height:48px;  max-width:48px;  }
 /* --------------------------------------------------- */
 
 
@@ -60,9 +93,15 @@
     -webkit-box-shadow: 0px 0px 10px rgba(20, 20, 20, 0.2);
        -moz-box-shadow: 0px 0px 10px rgba(20, 20, 20, 0.2);
             box-shadow: 0px 0px 10px rgba(20, 20, 20, 0.2);
+    transition:width 1s, height 1s, transform 1s;
 } 
 .pageContentWrapper.River .stream .stream-items .stream-list > .article.sticky {
     margin-top:15px;
+}
+.pageContentWrapper.River .stream .stream-items .stream-list > .article.unsticky {
+    width:0px;
+    height:0px;
+    transform:rotate(180deg);
 }
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .byline {
 	display:none;
@@ -135,6 +174,7 @@
   clear:both;
   margin:20px auto 0;
   max-width: 100%;
+  width:100%;
 }
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .encpicture2 {
   display:inline-block;
@@ -751,6 +791,10 @@ div.searchbar p.result-msg {
 
 /* --------------------------------------------------- */
 /* ----- Editor Page ----- */
+.submenuEditor {
+    z-index: 2;
+    margin-top:44px;
+}
 body#bodyEditOutline {
     background:white;
 }
@@ -758,45 +802,113 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     width: 97%;
 }
 .pageContentWrapper.Editor .divOutlineTitle {
-    border-bottom:solid #dddddd 1px;
+    /* border-bottom:solid #dddddd 1px; */
     opacity:1.0;
 }
-.pageContentWrapper.Editor .divOutlineTitle.dim {
-    -webkit-transition: all 0.7s ease;
-    -moz-transition: all 0.7s ease;
-    -o-transition: all 0.7s ease;
-    transition: all 0.7s ease;
-    opacity:0.1;
+.pageContentWrapper.Editor #divEditOutline li.concord-node {
+        /* margin-bottom:10px; */
+
 }
 .pageContentWrapper.Editor #divEditOutline {
-    background:white;
-    position: relative;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    width:900px;
-    margin-left:auto;
-    margin-right:auto;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;
-    border-radius: 0px;
-    min-height: 400px;
+     background:white;
+     position: relative;
+     margin-top: 20px;
+     padding-bottom: 10px;
+     width:900px;
+     margin-left:auto;
+     margin-right:auto;
+     -webkit-border-radius: 0px;
+     -moz-border-radius: 0px;
+     border-radius: 0px;
+     min-height: 400px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen {
+    background: #eee;
+    color:#333;
+    font-size:160%;
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:0;
+    overflow:hidden;
+    z-index:1;
+    transition: height 500ms;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.165);
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open {
+    height:50%;
+    padding-top:120px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen .recentfilesopen {
+    display:none;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open .recentfilesopen {
+    display:block;
+    list-style-type: none;
+    margin-left:60px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open .recentfilesopen li {
+    margin-bottom:10px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open .sheetclose {
+    margin-right:30px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open div.openbyurl {
+    margin-left:20px;
+    margin-bottom:20px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate {
+    background: #eee;
+    color:#333;
+    font-size:160%;
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:0;
+    overflow:hidden;
+    z-index:1;
+    transition: height 500ms;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.165);
+}
+.pageContentWrapper.Editor #divEditSheetTemplate .templateopen {
+    display:none;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open {
+    height:50%;
+    padding-top:120px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open .templateopen {
+    display:block;
+    list-style-type: none;
+    margin-left:60px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open .templateopen li {
+    margin-bottom:10px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open .sheetclose {
+    margin-right:30px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open div.openbyurl {
+    margin-left:20px;
+    margin-bottom:20px;
 }
 .pageContentWrapper.Editor #divEditOutline div.outlineinfo {
     text-align:right;
     margin-right:10px;
 }
 .pageContentWrapper.Editor #divEditOutline .divOutlinerContainer {
-    margin-top:30px;
+    margin-top:40px;
     padding-left:10px;
 }
 .pageContentWrapper.Editor #divEditOutline .title {
-    box-shadow: inset 0px 3px 1px -1px white;
-    margin-top:8px;
+    box-shadow: inset 0 3px 1px -1px white;
+    margin-top:18px;
     font-weight:bold;
     font-size:20px;
     border: none;
     outline:none;
-    border-bottom:solid black 1px;
     background: white;
     width: 600px;
     height: 28px;
@@ -1502,7 +1614,7 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
 @media (min-width:980px) { /* ---------- Start Media: 1000 -------------------------------------- */
 /* ----------------------------------------------------------------------------------------------- */
 /* ----------------------------------------------------------------------------------------------- */
-
+li.menubar-search-container { display:inline; }
 /* --------------------------------------------------- */
 /* ----- River ----- */
 .pageContentWrapper.River #stream-sidebar-right {  display:block;  }

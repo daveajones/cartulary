@@ -15,5 +15,8 @@
 <script id="search-people" type="text/x-jquery-tmpl">
 <?include "$confroot/$scripts/search-People-temp.js"?>
 </script>
+<script id="search-editor" type="text/x-jquery-tmpl">
+<?include "$confroot/$scripts/search-Editor-temp.js"?>
+</script>
 <!-- ---------------- -->
 <?}?>

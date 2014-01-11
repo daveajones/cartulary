@@ -1143,7 +1143,7 @@ function get_short_url($uid = NULL, $longurl = NULL)
     //Internal url shortener always takes precedence
     if (!empty($prefs['s3shortbucket'])) {
         $shortcode = get_next_short_url($prefs['lastshortcode']);
-        $file = create_short_url_file($longurl);
+        $file = create_short_url_file($longurl, $uid);
         $result = putInS3($file, $shortcode, $prefs['s3shortbucket'], $prefs['s3key'], $prefs['s3secret'], "text/html");
         if ($result == FALSE) {
             return (FALSE);
@@ -1172,14 +1172,20 @@ function get_short_url($uid = NULL, $longurl = NULL)
 
 
 //Create a meta-refresh html stub to act as a short url
-function create_short_url_file($url = NULL)
+function create_short_url_file($url = NULL, $uid = NULL)
 {
     //Check parameters
     if (empty($url)) {
         return (FALSE);
     }
 
-    return ("<html><head><meta http-equiv=\"refresh\" content=\"0;URL='$url'\"></head><body></body></html>");
+    $ac = "";
+    if (!empty($uid)) {
+        $prefs = get_user_prefs($uid);
+        $ac = $prefs['analyticscode'];
+    }
+
+    return ("<html><head><meta http-equiv=\"refresh\" content=\"0;URL='$url'\"></head><body>$ac</body></html>");
 }
 
 
@@ -1745,13 +1751,15 @@ function get_server_river_s3_url($path = NULL, $filename = NULL)
 
 
 //Remove all characters except alphanum and dashes
-function stripText($text)
+function stripText($text, $nl = TRUE, $leave = "")
 {
-    $text = strtolower(trim($text));
+    if($nl) {
+        $text = strtolower(trim($text));
+    }
     // replace all white space sections with a dash
     $text = str_replace(' ', '-', $text);
     // strip all non alphanum or -
-    $clean = ereg_replace("[^A-Za-z0-9\-]", "", $text);
+    $clean = ereg_replace("[^A-Za-z0-9".$leave."\-]", "", $text);
 
     return $clean;
 }

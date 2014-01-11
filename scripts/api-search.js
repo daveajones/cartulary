@@ -36,6 +36,7 @@ function _parseQuerySection( query ) {
   if( newQuery.indexOf("microblog:") === 0 ) {  return("microblog");  }
   if( newQuery.indexOf("articles:") === 0 )  {  return("articles");   }
   if( newQuery.indexOf("subscribe:") === 0 ) {  return("subscribe");  }
+  if( newQuery.indexOf("editor:") === 0 ) {  return("editor");  }
 
   //Return blank if no recognizable section was found
   return("");

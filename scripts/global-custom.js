@@ -1,13 +1,5 @@
-//System-wide globals
-var systemUrl = '<?echo $system_fqdn?>';
-var platform = '<?echo $platform?>';
-var gDatestamp = '<?echo date('YmdHis')?>';
-var gPlatformMenubarTopOffset = <?if( $g_platform == "mobile" ) {?>10<?}else{?>60<?}?>;
-var msgtimer;
-
-
-//http://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string
-//Call a function who's name is in a variable
+//Call a function whos name is in a variable
+//_____http://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string
 function executeFunctionByName(functionName, context /*, args */) {
   var args = Array.prototype.slice.call(arguments).splice(2);
   var namespaces = functionName.split(".");
@@ -17,6 +9,42 @@ function executeFunctionByName(functionName, context /*, args */) {
   }
   return context[func].apply(this, args);
 }
+
+
+//Save the selected text
+function saveSelection() {
+    if (window.getSelection) {
+        sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+            var ranges = [];
+            for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                ranges.push(sel.getRangeAt(i));
+            }
+            return ranges;
+        }
+    } else if (document.selection && document.selection.createRange) {
+        return document.selection.createRange();
+    }
+    console.log("can't get selection.");
+    return null;
+}
+
+
+//Restore a text selection
+function restoreSelection(savedSel) {
+    if (savedSel) {
+        if (window.getSelection) {
+            sel = window.getSelection();
+            sel.removeAllRanges();
+            for (var i = 0, len = savedSel.length; i < len; ++i) {
+                sel.addRange(savedSel[i]);
+            }
+        } else if (document.selection && savedSel.select) {
+            savedSel.select();
+        }
+    }
+}
+
 
 /**
  * author Remy Sharp
@@ -79,6 +107,7 @@ function executeFunctionByName(functionName, context /*, args */) {
     });
 })(jQuery);
 
+
 //A general purpose debouncer extension
 //_____via http://www.hnldesign.nl/blog/debouncing-events-with-jquery/
 var deBouncer = function($,cf,of, interval){
@@ -132,28 +161,26 @@ function getSelectionHtml() {
 
 //Convert links found in twitter messages into the target link of the message
 function sanitize_twitter(divStream) {
-$(divStream + ' a').each( function() {
-    var alobj = $(this);
-    var artitle = alobj.text();
-	if( alobj.attr("href") ) {
-    if(alobj.attr("href").indexOf("twitter.com") != -1) {
-    
-        //If this twitter post contains a URL, then attach that URL to the link
-        if(artitle.indexOf("http://") != -1) {
-            var twurl = artitle.match(/\bhttp\:\/\/([A-Za-z0-9\.\/\+\&\@\~\-\%\?\=\_\#\!]*)/gi);
-            //alobj.attr("href", twurl);
-            //alert(twurl);
-            var twlen = twurl.length;
-            for(var i=0; i < twlen; i++) {
-              alobj.parent().append(' &rarr; <a class="twurl" href="' + twurl[i] + '">Link</a>');
+    $(divStream + ' a').each( function() {
+        var alobj = $(this);
+        var artitle = alobj.text();
+        if( alobj.attr("href") ) {
+            if(alobj.attr("href").indexOf("twitter.com") != -1) {
+                //If this twitter post contains a URL, then attach that URL to the link
+                if(artitle.indexOf("http://") != -1) {
+                    var twurl = artitle.match(/\bhttp\:\/\/([A-Za-z0-9\.\/\+\&\@\~\-\%\?\=\_\#\!]*)/gi);
+                    var twlen = twurl.length;
+                    for(var i=0; i < twlen; i++) {
+                      alobj.parent().append(' &rarr; <a class="twurl" href="' + twurl[i] + '">Link</a>');
+                    }
+                } else {
+                    return true;
+                }
             }
-        } else {
-            return true;
         }
-    }
-	}
-});
+    });
 }
+
 
 //Strip leading and trailing whitespace from a string
 function trim(strText) {
@@ -168,6 +195,7 @@ function trim(strText) {
    return strText;
 }
 
+
 //Extend jquery so we can easily center an element
 //_____via stackflow: http://stackoverflow.com/questions/210717/using-jquery-to-center-a-div-on-the-screen
 jQuery.fn.center = function ( horz, vert ) {
@@ -181,6 +209,7 @@ jQuery.fn.center = function ( horz, vert ) {
     return this;
 }
 
+
 //A jquery selector extension to determine if an element is visible in the viewport
 //_____via http://remysharp.com/2009/01/26/element-in-view-event-plugin/
 $.extend($.expr[':'],{
@@ -192,7 +221,8 @@ $.extend($.expr[':'],{
     }
 });
 
-//Display something in the global message box
+
+//Display something in the global dropdown message box
 function showMessage( text, status, timeout) {
    clearInterval(msgtimer);
    $('#divMessageBox').slideUp("normal", function(){ $('#divMessageBox').remove(); });
@@ -231,19 +261,23 @@ function showMessage( text, status, timeout) {
 
 }
 
+
+//Close the global message box
 function closeMessage() {
          $('#divMessageBox').slideUp("normal", function(){ $('#divMessageBox').remove(); });
          return(false);
 }
 
+
 //Empty and blank string checks
-//via: http://stackoverflow.com/questions/154059/what-is-the-best-way-to-check-for-an-empty-string-in-javascript
+//_____via http://stackoverflow.com/questions/154059/what-is-the-best-way-to-check-for-an-empty-string-in-javascript
 function isEmpty(str) {
     return (!str || 0 === str.length);
 }
 function isBlank(str) {
     return (!str || /^\s*$/.test(str));
 }
+
 
 //Is this object an image?
 function isImage(url, type) {
@@ -260,6 +294,7 @@ function isImage(url, type) {
         return false;
 };
 
+
 //Is it video?
 function isVideo(url, type) {
 	var type = (typeof type === "undefined") ? false : type;
@@ -274,6 +309,7 @@ function isVideo(url, type) {
         
         return false;
 };
+
 
 //Is it audio?
 function isAudio(url, type) {
@@ -291,6 +327,7 @@ function isAudio(url, type) {
         return false;
 };
 
+
 //Is it html content?
 function isHtml(url, type) {
 	var type = (typeof type === "undefined") ? false : type;
@@ -303,6 +340,7 @@ function isHtml(url, type) {
         
         return false;
 };
+
 
 // Modified from http://ejohn.org/blog/javascript-pretty-date/#comment-297458
 function prettyDate(date) {
@@ -336,6 +374,7 @@ function prettyDate(date) {
   return dateFormat(date, 'longDate');    
 };
 
+
 /*
  * Date Format 1.2.3
  * (c) 2007-2009 Steven Levithan <stevenlevithan.com>
@@ -351,7 +390,6 @@ function prettyDate(date) {
  *
  * http://blog.stevenlevithan.com/archives/date-time-format
  */
-
 var dateFormat = function () {
 	var	token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g,
 		timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
@@ -431,6 +469,7 @@ var dateFormat = function () {
     return finalDate;
 }();
 
+
 // Some common format strings
 dateFormat.masks = {
 	"default":      "HH:MM:ss dd mmm yyyy ", // 17:46:21 09 Jun 2007 
@@ -448,6 +487,7 @@ dateFormat.masks = {
     
     timeDate:       "dd mmm; h:MM TT" // 09 Jun; 5:46:21 PM
 };
+
 
 // Internationalization strings
 dateFormat.i18n = {
@@ -488,7 +528,6 @@ function getVerticalMargins(el) {
 
 //Adjust the size of a cartulized article modal to fill the screen better
 function modalFullHeight(el, loading) {
-	<?if($g_platform != "mobile"){?>
 	var winH = $(window).height();
         var winW = $(window).width();  
 	var winScLeft = $(window).scrollLeft();
@@ -539,15 +578,13 @@ function modalFullHeight(el, loading) {
 		$(window).off('debouncedresize');	    		
 	});
 
-
-	<?}?>			
 	return true;
 }
 
 
 //Spawn a microblog post box
 function newMicroblogPostWindow(riveritem) {
-        var modal = '#mdlMicroblogPost';
+    var modal = '#mdlMicroblogPost';
 	var riveritem  = (typeof riveritem === "undefined") ? false : riveritem;
 	var compact = true;
 
@@ -623,11 +660,7 @@ function newMicroblogPostWindow(riveritem) {
 	//Clear the upload queue
         $(modal + ' #divEnclosures').hide();
         $(modal + ' #divUpload').hide();
-        <?if($device=="android") {?>
-        $(modal + ' #fileMobile').replaceWith($(modal + ' #fileMobile').clone(true));
-        <?} else {?>
         $(modal + ' #file_upload').uploadifive('clearQueue');
-        <?}?>
 
 
 	//Show the modal	
@@ -636,8 +669,7 @@ function newMicroblogPostWindow(riveritem) {
 
         //Ajaxify the form
         $(modal + ' .mbpostform').ajaxForm({
-                <?if($device=="android") {?>dataType:       'html',<?
-                } else {?>dataType:       'json',<?}?>
+                dataType:       'json',
                 cache:          false,
                 clearForm:      true,
                 resetForm:      true,
@@ -750,8 +782,8 @@ function showArticleWindow(riveritem) {
 					modalFullHeight(modal, false);
                                         $(modal + ' .artitle').append(data.article.title);
                                         $(modal + ' .arbody').append(data.article.body);
-                                        $(modal + ' .arfooter .opml').attr('href', "<?echo $showarticlepage?>-opml?aid=" + data.article.id);
-                                        $(modal + ' .arfooter .print').attr('href', "<?echo $showarticlepage?>-print?aid=" + data.article.id);
+                                        $(modal + ' .arfooter .opml').attr('href', "/showarticle-opml?aid=" + data.article.id);
+                                        $(modal + ' .arfooter .print').attr('href', "/showarticle-print?aid=" + data.article.id);
                                         $(modal + ' .arfooter .link').attr('href', data.article.url);
                                         $(modal + ' .arfooter').show();
                                 }

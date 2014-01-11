@@ -1,4 +1,5 @@
 <?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
+<?include "$confroot/$templates/php_redirect_handler.php"?>
 <?include "$confroot/$templates/php_page_noauth.php"?>
 <?
   // If this person is already logged in, send them to the start page

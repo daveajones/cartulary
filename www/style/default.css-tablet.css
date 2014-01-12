@@ -675,10 +675,28 @@ div.searchbar p.result-msg {
 
 /* --------------------------------------------------- */
 /* ----- Editor Page ----- */
+.submenuEditor {
+    z-index: 2;
+    margin-top:44px;
+}
+body#bodyEditOutline {
+    background:white;
+}
+body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
+    width: 97%;
+}
+.pageContentWrapper.Editor .divOutlineTitle {
+    /* border-bottom:solid #dddddd 1px; */
+    opacity:1.0;
+}
+.pageContentWrapper.Editor #divEditOutline li.concord-node {
+    /* margin-bottom:10px; */
+
+}
 .pageContentWrapper.Editor #divEditOutline {
     background:white;
     position: relative;
-    padding-top: 10px;
+    margin-top: 20px;
     padding-bottom: 10px;
     width:900px;
     margin-left:auto;
@@ -688,19 +706,99 @@ div.searchbar p.result-msg {
     border-radius: 0px;
     min-height: 400px;
 }
+.pageContentWrapper.Editor #divEditSheetOpen {
+    background: #eee;
+    color:#333;
+    font-size:160%;
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:0;
+    overflow:hidden;
+    z-index:1;
+    transition: height 500ms;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.165);
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open {
+    height:50%;
+    padding-top:120px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen .recentfilesopen {
+    display:none;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open .recentfilesopen {
+    display:block;
+    list-style-type: none;
+    margin-left:60px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open .recentfilesopen li {
+    margin-bottom:10px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open .sheetclose {
+    margin-right:30px;
+}
+.pageContentWrapper.Editor #divEditSheetOpen.open div.openbyurl {
+    margin-left:20px;
+    margin-bottom:20px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate {
+    background: #eee;
+    color:#333;
+    font-size:160%;
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:0;
+    overflow:hidden;
+    z-index:1;
+    transition: height 500ms;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.165);
+}
+.pageContentWrapper.Editor #divEditSheetTemplate .templateopen {
+    display:none;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open {
+    height:50%;
+    padding-top:120px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open .templateopen {
+    display:block;
+    list-style-type: none;
+    margin-left:60px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open .templateopen li {
+    margin-bottom:10px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open .sheetclose {
+    margin-right:30px;
+}
+.pageContentWrapper.Editor #divEditSheetTemplate.open div.openbyurl {
+    margin-left:20px;
+    margin-bottom:20px;
+}
 .pageContentWrapper.Editor #divEditOutline div.outlineinfo {
     text-align:right;
     margin-right:10px;
 }
 .pageContentWrapper.Editor #divEditOutline .divOutlinerContainer {
-    margin-top:30px;
+    margin-top:40px;
     padding-left:10px;
 }
 .pageContentWrapper.Editor #divEditOutline .title {
-    margin-top:8px;
+    box-shadow: inset 0 3px 1px -1px white;
+    margin-top:18px;
+    font-weight:bold;
+    font-size:20px;
     border: none;
-    background: #eee;
-    width: 700px;
+    outline:none;
+    background: white;
+    width: 600px;
+    height: 28px;
+}
+.pageContentWrapper.Editor #divEditOutline .title:focus, input:focus {
+    outline: 0;
 }
 /* --------------------------------------------------- */
 

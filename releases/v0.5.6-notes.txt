@@ -1,0 +1,30 @@
+#Release Notes - Freedom Controller v0.5.6
+
+
+##This release has one focus: improving the editor.
+
+
+##There are two new user prefs.
+  - Disqus Shortname:  This is used for enabling disqus comments on pages you publish using the editor.
+  - Analytics code:  Whatever html or text you put here will be injected at the bottom of every html body
+                     of editor documents AND url shortener files for s3.  You can use this for adding 
+                     analytics to editor documents and short urls.
+
+
+##The editor has a new sub-menu that controls everything.
+  - New: Creates a new, empty file that replaces what you currently have.  No prompt to save.
+  - Open: Drops down a list of the files you've recently worked on so you can re-open them.  You can also
+          open an opml file by url using this.
+  - Save: Saves the file and writes an opml and html version to your s3 bucket.
+  - Rename: Save the file under a different file name.
+  - Template: Apply an outline containing a "replace" node to another outline. The content of the current
+              outline replaces the "replace" type node in the template.
+  - Publish: Brings up the Microblog modal so you can push it to your microblog feed and/or twitter.
+  - WYSIWYG: Toggles html rendering on for the outline your working on.
+  - Type: Sets the node you currently have selected to the type you choose.
+  - Disqus: Enables disqus comments for the html version of this outline.
+  - Redirect: Writes a stub file to an S3 bucket containing a meta redirect to the html version of an outline.
+  - Link Icon: Sets selected text as a hyperlink.
+
+
+

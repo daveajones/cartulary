@@ -66,6 +66,7 @@ if ( isset($_POST['usetotp']) ) { $usetotp = 1; } else { $usetotp = 0; };
 if ( isset($_POST['hidesublist']) ) { $hidesublist = 1; } else { $hidesublist = 0; };
 if ( isset($_POST['analyticscode']) ) { $analyticscode = $_POST['analyticscode']; } else { $analyticscode = ""; };
 if ( isset($_POST['disqus_shortname']) ) { $disqus_shortname = $_POST['disqus_shortname']; } else { $disqus_shortname = ""; };
+if ( isset($_POST['editorbucket']) ) { $editorbucket = $_POST['editorbucket']; } else { $editorbucket = ""; };
 $jsondata = array();
 $jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
@@ -698,6 +699,17 @@ if( strlen($disqus_shortname) > 64 ) {
     exit(1);
 }
 $prefs['disqus_shortname'] = $disqus_shortname;
+
+$jsondata['prefname'] = "editorbucket";
+if( strlen($editorbucket) > 64 ) {
+    //Log it
+    loggit(2,"The value for editor bucket was too long: [$editorbucket]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max editor bucket length is 64 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['editorbucket'] = $editorbucket;
 //--------------------------------------------------------
 //--------------------------------------------------------
 

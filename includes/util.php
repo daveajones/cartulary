@@ -1711,6 +1711,47 @@ function get_s3_url($uid = NULL, $path = NULL, $filename = NULL)
 }
 
 
+//Build an s3 url off of a given bucket
+/*
+function get_s3_bucket_url($bucket = NULL, $path = NULL, $filename = NULL)
+{
+
+    if (empty($bucket)) {
+        loggit(2, "The bucket string was empty: [$bucket].");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+
+    //Globals
+    $url = '';
+    $prot = 'http://';
+    $host = $bucket . '.s3.amazonaws.com';
+    $path = trim($path, '/');
+    $filename = ltrim($filename, '/');
+
+    //First let's get a proper hostname value
+    $url = $prot . $host . "/" . $path . "/" .$filename;
+
+
+    $url = trim($url, "/");
+
+    if (!empty($path)) {
+        $url .= "/" . $path;
+    }
+
+    if (!empty($filename)) {
+        $url .= "/" . $filename;
+    }
+
+    //loggit(3, "DEBUG: ".print_r($s3info, TRUE));
+    //loggit(3, "DEBUG: $url");
+    return ($url);
+}
+*/
+
 //Build an s3 url for the server's river files
 function get_server_river_s3_url($path = NULL, $filename = NULL)
 {

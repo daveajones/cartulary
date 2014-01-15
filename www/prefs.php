@@ -187,6 +187,7 @@
         <h3>Editor</h3>
         <ul>
             <li>My disqus shortname is: <input name="disqus_shortname" class="urlinput" type="text" value="<?echo $prefs['disqus_shortname']?>" /></li>
+            <li>I want editor files saved in this bucket: <input name="editorbucket" class="urlinput" type="text" value="<?echo $prefs['editorbucket']?>" /></li>
         </ul>
     </div>
 

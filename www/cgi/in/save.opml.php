@@ -10,12 +10,12 @@ $jsondata = array();
 
 //Check that s3 is enabled
 if( !s3_is_enabled($uid) && !sys_s3_is_enabled() ) {
-  //Log it
-  loggit(2,"User didn't have s3 enabled for opml save: [$uid].");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Configure s3 in the prefs to enable saving.";
-  echo json_encode($jsondata);
-  exit(1);
+    //Log it
+    loggit(2,"User didn't have s3 enabled for opml save: [$uid].");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Configure s3 in the prefs to enable saving.";
+    echo json_encode($jsondata);
+    exit(1);
 }
 
 //Get the title
@@ -27,7 +27,7 @@ if ( isset($_REQUEST['title']) ) {
 //Render the title?
 $rendertitle = TRUE;
 if ( isset($_REQUEST['rendertitle']) && $_REQUEST['rendertitle'] == "false" ) {
-     $rendertitle = FALSE;
+    $rendertitle = FALSE;
 }
 loggit(3, "DEBUG: [".$_REQUEST['rendertitle']."]");
 
@@ -63,14 +63,14 @@ if ( isset($_REQUEST['oldfilename']) ) {
 
 //Get the opml data
 if ( isset($_REQUEST['opml']) ) {
-  $opml = $_REQUEST['opml'];
+    $opml = $_REQUEST['opml'];
 } else {
-  //Log it
-  loggit(2,"No opml data was set for this opml save.");
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "No opml data given.";
-  echo json_encode($jsondata);
-  exit(1);
+    //Log it
+    loggit(2,"No opml data was set for this opml save.");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "No opml data given.";
+    echo json_encode($jsondata);
+    exit(1);
 };
 
 
@@ -78,16 +78,16 @@ if ( isset($_REQUEST['opml']) ) {
 $s3info = get_s3_info($uid);
 $s3res = putInS3($opml, $filename, $s3info['bucket']."/opml", $s3info['key'], $s3info['secret'], "text/xml");
 if(!$s3res) {
-  loggit(2, "Could not create S3 file: [$filename] for user: [$uid].");
-  loggit(3, "Could not create S3 file: [$filename] for user: [$uid].");
-  //Log it
-  $jsondata['status'] = "false";
-  $jsondata['description'] = "Error writing to S3.";
-  echo json_encode($jsondata);
-  exit(1);
+    loggit(2, "Could not create S3 file: [$filename] for user: [$uid].");
+    loggit(3, "Could not create S3 file: [$filename] for user: [$uid].");
+    //Log it
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Error writing to S3.";
+    echo json_encode($jsondata);
+    exit(1);
 } else {
-  $s3url = get_s3_url($uid, "/opml/", $filename);
-  loggit(1, "Wrote opml to S3 at url: [$s3url].");
+    $s3url = get_s3_url($uid, "/opml/", $filename);
+    loggit(1, "Wrote opml to S3 at url: [$s3url].");
 }
 
 //Assemble an old url if we had an old filename
@@ -116,30 +116,64 @@ if(!$s3res) {
 //Update recent file table
 update_recent_file($uid, $s3url, $title, $opml, $s3oldurl);
 
+//Go ahead and put in the urls we saved
+$jsondata['url'] = $s3url;
+$jsondata['html'] = $s3html;
+
 //Update the redirector table
 if( !empty($rhost) ) {
     //Update the redirection table
     update_redirection_host_name_by_url($s3html, $rhost, $uid);
 
-    //Create the index stub that will redirect via a meta-refresh
-    $rfile = create_short_url_file($s3html, $uid);
-
     //Parse out the url to find the bucket and key names
+    if( stripos($rhost, 'http') !== 0) {
+        $rhost = 'http://'.$rhost;
+    }
     $purl = parse_url($rhost);
 
-    //Now put the index stub into s3
-    $s3res = putInS3($rfile, "index.html", $purl['host'].rtrim($purl['path'], '/'), $s3info['key'], $s3info['secret'], "text/html");
-    if(!$s3res) {
-        loggit(2, "Could not create S3 file: [index.html] for user: [$uid].");
-        loggit(3, "Could not create S3 file: [index.html] for user: [$uid].");
-        //Log it
-        $jsondata['status'] = "false";
-        $jsondata['description'] = "Error writing redirection stub to S3.";
-        echo json_encode($jsondata);
-        exit(1);
-    } else {
-        $redhtml = $purl['host'].rtrim($purl['path'], '/')."/index.html";
-        loggit(3, "DEBUG: Wrote html to S3 at url: [$redhtml].");
+    //See if the host of this url is a bucket
+    $buckets = get_s3_buckets($s3info['key'], $s3info['secret']);
+    $search_array = array_map('strtolower', $buckets);
+    if( in_array(strtolower($purl['host']), $search_array) ) {
+        //Create the index stub that will redirect via a meta-refresh
+        $rfile = create_short_url_file($s3html, $uid);
+
+        loggit(3, "DEBUG: [".print_r($purl, TRUE));
+        loggit(3, "DEBUG:  ".print_r($search_array, TRUE));
+
+        //Pull out the last part of the path to use as a file stub name
+        if( !empty($purl['path']) ) {
+            $pathFragments = explode('/', rtrim($purl['path'], '/'));
+            loggit(3, "DEBUG: ".print_r($pathFragments, TRUE));
+            $pend = trim(end($pathFragments), '/');
+            array_shift($pathFragments);
+            array_pop($pathFragments);
+            $path = implode('/', $pathFragments);
+            loggit(3, "DEBUG: path is [$path].");
+        } else {
+            $path = "";
+            $pend = "index.html";
+        }
+
+        loggit(3, "DEBUG: ".print_r($pathFragments, TRUE));
+
+        $s3path = rtrim($purl['host']."/".trim($path, '/'), '/');
+        loggit(3, "DEBUG: s3path is [$s3path].");
+
+        //Now put the index stub into s3
+        $s3res = putInS3($rfile, $pend, $s3path, $s3info['key'], $s3info['secret'], "text/html");
+        if(!$s3res) {
+            loggit(2, "Could not create S3 file: [index.html] for user: [$uid].");
+            loggit(3, "Could not create S3 file: [index.html] for user: [$uid].");
+            //Log it
+            $jsondata['status'] = "false";
+            $jsondata['description'] = "Error writing redirection stub to S3.";
+            echo json_encode($jsondata);
+            exit(1);
+        } else {
+            $redhtml = 'http://'.$s3path."/".$pend;
+            loggit(3, "DEBUG: Wrote html to S3 at url: [$redhtml].");
+        }
     }
 }
 
@@ -148,8 +182,6 @@ loggit(3,"Saved: [$filename] to S3 for user: [$uid]. ");
 
 //Give feedback that all went well
 $jsondata['status'] = "true";
-$jsondata['url'] = $s3url;
-$jsondata['html'] = $s3html;
 $jsondata['description'] = "File saved to S3.";
 echo json_encode($jsondata);
 

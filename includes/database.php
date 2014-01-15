@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 34;
+$cg_database_version = 36;
 $cg_database_updates = array();
 
 
@@ -474,6 +474,27 @@ CGDB0105;
 $cg_database_updates[33][] = <<<CGDB0106
  INSERT INTO `dbversion` ( `version` ) VALUES ( '34' )
 CGDB0106;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 34 to 35 -----------------------------------------------------------------------------------------------
+$cg_database_updates[34][] = <<<CGDB0107
+ ALTER TABLE  `prefs` ADD  `editorbucket` VARCHAR( 64 ) NOT NULL COMMENT  'S3 Bucket to hold editor files.'
+CGDB0107;
+$cg_database_updates[34][] = <<<CGDB0108
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '35' )
+CGDB0108;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 35 to 36 -----------------------------------------------------------------------------------------------
+$cg_database_updates[35][] = <<<CGDB0109
+ ALTER TABLE `recentfiles` CHANGE id id bigint(20)auto_increment
+CGDB0109;
+$cg_database_updates[35][] = <<<CGDB0110
+ ALTER TABLE `redirect` CHANGE id id bigint(20)auto_increment
+CGDB0110;
+$cg_database_updates[35][] = <<<CGDB0111
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '36' )
+CGDB0111;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

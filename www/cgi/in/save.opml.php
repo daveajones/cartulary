@@ -43,6 +43,12 @@ if ( isset($_REQUEST['disqus']) && $_REQUEST['disqus'] == "true" ) {
     $disqus = TRUE;
 }
 
+//Get wysiwyg bool
+$wysiwyg = FALSE;
+if ( isset($_REQUEST['wysiwyg']) && $_REQUEST['wysiwyg'] == "true" ) {
+    $wysiwyg = TRUE;
+}
+
 //Make sure we have a filename to use
 if ( isset($_REQUEST['filename']) ) {
     $filename = $_REQUEST['filename'];
@@ -114,7 +120,7 @@ if(!$s3res) {
 }
 
 //Update recent file table
-update_recent_file($uid, $s3url, $title, $opml, $s3oldurl);
+update_recent_file($uid, $s3url, $title, $opml, $s3oldurl, $disqus, $wysiwyg);
 
 //Go ahead and put in the urls we saved
 $jsondata['url'] = $s3url;

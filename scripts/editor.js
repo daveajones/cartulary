@@ -1,13 +1,15 @@
 $(document).ready(function () {
     var hoverTimer = null;
+    var loading = $('div.loading');
     var outliner = $('#outliner');
     var sheetopen = $('#divEditSheetOpen');
+    var srmodal = $('#mdlEditorSearchReplace');
     var sheettemplate = $('#divEditSheetTemplate');
     var chkToggleRender = $('.rendertoggle');
     var chkDisqusInclude = $('.menuDisqusToggle');
-    var includeDisqus = false;
     var menubar = $('#menubarEditor');
     var elTitle = $('.divOutlineTitle input.title');
+    var dotAnimation = null;
 
 
     //New button
@@ -27,13 +29,15 @@ $(document).ready(function () {
                 lasttitle = title;
 
                 //Get the filenames sorted
-                oldfilename = filename;
+                //oldfilename = filename;
                 filename = result.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
 
                 //Save the file
-                saveFile(title, filename, mode, redirect, includeDisqus, opOutlineToXml(), oldfilename);
+                saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, opOutlineToXml());
             }
         });
+        $('#dropdownSave').dropdown('toggle');
+        return false;
     });
     menubar.find('.menuSave').click(function () {
         //Grab the current title
@@ -54,10 +58,11 @@ $(document).ready(function () {
         lasttitle = title;
 
         //Save the file
-        saveFile(title, filename, mode, redirect, includeDisqus, opOutlineToXml());
-
+        saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, opOutlineToXml());
+        $('#dropdownSave').dropdown('hide');
         return false;
     });
+
 
     //Publish button
     menubar.find('.menuPublish').click(function () {
@@ -100,7 +105,7 @@ $(document).ready(function () {
         return false;
     });
 
-    //Template button
+    //Select inclusion
     menubar.find('.menuTemplate').click(function() {
         //Make the ajax call to get the recent file list
         $.ajax({
@@ -142,36 +147,7 @@ $(document).ready(function () {
                 //Store the xml data
                 var opml = opOutlineToXml();
                 redirect = result;
-
-                //Make the ajax call
-                $.ajax({
-                    type: 'POST',
-                    url: '/cgi/in/save.opml',
-                    data: {
-                        "opml": opml,
-                        "mode" : mode,
-                        "filename": filename,
-                        "disqus" : includeDisqus,
-                        "redirect" : redirect,
-                        "title": title
-                    },
-                    dataType: "json",
-                    beforeSend: function () {
-                        //Disable the save button and show a spinner
-                        menubar.find('.menuSave').attr('disabled', true);
-                        menubar.find('.menuSave').html('<i class="icon-spinner"></i> Saving...');
-                    },
-                    success: function (data) {
-                        //Show returned info and re-enable the save button
-                        url = data.url;
-                        htmlurl = data.html;
-                        updateOutlineInfo(url, data.html, result);
-
-                        showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
-                        menubar.find('.menuSave').html('Save');
-                        menubar.find('.menuSave').attr('disabled', false);
-                    }
-                });
+                updateOutlineInfo('', '', result);
             }
         });
 
@@ -195,11 +171,31 @@ $(document).ready(function () {
          });
     });
 
-    //Open template by url button
+    //Open inclusion by url button
     sheettemplate.find('a.openbyurl').click( function() {
-        bootbox.prompt("Url of the template to use?", function(result) {
-            if (result !== null) {
-                applyTemplate(result);
+        bootbox.prompt("Url of the template to use?", function(geturl) {
+            if (geturl !== null) {
+                //Set the node's attributes
+                opSetOneAtt('type', 'include');
+                opSetOneAtt('url', geturl);
+                //Now call out and get the outline data
+                if(!opHasSubs()) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/cgi/out/get.url.json?url=' + geturl,
+                        dataType: "json",
+                        beforeSend: function() {
+                            dotAnimation = setInterval("animateDots", 300);
+                        },
+                        success: function (data) {
+                            clearInterval(dotAnimation);
+                            opInsertXml(data.data, right);
+                            //outliner.concord().op.deleteLine();
+                        }
+                    });
+                }
+                //Close the sheet
+                $('div.sheet').removeClass('open');
             }
         });
     });
@@ -216,6 +212,62 @@ $(document).ready(function () {
                     opSetOneAtt('url', result);
                 }
             });
+        } else
+        if( thistype == 'include') {
+            //Make the ajax call to get the recent file list
+            $.ajax({
+                type: 'POST',
+                url: '/cgi/out/get.recentfiles',
+                dataType: "json",
+                success: function (data) {
+                    //Clear the table for new data
+                    $('.templateopen').empty();
+
+                    //Iterate
+                    $.each(data.files, function(i, item) {
+                        var re = /\.$/;
+                        var newtitle = item.title.replace(re, "").toLowerCase();
+                        //Add an entry for each url returned
+                        $('.templateopen').append('<li><a href="#" data-url="'+ item.url +'">' + newtitle + '</a> ' + prettyDate(item.time * 1000).toLowerCase() + '.</li>');
+                    });
+
+                    //Link apply function to each file link
+                    $('.templateopen li a').click(function() {
+                        var geturl = $(this).data('url');
+                        sheettemplate.removeClass('open');
+                        //Set the node's attributes
+                        opSetOneAtt('type', thistype);
+                        opSetOneAtt('url', geturl);
+                        //Now call out and get the outline data
+                        if(!opHasSubs()) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/cgi/out/get.url.json?url=' + geturl,
+                                dataType: "json",
+                                beforeSend: function() {
+                                    loading.show();
+                                    dotAnimation = setInterval("animateDots", 300);
+                                },
+                                success: function (data) {
+                                    clearInterval(dotAnimation);
+                                    opInsertXml(data.data, right);
+                                    loading.hide();
+                                    //outliner.concord().op.deleteLine();
+                                },
+                                error: function() {
+                                    showMessage("Error loading include url.", false, 5);
+                                    loading.show();
+                                }
+                            });
+                        }
+                        return false;
+                    });
+
+                    //Open the dropdown sheet
+                    sheettemplate.toggleClass('open');
+
+                }
+            });
         } else {
             opSetOneAtt('type', thistype);
         }
@@ -226,9 +278,11 @@ $(document).ready(function () {
     chkToggleRender.click(function () {
         if ( $(this).parent().hasClass('active') ) {
             console.log('T: ' + outliner.concord().op.setRenderMode(false));
+            wysiwygOn = false;
             $(this).parent().removeClass('active');
         } else {
             console.log('F: ' + outliner.concord().op.setRenderMode(true));
+            wysiwygOn = true;
             $(this).parent().addClass('active');
         }
     });
@@ -248,6 +302,34 @@ $(document).ready(function () {
     menubar.find('.menuAddLink').click( function() {
        editorToolAddLink();
        return false;
+    });
+    menubar.find('.menuSearchReplace').click( function() {
+       srmodal.modal('show');
+    });
+    $('.modalsrgo').click( function() {
+        //Hide the form
+        srmodal.find('form.srpostform').hide();
+        srmodal.find('.spinner').show();
+
+        //Get the terms
+        var search = srmodal.find('input.srsearch').val();
+        var replace = srmodal.find('input.srreplace').val();
+
+        //Iterate over every node, doing the replacement
+        opVisitAll( function(op) {
+           var ltext = op.getLineText();
+           if (ltext.indexOf(search) != -1 ) {
+               op.setLineText( ltext.replace(search, replace) );
+           }
+        });
+
+        //Close the modal
+        setTimeout(function() {
+            srmodal.modal('hide');
+            //Un-hide the form
+            srmodal.find('.spinner').hide();
+            srmodal.find('form.srpostform').show();
+        }, 2000);
     });
 
     //Handle opacity on focus change
@@ -292,18 +374,63 @@ $(document).ready(function () {
             "typeIcons": appTypeIcons
         },
     });
-    opXmlToOutline(initialOpmlText);
+
+    //Load the outline content
+    if(!isBlank(url)) {
+        $.ajax({
+            type: 'POST',
+            url: '/cgi/out/get.url.json',
+            data: {
+                "url" : url
+            },
+            dataType: "json",
+            beforeSend: function() {
+                loading.show();
+            },
+            success: function (data) {
+                //Show returned info and re-enable the save button
+                //url = data.url;
+                //htmlurl = data.html;
+
+                //Load the outline body data
+                opXmlToOutline(data.data);
+                title = opGetTitle();
+
+                //Set a title
+                if( title == "Untitled") {
+                    elTitle.val('');
+                } else {
+                    elTitle.val(title);
+                }
+
+                //Set up the root node type correctly
+                getRootNodeType();
+
+                //Set the menu bar info
+                //updateOutlineInfo(url, data.html, redirect);
+
+                //Set the default toggle states
+                if(includeDisqus) {
+                    chkDisqusInclude.parent().addClass('active');
+                }
+                if(wysiwygOn) {
+                    outliner.concord().op.setRenderMode(true);
+                    chkToggleRender.parent().addClass('active');
+                }
+                loading.hide();
+            }
+        });
+    } else {
+        opXmlToOutline(initialOpmltext);
+    }
     title = opGetTitle();
 
 
     //Refresh the outliner info pane
-    updateOutlineInfo(url, "", redirect);
+    //updateOutlineInfo(url, "", redirect);
     if( badurl == true ) {
         showMessage('Parse error. Please check the url.', false, 5);
     }
-
-    //Set up the root node type correctly
-    getRootNodeType();
 
     //Dim the title area when not in use
     hoverTimer = setTimeout(function() {
@@ -311,24 +438,57 @@ $(document).ready(function () {
     }, 7000);
 
 
-    //Set a title
-    if( title == "Untitled") {
-        elTitle.val('');
-    } else {
-        elTitle.val(title);
-    }
-
 
     //Hot keys
-    key('ctrl+y', function() {
+    $(window).bind('keydown', function(event) {
+        if (event.ctrlKey || event.metaKey) {
+            switch (String.fromCharCode(event.which).toLowerCase()) {
+                case 's':
+                    event.preventDefault();
+                    //alert('ctrl-s');
+                    break;
+                case 'f':
+                    event.preventDefault();
+                    //alert('ctrl-f');
+                    break;
+                case 'g':
+                    event.preventDefault();
+                    //alert('ctrl-g');
+                    break;
+            }
+        }
+    });
+    key('ctrl+s,command+s', function() {
+        menubar.find('.menuSave').trigger('click');
+        return false;
+    });
+    key('ctrl+y,command+y', function() {
         editorToolAddLink();
-    })
-
-
+    });
+    key('ctrl+left,command+left', function() {
+        opFirstSummit();
+        window.scrollTo(0,0);
+    });
+    key('ctrl+right,command+right', function() {
+        opGo (left, 32767);
+        opGo (down, 32767);
+        window.scrollTo(0,999999);
+        while( opHasSubs() && opSubsExpanded() ) {
+            opGo (right,1);
+            opGo (down, 32767);
+        }
+        window.scrollTo(0,999999);
+    });
+    key('ctrl+up,command+up', function() {
+        $('#outliner').concord().op.go('up',32767);
+    });
+    key('ctrl+down,command+down', function() {
+        $('#outliner').concord().op.go('down',32767);
+    });
 });
 
 //Save a file
-function saveFile( ftitle, fname, fmode, fredirect, fdisqus, fopml, foldname ) {
+function saveFile( ftitle, fname, fmode, fredirect, fdisqus, fwysiwyg, fopml, foldname ) {
     var _foldname = (typeof foldname === "undefined") ? "" : foldname;
     var menubar = $('#menubarEditor');
 
@@ -349,6 +509,7 @@ function saveFile( ftitle, fname, fmode, fredirect, fdisqus, fopml, foldname ) {
             "filename" : fname,
             "redirect" : fredirect,
             "disqus" : fdisqus,
+            "wysiwyg" : fwysiwyg,
             "title" : ftitle,
             "rendertitle" : rendertitle
         },
@@ -356,7 +517,7 @@ function saveFile( ftitle, fname, fmode, fredirect, fdisqus, fopml, foldname ) {
         beforeSend: function () {
             //Disable the save button and show a spinner
             menubar.find('.saves').attr('disabled', true);
-            menubar.find('.saves').html('<i class="icon-spinner"></i> Saving...');
+            menubar.find('#dropdownSave').html('<i class="icon-spinner"></i> Saving...');
         },
         success: function (data) {
             //Show returned info and re-enable the save button
@@ -365,8 +526,7 @@ function saveFile( ftitle, fname, fmode, fredirect, fdisqus, fopml, foldname ) {
             updateOutlineInfo(url, data.html, redirect);
 
             showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
-            menubar.find('.menuSave').html('Save');
-            menubar.find('.menuSaveAs').html('Rename');
+            menubar.find('#dropdownSave').html('Save');
             menubar.find('.saves').attr('disabled', false);
         }
     });
@@ -504,6 +664,38 @@ function opExpandCallback (op) {
     if(nodetype == "link" || nodetype == "redirect") {
         gotourl = op.attributes.getOne('url');
         window.open(gotourl);
+    } else
+    if (nodetype == "include") {
+        var geturl = op.attributes.getOne('url');
+        //Now call out and get the outline data only if the inclusion node doesn't have any children
+        if(!opHasSubs()) {
+            $.ajax({
+                type: 'POST',
+                url: '/cgi/out/get.url.json?url=' + geturl,
+                dataType: "json",
+                beforeSend: function() {
+                    dotAnimation = setInterval("animateDots", 300);
+                },
+                success: function (data) {
+                    clearInterval(dotAnimation);
+                    opInsertXml(data.data, right);
+                    //outliner.concord().op.deleteLine();
+                }
+            });
+        }
     }
+    return true;
+}
+
+//Animate some dots to show progress
+function animateDots () {
+    var dots = opGetLineText();
+
+    if( dots == '...' ) {
+        opSetLineText('');
+    } else {
+        opSetLineText(dots + '.');
+    }
+
     return true;
 }

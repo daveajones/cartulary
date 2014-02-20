@@ -2,6 +2,9 @@
 <?include "$confroot/$templates/php_page_init.php"?>
 <?require_once "$confroot/$includes/net.php";?>
 <?
+
+
+
   // See if we have a valid article id or url to get source xml from
   $mode = "";
   $filename = "";
@@ -30,10 +33,14 @@
               $badurl = true;
           } else {
               $opmldata = fetchUrl(get_final_url($url));
+              $opmldata = stripInvalidXml($opmldata);
               if( !is_outline($opmldata) ) {
                   $badurl = true;
               }
           }
+
+          //Get side info
+          $seenfile = get_recent_file_by_url($g_uid, $url);
 
           //Set the redirect host for this document
           loggit(3, "DEBUG: Url to open - [".$url."]");
@@ -86,13 +93,10 @@ if( !empty($opmldata) ) {
     var oldfilename = "";
     var bufilename = '<?echo time()."-".$default_opml_export_file_name;?>';
     var badurl = false;
+    var includeDisqus = <?if($seenfile[0]['disqus'] == 0) { echo "false"; } else { echo "true"; }?>;
+    var wysiwygOn = <?if($seenfile[0]['wysiwyg'] == 0) { echo "false"; } else { echo "true"; }?>;
     <?if( isset($badurl) ) {?>
     badurl = true;
-    <?}?>
-    <?if( isset($opmldata) && !isset($badurl) ) {?>
-    var initialOpmlText = '<?echo $opmldata?>';
-    <?} else {?>
-    var initialOpmlText = initialOpmltext;
     <?}?>
     <?include "$confroot/$scripts/editor.js"?>
 </script>
@@ -115,7 +119,7 @@ if( !empty($opmldata) ) {
 
 <div id="divEditSheetTemplate" class="sheet">
     <a class="sheetclose pull-right" href="#"> X </a>
-    <div class="openbyurl"><a class="openbyurl" href="#">Open</a> by url or...</div>
+    <div class="openbyurl"><a class="openbyurl" href="#">Include</a> by url or...</div>
     <ul class="templateopen"></ul>
 </div>
 
@@ -124,6 +128,7 @@ if( !empty($opmldata) ) {
     <div class="divOutlineTitle">
         <input class="rendertitle" checked="checked" type="checkbox" title="Render title and byline in the HTML?" /> <input class="title" placeholder="Title" type="text" />
     </div>
+    <div class="loading" style="display:none;"><i class="icon-spinner"></i> Loading...</div>
     <div class="outlineinfo pull-right"></div>
 
     <div class="divOutlinerContainer">
@@ -141,3 +146,4 @@ if( !empty($opmldata) ) {
 
 <?include "$confroot/$templates/$template_html_postbody"?>
 </html>
+

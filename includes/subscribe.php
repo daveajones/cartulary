@@ -369,6 +369,12 @@ function unmark_feed_as_sticky($fid = NULL, $uid = NULL)
     $updcount = $sql->affected_rows;
     $sql->close();
 
+    //Unmark all of this feeds items as sticky
+    $fitems = get_items_by_feed_id($fid);
+    foreach($fitems as $item) {
+        unmark_feed_item_as_sticky($item['id'], $uid);
+    }
+
     //Log and return
     loggit(1, "Flagged feed: [$fid] as sticky for user: [$uid].");
     return (TRUE);

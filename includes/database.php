@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 36;
+$cg_database_version = 37;
 $cg_database_updates = array();
 
 
@@ -495,6 +495,15 @@ CGDB0110;
 $cg_database_updates[35][] = <<<CGDB0111
  INSERT INTO `dbversion` ( `version` ) VALUES ( '36' )
 CGDB0111;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 36 to 37 -----------------------------------------------------------------------------------------------
+$cg_database_updates[36][] = <<<CGDB0112
+ ALTER TABLE `recentfiles` ADD `disqus` TINYINT NOT NULL COMMENT 'Comments enabled?', ADD `wysiwyg` TINYINT NOT NULL COMMENT 'Wysiwyg enabled?'
+CGDB0112;
+$cg_database_updates[36][] = <<<CGDB0113
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '37' )
+CGDB0113;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

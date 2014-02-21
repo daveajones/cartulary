@@ -3836,7 +3836,8 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Run the query
-    $sqltxt = "SELECT url,
+    $sqltxt = "SELECT id,
+                    url,
                     description,
                     timestamp,
                     enclosure,
@@ -3867,7 +3868,8 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
         return (array());
     }
 
-    $sql->bind_result($aurl,
+    $sql->bind_result($aid,
+        $aurl,
         $adescription,
         $atimestamp,
         $aenclosure,
@@ -3879,7 +3881,8 @@ function get_items_by_feed_id($fid = NULL, $max = NULL)
     $items = array();
     $count = 0;
     while ($sql->fetch()) {
-        $items[$count] = array('url' => $aurl,
+        $items[$count] = array('id' => $aid,
+            'url' => $aurl,
             'title' => $atitle,
             'description' => $adescription,
             'timestamp' => $atimestamp,

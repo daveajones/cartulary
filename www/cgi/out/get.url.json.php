@@ -21,7 +21,6 @@ if( isset($_REQUEST['url']) && !empty($_REQUEST['url']) && stripos($_REQUEST['ur
 
 $urldata = fetchUrl($url);
 
-
 //--------------------------------------------------------------------------------
 //Give feedback that all went well
 $jsondata['status'] = "true";

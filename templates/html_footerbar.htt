@@ -108,6 +108,38 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 <!-- Microblog Post -->
 
 
+<!-- Editor search+replace dialog -->
+<div id="mdlEditorSearchReplace" class="modal hide fade" tabindex="-1">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="title">Search and Replace</h4>
+    </div>
+    <div class="modal-body">
+        <div class="blogpost">
+            <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Replacing. Please wait...<br/><br/></center>
+            <form class="srpostform" name="searchreplace">
+                <fieldset>
+                    <div class="control-group">
+                        <!-- Search term -->
+                        <div class="srsearch">
+                            <img class="icon-text-height" src="/images/blank.gif" title="Term to find" /><input class="srsearch" name="search" type="text" placeholder="Term to find" value="" />
+                        </div>
+                        <!-- Replace term -->
+                        <div class="srreplace">
+                            <img class="icon-text-width" src="/images/blank.gif" title="Term to use as replacement" /><input class="srreplace" name="replace" type="text" placeholder="Term to replace with" value="" />
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success srsubmit pull-right modalsrgo" aria-hidden="true">Go!</button>
+    </div>
+</div>
+<!-- Editor search+replace dialog -->
+
+
 <!-- Social Outline View/Subscribe -->
 <div id="mdlSocialOutlineView" class="modal hide fade fcmodal" tabindex="-1">
   <div class="modal-header">
@@ -138,6 +170,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
 </div>
 <!-- Social Outline View/Subscribe -->
 
+
 <!-- Show article modal dialog -->
 <div id="mdlShowArticle" class="modal hide fade" tabindex="-1">
   <div class="modal-header">
@@ -160,6 +193,7 @@ data-blogpostcgi="<?echo $blogpostcgi?>"
   </div>
 </div>
 <!-- Show article modal dialog -->
+
 
 <!-- Media display shadow box modal -->
 <div id="mdlMediaShadowbox" class="modal hide fade fcmodal" tabindex="-1">

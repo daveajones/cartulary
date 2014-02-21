@@ -97,12 +97,17 @@
             <ul class="nav menubar">
                 <li><a class="menuNew" href="#" title="New">New</a></li>
                 <li><a class="menuOpen" href="#" title="Open">Open</a></li>
-                <li><a class="menuSave saves" href="#" title="Save">Save</a></li>
-                <li><a class="menuSaveAs saves" href="#" title="Save As">Rename</a></li>
-                <li><a class="menuTemplate" href="#" title="Apply a template.">Template</a></li>
+                <li class="dropdown menuSaves" title="Save your outline.">
+                    <a href="#" id="dropdownSave" class="dropdown-toggle" data-toggle="dropdown">Save</a>
+                    <ul class="dropdown-menu" data-container="body">
+                        <li><a href="#" class="menuSave saves" title="Save">Save</a></li>
+                        <li><a href="#" class="menuSaveAs saves" title="Save As">Save as...</a></li>
+                    </ul>
+                </li>
                 <li><a class="menuPublish" href="#" title="Publish">Publish</a></li>
                 <li class="divider-vertical34"></li>
                 <li class="<?if($mode == "article"){echo "active";}?>"><a class="rendertoggle" href="#" title="Toggle html rendering">WYSIWYG</a></li>
+                <?if(!empty($myprefs['disqus_shortname'])) { ?><li><a class="menuDisqusToggle" href="#" title="Include Disqus comments in rendered version?">Disqus</a></li><?}?>
                 <li class="dropdown menuType" title="What type of outline is this?">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Type <b class="caret"></b></a>
                     <ul class="dropdown-menu" data-container="body">
@@ -114,13 +119,13 @@
                         <li><a href="#" class="menuTypeSelection menuTypeTabs" title="A tabbed view." data-type="tabs">Tabs</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeMenu" title="A menu bar structure." data-type="menu">Menu</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeLink" title="Link to a url." data-type="link">Link</a></li>
-                        <li><a href="#" class="menuTypeSelection menuTypeReplace" title="Insert a replacement node." data-type="replace">Replace</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeInclude" title="Bring in another outline's content." data-type="include">Include</a></li>
                     </ul>
                 </li>
-                <?if(!empty($myprefs['disqus_shortname'])) { ?><li><a class="menuDisqusToggle" href="#" title="Include Disqus comments in rendered version?">Disqus</a></li><?}?>
                 <li class="<?if(!empty($rhost)){echo "active";}?>"><a class="menuRedirect" href="#" <?if(!empty($rhost)){echo "data-redirect=\"".$rhost."\"";}?> title="Set a dns redirect for this document.">Redirect<?if(!empty($rhost)){echo ": ".$rhost;}?></a></li>
                 <li class="divider-vertical34"></li>
                 <li><a class="menuAddLink" href="#" title="Make selection a link."><i class="icon-link"></i></a></li>
+                <li><a class="menuSearchReplace" href="#" title="Replace text with other text."><i class="icon-repeat"></i></a></li>
             </ul>
             <ul class="nav pull-right outlineinfo"></ul>
         </div>

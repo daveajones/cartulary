@@ -1,0 +1,22 @@
+#Release Notes - Freedom Controller v0.5.7
+
+
+This release again focuses on the editor.
+
+
+- Rename is now called Save as...  It creates a new file with the new name instead of just renaming the old file.
+
+- The "include" node type is now supported in favor of the old templating.  Inclusions are better and more standard opml.
+
+- WYSIWYG and Disqus button states are now remembered.
+
+- Search and Replace option is now functional.
+
+- Hot keys now supported:
+    - CTRL/CMD + S for saving
+    - CTRL/CMD + Right Arrow for jumping to the last open node in an outline
+    - CTRL/CMD + Left Arrow for jumping to the first node in an outline
+    - CTRL/CMD + Up Arrow for jumping to the top sibling node in an outline
+    - CTRL/CMD + Down Arrow for jumping to the last sibling node in an outline
+
+- Outlines now load through ajax instead of in the PHP

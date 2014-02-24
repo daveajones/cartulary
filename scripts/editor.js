@@ -319,7 +319,8 @@ $(document).ready(function () {
         opVisitAll( function(op) {
            var ltext = op.getLineText();
            if (ltext.indexOf(search) != -1 ) {
-               op.setLineText( ltext.replace(search, replace) );
+               var r = new RegExp(search, 'g');
+               op.setLineText( ltext.replace(r, replace) );
            }
         });
 
@@ -466,18 +467,22 @@ $(document).ready(function () {
         editorToolAddLink();
     });
     key('ctrl+left,command+left', function() {
-        opFirstSummit();
-        window.scrollTo(0,0);
+        if( !opInTextMode() ) {
+            opFirstSummit();
+            window.scrollTo(0,0);
+        }
     });
     key('ctrl+right,command+right', function() {
-        opGo (left, 32767);
-        opGo (down, 32767);
-        window.scrollTo(0,999999);
-        while( opHasSubs() && opSubsExpanded() ) {
-            opGo (right,1);
+        if( !opInTextMode() ) {
+            opGo (left, 32767);
             opGo (down, 32767);
+            window.scrollTo(0,999999);
+            while( opHasSubs() && opSubsExpanded() ) {
+                opGo (right,1);
+                opGo (down, 32767);
+            }
+            window.scrollTo(0,999999);
         }
-        window.scrollTo(0,999999);
     });
     key('ctrl+up,command+up', function() {
         $('#outliner').concord().op.go('up',32767);

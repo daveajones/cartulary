@@ -470,6 +470,8 @@ $(document).ready(function () {
         if( !opInTextMode() ) {
             opFirstSummit();
             window.scrollTo(0,0);
+        } else {
+            return false;
         }
     });
     key('ctrl+right,command+right', function() {
@@ -482,6 +484,8 @@ $(document).ready(function () {
                 opGo (down, 32767);
             }
             window.scrollTo(0,999999);
+        } else {
+            return false;
         }
     });
     key('ctrl+up,command+up', function() {

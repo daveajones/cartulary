@@ -377,7 +377,7 @@ $(document).ready(function () {
     });
 
     //Load the outline content
-    if(!isBlank(url)) {
+    if(!isBlank(url) && mode != "article") {
         $.ajax({
             type: 'POST',
             url: '/cgi/out/get.url.json',
@@ -422,7 +422,9 @@ $(document).ready(function () {
             }
         });
     } else {
-        opXmlToOutline(initialOpmltext);
+        opXmlToOutline(initialOpmlText);
+        title = opGetTitle();
+        elTitle.val(title);
     }
     title = opGetTitle();
 

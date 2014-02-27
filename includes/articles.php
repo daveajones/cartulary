@@ -746,10 +746,6 @@ function build_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles = 
       <managingEditor>" . get_email_from_uid($uid) . " ($username)</managingEditor>
       <webMaster>" . $email_filemaster . "</webMaster>\n";
 
-    if ($enable_rsscloud == 1) {
-        $rss .= "      <cloud domain=\"" . $rss_cloud_domain . "\" port=\"" . $rss_cloud_port . "\" path=\"" . $rss_cloud_notify_path . "\" registerProcedure=\"\" protocol=\"" . $rss_cloud_protocol . "\" />\n";
-    }
-
     if ($cg_opmlcloud_enabled == 1) {
         $rss .= "      <sopml:updates host=\"" . $cg_opmlcloud_host . "\" port=\"" . $cg_opmlcloud_port . "\" type=\"" . $cg_opmlcloud_type . "\" value=\"" . random_gen(16) . "\" />\n";
     }
@@ -814,12 +810,6 @@ function build_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles = 
         } else {
             $s3url = get_s3_url($uid, $arcpath, $filename);
             loggit(1, "Wrote feed to S3 at url: [$s3url].");
-
-            //Ping the rss cloud
-            if ($archive == FALSE && $enable_rsscloud == 1) {
-                $resp = httpRequest($rss_cloud_domain, $rss_cloud_port, $rss_cloud_method, $rss_cloud_ping_path, array("url" => $s3url), $rss_cloud_timeout);
-                loggit(1, "Pinged the rss cloud for feed: [$s3url].");
-            }
 
             //Mark feed as updated internally
             $id = feed_exists($s3url);

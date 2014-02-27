@@ -145,8 +145,6 @@ function get_feed_info_for_user($id = NULL, $uid = NULL)
                   $table_newsfeed.lastmod,
                   $table_newsfeed.createdon,
                   $table_newsfeed.link,
-                  $table_newsfeed.rsscloudregurl,
-                  $table_newsfeed.rsscloudlastreg,
                   $table_newsfeed.updated,
                   $table_newsfeed.lastitemid,
                   $table_nfcatalog.outlineid,
@@ -173,8 +171,7 @@ function get_feed_info_for_user($id = NULL, $uid = NULL)
     }
     $feed = array();
     $sql->bind_result($feed['url'], $feed['title'], $feed['content'], $feed['lastcheck'], $feed['lastupdate'],
-        $feed['lastmod'], $feed['createdon'], $feed['link'], $feed['rsscloudregurl'],
-        $feed['rsscloudlastreg'], $feed['updated'], $feed['lastitemid'], $feed['oid'],
+        $feed['lastmod'], $feed['createdon'], $feed['link'], $feed['updated'], $feed['lastitemid'], $feed['oid'],
         $feed['pubdate'], $feed['errors'], $feed['id'], $feed['sticky'], $feed['hidden']) or loggit(2, "MySql error: " . $dbh->error);
     $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close();

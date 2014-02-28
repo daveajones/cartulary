@@ -2058,7 +2058,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         //If this feed item reports a pubdate of greater than 7 days ago, then set
         //timeadded to same value as pubdate.  This keeps old items from re-appearing as new.
         if ($pubdate < (time() - 604800)) {
-            loggit(1, "OLD ITEM: Setting timeadded: [$timeadded] to pubdate: [$pubdate] on item id: [$id].");
+            loggit(1, "OLD ITEM: Setting timeadded: [$timeadded] to pubdate: [$pubdate].");
             $timeadded = $pubdate;
             $old = TRUE;
         }

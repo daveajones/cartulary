@@ -2086,6 +2086,11 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                 $linkurl = $item->link[$lcount]['href'];
             }
 
+            //Some feeds only use id for the link
+            if ( isset($item->id) && ( stripos($item->id, 'http:') !== FALSE || stripos($item->id, 'https:') !== FALSE) ) {
+                $linkurl = trim($item->id);
+            }
+
             //Enclosures are links also
             if ($item->link[$lcount]['rel'] == "enclosure") {
                 $esize = "";
@@ -2128,7 +2133,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         if (strpos($linkurl, 'twitter.com') !== FALSE) {
             //Search for an embedded link in the description
             $title = $item->title;
-            if (strpos($title, 'http:') !== FALSE) {
+            if (stripos($title, 'http:') !== FALSE || stripos($title, 'https:') !== FALSE) {
                 preg_match('/\bhttp\:\/\/([A-Za-z0-9\.\/\+\&\@\~\-\%\?\=\_\#\!]*)/i', $title, $twurl);
                 $linkurl = $twurl[0];
             }

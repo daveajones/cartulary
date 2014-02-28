@@ -3,7 +3,7 @@
 <?
 
 //Dump the incoming POST to debug
-loggit(3, "RSSCLOUD: ".print_r($_REQUEST, TRUE));
+loggit(3, "PING: ".print_r($_REQUEST, TRUE));
 
 //Is this a registration challenge?
 if( !empty($_REQUEST['challenge']) ) {
@@ -17,13 +17,11 @@ if( empty($_REQUEST['url']) ) {
 }
 
 //See if this feed exists
-loggit(1, "RSSCLOUD: Incoming ping for url: [".$_REQUEST['url']."].");
+loggit(1, "PING: Incoming ping for url: [".$_REQUEST['url']."].");
 $id = feed_exists($_REQUEST['url']);
-if( $id == FALSE ) {
+if( empty($id) ) {
   exit(0);
 }
 
 //Flag the feed as needing to be scanned
 mark_feed_as_updated($id);
-
-?>

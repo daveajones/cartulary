@@ -433,8 +433,6 @@ function get_feed_info($id = NULL)
                   $table_newsfeed.lastmod,
                   $table_newsfeed.createdon,
                   $table_newsfeed.link,
-                  $table_newsfeed.rsscloudregurl,
-                  $table_newsfeed.rsscloudlastreg,
                   $table_newsfeed.updated,
                   $table_newsfeed.lastitemid,
                   $table_newsfeed.oid,
@@ -458,8 +456,7 @@ function get_feed_info($id = NULL)
     }
     $feed = array();
     $sql->bind_result($feed['url'], $feed['title'], $feed['content'], $feed['lastcheck'], $feed['lastupdate'],
-        $feed['lastmod'], $feed['createdon'], $feed['link'], $feed['rsscloudregurl'],
-        $feed['rsscloudlastreg'], $feed['updated'], $feed['lastitemid'], $feed['oid'],
+        $feed['lastmod'], $feed['createdon'], $feed['link'], $feed['updated'], $feed['lastitemid'], $feed['oid'],
         $feed['pubdate'], $feed['errors'], $feed['avatarurl'], $feed['id']) or loggit(2, "MySql error: " . $dbh->error);
     $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close();
@@ -827,102 +824,6 @@ function update_feed_pubdate($fid = NULL, $pubdate = NULL)
 
     //Log and return
     loggit(1, "Changed feed:[$fid]'s pubdate to: [$pubdate].");
-    return (TRUE);
-}
-
-
-//Change the rsscloud registration url for a feed
-function update_feed_rsscloud_regurl($fid = NULL, $url = NULL)
-{
-    //Check parameters
-    if ($fid == NULL) {
-        loggit(2, "The feed id is blank or corrupt: [$fid]");
-        return (FALSE);
-    }
-    if ($url == NULL) {
-        loggit(2, "The rsscloud reg url is blank or corrupt: [$url]");
-        return (FALSE);
-    }
-
-    //Includes
-    include get_cfg_var("cartulary_conf") . '/includes/env.php';
-
-    //Connect to the database server
-    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
-
-    //Now that we have a good id, put the article into the database
-    $stmt = "UPDATE $table_newsfeed SET rsscloudregurl=? WHERE id=?";
-    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("ss", $url, $fid) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
-    $sql->close();
-
-    //Log and return
-    loggit(1, "Changed feed:[$fid]'s rssCloud registration url to: [$url].");
-    return (TRUE);
-}
-
-
-//Change the rsscloud lastreg timestamp for a feed
-function update_feed_rsscloud_lastreg($fid = NULL, $time = NULL)
-{
-    //Check parameters
-    if ($fid == NULL) {
-        loggit(2, "The feed id is blank or corrupt: [$fid]");
-        return (FALSE);
-    }
-    if ($time == NULL) {
-        loggit(2, "The time is blank or corrupt: [$time]");
-        return (FALSE);
-    }
-
-    //Includes
-    include get_cfg_var("cartulary_conf") . '/includes/env.php';
-
-    //Connect to the database server
-    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
-
-    //Now that we have a good id, put the article into the database
-    $stmt = "UPDATE $table_newsfeed SET rsscloudlastreg=? WHERE id=?";
-    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("ss", $time, $fid) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
-    $sql->close();
-
-    //Log and return
-    loggit(1, "Changed feed:[$fid]'s rssCloud lastreg time to: [$time].");
-    return (TRUE);
-}
-
-
-//Change the rsscloud lastreg timestamp for a feed
-function update_feed_rsscloud_reglastresp($fid = NULL, $resp = NULL)
-{
-    //Check parameters
-    if ($fid == NULL) {
-        loggit(2, "The feed id is blank or corrupt: [$fid]");
-        return (FALSE);
-    }
-    if ($resp == NULL) {
-        loggit(2, "The response string is blank or corrupt: [$resp]");
-        return (FALSE);
-    }
-
-    //Includes
-    include get_cfg_var("cartulary_conf") . '/includes/env.php';
-
-    //Connect to the database server
-    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
-
-    //Now that we have a good id, put the article into the database
-    $stmt = "UPDATE $table_newsfeed SET rsscloudreglastresp=? WHERE id=?";
-    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("ss", $resp, $fid) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
-    $sql->close();
-
-    //Log and return
-    loggit(1, "Changed feed:[$fid]'s rssCloud last response text to: [$resp].");
     return (TRUE);
 }
 
@@ -1656,30 +1557,11 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         return (-1);
     }
 
-    //Do we need to re-register?
-    if (!empty($feed['rsscloudregurl']) && ((time() - $feed['rsscloudlastreg']) > 86400 || $feed['rsscloudlastreg'] == '') && $enable_rsscloud == 1) {
-        $rcregurl = parse_url($feed['rsscloudregurl']);
-        //debug
-        loggit(1, "RSSCLOUD: Feed: [$url] was last registered " . (time() - $feed['rsscloudlastreg']) . " seconds ago. Time to renew.");
-        update_feed_rsscloud_lastreg($fid, time());
-
-        //Send the registration post if rssCloud is enabled AND the feed has been updated within the last 2 weeks
-        //We don't want to keep cloud registrations in place for feeds that rarely update
-        if ($enable_rsscloud == 1 && (time() - $feed['lastupdate']) < 1209600) {
-            loggit(1, "RSSCLOUD: Registering at: [" . $rcregurl['host'] . "] for feed [$fid].");
-            $resp = httpRequest($rcregurl['host'], $rcregurl['port'], "POST", $rcregurl['path'], array("notifyProcedure" => '', "port" => '80', "path" => '/cgi/in/ping',
-                    "protocol" => 'http-post', "url1" => $url, "domain" => $rss_cloud_url)
-            );
-            $resp = trim(htmlentities(strip_tags($resp)));
-            loggit(1, "RSSCLOUD: Registration response: [$resp].");
-            update_feed_rsscloud_reglastresp($fid, $resp);
-        }
-    }
-
     //Let's do some intelligent header checking so we don't waste time and bandwidth
     update_feed_lastcheck($fid, time());
     $lastmodtime = check_head_lastmod($url);
-    if (($lastmodtime == $feed['lastmod']) && ($lastmodtime != FALSE) && $force == FALSE) {
+    //loggit(3, "DEBUG: Last-modified: [$lastmodtime]");
+    if (($lastmodtime == $feed['lastmod']) && !empty($lastmodtime) && $force == FALSE) {
         loggit(1, "Feed: [($url) $fid] hasn't been updated. Skipping.");
         $stats['checktime'] += (time() - $fstart);
         set_feed_stats($fid, $stats);
@@ -1747,7 +1629,8 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     } else {
         $pubdate = time();
     }
-    if ($feed['pubdate'] == $pubdate && $force == FALSE) {
+    loggit(3, "DEBUG: Pubdate: [$lastmodtime]");
+    if ($feed['pubdate'] == $pubdate && !empty($pubdate) && $force == FALSE) {
         //The feed says that it hasn't been updated
         loggit(1, "The pubdate in the feed has not changed.");
         $stats['checktime'] += (time() - $fstart);
@@ -1775,15 +1658,6 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Freshen feed avatar
     update_feed_avatar($fid, get_feed_avatar($x));
 
-    //Does this feed support rssCloud?
-    if (isset($x->channel->cloud) && $enable_rsscloud == 1) {
-        //loggit(3, "RSSCLOUD REG: Feed [$fid] has a cloud element.");
-        $domain = (string)$x->channel->cloud->attributes()->domain;
-        $port = (string)$x->channel->cloud->attributes()->port;
-        $path = (string)$x->channel->cloud->attributes()->path;
-        $regurl = $domain . ":" . $port . $path;
-        update_feed_rsscloud_regurl($fid, $regurl);
-    }
 
     //Pass any namespaces to the item add routine
     $namespaces = $x->getDocNamespaces(TRUE);
@@ -2184,7 +2058,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         //If this feed item reports a pubdate of greater than 7 days ago, then set
         //timeadded to same value as pubdate.  This keeps old items from re-appearing as new.
         if ($pubdate < (time() - 604800)) {
-            loggit(1, "OLD ITEM: Setting timeadded: [$timeadded] to pubdate: [$pubdate] on item id: [$id].");
+            loggit(1, "OLD ITEM: Setting timeadded: [$timeadded] to pubdate: [$pubdate].");
             $timeadded = $pubdate;
             $old = TRUE;
         }
@@ -2210,6 +2084,11 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
             //Alternate is the main link
             if ($item->link[$lcount]['rel'] == "alternate") {
                 $linkurl = $item->link[$lcount]['href'];
+            }
+
+            //Some feeds only use id for the link
+            if ( isset($item->id) && ( stripos($item->id, 'http:') !== FALSE || stripos($item->id, 'https:') !== FALSE) ) {
+                $linkurl = trim($item->id);
             }
 
             //Enclosures are links also
@@ -2254,7 +2133,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         if (strpos($linkurl, 'twitter.com') !== FALSE) {
             //Search for an embedded link in the description
             $title = $item->title;
-            if (strpos($title, 'http:') !== FALSE) {
+            if (stripos($title, 'http:') !== FALSE || stripos($title, 'https:') !== FALSE) {
                 preg_match('/\bhttp\:\/\/([A-Za-z0-9\.\/\+\&\@\~\-\%\?\=\_\#\!]*)/i', $title, $twurl);
                 $linkurl = $twurl[0];
             }

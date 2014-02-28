@@ -39,7 +39,6 @@
 	$l_tw_sys_token = "";
 	$l_tw_sys_tokensecret = "";
     $l_ipreflectorurl = "http://checkip.dyndns.com";
-    $l_rsscloud = 0;
     $l_peoplesearch = 1;
 	$l_opensignup = 0;
     $l_opensignupphrase = "";
@@ -82,7 +81,6 @@
         if( isset($cg_main_serverguid) ) {
           $l_serverguid = $cg_main_serverguid;
         }
-        $l_rsscloud = $enable_rsscloud;
         if( isset($cg_peoplesearch) ) {
 	  		$l_peoplesearch = $cg_peoplesearch;
 		}
@@ -250,11 +248,6 @@
 
     //Preserve server guid
     $template = str_replace('server.guid.goes.here', $l_serverguid, $template);
-
-    //Preserve rssCloud setting
-    if( $l_rsscloud == 1 ) {
-      $template = str_replace('enable_rsscloud=0', 'enable_rsscloud=1', $template);
-    }
 
     //Preserve peoplesearch setting
     if( $l_peoplesearch == 0 ) {

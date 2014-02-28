@@ -93,6 +93,11 @@ if( !empty($opmldata) ) {
     var oldfilename = "";
     var bufilename = '<?echo time()."-".$default_opml_export_file_name;?>';
     var badurl = false;
+    <?if( isset($opmldata) && !isset($badurl) ) {?>
+    var initialOpmlText = '<?echo $opmldata?>';
+    <?} else {?>
+    var initialOpmlText = initialOpmltext;
+    <?}?>
     var includeDisqus = <?if($seenfile[0]['disqus'] == 0) { echo "false"; } else { echo "true"; }?>;
     var wysiwygOn = <?if($seenfile[0]['wysiwyg'] == 0) { echo "false"; } else { echo "true"; }?>;
     <?if( isset($badurl) ) {?>

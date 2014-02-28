@@ -1560,7 +1560,8 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Let's do some intelligent header checking so we don't waste time and bandwidth
     update_feed_lastcheck($fid, time());
     $lastmodtime = check_head_lastmod($url);
-    if (($lastmodtime == $feed['lastmod']) && ($lastmodtime != FALSE) && $force == FALSE) {
+    //loggit(3, "DEBUG: Last-modified: [$lastmodtime]");
+    if (($lastmodtime == $feed['lastmod']) && !empty($lastmodtime) && $force == FALSE) {
         loggit(1, "Feed: [($url) $fid] hasn't been updated. Skipping.");
         $stats['checktime'] += (time() - $fstart);
         set_feed_stats($fid, $stats);
@@ -1628,7 +1629,8 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     } else {
         $pubdate = time();
     }
-    if ($feed['pubdate'] == $pubdate && $force == FALSE) {
+    loggit(3, "DEBUG: Pubdate: [$lastmodtime]");
+    if ($feed['pubdate'] == $pubdate && !empty($pubdate) && $force == FALSE) {
         //The feed says that it hasn't been updated
         loggit(1, "The pubdate in the feed has not changed.");
         $stats['checktime'] += (time() - $fstart);

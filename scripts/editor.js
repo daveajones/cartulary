@@ -364,7 +364,8 @@ $(document).ready(function () {
     outliner.concord({
         "callbacks": {
             "opCursorMoved": opCursorMovedCallback,
-            "opExpand": opExpandCallback
+            "opExpand": opExpandCallback,
+            "opKeystroke": opKeystrokeCallback
         },
         "prefs": {
             "outlineFont": "Calibri",
@@ -707,6 +708,16 @@ function opExpandCallback (op) {
         }
     }
     return true;
+}
+
+//Handle some special key stroke stuff
+function opKeystrokeCallback (event) {
+    if(event.which == 13 && event.shiftKey) {
+        opInsert("", 'up');
+        opSetTextMode(false);
+        outliner.op.deleteLine();
+        return false;
+    }
 }
 
 //Animate some dots to show progress

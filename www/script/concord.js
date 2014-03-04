@@ -2756,7 +2756,10 @@ function Op(opmltext){
             }
         }
         if(!readonly){
-            concordInstance.fireCallback("opKeystroke", event);
+            var cbreturn = concordInstance.fireCallback("opKeystroke", event);
+            if( cbreturn == false) {
+                return;
+            }
             var keyCaptured = false;
             var commandKey = event.metaKey || event.ctrlKey;
             switch(event.which) {

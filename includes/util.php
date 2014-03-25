@@ -695,6 +695,8 @@ function twitter_search_to_rss($query = NULL)
 
         $twr = json_decode($twresponse, TRUE);
 
+        loggit(3, print_r($twr, TRUE));
+
         $xml = new SimpleXMLElement('<rss version="2.0"></rss>');
         $xml->addChild('channel');
         $xml->channel->addChild('title', 'Twitter Search - [' . $query . ']');

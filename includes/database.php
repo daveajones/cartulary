@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 37;
+$cg_database_version = 38;
 $cg_database_updates = array();
 
 
@@ -505,6 +505,16 @@ $cg_database_updates[36][] = <<<CGDB0113
  INSERT INTO `dbversion` ( `version` ) VALUES ( '37' )
 CGDB0113;
 //----------------------------------------------------------------------------------------------------------------
+
+//Version 37 to 38 -----------------------------------------------------------------------------------------------
+$cg_database_updates[37][] = <<<CGDB0114
+ ALTER TABLE `prefs` ADD `sessioncookies` TINYINT NOT NULL COMMENT 'Stay logged in?'
+CGDB0114;
+$cg_database_updates[37][] = <<<CGDB0115
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '38' )
+CGDB0115;
+//----------------------------------------------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------------------------------------------
 
 

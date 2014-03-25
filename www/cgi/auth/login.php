@@ -119,6 +119,7 @@ if( $prefs['usetotp'] == 1 ) {
             }
             exit(1);
         }
+
         //Make a cookie for this session
         setcookie($sidcookie, $sid, 0, "/");
         $jsondata['goloc'] = $twofactorpage;
@@ -150,8 +151,14 @@ if( ($sid = new_session($uid)) == FALSE ) {
   exit(1);
 }
 
+//Should we use session cookies or long term?
+$cookieexpire = 0;
+if( $prefs['sessioncookies'] == 0 ) {
+    $cookieexpire = time()+(60*60*24*30); //30 days
+}
+
 //Make a cookie for this session
-setcookie($sidcookie, $sid, 0, "/");
+setcookie($sidcookie, $sid, $cookieexpire, "/");
 
 
 //Is this the first time this user is logging in?
@@ -183,7 +190,7 @@ if(is_user_active($uid)) {
 } else {
   //Log it
   loggit(3,"Redirecting new user: [$email | $uid] with sid: [$sid] to the activation page: [$activatepage].");
-  setcookie($newusercookie, $newusercookie, 0, "/");
+  setcookie($newusercookie, $newusercookie, $cookieexpire, "/");
 
   //Set the activation stage
   $stg = get_activation_stage($uid);

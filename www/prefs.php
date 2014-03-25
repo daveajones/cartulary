@@ -85,6 +85,7 @@
 		    </select>
                 </li>
 		<li class="privacy"><label class="checkbox inline"><input name="hideme" type="checkbox" <?if ($prefs['hideme'] == 1) echo "checked ";?>/> I don't want to be found in directory searches.</label></li>
+        <li class="privacy"><label class="checkbox inline"><input name="sessioncookies" type="checkbox" <?if ($prefs['sessioncookies'] == 1) echo "checked ";?>/> Re-prompt for login every time I open the browser.</label></li>
         <li class="privacy"><label class="checkbox inline"><input name="usetotp" type="checkbox" <?if ($prefs['usetotp'] == 1) echo "checked ";?>/> I want to use two-factor authentication to log in.</label></li>
             <?if ( $prefs['usetotp'] == 1 && !empty($utps16) ) {
                 $b32 = new Base32;

@@ -131,7 +131,7 @@ function is_session_valid($sid = NULL)
     }
 
     //The session was valid, but did the ip address or browser change?
-    if (session_changed($sid)) {
+    if (session_changed($sid) && $cg_session_hijack_checking == 1) {
         loggit(3, "The session changed ip or browser string.  Need to re-login.");
         expire_session($sid);
         return (FALSE);
@@ -2565,11 +2565,12 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                   hidesublist=?,
                   analyticscode=?,
                   disqus_shortname=?,
-                  editorbucket=?
+                  editorbucket=?,
+                  sessioncookies=?
            WHERE uid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddssss",
+    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssds",
         $prefs['publicdefault'],
         $prefs['publicrss'],
         $prefs['publicopml'],
@@ -2623,6 +2624,7 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
         $prefs['analyticscode'],
         $prefs['disqus_shortname'],
         $prefs['editorbucket'],
+        $prefs['sessioncookies'],
         $uid
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);

@@ -44,8 +44,17 @@ if( ($sid = new_session($uid)) == FALSE ) {
     exit(1);
 }
 
+//Get user prefs
+$prefs = get_user_prefs($uid);
+
+//Should we use session cookies or long term?
+$cookieexpire = 0;
+if( $prefs['sessioncookies'] == 0 ) {
+    $cookieexpire = time()+(60*60*24*30); //30 days
+}
+
 //Make a cookie for this session
-setcookie($sidcookie, $sid, 0, "/");
+setcookie($sidcookie, $sid, $cookieexpire, "/");
 
 $jsondata['status'] = "true";
 $jsondata['goloc'] = '/';

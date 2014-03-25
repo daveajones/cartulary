@@ -56,6 +56,7 @@ if ( isset($_POST['cartinriver']) ) { $cartinriver = 1; } else { $cartinriver = 
 if ( isset($_POST['staticarticles']) ) { $staticarticles = 1; } else { $staticarticles = 0; };
 if ( isset($_POST['collapseriver']) ) { $collapseriver = 1; } else { $collapseriver = 0; };
 if ( isset($_POST['hideme']) ) { $hideme = 1; } else { $hideme = 0; };
+if ( isset($_POST['sessioncookies']) ) { $sessioncookies = 1; } else { $sessioncookies = 0; };
 if ( isset($_POST['pubrivertemplate']) ) { $pubrivertemplate = $_POST['pubrivertemplate']; } else { $pubrivertemplate = ""; };
 if ( isset($_POST['opensubs']) ) { $opensubs = 1; } else { $opensubs = 0; };
 if ( isset($_POST['publicriver']) ) { $publicriver = 1; } else { $publicriver = 0; };
@@ -589,6 +590,17 @@ if( ($hideme < 0) || ($hideme > 1) ) {
   exit(1);
 }
 $prefs['hideme'] = $hideme;
+
+$jsondata['prefname'] = "sessioncookies";
+if( ($sessioncookies < 0) || ($sessioncookies > 1) ) {
+    //Log it
+    loggit(2,"The value for sessioncookies pref was not within acceptable range: [$sessioncookies]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Value of pref is out of range.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['sessioncookies'] = $sessioncookies;
 
 $jsondata['prefname'] = "pubrivertemplate";
 if( strlen($pubrivertemplate) > 128 ) {

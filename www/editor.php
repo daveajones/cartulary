@@ -133,7 +133,7 @@ if( !empty($opmldata) ) {
     <div class="divOutlineTitle">
         <input class="rendertitle" checked="checked" type="checkbox" title="Render title and byline in the HTML?" /> <input class="title" placeholder="Title" type="text" />
     </div>
-    <div class="loading" style="display:none;"><i class="icon-spinner"></i> Loading...</div>
+    <div class="loading" style="display:none;"><i class="icon-spinner icon-spin"></i> Loading...</div>
     <div class="outlineinfo pull-right"></div>
 
     <div class="divOutlinerContainer">

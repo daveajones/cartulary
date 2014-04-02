@@ -328,9 +328,6 @@ $(document).ready(function () {
                 $('.templateopen li a').click(function() {
                     var geturl = $(this).data('url');
                     sheettemplate.removeClass('open');
-                    //Set the node's attributes
-                    opSetOneAtt('type', 'import');
-                    opSetOneAtt('url', geturl);
                     //Now call out and get the outline data
                     if(!opHasSubs()) {
                         $.ajax({
@@ -342,10 +339,13 @@ $(document).ready(function () {
                             },
                             success: function (data) {
                                 opInsertXml(data.data, right);
+                                //Set the node's attributes
+                                opSetOneAtt('type', 'import');
+                                opSetOneAtt('url', geturl);
                                 loading.hide();
                             },
                             error: function() {
-                                showMessage("Error loading include url.", false, 5);
+                                showMessage("Error loading import url.", false, 5);
                                 loading.hide();
                             }
                         });

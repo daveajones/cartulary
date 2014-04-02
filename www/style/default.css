@@ -703,10 +703,14 @@ div.searchbar p.result-msg {
   left:0;
   margin: 0;
   width:90%;
-  background-color:#333;
+  background-color:transparent;
   color: #ddd;
   max-height:90%;
   padding:15px;
+  border:none;
+  -webkit-box-shadow: 0 0 0 transparent;
+     -moz-box-shadow: 0 0 0 transparent;
+          box-shadow: 0 0 0 transparent;
 }
 #mdlMediaShadowbox .modal-body .media {
   display:block;
@@ -714,12 +718,17 @@ div.searchbar p.result-msg {
   margin-right:auto;
 }
 #mdlMediaShadowbox .modal-header {
-  background-color:#333;
+  background-color:transparent;
   color: #ddd;
   border:none;
 }
+#mdlMediaShadowbox .modal-header button.close {
+  background-color:transparent;
+  color: white;
+  border:none;
+}
 #mdlMediaShadowbox .modal-footer {
-  background-color:#333;
+  background-color:transparent;
   color: #ddd;
   border-top:solid #444 1px;
   max-height:20px;
@@ -836,7 +845,7 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.165);
 }
 .pageContentWrapper.Editor #divEditSheetOpen.open {
-    height:50%;
+    min-height: 70%;
     padding-top:120px;
 }
 .pageContentWrapper.Editor #divEditSheetOpen .recentfilesopen {
@@ -875,7 +884,7 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     display:none;
 }
 .pageContentWrapper.Editor #divEditSheetTemplate.open {
-    height:50%;
+    height:70%;
     padding-top:120px;
 }
 .pageContentWrapper.Editor #divEditSheetTemplate.open .templateopen {

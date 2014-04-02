@@ -44,6 +44,7 @@
     $l_opensignupphrase = "";
 	$l_backupencrypt = 0;
 	$l_backupencryptpassword = "";
+    $l_cg_session_hijack_checking = 0;
 
     //If there is already a config file, let's hang on to it
     if( file_exists($cfname) ) {
@@ -96,6 +97,9 @@
 		if( isset($cg_backup_encrypt_password) ) {
 			$l_backupencryptpassword = $cg_backup_encrypt_password;
 		}
+        if( isset($cg_session_hijack_checking) ) {
+            $l_cg_session_hijack_checking = $cg_session_hijack_checking;
+        }
       }
 
       copy( $cfname, $cfname.'.old.'.time() );
@@ -265,6 +269,11 @@
 	    $template = str_replace('cg_opensignup=0', 'cg_opensignup=1', $template);
 	}
     $template = str_replace('cg_opensignup_phrase="opensignupphrase"', 'cg_opensignup_phrase="'.$l_opensignupphrase.'"', $template);
+
+    //Preserve session hijack setting check
+    if( $l_cg_session_hijack_checking == 1 ) {
+        $template = str_replace('cg_session_hijack_checking=0', 'cg_session_hijack_checking=1', $template);
+    }
 
     //Eliminate the newinstall flag if it's set
     if( !isset($cartularynewinstall) ) {

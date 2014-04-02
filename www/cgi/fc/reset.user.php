@@ -35,6 +35,9 @@ set_password($userId, $newPassword);
 //Disable two-factor auth for this user
 disable_totp($userId);
 
+//Clear all active sessions for this user
+remove_sessions_for_user($userId);
+
 //Log it
 loggit(1,"Password reset for user: [$userId].");
 

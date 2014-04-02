@@ -789,6 +789,13 @@ if( empty($utps16) || ($oldprefs['usetotp'] != $prefs['usetotp']) ) {
     $jsondata['goloc'] = "/prefs?ts=".time();
 }
 
+//If the user wants session-only cookies, set a new cookie
+$cookieexpire = 0;
+if( $prefs['sessioncookies'] == 0 ) {
+    $cookieexpire = time()+(60*60*24*30); //30 days
+}
+setcookie($sidcookie, get_session_id(), $cookieexpire, "/");
+
 //Rebuild static files
 build_blog_rss_feed($uid);
 build_blog_opml_feed($uid);

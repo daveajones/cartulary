@@ -4,7 +4,8 @@ $(document).ready(function () {
     var hoverTimer = null;
     var sheetopen = $('#divEditSheetOpen');
     var srmodal = $('#mdlEditorSearchReplace');
-    var sheettemplate = $('#divEditSheetTemplate');
+    var sheetinclude = $('#divEditSheetInclude');
+    var sheetimport = $('#divEditSheetImport');
     var chkToggleRender = $('.rendertoggle');
     var chkDisqusInclude = $('.menuDisqusToggle');
     var menubar = $('#menubarEditor');
@@ -104,41 +105,6 @@ $(document).ready(function () {
         return false;
     });
 
-    //Select inclusion
-    menubar.find('.menuTemplate').click(function() {
-        //Make the ajax call to get the recent file list
-        $.ajax({
-            type: 'POST',
-            url: '/cgi/out/get.recentfiles',
-            dataType: "json",
-            success: function (data) {
-                //Clear the table for new data
-                $('.templateopen').empty();
-
-                //Iterate
-                $.each(data.files, function(i, item) {
-                    var re = /\.$/;
-                    var newtitle = item.title.replace(re, "").toLowerCase();
-                    //Add an entry for each url returned
-                    $('.templateopen').append('<li><a href="#" data-url="'+ item.url +'">' + newtitle + '</a> ' + prettyDate(item.time * 1000).toLowerCase() + '.</li>');
-                });
-
-                //Link apply function to each file link
-                $('.templateopen li a').click(function() {
-                    var geturl = $(this).data('url');
-                    sheettemplate.removeClass('open');
-                    applyTemplate(geturl);
-                    return false;
-                });
-
-                //Open the dropdown sheet
-                sheettemplate.toggleClass('open');
-            }
-        });
-
-        return false;
-    });
-
     //Redirect button
     menubar.find('.menuRedirect').click(function() {
         bootbox.prompt("What url should redirect to this document?", function(result) {
@@ -170,9 +136,41 @@ $(document).ready(function () {
          });
     });
 
+    //Import by url button
+    sheetimport.find('a.openbyurl').click( function() {
+        bootbox.prompt("Url of outline to import?", function(geturl) {
+            if (geturl !== null) {
+                //Set the node's attributes
+                opSetOneAtt('type', 'import');
+                opSetOneAtt('url', geturl);
+                //Now call out and get the outline data
+                if(!opHasSubs()) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/cgi/out/get.url.json?url=' + geturl,
+                        dataType: "json",
+                        beforeSend: function() {
+                            loading.show();
+                        },
+                        success: function (data) {
+                            opInsertXml(data.data, right);
+                            loading.hide();
+                        },
+                        error: function() {
+                            showMessage("Error loading import url.", false, 5);
+                            loading.hide();
+                        }
+                    });
+                }
+                //Close the sheet
+                $('div.sheet').removeClass('open');
+            }
+        });
+    });
+
     //Open inclusion by url button
-    sheettemplate.find('a.openbyurl').click( function() {
-        bootbox.prompt("Url of the template to use?", function(geturl) {
+    sheetinclude.find('a.openbyurl').click( function() {
+        bootbox.prompt("Url of outline to link to?", function(geturl) {
             if (geturl !== null) {
                 //Set the node's attributes
                 opSetOneAtt('type', 'include');
@@ -236,34 +234,33 @@ $(document).ready(function () {
                     //Link apply function to each file link
                     $('.templateopen li a').click(function() {
                         var geturl = $(this).data('url');
-                        sheettemplate.removeClass('open');
+                        sheetinclude.removeClass('open');
                         //Set the node's attributes
                         opSetOneAtt('type', thistype);
                         opSetOneAtt('url', geturl);
                         //Now call out and get the outline data
-                        if(!opHasSubs()) {
-                            $.ajax({
-                                type: 'POST',
-                                url: '/cgi/out/get.url.json?url=' + geturl,
-                                dataType: "json",
-                                beforeSend: function() {
-                                    loading.show();
-                                },
-                                success: function (data) {
-                                    opInsertXml(data.data, right);
-                                    loading.hide();
-                                },
-                                error: function() {
-                                    showMessage("Error loading include url.", false, 5);
-                                    loading.show();
-                                }
-                            });
-                        }
+                        $.ajax({
+                            type: 'POST',
+                            url: '/cgi/out/get.url.json?url=' + geturl,
+                            dataType: "json",
+                            beforeSend: function() {
+                                loading.show();
+                                opDeleteSubs();
+                            },
+                            success: function (data) {
+                                opInsertXml(data.data, right);
+                                loading.hide();
+                            },
+                            error: function() {
+                                showMessage("Error loading include url.", false, 5);
+                                loading.show();
+                            }
+                        });
                         return false;
                     });
 
                     //Open the dropdown sheet
-                    sheettemplate.toggleClass('open');
+                    sheetinclude.toggleClass('open');
 
                 }
             });
@@ -327,34 +324,32 @@ $(document).ready(function () {
                 //Link apply function to each file link
                 $('.templateopen li a').click(function() {
                     var geturl = $(this).data('url');
-                    sheettemplate.removeClass('open');
+                    sheetimport.removeClass('open');
+                    //Set the node's attributes
+                    opSetOneAtt('type', 'import');
+                    opSetOneAtt('url', geturl);
                     //Now call out and get the outline data
-                    if(!opHasSubs()) {
-                        $.ajax({
-                            type: 'POST',
-                            url: '/cgi/out/get.url.json?url=' + geturl,
-                            dataType: "json",
-                            beforeSend: function() {
-                                loading.show();
-                            },
-                            success: function (data) {
-                                opInsertXml(data.data, right);
-                                //Set the node's attributes
-                                opSetOneAtt('type', 'import');
-                                opSetOneAtt('url', geturl);
-                                loading.hide();
-                            },
-                            error: function() {
-                                showMessage("Error loading import url.", false, 5);
-                                loading.hide();
-                            }
-                        });
-                    }
+                    $.ajax({
+                        type: 'POST',
+                        url: '/cgi/out/get.url.json?url=' + geturl,
+                        dataType: "json",
+                        beforeSend: function() {
+                            loading.show();
+                        },
+                        success: function (data) {
+                            opInsertXml(data.data, right);
+                            loading.hide();
+                        },
+                        error: function() {
+                            showMessage("Error loading import url.", false, 5);
+                            loading.hide();
+                        }
+                    });
                     return false;
                 });
 
                 //Open the dropdown sheet
-                sheettemplate.toggleClass('open');
+                sheetimport.toggleClass('open');
 
             }
         });

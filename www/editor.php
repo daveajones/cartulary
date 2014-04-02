@@ -122,9 +122,15 @@ if( !empty($opmldata) ) {
     <ul class="recentfilesopen"></ul>
 </div>
 
-<div id="divEditSheetTemplate" class="sheet">
+<div id="divEditSheetInclude" class="sheet">
     <a class="sheetclose pull-right" href="#"> X </a>
     <div class="openbyurl"><a class="openbyurl" href="#">Include</a> by url or...</div>
+    <ul class="templateopen"></ul>
+</div>
+
+<div id="divEditSheetImport" class="sheet">
+    <a class="sheetclose pull-right" href="#"> X </a>
+    <div class="openbyurl"><a class="openbyurl" href="#">Import</a> by url or...</div>
     <ul class="templateopen"></ul>
 </div>
 
@@ -133,7 +139,7 @@ if( !empty($opmldata) ) {
     <div class="divOutlineTitle">
         <input class="rendertitle" checked="checked" type="checkbox" title="Render title and byline in the HTML?" /> <input class="title" placeholder="Title" type="text" />
     </div>
-    <div class="loading" style="display:none;"><i class="icon-spinner icon-spin"></i> Loading...</div>
+    <div class="loading" style="display:none;"><i class="icon-refresh icon-spin"></i> Loading...</div>
     <div class="outlineinfo pull-right"></div>
 
     <div class="divOutlinerContainer">

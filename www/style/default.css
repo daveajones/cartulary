@@ -866,7 +866,8 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     margin-left:20px;
     margin-bottom:20px;
 }
-.pageContentWrapper.Editor #divEditSheetTemplate {
+.pageContentWrapper.Editor #divEditSheetImport,
+.pageContentWrapper.Editor #divEditSheetInclude {
     background: #eee;
     color:#333;
     font-size:160%;
@@ -880,25 +881,31 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     transition: height 500ms;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.165);
 }
-.pageContentWrapper.Editor #divEditSheetTemplate .templateopen {
+.pageContentWrapper.Editor #divEditSheetImport .templateopen,
+.pageContentWrapper.Editor #divEditSheetInclude .templateopen {
     display:none;
 }
-.pageContentWrapper.Editor #divEditSheetTemplate.open {
+.pageContentWrapper.Editor #divEditSheetImport.open,
+.pageContentWrapper.Editor #divEditSheetInclude.open {
     height:70%;
     padding-top:120px;
 }
-.pageContentWrapper.Editor #divEditSheetTemplate.open .templateopen {
+.pageContentWrapper.Editor #divEditSheetImport.open .templateopen,
+.pageContentWrapper.Editor #divEditSheetInclude.open .templateopen {
     display:block;
     list-style-type: none;
     margin-left:60px;
 }
-.pageContentWrapper.Editor #divEditSheetTemplate.open .templateopen li {
+.pageContentWrapper.Editor #divEditSheetImport.open .templateopen li,
+.pageContentWrapper.Editor #divEditSheetInclude.open .templateopen li {
     margin-bottom:10px;
 }
-.pageContentWrapper.Editor #divEditSheetTemplate.open .sheetclose {
+.pageContentWrapper.Editor #divEditSheetImport.open .sheetclose,
+.pageContentWrapper.Editor #divEditSheetInclude.open .sheetclose {
     margin-right:30px;
 }
-.pageContentWrapper.Editor #divEditSheetTemplate.open div.openbyurl {
+.pageContentWrapper.Editor #divEditSheetImport.open div.openbyurl,
+.pageContentWrapper.Editor #divEditSheetInclude.open div.openbyurl {
     margin-left:20px;
     margin-bottom:20px;
 }

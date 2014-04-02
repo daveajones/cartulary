@@ -35,6 +35,13 @@
 			return false;
 		});
 
+        //Submit form on enter
+        $(document).on('keyup', '#loginForm', function(event) {
+            if( event.which == 13 ) {
+                $('#aLogin').trigger('click');
+            }
+        });
+
         //Ajaxify the login form
         $('#loginForm').ajaxForm({
 	        cache:          false,
@@ -76,7 +83,7 @@
     <center>
 	<div id="divLoginInner">
 	    <form id="loginForm" action="/cgi/auth/login" method="post" class="<?if ($g_platform != "mobile"){?>form-horizontal<?}?>">
-		<input id="txtUsername" name="email" class="txtinput required" placeholder="Email" type="text" />
+		<input id="txtUsername" name="email" class="txtinput required" placeholder="Email" type="email" />
 		<input id="txtPassword" name="password" class="txtinput required password" placeholder="Password" type="password" />
 		<input type="hidden" name="type" value="json" />
 

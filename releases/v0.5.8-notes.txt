@@ -1,0 +1,33 @@
+#Release Notes - Freedom Controller v0.5.8
+
+
+More editor work and some security changes.
+
+
+- There is a new menu option to import external outlines into the current outline.  When you do this, the node with focus
+  becomes an "import" node.  An "import" node will not dynamically refresh from the external outline unless you delete all
+  of it's children first.  If you have content you want to bring in to your outline, use import.  If you ever want your
+  outline to go out and fetch that content again, delete all of the import node's children and then double-click it.  Barring
+  that, the content imported is statically part of your outline and won't change.
+
+- Behavior of "include" nodes has changed.  They now dynamically refresh on each collapse-expand.  That means each time you
+  collapse, then re-expand an "include" node, the editor fetches a new copy of the external outline.  This is more consistent
+  with the way Fargo works, so that people don't find unexpected behavior when switching between the two.  This also enables
+  FC to be used as an "instant outliner".
+
+- Better "loading" indicator for ajax operations in the editor.
+
+- There is a new security pref called "Re-prompt for login every time I open the browser."  This toggles your user account
+  between 30 day cookies and session cookies.  For those people getting constantly annoyed by having to re-login on mobile, this
+  will fix you up.  Convenience vs. security.
+
+- The "reset user" button on the admin panel now clears all user sessions, in light of the new pref above.  If someone loses their
+  phone, just do a reset and they will be given a new password and all sessions/tokens will be expired.
+
+- Enter key now submits the form on the login page.  Doh!
+
+- There is a new server level pref in cartulary.conf called "cg_session_hijack_checking".  It's in the [security] section toward
+  the bottom of the file.  Set this to 1 to enable strict checking of whether browser agent string and ip have changed between
+  session touches.  This gives some moderate protection against session cookie sniffing at the expense of having to re-login more.
+
+- Database updated to version 38.

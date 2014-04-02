@@ -1,7 +1,7 @@
 $(document).ready(function () {
-    var hoverTimer = null;
     var loading = $('div.loading');
     var outliner = $('#outliner');
+    var hoverTimer = null;
     var sheetopen = $('#divEditSheetOpen');
     var srmodal = $('#mdlEditorSearchReplace');
     var sheettemplate = $('#divEditSheetTemplate');
@@ -62,7 +62,6 @@ $(document).ready(function () {
         $('#dropdownSave').dropdown('hide');
         return false;
     });
-
 
     //Publish button
     menubar.find('.menuPublish').click(function () {
@@ -185,12 +184,15 @@ $(document).ready(function () {
                         url: '/cgi/out/get.url.json?url=' + geturl,
                         dataType: "json",
                         beforeSend: function() {
-                            dotAnimation = setInterval("animateDots", 300);
+                            loading.show();
                         },
                         success: function (data) {
-                            clearInterval(dotAnimation);
                             opInsertXml(data.data, right);
-                            //outliner.concord().op.deleteLine();
+                            loading.hide();
+                        },
+                        error: function() {
+                            showMessage("Error loading include url.", false, 5);
+                            loading.hide();
                         }
                     });
                 }
@@ -246,13 +248,10 @@ $(document).ready(function () {
                                 dataType: "json",
                                 beforeSend: function() {
                                     loading.show();
-                                    dotAnimation = setInterval("animateDots", 300);
                                 },
                                 success: function (data) {
-                                    clearInterval(dotAnimation);
                                     opInsertXml(data.data, right);
                                     loading.hide();
-                                    //outliner.concord().op.deleteLine();
                                 },
                                 error: function() {
                                     showMessage("Error loading include url.", false, 5);
@@ -305,6 +304,60 @@ $(document).ready(function () {
     });
     menubar.find('.menuSearchReplace').click( function() {
        srmodal.modal('show');
+    });
+    menubar.find('.menuImportOutline').click( function() {
+        console.log("test");
+        //Make the ajax call to get the recent file list
+        $.ajax({
+            type: 'POST',
+            url: '/cgi/out/get.recentfiles',
+            dataType: "json",
+            success: function (data) {
+                //Clear the table for new data
+                $('.templateopen').empty();
+
+                //Iterate
+                $.each(data.files, function(i, item) {
+                    var re = /\.$/;
+                    var newtitle = item.title.replace(re, "").toLowerCase();
+                    //Add an entry for each url returned
+                    $('.templateopen').append('<li><a href="#" data-url="'+ item.url +'">' + newtitle + '</a> ' + prettyDate(item.time * 1000).toLowerCase() + '.</li>');
+                });
+
+                //Link apply function to each file link
+                $('.templateopen li a').click(function() {
+                    var geturl = $(this).data('url');
+                    sheettemplate.removeClass('open');
+                    //Set the node's attributes
+                    opSetOneAtt('type', 'import');
+                    opSetOneAtt('url', geturl);
+                    //Now call out and get the outline data
+                    if(!opHasSubs()) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/cgi/out/get.url.json?url=' + geturl,
+                            dataType: "json",
+                            beforeSend: function() {
+                                loading.show();
+                            },
+                            success: function (data) {
+                                opInsertXml(data.data, right);
+                                loading.hide();
+                            },
+                            error: function() {
+                                showMessage("Error loading include url.", false, 5);
+                                loading.hide();
+                            }
+                        });
+                    }
+                    return false;
+                });
+
+                //Open the dropdown sheet
+                sheettemplate.toggleClass('open');
+
+            }
+        });
     });
     $('.modalsrgo').click( function() {
         //Hide the form
@@ -508,7 +561,7 @@ $(document).ready(function () {
             opSetTextMode(false);
         }
     });
-});
+
 
 //Save a file
 function saveFile( ftitle, fname, fmode, fredirect, fdisqus, fwysiwyg, fopml, foldname ) {
@@ -688,21 +741,25 @@ function opExpandCallback (op) {
         gotourl = op.attributes.getOne('url');
         window.open(gotourl);
     } else
-    if (nodetype == "include") {
+    if (nodetype == "import" || nodetype == "include") {
         var geturl = op.attributes.getOne('url');
         //Now call out and get the outline data only if the inclusion node doesn't have any children
-        if(!opHasSubs()) {
+        if( (nodetype == "import" && !opHasSubs()) || nodetype == "include") {
             $.ajax({
                 type: 'POST',
                 url: '/cgi/out/get.url.json?url=' + geturl,
                 dataType: "json",
                 beforeSend: function() {
-                    dotAnimation = setInterval("animateDots", 300);
+                    loading.show();
+                    opDeleteSubs();
                 },
                 success: function (data) {
-                    clearInterval(dotAnimation);
                     opInsertXml(data.data, right);
-                    //outliner.concord().op.deleteLine();
+                    loading.hide();
+                },
+                error: function() {
+                    showMessage("Error refreshing inclusion content.", false, 5);
+                    loading.hide();
                 }
             });
         }
@@ -720,18 +777,6 @@ function opKeystrokeCallback (event) {
     }
 }
 
-//Animate some dots to show progress
-function animateDots () {
-    var dots = opGetLineText();
-
-    if( dots == '...' ) {
-        opSetLineText('');
-    } else {
-        opSetLineText(dots + '.');
-    }
-
-    return true;
-}
 
 //Move cursors within a content editable element
 //___via: http://stackoverflow.com/questions/1125292/how-to-move-cursor-to-end-of-contenteditable-entity
@@ -773,3 +818,5 @@ function moveCursorToEnd(contentEditableElement) {
         range.select();//Select the range (make it the visible selection
     }
 }
+
+});

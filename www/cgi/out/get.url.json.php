@@ -19,7 +19,7 @@ if( isset($_REQUEST['url']) && !empty($_REQUEST['url']) && stripos($_REQUEST['ur
     exit(0);
 }
 
-$urldata = fetchUrl($url);
+$urldata = fetchUrl(get_final_url($url));
 
 //--------------------------------------------------------------------------------
 //Give feedback that all went well

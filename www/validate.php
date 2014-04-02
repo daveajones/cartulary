@@ -76,7 +76,7 @@ $tree_location = "Validate";
     <center>
         <div id="divLoginInner">
             <form id="loginForm" action="/cgi/auth/validate" method="post" class="<?if ($g_platform != "mobile"){?>form-horizontal<?}?>">
-                <input id="txtCode" name="totp" class="txtinput required" placeholder="Enter Code" type="text" />
+                <input id="txtCode" name="totp" class="txtinput required" placeholder="Enter Code" type="number" />
                 <input type="hidden" name="type" value="json" />
 
                 <a id="aLogin" class="btn" href="#">Validate</a>

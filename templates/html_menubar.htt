@@ -126,6 +126,7 @@
                 <li class="divider-vertical34"></li>
                 <li><a class="menuAddLink" href="#" title="Make selection a link."><i class="icon-link"></i></a></li>
                 <li><a class="menuSearchReplace" href="#" title="Replace text with other text."><i class="icon-repeat"></i></a></li>
+                <li><a class="menuImportOutline" href="#" title="Import an outline into this node."><i class="icon-signin"></i></a></li>
             </ul>
             <ul class="nav pull-right outlineinfo"></ul>
         </div>

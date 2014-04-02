@@ -20,6 +20,3 @@ $jsondata['description'] = "Parsed social outline content.";
 echo json_encode($jsondata);
 
 return(0);
-
-?>
-

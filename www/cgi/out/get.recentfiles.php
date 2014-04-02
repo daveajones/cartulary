@@ -9,7 +9,7 @@ $jsondata = array();
 
 
 //Pull a list of recently edited files for this user
-$files = get_recent_files($g_uid, 10);
+$files = get_recent_files($g_uid, 15);
 
 
 //--------------------------------------------------------------------------------

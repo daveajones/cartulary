@@ -32,11 +32,14 @@
           if( $protpos <> 0 || $protpos === FALSE ) {
               $badurl = true;
           } else {
+              /*
               $opmldata = fetchUrl(get_final_url($url));
               $opmldata = stripInvalidXml($opmldata);
               if( !is_outline($opmldata) ) {
                   $badurl = true;
               }
+              */
+              $opmldata = "";
           }
 
           //Get side info
@@ -93,7 +96,7 @@ if( !empty($opmldata) ) {
     var oldfilename = "";
     var bufilename = '<?echo time()."-".$default_opml_export_file_name;?>';
     var badurl = false;
-    <?if( isset($opmldata) && !isset($badurl) ) {?>
+    <?if( isset($opmldata) && !empty($aid) ) {?>
     var initialOpmlText = '<?echo $opmldata?>';
     <?} else {?>
     var initialOpmlText = initialOpmltext;

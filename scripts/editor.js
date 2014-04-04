@@ -413,6 +413,7 @@ $(document).ready(function () {
         "callbacks": {
             "opCursorMoved": opCursorMovedCallback,
             "opExpand": opExpandCallback,
+            "opCollapse": opCollapseCallback,
             "opKeystroke": opKeystrokeCallback
         },
         "prefs": {
@@ -723,10 +724,27 @@ function opCursorMovedCallback (op) {
     var nodetype = op.attributes.getOne('type');
 
     if( typeof(nodetype) == "undefined" )  {  nodetype = "not set";  }
-    $('#menubarEditor').find('.menuType > a.dropdown-toggle').html('Type (' + nodetype + ') <b class="caret"></b>');
+    menubar.find('.menuType > a.dropdown-toggle').html('Type (' + nodetype + ') <b class="caret"></b>');
+
+    //Add a link-out option for include nodes
+    menubar.find('.menubar li.extLink').remove();
+    menubar.find('.menubar li.extEditLink').remove();
+    if( nodetype == "include" || nodetype == "import" ) {
+        menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="'+op.attributes.getOne('url')+'"><i class="icon-external-link" style="color:#090;"></i></a></li>');
+        menubar.find('.menubar').append('<li class="extEditLink"><a target="_blank" href="/editor?url='+op.attributes.getOne('url')+'"><i class="icon-edit-sign" style="color:#090;"></i></a></li>');
+        return true;
+    }
+    if( nodetype == "link" ) {
+        menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="'+op.attributes.getOne('url')+'"><i class="icon-external-link" style="color:#090;"></i></a></li>');
+        return true;
+    }
+    if( nodetype == "rss" ) {
+        menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="'+op.attributes.getOne('xmlUrl')+'"><i class="icon-external-link" style="color:#090;"></i></a></li>');
+        return true;
+    }
+
 
     return true;
-
 }
 
 //Handle expansion requests for nodes
@@ -758,6 +776,16 @@ function opExpandCallback (op) {
                 }
             });
         }
+    }
+    return true;
+}
+
+//Handle collapse requests for nodes
+function opCollapseCallback (op) {
+    var nodetype = op.attributes.getOne('type');
+    //If we collapse an include node, delete it's sub-nodes
+    if( nodetype == "include" ) {
+        op.deleteSubs();
     }
     return true;
 }

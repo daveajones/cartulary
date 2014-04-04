@@ -803,6 +803,9 @@ div.searchbar p.result-msg {
     z-index: 2;
     margin-top:44px;
 }
+.submenuEditor li.menuType {
+    min-width:160px;
+}
 body#bodyEditOutline {
     background:white;
 }

@@ -480,17 +480,10 @@ $(document).ready(function () {
 
 
     //Refresh the outliner info pane
-    //updateOutlineInfo(url, "", redirect);
+    updateOutlineInfo(url, "", redirect);
     if( badurl == true ) {
         showMessage('Parse error. Please check the url.', false, 5);
     }
-
-    //Dim the title area when not in use
-    hoverTimer = setTimeout(function() {
-        $('.divOutlineTitle').addClass('dim');
-    }, 7000);
-
-
 
     //Hot keys
     $(window).bind('keydown', function(event) {
@@ -706,10 +699,12 @@ function updateOutlineInfo(url, html, redirect) {
 
     elOutlineinfo.html('');
     if (url != "") {
-        elOutlineinfo.html('<li><a target="_blank" href="' + url + '">OPML</a></li>');
-        if( html != "") {
-            elOutlineinfo.append('<li><a target="_blank" href="' + html + '">HTML</a></li>');
+        elOutlineinfo.html('<li><a target="_blank" title="Link to opml source of this outline." href="' + url + '">OPML</a></li>');
+        if( html == "") {
+            htmlurl = url.replace("/opml/", "/html/");
+            htmlurl = htmlurl.substr(0, htmlurl.lastIndexOf(".")) + ".html";
         }
+        elOutlineinfo.append('<li><a target="_blank" title="Link to rendered html version of this outline." href="' + htmlurl + '">HTML</a></li>');
     }
 
     if ( redirect != "" ) {

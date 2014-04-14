@@ -318,6 +318,9 @@ li.menubar-search-container { display:none; }
 	padding-left:30px;
 	border-bottom:solid #ddd 1px;
 }
+.pageContentWrapper.River #stream-sidebar-right #divActiveFeeds ul.feedlist li.hilite {
+    background:#f0e067;
+}
 .pageContentWrapper.River #stream-sidebar-right #divActiveFeeds ul.feedlist li.person {
 	padding:0;
 	padding-left:30px;
@@ -327,6 +330,9 @@ li.menubar-search-container { display:none; }
 }
 .pageContentWrapper.River #stream-sidebar-right #divActiveFeeds ul.feedlist li:hover {
 	background:lightyellow;
+}
+.pageContentWrapper.River #stream-sidebar-right #divActiveFeeds ul.feedlist li.hilite:hover {
+    background:#f0e067;
 }
 /* ----- Subitems ------------------------------------ */
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .subitem .rivermicrotar {

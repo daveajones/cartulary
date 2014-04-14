@@ -67,6 +67,7 @@ function _rebindEverything(elid) {
 
 function _showOnlyItems( klass, title ) {
     var streamObj = $('#stream');
+    var activeFeedsObj = $('#divActiveFeeds');
 
 	_showAllItems();
     $(pathToStreamItem).not('.' + klass).hide();
@@ -76,15 +77,18 @@ function _showOnlyItems( klass, title ) {
 		_showAllItems();
 		return false;
 	});
-	$('html, body').animate({ scrollTop: '0px' }, 300); 		
+    activeFeedsObj.find('ul.feedlist li.' + klass).addClass('hilite');
+	$('html, body').animate({ scrollTop: '0px' }, 300);
 }
 
 
 function _showAllItems() {
     var streamObj = $('#stream');
+    var activeFeedsObj = $('#divActiveFeeds');
 
 	streamObj.find(' div.filternotice').remove();
 	streamObj.removeClass('filtered');
+    activeFeedsObj.find('ul.feedlist li').removeClass('hilite');
 	$(pathToStreamItem).show();
 }
 

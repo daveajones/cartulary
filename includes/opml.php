@@ -1102,7 +1102,7 @@ function get_outline_items($id = NULL, $max = NULL)
 
     //Let's do some intelligent header checking so we don't waste time and bandwidth
     $lastmodtime = check_head_lastmod($url);
-    if (($lastmodtime == $outline['lastmod']) && ($lastmodtime != FALSE)) {
+    if (($lastmodtime == $outline['lastmod']) && !empty($lastmodtime)) {
         loggit(1, "Outline: [($url) $id] hasn't been updated. Skipping.");
         return (-3);
     }
@@ -1532,7 +1532,7 @@ function add_outline_item($id = NULL, $item = NULL, $format = NULL)
     $content = (string)$item->attributes()->text;
 
     //Now that we have a good id, put the outline item into the database
-    $stmt = "INSERT INTO $table_sopml_outlineitems (id,content,attributes,oid,timeadded,conthash) VALUES (?,?,?,?,?,?)";
+    $stmt = "INSERT IGNORE INTO $table_sopml_outlineitems (id,content,attributes,oid,timeadded,conthash) VALUES (?,?,?,?,?,?)";
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
     $sql->bind_param("ssssss", $iid, $content, $item->attributes(), $id, $timeadded, md5($content)) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -2220,6 +2220,7 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$includes/posts.php";
 
     $prefs = get_user_prefs($uid);
     $analyticscode = $prefs['analyticscode'];
@@ -2244,9 +2245,15 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
     $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
     libxml_clear_errors();
 
+    //Get rss opml for the microblog
+    if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
+        $microblogrss = get_s3_url($uid, NULL, get_microblog_feed_filename($uid));
+    }
+
     //Was there an opml url given
     $linktoopml = "";
     if( !empty($opmlurl) ) {
+        loggit(3, "DEBUG: Opml url is: [$opmlurl].");
         $linktoopml = "<a class=\"opmlicon\" href=\"$opmlurl\" title=\"Link to the opml for this document.\">&nbsp;</a>";
     }
 
@@ -2281,9 +2288,12 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
   <head>
     <title>$title</title>
     <meta charset="UTF-8">
+    <link rel="alternate" type="text/xml" title="OPML" href="$opmlurl" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="$microblogrss" />
     <link href='http://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css' />
-    <link href='//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css' rel='stylesheet' type='text/css' />
+    <link href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css' rel='stylesheet' type='text/css' />
     <style>
+        html { overflow-y: scroll; }
         body { font-family: 'Noto Sans', serif; width: 900px; margin:100px auto 20px; }
         div.otitle { font-weight:bold; font-size: 28px; line-height: 30px; margin-bottom: 20px; }
         div.obyline { font-size: 14px; margin-left:3px; margin-bottom: 40px; }
@@ -2291,7 +2301,7 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
         ul { list-style-type:none; list-style-position:inside; padding:0px; margin:0px; }
         li { list-style-type:none; padding:0px; margin:0px; }
 
-        li.o { display:inline-block; float:left; font-size: 18px; line-height: 24px; max-width:95%; }
+        li.o { display:inline-block; font-size: 18px; line-height: 24px; max-width:95%; }
 
         li.ouwedge { background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QwJFjoSFDd3KQAAAJhJREFUKM+9kCESgzAQRV+DquQCBVNdPBfocAqOwDV6DG4AJromnuqaMj1AwCExm5l0GiYovtq/+//+2YWjcAJIy+oDZDv0ozU6V0LqnSE1gAKwRj+BPmLoRYfymg0wbxhmmQOQuGL5vqfz5boA94DpYY3ufh7hIy2rAbh5rZc1uvA1KrC1ifB/kxzbCm3d8bEkt30MpRyLFdXdKFaW+5X5AAAAAElFTkSuQmCC) 0px 7px no-repeat; display:inline-block; float:left; clear:both; padding-right:13px;  }
         li.ouwedge.collapsed { background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QwJFjkvZ3Jo+wAAAIdJREFUKM9jYCAXCFp7PRC09nIgVj0TlJZnYGDYL2jttUHQ2kuBWE0w4M/AwHBB0NqrAZ8mRqjz/mORu8jAwFDw/ui2A6RogoGFUM0fcDkPG4hnYGC4gM9PuGwyQBZgwaMYp5+wafrIwMDQ8P7otgm4TEPXtBFq+gN87oVpesjAwJCAzSlUAwDgjSci5nmpKgAAAABJRU5ErkJggg==) 0px 6px no-repeat;  }
@@ -2323,8 +2333,8 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
     <div class="ocomments">
         <div id="disqus_thread"></div>
     </div>
-    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script>
     $(document).ready(function() {
         $('li.ouwedge').click(function() {

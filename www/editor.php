@@ -3,8 +3,6 @@
 <?require_once "$confroot/$includes/net.php";?>
 <?
 
-
-
   // See if we have a valid article id or url to get source xml from
   $mode = "";
   $filename = "";
@@ -153,6 +151,11 @@ if( !empty($opmldata) ) {
 <?}?>
 </div>
 
+<div id="divEditorEnclosures" class="dropzone hide">
+    <input type="hidden" name="datestamp" class="datestamp" value="<?echo $datestamp?>" />
+    <div id="editor_queue"><span id="spnEditorQueueText">Drop file(s) here or press 'esc' to dismiss...</span></div>
+    <input type="file" name="file_upload" id="editor_upload" />
+</div>
 
 <?//--- Include the footer bar html fragments -----------?>
 <?include "$confroot/$templates/$template_html_footerbar"?>
@@ -160,4 +163,3 @@ if( !empty($opmldata) ) {
 
 <?include "$confroot/$templates/$template_html_postbody"?>
 </html>
-

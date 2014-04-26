@@ -320,6 +320,7 @@ li.menubar-search-container { display:none; }
 }
 .pageContentWrapper.River #stream-sidebar-right #divActiveFeeds ul.feedlist li.hilite {
     background:#f0e067;
+    border-left:solid royalblue 3px;
 }
 .pageContentWrapper.River #stream-sidebar-right #divActiveFeeds ul.feedlist li.person {
 	padding:0;
@@ -330,6 +331,7 @@ li.menubar-search-container { display:none; }
 }
 .pageContentWrapper.River #stream-sidebar-right #divActiveFeeds ul.feedlist li:hover {
 	background:lightyellow;
+    border-left:solid royalblue 2px;
 }
 .pageContentWrapper.River #stream-sidebar-right #divActiveFeeds ul.feedlist li.hilite:hover {
     background:#f0e067;
@@ -926,6 +928,10 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
     margin-top:40px;
     padding-left:10px;
 }
+.pageContentWrapper.Editor #divEditOutline .rendertitle,
+.pageContentWrapper.Editor #divEditOutline .loading {
+    margin-left:10px;
+}
 .pageContentWrapper.Editor #divEditOutline .title {
     box-shadow: inset 0 3px 1px -1px white;
     margin-top:18px;
@@ -939,6 +945,29 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
 }
 .pageContentWrapper.Editor #divEditOutline .title:focus, input:focus {
     outline: 0;
+}
+.pageContentWrapper.Editor #divEditorEnclosures {
+    padding:20px;
+    transition: display 500ms;
+    position: absolute;
+    border:dashed rgba(250,250,250,1) 4px;
+    background-color:rgba(80, 80, 180, 0.9)
+}
+.pageContentWrapper.Editor #divEditorEnclosures #editor_queue {
+    position: relative;
+    width:100%;
+    min-height: 200px;
+    height:100%;
+}
+.pageContentWrapper.Editor #divEditorEnclosures #spnEditorQueueText {
+    margin:20px;
+    font-size:200%;
+    display:block;
+    color: #eee;
+    text-shadow:0 1px 0 #555;
+}
+.pageContentWrapper.Editor .uploadifive-button {
+    display:none;
 }
 /* --------------------------------------------------- */
 

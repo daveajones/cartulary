@@ -6,14 +6,15 @@
 ##: ----------
 MAILTO=""
 
-##: The main feed aggregator (hard timeout after 8 minutes)
-0,20,40 * * * * root timeout 1100 php [$CONF_ROOT]/bin/feedscan.php
+##: The main feed aggregator (hard timeout after t-1 minutes)
+*/8 * * * * root timeout 420 php [$CONF_ROOT]/bin/feedscan.php
+0,20,40 * * * * root timeout 1100 php [$CONF_ROOT]/bin/feedpull.php
 
 ##: Only scan high error feeds every 6 hours
-9  */6 * * * root timeout 480 php [$CONF_ROOT]/bin/feedscan.php error
+9  */6 * * * root timeout 480 php [$CONF_ROOT]/bin/feedpull.php error
 
 ##: Only scan old feeds every 6 hours
-39 */6 * * * root timeout 480 php [$CONF_ROOT]/bin/feedscan.php old
+39 */6 * * * root timeout 480 php [$CONF_ROOT]/bin/feedpull.php old
 
 ##: The outline and list aggregator
 17   * * * * root php [$CONF_ROOT]/bin/outlinescan.php

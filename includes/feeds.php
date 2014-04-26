@@ -1519,6 +1519,65 @@ function delete_feed($fid = NULL)
 }
 
 
+//Fetch the newest content for a feed
+function fetch_feed_content($fid = NULL, $force = FALSE)
+{
+    //Check params
+    if (empty($fid)) {
+        loggit(2, "The feed id is blank or corrupt: [$fid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Get the content of the feed
+    $feed = get_feed_info($fid);
+    $url = $feed['url'];
+
+    //Check for bad feed url
+    if (empty($url)) {
+        loggit(2, "Feed: [$fid] has a blank url: [$url].");
+        return (FALSE);
+    }
+
+    //Let's do some intelligent header checking so we don't waste time and bandwidth
+    update_feed_lastcheck($fid, time());
+    $lastmodtime = check_head_lastmod($url);
+    //loggit(3, "DEBUG: Last-modified: [$lastmodtime]");
+    if (($lastmodtime == $feed['lastmod']) && !empty($lastmodtime) && $force == FALSE) {
+        loggit(1, "Feed: [($url) $fid] hasn't been updated. Skipping.");
+        return (FALSE);
+    }
+
+    //Feed has been changed so grab the new content
+    if (!empty($lastmodtime)) {
+        update_feed_lastmod($fid, $lastmodtime);
+    }
+    $goodurl = get_final_url($url);
+    if ($goodurl != $url) {
+        loggit(1, "Re-direct: Feed: [$url] re-directs to: [$goodurl].");
+    }
+    $tstart = time();
+    $content = fetchFeedUrl($goodurl, get_feed_subscriber_count($fid), $cg_sys_version);
+    //loggit(3, "FEED SCAN: GET request took [".(time() - $tstart)."] seconds.");
+    if( empty($content) ) {
+        loggit(2, "Error attempting to get url: [$url]. See log for details.");
+        increment_feed_error_count($fid);
+        return (FALSE);
+    }
+    update_feed_content($fid, $content);
+    $consize = strlen($content);
+
+    //Flag feed as updated
+    mark_feed_as_updated($fid);
+
+    //Log and leave
+    loggit(3, "Fetched: [$consize] new bytes of content for feed: [$goodurl].");
+    return ($consize);
+}
+
+
 //Get and parse out the content of an RSS feed
 function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 {
@@ -1551,45 +1610,17 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         $max = $default_new_subscription_item_count;
     }
 
-    //Check for bad feed url
-    if (empty($url)) {
-        loggit(2, "Feed: [$fid] has a blank url: [$url].");
-        return (-1);
-    }
-
-    //Let's do some intelligent header checking so we don't waste time and bandwidth
-    update_feed_lastcheck($fid, time());
-    $lastmodtime = check_head_lastmod($url);
-    //loggit(3, "DEBUG: Last-modified: [$lastmodtime]");
-    if (($lastmodtime == $feed['lastmod']) && !empty($lastmodtime) && $force == FALSE) {
-        loggit(1, "Feed: [($url) $fid] hasn't been updated. Skipping.");
-        $stats['checktime'] += (time() - $fstart);
-        set_feed_stats($fid, $stats);
-        return (-3);
-    }
-
-    //Feed has been changed so grab the new content
-    if (!empty($lastmodtime)) {
-        update_feed_lastmod($fid, $lastmodtime);
-    }
-    $goodurl = get_final_url($url);
-    if ($goodurl != $url) {
-        loggit(1, "Re-direct: Feed: [$url] re-directs to: [$goodurl].");
-    }
-    $tstart = time();
-    $content = fetchFeedUrl($goodurl, $stats['subscribers'], $cg_sys_version);
-    //loggit(3, "FEED SCAN: GET request took [".(time() - $tstart)."] seconds.");
-    if ($content == FALSE) {
+    //Pull the latest content blob from the database
+    if( empty($feed['content']) ) {
         loggit(2, "Error attempting to get url: [$url]. See log for details.");
         increment_feed_error_count($fid);
         $stats['checktime'] += (time() - $fstart);
         set_feed_stats($fid, $stats);
         return (-1);
     }
-    update_feed_content($fid, $content);
 
     //Is the feed any good?
-    if (!feed_is_valid($content)) {
+    if (!feed_is_valid($feed['content'])) {
         loggit(3, "Feed: [$fid] doesn't seem to be a known feed format. Skip it.");
         set_feed_error_count($fid, 100);
         return (-1);
@@ -1598,7 +1629,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Parse it
     $tstart = time();
     libxml_use_internal_errors(true);
-    $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+    $x = simplexml_load_string($feed['content'], 'SimpleXMLElement', LIBXML_NOCDATA);
     libxml_clear_errors();
     //loggit(3, "FEED SCAN: SimpleXML parse load took [".(time() - $tstart)."] seconds.");
 
@@ -1606,7 +1637,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     if (!$x) {
         loggit(1, "Failed to parse XML for feed: [$fid].  Let's run it through Tidy() and try again.");
         $tidy = new tidy();
-        $xr = $tidy->repairString($content, array('output-xml' => true, 'input-xml' => true));
+        $xr = $tidy->repairString($feed['content'], array('output-xml' => true, 'input-xml' => true));
         libxml_use_internal_errors(true);
         $x = simplexml_load_string($xr, 'SimpleXMLElement', LIBXML_NOCDATA);
         libxml_clear_errors();
@@ -1629,7 +1660,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     } else {
         $pubdate = time();
     }
-    loggit(3, "DEBUG: Pubdate: [$lastmodtime]");
+    loggit(3, "DEBUG: Pubdate: [$pubdate]");
     if ($feed['pubdate'] == $pubdate && !empty($pubdate) && $force == FALSE) {
         //The feed says that it hasn't been updated
         loggit(1, "The pubdate in the feed has not changed.");

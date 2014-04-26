@@ -9,7 +9,7 @@ function loadPostList(elDiv, elTemplate) {
               bindDeletePost('.aDeletePost');
 
               //Go masonry
-              <?if($platform != "mobile") {?>
+              if(platform != "mobile") {
       	      $(function(){
        		var $container = $('div.postList');
        		$container.imagesLoaded(function(){
@@ -19,7 +19,7 @@ function loadPostList(elDiv, elTemplate) {
           	  });
         	});
       	      });
-              <?}?>
+              }
 		
           } else {
 	      $(elDiv).empty();
@@ -78,7 +78,7 @@ $(document).ready( function() {
                                         	} else {
                                                 	$('#'+rowid).remove();
                                         	}
-						<?if($g_platform=="mobile") {?>alert("Post deleted.");<?}?>
+						if( platform == "mobile") { alert("Post deleted.");}
 						loadPostList();
                                 	}
                         	});

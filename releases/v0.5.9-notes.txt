@@ -1,0 +1,18 @@
+#Release Notes - Freedom Controller v0.5.9
+
+
+More editor work and some security changes.
+
+
+- The biggest feature is that the editor now supports dragging and dropping files directly into an outline.  If you drag a file into an outline and drop it, the file will be uploaded to Amazon S3 and an A or IMG (depending on the file extension) tag will be inserted into the outline with a reference to the uploaded file.  You can also use the paperclip icon to select files for upload/insertion.  A cool thing about this, is that since Concord nodes are "contenteditable", you can resize an image right in the browser and the IMG tag will be properly set with the right "width=" and "height=" attributes when you save it.  It's pretty awesome.
+- Another big change is with the aggregator.  I split the fetching of feeds and the scanning for new items into 2 difference processes, so that they could run independently and move faster.  This is the first step in the goal to move the aggregator to a more asynchronous operation.
+- Editor tweaks:
+	The link creator (chain-link menu item) is now much more intelligent.  It can create a link from a text selection, or create a "link" node if you aren't in text mode.  It will also not ask for a link if the selected node/text is already a textual reference to a full url.  Their is a shortcut key for this:  CMD/CTRL+L.
+	Browser tabs now have the outline title in the title of the tab.
+	Outline opml now includes ownerEmail and ownerName in the "head" element.
+	The OPML and HTML links now expose when the outline loads.
+- River tweaks:
+	The river side-bar feed filter now has better styling to let you know which one is selected.
+- Bug fixes:
+	The opml icon link was not showing up in the byline in the editor if there wasn't an ownerName header.
+- The styling of the collapsable nodes in html renders of outlines was messed up in Firefox and wouldn't collapse properly.  Thanks to Frank Strater for solving the problem.

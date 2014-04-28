@@ -12,3 +12,6 @@ extract($envars);
 
 //Set root path to app
 $confroot = rtrim(get_cfg_var("cartulary_conf"), '/');
+
+//Give a timestamp for body use
+$dg_timestamp=time();

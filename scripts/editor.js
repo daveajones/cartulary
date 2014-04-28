@@ -33,7 +33,7 @@ $(document).ready(function () {
                 filename = result.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
 
                 //Save the file
-                saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, opOutlineToXml());
+                saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, opOutlineToXml(ownerName, ownerEmail));
             }
         });
         $('#dropdownSave').dropdown('toggle');
@@ -58,7 +58,7 @@ $(document).ready(function () {
         lasttitle = title;
 
         //Save the file
-        saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, opOutlineToXml());
+        saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, opOutlineToXml(ownerName, ownerEmail));
         $('#dropdownSave').dropdown('hide');
         return false;
     });

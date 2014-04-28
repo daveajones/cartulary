@@ -92,6 +92,9 @@ if( !empty($opmldata) ) {
     var redirect = '<?echo $rhost?>';
     var lasttitle = "";
     var filename = '<?echo $filename?>';
+    var ownerName = '<?echo get_user_name_from_uid($g_uid)?>';
+    var ownerEmail = '<?echo get_email_from_uid($g_uid)?>';
+    var ownerId = '';
     var oldfilename = "";
     var bufilename = '<?echo time()."-".$default_opml_export_file_name;?>';
     var badurl = false;

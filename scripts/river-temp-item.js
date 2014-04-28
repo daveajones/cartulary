@@ -50,7 +50,7 @@
 	    {{each(e,enc) enclosure}}
     	    {{if freedomController.v1.river.methods.isImage(enc.url, enc.type) && (Hidebigpics == false || enc.length < 50000) && Hidepics == false && freedomController.v1.river.methods.isAvatar(enc.url) == false}}
 				<!-- Picture -->
-	            <a href="${enc.url}">
+	            <a href="${enc.url}" target="_blank">
 			    {{if freedomController.v1.river.methods.countEnclosuresOfType(enclosure, 'image')   == 2}}
 	                <img class="encobj enclosurepic encpicture2 postload" src="${enc.url}" data-src="${enc.url}" data-type="${enc.type}" data-length="${enc.length}" alt="" />
 			    {{else freedomController.v1.river.methods.countEnclosuresOfType(enclosure, 'image') == 3}}

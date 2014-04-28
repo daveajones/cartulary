@@ -4,6 +4,7 @@
 <?
 
   // See if we have a valid article id or url to get source xml from
+  $datestamp = date('YmdHis');
   $mode = "";
   $filename = "";
   $url = "";

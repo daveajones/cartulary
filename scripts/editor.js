@@ -495,7 +495,7 @@ $(document).ready(function () {
     }
 
     //Hot keys
-    $(window).bind('keydown', function (event) {
+    $(window).bind('keydown keyup keypress', function (event) {
         if ( event.ctrlKey || event.metaKey ) {
             switch ( String.fromCharCode(event.which).toLowerCase() ) {
                 case 's':
@@ -851,11 +851,20 @@ $(document).ready(function () {
 
     //Handle some special key stroke stuff
     function opKeystrokeCallback(event) {
+        //SHIFT+Enter should create a new blank link above the current line
         if ( event.which == 13 && event.shiftKey ) {
             opInsert("", 'up');
             opSetTextMode(false);
             outliner.op.deleteLine();
             return false;
+        }
+        //Stop concord from responding to these key combos
+        if ( event.ctrlKey || event.metaKey ) {
+            switch ( String.fromCharCode(event.which).toLowerCase() ) {
+                case 'l':
+                    event.which = 0;
+                    break;
+            }
         }
     }
 

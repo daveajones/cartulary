@@ -2161,13 +2161,14 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             }
         }
 
-        //If this is a
+        //Adjust the expansion state tracking
         $lb = $line + 1;
         $ne = $expand;
         $ex = FALSE;
         if( in_array($expand, $expansionState) ) {  $ex = TRUE;  }
         if( $expanded || $ex ) {  $ne = $expand + 1;  }
 
+        //Make the recursion call for the next set of nodes
         list($line, $expand) = buildHtmlFromOpmlRecursive($child, $html, $indent + 1, $line + 1, $expansionState, $ne, $ex, $parents, $extrahtml);
 
 
@@ -2280,7 +2281,7 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
         $byline = "";
     }
 
-    buildHtmlFromOpmlRecursive($x->body, $body, 0, 1, $expansionState, NULL, NULL, $parents, $extrabody);
+    buildHtmlFromOpmlRecursive($x->body, $body, 0, 1, $expansionState, 1, FALSE, $parents, $extrabody);
     $html = <<<OPML2HTML1
 <!DOCTYPE html>
 <html>

@@ -2378,10 +2378,10 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
         $body
         $extrabody
         <div class="text-right">$linktoopml</div>
-    </div>
 
-    <div class="ocomments">
-        <div id="disqus_thread"></div>
+        <div class="ocomments">
+            <div id="disqus_thread"></div>
+        </div>
     </div>
 
 	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>

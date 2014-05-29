@@ -265,6 +265,12 @@ $(document).ready(function () {
         } else {
             opSetOneAtt('type', thistype);
         }
+
+        //Collaboration node
+        if( thistype == 'collaborate' ) {
+            opSetLineText("[Collaboration node - do not delete.]");
+        }
+
         return true;
     });
 

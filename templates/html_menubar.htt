@@ -115,6 +115,7 @@
                         <li><a href="#" class="menuTypeSelection menuTypeDocument" title="A flat, fully expanded document." data-type="document">Document</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeIndex" title="A collapsible outline." data-type="index">Index</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeHtml" title="Renders as raw html." data-type="html">Html</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeCollaborate" title="Enable collaboration on this outline." data-type="collaborate">Collaborate</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeRedirect" title="A meta-refresh redirect." data-type="redirect">Redirect</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeTabs" title="A tabbed view." data-type="tabs">Tabs</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeMenu" title="A menu bar structure." data-type="menu">Menu</a></li>
@@ -127,6 +128,7 @@
                 <li><a class="menuAddLink" href="#" title="Make selection a link."><i class="icon-link"></i></a></li>
                 <li><a class="menuSearchReplace" href="#" title="Replace text with other text."><i class="icon-repeat"></i></a></li>
                 <li><a class="menuImportOutline" href="#" title="Import an outline into this node."><i class="icon-signin"></i></a></li>
+                <li><a class="menuInsertFiles" href="#" title="Insert files into this outline."><i class="icon-paper-clip"></i></a></li>
             </ul>
             <ul class="nav pull-right outlineinfo"></ul>
         </div>

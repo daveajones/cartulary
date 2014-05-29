@@ -2139,6 +2139,9 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
                 $htmlcontent .= "<div class=\"navbar navbar-fixed-top navbar-inverse\" role=\"navigation\">\n<div class=\"container\">\n<div class=\"navbar-header\">\n<button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\"#navbar-collapse-1\">\n<span class=\"sr-only\">Toggle navigation</span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n</button>\n<a class=\"navbar-brand\" href='#'>$nodetext</a>\n</div>\n<div class=\"collapse navbar-collapse\" id=\"navbar-collapse-1\"><ul class=\"nav navbar-nav\">\n";
                 $menuexists++;
             } else
+            if ( $type == "collaborate" ) {
+                $htmlcontent .= "<script>var TogetherJSConfig_youtube = true; var TogetherJSConfig_cloneClicks = true;</script><script src=\"//togetherjs.com/togetherjs-min.js\"></script><div id=\"togetherjs-div\"><button id=\"start-togetherjs\" type=\"button\" onclick=\"TogetherJS(this); return false\" data-end-togetherjs-html=\"End TogetherJS\">Collaborate. Go!</button></div>\n";
+            } else
             if ( $type == "tabs" ) {
                 $html .= "\n" . str_repeat('    ', $indent+1) . "<ul class=\"nav nav-tabs\" id=\"myTab\">";
                 $extrahtml .= "<div class=\"tab-content\">\n";
@@ -2152,7 +2155,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             if ( in_array('menu', $parents) ) {
                 $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "<li>$nodetext</li>";
             } else
-            if ( in_array('html', $parents) && $type != "html" ) {
+            if ( in_array('html', $parents) || $type == "html" ) {
                 $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "$nodetext";
             } else {
                 if( isset($child->outline) ) {
@@ -2186,6 +2189,9 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
                 $htmlcontent .= str_repeat('    ', $indention) ."</ul>\n</div>\n</div>\n</div>";
                 $menuexists++;
             } else
+            if ( $type == "collaborate" ) {
+                    $htmlcontent .= "\n";
+            } else
             if ($type == "tabs") {
                 $html .= str_repeat('    ', $indention) ."</ul>\n";
                 $extrahtml .= str_repeat('    ', $indention) ."</div>\n";
@@ -2198,7 +2204,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             if ( in_array('menu', $parents) && $type != "html") {
                 $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "\n";
             } else
-            if ( in_array('html', $parents) ) {
+            if ( in_array('html', $parents) || $type == "html") {
                 $htmlcontent .= str_repeat('    ', $indention) ."\n";
             } else {
                 $htmlcontent .= str_repeat('    ', $indention) ."</li></ul>\n";

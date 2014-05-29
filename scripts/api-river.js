@@ -236,13 +236,13 @@ function _getFavicon(url) {
 
 
 function _focusFirstVisibleArticle() {
-	$(pathToStreamItem).each(function(index) {
+	$(pathToStreamItem).each(function() {
+        console.log( $(document).scrollTop() +" : " + $(this).offset().top );
 		if( $(document).scrollTop() < $(this).offset().top ) {
 			$(pathToStreamItem + '.activeItem').removeClass("activeItem");				
 			$(this).addClass("activeItem");
 			return false;
 		}
-        return false;
 	});
 	return false;
 }

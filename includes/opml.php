@@ -2140,7 +2140,8 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
                 $menuexists++;
             } else
             if ( $type == "collaborate" ) {
-                $htmlcontent .= "<script>var TogetherJSConfig_youtube = true; var TogetherJSConfig_cloneClicks = true;</script><script src=\"//togetherjs.com/togetherjs-min.js\"></script><div id=\"togetherjs-div\"><button id=\"start-togetherjs\" type=\"button\" onclick=\"TogetherJS(this); return false\" data-end-togetherjs-html=\"End TogetherJS\">Collaborate. Go!</button></div>\n";
+                $colltime = time();
+                $htmlcontent .= "<script>var TogetherJSConfig_findRoom = \"$colltime\";var TogetherJSConfig_inviteFromRoom = true; var TogetherJSConfig_suppressJoinConfirmation = true;</script><script src=\"//togetherjs.com/togetherjs-min.js\"></script><div id=\"togetherjs-div\"><button id=\"start-togetherjs\" type=\"button\" onclick=\"TogetherJS(this); return false\" data-end-togetherjs-html=\"End TogetherJS\">Collaborate!</button></div>\n";
             } else
             if ( $type == "tabs" ) {
                 $html .= "\n" . str_repeat('    ', $indent+1) . "<ul class=\"nav nav-tabs\" id=\"myTab\">";
@@ -2324,6 +2325,13 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
 			padding-top: 16px;
 			padding-bottom: 14px;
 		}
+
+        .navbar > img.navatar {
+            float: right;
+            margin:0;
+            height:51px;
+            width:51px;
+        }
 
 		.container {
 			max-width: 900px;

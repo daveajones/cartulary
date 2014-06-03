@@ -857,7 +857,25 @@ $(document).ready(function () {
 
     //Handle some special key stroke stuff
     function opKeystrokeCallback(event) {
-        //SHIFT+Enter should create a new blank link above the current line
+        //CTRL+SHIFT+Enter should duplicate this line above the current line
+        if ( event.which == 13 && event.shiftKey && (event.ctrlKey || event.metaKey) )  {
+            var dupline = opCursorToXml();
+            opInsertXml(dupline, 'up');
+            opSetTextMode(false);
+            opGo(up, 1);
+            outliner.op.deleteLine();
+            return false;
+        }
+        //CTRL+Enter should duplicate this line below the current line
+        if ( event.which == 13 && (event.ctrlKey || event.metaKey) )  {
+            var dupline = opCursorToXml();
+            opInsertXml(dupline, 'down');
+            opSetTextMode(false);
+            opGo(down, 1);
+            outliner.op.deleteLine();
+            return false;
+        }
+        //SHIFT+Enter should create a new blank line above the current line
         if ( event.which == 13 && event.shiftKey ) {
             opInsert("", 'up');
             opSetTextMode(false);

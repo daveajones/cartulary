@@ -271,6 +271,11 @@ $(document).ready(function () {
             opSetLineText("[Collaboration node - do not delete.]");
         }
 
+        //Presentation
+        if( thistype == 'presentation' ) {
+            showMessage("Now build your slideshow structure as children below this node.", true, 5);
+        }
+
         return true;
     });
 

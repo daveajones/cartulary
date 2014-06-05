@@ -116,6 +116,7 @@
                         <li><a href="#" class="menuTypeSelection menuTypeIndex" title="A collapsible outline." data-type="index">Index</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeHtml" title="Renders as raw html." data-type="html">Html</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeCollaborate" title="Enable collaboration on this outline." data-type="collaborate">Collaborate</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypePresentation" title="Make this outline a slide show presentation." data-type="presentation">Presentation</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeRedirect" title="A meta-refresh redirect." data-type="redirect">Redirect</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeTabs" title="A tabbed view." data-type="tabs">Tabs</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeMenu" title="A menu bar structure." data-type="menu">Menu</a></li>

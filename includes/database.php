@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 38;
+$cg_database_version = 39;
 $cg_database_updates = array();
 
 
@@ -513,6 +513,19 @@ CGDB0114;
 $cg_database_updates[37][] = <<<CGDB0115
  INSERT INTO `dbversion` ( `version` ) VALUES ( '38' )
 CGDB0115;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 38 to 39 -----------------------------------------------------------------------------------------------
+$cg_database_updates[38][] = <<<CGDB0116
+ ALTER TABLE `prefs` ADD `imap_server` VARCHAR( 128 ) NOT NULL ,
+ ADD `imap_username` VARCHAR( 128 ) NOT NULL ,
+ ADD `imap_password` VARCHAR( 128 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL ,
+ ADD `imap_folder` VARCHAR( 128 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL ,
+ ADD `imap_secure` TINYINT NOT NULL
+CGDB0116;
+$cg_database_updates[38][] = <<<CGDB0117
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '39' )
+CGDB0117;
 //----------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------

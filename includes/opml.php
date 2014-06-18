@@ -2082,15 +2082,17 @@ function convert_opml_to_html($content = NULL, $max = NULL)
 
 
 //Recursive function for parsing an entire outline structure into html format
-function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $expansionState = array(), $expand = 1, $expanded = FALSE, &$parents, &$extrahtml, $menuexists = 0)
+function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $expansionState = array(), $expand = 1, $expanded = FALSE, &$parents, &$extrahtml, $menuexists = 0, &$extrahead)
 {
-    //if( in_array('tabs', $parents) ) {  loggit(3, "DEBUG: ".print_r($parents, TRUE));  }
+
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
     foreach ($x->children() as $child) {
         $text = (string)$child->attributes()->text;
         $name = (string)$child->attributes()->name;
         $link = (string)$child->attributes()->url;
         $type = strtolower((string)$child->attributes()->type);
         $attr = (string)$child->attributes();
+        $oldindent = 0;
 
         //Set up class strings for different conditions
         $classes = "outline";
@@ -2099,7 +2101,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
         }
 
         //Push the current type onto the stack
-        if( ($type == "tabs" || $type == "html" || $type == "document" || $type == "menu") && end(array_values($parents)) != "tabs" ) {
+        if( ($type == "tabs" || $type == "html" || $type == "document" || $type == "menu" || $type == "presentation") && end(array_values($parents)) != "tabs" ) {
             array_push($parents, $type);
         }
 
@@ -2141,11 +2143,40 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             } else
             if ( $type == "collaborate" ) {
                 $colltime = time();
-                $htmlcontent .= "<script>var TogetherJSConfig_findRoom = \"$colltime\";var TogetherJSConfig_inviteFromRoom = true; var TogetherJSConfig_suppressJoinConfirmation = true;</script><script src=\"//togetherjs.com/togetherjs-min.js\"></script><div id=\"togetherjs-div\"><button id=\"start-togetherjs\" type=\"button\" onclick=\"TogetherJS(this); return false\" data-end-togetherjs-html=\"End TogetherJS\">Collaborate!</button></div>\n";
+                $extrahead .= "<script>var TogetherJSConfig_findRoom = \"$colltime\";var TogetherJSConfig_inviteFromRoom = true; var TogetherJSConfig_suppressJoinConfirmation = true;</script><script id='togetherJS' src=\"//togetherjs.com/togetherjs-min.js\"></script>";
+            } else
+            if ( $type == "presentation" ) {
+                //Bring in the reveal.js style
+                $fh = fopen("$confroot/$templates/$cg_editor_presentation_style_filename", "r");
+                $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_editor_presentation_style_filename"));
+                fclose($fh);
+                $extrahead .= "\n      <style>" . $rftemplate . "</style>";
+                //Now the script
+                $fh = fopen("$confroot/$templates/$cg_editor_presentation_js_filename", "r");
+                $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_editor_presentation_js_filename"));
+                fclose($fh);
+                $extrahead .= "\n      <script id='revealJS'>" . $rftemplate . "</script>";
+
+                //Make collaboration track clicks
+                $extrahead .= "<script>var TogetherJSConfig_cloneClicks = true;</script>";
+
+                //Begin the slide sections
+                $htmlcontent .= "<section>$nodetext</section>";
             } else
             if ( $type == "tabs" ) {
                 $html .= "\n" . str_repeat('    ', $indent+1) . "<ul class=\"nav nav-tabs\" id=\"myTab\">";
                 $extrahtml .= "<div class=\"tab-content\">\n";
+            } else
+            if ( $parent == "slide" || $type == "slide" || in_array('slide', $parents)) {
+                if( isset($child->outline) ) {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "<section>$nodetext</section><section>\n";
+                } else {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "<section>$nodetext</section>\n";
+                }
+            } else
+            if ( $parent == "presentation" ) {
+                array_push($parents, 'slide');
+                $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "<section>$nodetext</section>\n";
             } else
             if ( $parent == "tabs" ) {
                 array_push($parents, 'tab');
@@ -2156,8 +2187,13 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             if ( in_array('menu', $parents) ) {
                 $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "<li>$nodetext</li>";
             } else
-            if ( in_array('html', $parents) || $type == "html" ) {
-                $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "$nodetext";
+            if ( in_array('html', $parents) ) {
+                $htmlcontent .= str_repeat('    ', $indent) . "$nodetext\n";
+            } else
+            if ( $type == 'html') {
+                $oldindent = $indent;
+                $indent = 0;
+                $htmlcontent .= str_repeat('    ', $indent) . "$nodetext\n";
             } else {
                 if( isset($child->outline) ) {
                     $expandible = "<li class=\"owedge$exco\"><span>$nodetext</span>";
@@ -2178,7 +2214,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
         if( $expanded || $ex ) {  $ne = $expand + 1;  }
 
         //Make the recursion call for the next set of nodes
-        list($line, $expand) = buildHtmlFromOpmlRecursive($child, $html, $indent + 1, $line + 1, $expansionState, $ne, $ex, $parents, $extrahtml, $menuexists);
+        list($line, $expand) = buildHtmlFromOpmlRecursive($child, $html, $indent + 1, $line + 1, $expansionState, $ne, $ex, $parents, $extrahtml, $menuexists, $extrahead);
 
 
         //If this is an outline node, close the open tag.  We take care to keep the html looking good, so don't add spaces
@@ -2193,9 +2229,23 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             if ( $type == "collaborate" ) {
                     $htmlcontent .= "\n";
             } else
+            if ( $type == "presentation" ) {
+                $htmlcontent .= "";
+            } else
             if ($type == "tabs") {
                 $html .= str_repeat('    ', $indention) ."</ul>\n";
                 $extrahtml .= str_repeat('    ', $indention) ."</div>\n";
+            } else
+            if ( $parent == "slide" || $type == "slide" || in_array('slide', $parents) ) {
+                if( isset($child->outline) ) {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "</section>\n";
+                } else {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "\n";
+                }
+            } else
+            if ( $parent == "presentation" ) {
+                array_pop($parents);
+                $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "</section>\n";
             } else
             if ($parent == "tabs") {
                 array_pop($parents);
@@ -2205,15 +2255,20 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             if ( in_array('menu', $parents) && $type != "html") {
                 $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "\n";
             } else
-            if ( in_array('html', $parents) || $type == "html") {
-                $htmlcontent .= str_repeat('    ', $indention) ."\n";
+            if ( in_array('html', $parents) ) {
+                $htmlcontent .= str_repeat('    ', $indent) ."";
+            } else
+            if ( $type == 'html') {
+                $htmlcontent .= str_repeat('    ', $indent) ."";
+                $indent = $oldindent;
             } else {
                 $htmlcontent .= str_repeat('    ', $indention) ."</li></ul>\n";
             }
+
         }
 
         if( $indent == 0 && $ex == FALSE ) {  $expand++;  }
-        if( ($type == "tabs" || $type == "html" || $type == "document" || $type == "menu") && end(array_values($parents)) != "tabs" ) {
+        if( ($type == "tabs" || $type == "html" || $type == "document" || $type == "menu" || $type == "presentation") && end(array_values($parents)) != "tabs" ) {
             array_pop($parents);
         }
     }
@@ -2236,6 +2291,8 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
     require_once "$confroot/$includes/posts.php";
 
+    $extrahead = "";
+    $extrabody = "";
     $prefs = get_user_prefs($uid);
     $analyticscode = $prefs['analyticscode'];
     $disqus = "";
@@ -2271,11 +2328,6 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
         }
     }
 
-    //Get the title
-    if( !empty($title) ) {
-        $titleline = '<div class="page-header"><h2>'.$title.$byline.'</h2></div>';
-    }
-
     //Roll through all of the outline nodes
     $nodes = $x->xpath('//outline');
     if (empty($nodes)) {
@@ -2288,32 +2340,23 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
     $serialES = (string)$x->head->expansionState;
     $parents = array();
 
-    //Was title rendering set to false?
-    if( $rendertitle == FALSE ) {
-        $titleline = "";
-        $byline = "";
-    }
+    //Parse the outline
+    buildHtmlFromOpmlRecursive($x->body, $body, 0, 1, $expansionState, 1, FALSE, $parents, $extrabody, 0, $extrahead);
 
     //Put in some extra space if we don't have a title
-    if( empty($titleline) ) {
+    if( empty($titleline) || $rendertitle == FALSE ) {
         $bodypadding = "120px";
     } else {
         $bodypadding = "60px";
     }
 
-    buildHtmlFromOpmlRecursive($x->body, $body, 0, 1, $expansionState, 1, FALSE, $parents, $extrabody);
-    $html = <<<OPML2HTML1
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>$title</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="alternate" type="text/xml" title="OPML" href="$opmlurl" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="$microblogrss" />
-    <link href='//fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css' />
-    <link href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css' rel='stylesheet' type='text/css' />
-
+    //See what type of build out do we need?
+    //Get the title
+    if( !empty($title) ) { $titleline = '<div class="page-header"><h2>'.$title.$byline.'</h2></div>'; }
+    $precontent = "";
+    $container_start = "<div class='container'>";
+    $container_stop  = "</div>\n<div class='container text-right'><script>document.write(\"Last Modified \" + document.lastModified + \" by <a href='http://freedomcontroller.com'>Freedom Controller</a>\")</script> $linktoopml<div class='ocomments'><div id='disqus_thread'></div></div></div>";
+    $inlinestyle = <<<OPML2HTMLCSS
 	<style type="text/css">
 		body {
 			font-family: 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -2379,24 +2422,56 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
         a.opmlicon:hover { text-decoration:none; }
 	</style>
 
+OPML2HTMLCSS;
+    if( stripos($extrahead, 'revealJS') !== FALSE ) {
+        if( !empty($title) ) { $titleline = '<section><h2>'.$title.$byline.'</h2></section>'; }
+        $container_start = "<div class=\"reveal\"><div class=\"slides\">";
+        $container_stop  = "</div></div>";
+        $inlinestyle = "";
+    }
+
+    if( stripos($extrahead, 'togetherJS') !== FALSE ) {
+        $precontent .= "<div id=\"togetherjs-div\"><button id=\"start-togetherjs\" type=\"button\" onclick=\"TogetherJS(this); return false\" data-end-togetherjs-html=\"End TogetherJS\">Collaborate!</button></div>\n";
+        $inlinestyle .= "<style>div.togetherjs-div { position:absolute; top:10px; right:10px; text-align:right; }</style>";
+    }
+
+    //Was title rendering set to false?
+    if( $rendertitle == FALSE ) {
+        $titleline = "";
+        $byline = "";
+    }
+
+    //Render into html
+    $html = <<<OPML2HTML1
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>$title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="alternate" type="text/xml" title="OPML" href="$opmlurl" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="$microblogrss" />
+    <link href='//fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css' />
+    <link href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css' rel='stylesheet' type='text/css' />
+    $inlinestyle
+
 	<!--[if lt IE 9]>
 		<script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
 		<script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
 	<![endif]-->
+
+	$extrahead
 </head>
 
   <body>
-    <div class="container">
-        $titleline
+    $precontent
+    $container_start
+    $titleline
 
-        $body
-        $extrabody
-        <div class="text-right">$linktoopml</div>
-
-        <div class="ocomments">
-            <div id="disqus_thread"></div>
-        </div>
-    </div>
+    $body
+    $extrabody
+    $disqus
+    $container_stop
 
 	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
@@ -2414,9 +2489,12 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
             if( $('#myTab').length > 0 ) {
                 $('#myTab a:first').tab('show');
             }
+            //If this is a presentation start reveal
+            if( $('div.reveal').length > 0 ) {
+                Reveal.initialize({ controls: true, progress: true, history: true, center: true, theme: 'default', transition: 'default' });
+            }
         });
 	</script>
-    $disqus
     $analyticscode
   </body>
 </html>

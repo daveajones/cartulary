@@ -130,6 +130,7 @@
                 <li><a class="menuSearchReplace" href="#" title="Replace text with other text."><i class="icon-repeat"></i></a></li>
                 <li><a class="menuImportOutline" href="#" title="Import an outline into this node."><i class="icon-signin"></i></a></li>
                 <li><a class="menuInsertFiles" href="#" title="Insert files into this outline."><i class="icon-paper-clip"></i></a></li>
+                <li><a class="menuArchiveNodes" href="#" title="Archive selected nodes."><i class="icon-archive"></i></a></li>
             </ul>
             <ul class="nav pull-right outlineinfo"></ul>
         </div>

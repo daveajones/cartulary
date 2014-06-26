@@ -2344,7 +2344,7 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
     buildHtmlFromOpmlRecursive($x->body, $body, 0, 1, $expansionState, 1, FALSE, $parents, $extrabody, 0, $extrahead);
 
     //Put in some extra space if we don't have a title
-    if( empty($titleline) || $rendertitle == FALSE ) {
+    if( empty($title) || $rendertitle == FALSE ) {
         $bodypadding = "120px";
     } else {
         $bodypadding = "60px";
@@ -2355,7 +2355,7 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
     if( !empty($title) ) { $titleline = '<div class="page-header"><h2>'.$title.$byline.'</h2></div>'; }
     $precontent = "";
     $container_start = "<div class='container'>";
-    $container_stop  = "</div>\n<div class='container text-right'><script>document.write(\"Last Modified \" + document.lastModified + \" by <a href='http://freedomcontroller.com'>Freedom Controller</a>\")</script> $linktoopml<div class='ocomments'><div id='disqus_thread'></div></div></div>";
+    $container_stop  = "</div>\n<div class='container text-right'><script>document.write(\"<small>Last Modified \" + document.lastModified + \" by <a href='http://freedomcontroller.com'>Freedom Controller</a></small>\")</script> $linktoopml<div class='ocomments'><div id='disqus_thread'></div></div></div>";
     $inlinestyle = <<<OPML2HTMLCSS
 	<style type="text/css">
 		body {
@@ -2432,7 +2432,7 @@ OPML2HTMLCSS;
 
     if( stripos($extrahead, 'togetherJS') !== FALSE ) {
         $precontent .= "<div id=\"togetherjs-div\"><button id=\"start-togetherjs\" type=\"button\" onclick=\"TogetherJS(this); return false\" data-end-togetherjs-html=\"End TogetherJS\">Collaborate!</button></div>\n";
-        $inlinestyle .= "<style>div.togetherjs-div { position:absolute; top:10px; right:10px; text-align:right; }</style>";
+        $inlinestyle .= "<style>div#togetherjs-div { z-index:9999; position:absolute; top:10px; right:10px; float:right; }</style>";
     }
 
     //Was title rendering set to false?

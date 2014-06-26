@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 39;
+$cg_database_version = 40;
 $cg_database_updates = array();
 
 
@@ -528,6 +528,14 @@ $cg_database_updates[38][] = <<<CGDB0117
 CGDB0117;
 //----------------------------------------------------------------------------------------------------------------
 
+//Version 39 to 40 -----------------------------------------------------------------------------------------------
+$cg_database_updates[39][] = <<<CGDB0118
+ ALTER TABLE `newsfeeds` ADD `type` TINYINT NOT NULL COMMENT 'What type of feed is this'
+CGDB0118;
+$cg_database_updates[39][] = <<<CGDB0119
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '40' )
+CGDB0119;
+//----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 
 

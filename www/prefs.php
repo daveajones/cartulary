@@ -192,6 +192,18 @@
         </ul>
     </div>
 
+    <div class="divPrefPane">
+        <div class="divPrefSubmit pull-right divPrefEmail"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
+        <h3>Email</h3>
+        <ul>
+            <li>My IMAP server address is: <input name="imap_server" class="urlinput" type="text" value="<?echo $prefs['imap_server']?>" /></li>
+            <li class="privacy"><label class="checkbox inline"><input name="imap_secure" type="checkbox" <?if ($prefs['imap_secure'] == 1) echo "checked ";?>/> My IMAP server uses secure sockets.</label></li>
+            <li>My IMAP username is: <input name="imap_username" class="urlinput" type="text" value="<?echo $prefs['imap_username']?>" /></li>
+            <li>My IMAP password is: <input name="imap_password" class="urlinput" type="text" value="<?echo $prefs['imap_password']?>" /></li>
+            <li>The IMAP folder I want to import from is: <input name="imap_folder" class="urlinput" type="text" value="<?echo $prefs['imap_folder']?>" /></li>
+        </ul>
+    </div>
+
 	<div class="divPrefPane">
 	<div class="divPrefSubmit pull-right divPrefLinks"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
 	<h3>Links</h3>

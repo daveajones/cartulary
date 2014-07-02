@@ -11,6 +11,7 @@
 <script type="text/javascript" src="/script/jquery.masonry.min.js"></script>
 <script type="text/javascript" src="/script/jquery.debouncedresize.js"></script>
 <script type="text/javascript" src="/script/jquery.touchSwipe.min.js"></script>
+<script type="text/javascript" src="/script/hmac-sha1.js"></script>
 <!-- Other -->
 <script type="text/javascript" src="/script/keymaster.min.js"></script>
 <!-- Global custom -->

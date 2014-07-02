@@ -68,6 +68,11 @@ if ( isset($_POST['hidesublist']) ) { $hidesublist = 1; } else { $hidesublist = 
 if ( isset($_POST['analyticscode']) ) { $analyticscode = $_POST['analyticscode']; } else { $analyticscode = ""; };
 if ( isset($_POST['disqus_shortname']) ) { $disqus_shortname = $_POST['disqus_shortname']; } else { $disqus_shortname = ""; };
 if ( isset($_POST['editorbucket']) ) { $editorbucket = $_POST['editorbucket']; } else { $editorbucket = ""; };
+if ( isset($_POST['imap_server']) ) { $imap_server = $_POST['imap_server']; } else { $imap_server = ""; };
+if ( isset($_POST['imap_username']) ) { $imap_username = $_POST['imap_username']; } else { $imap_username = ""; };
+if ( isset($_POST['imap_password']) ) { $imap_password = $_POST['imap_password']; } else { $imap_password = ""; };
+if ( isset($_POST['imap_folder']) ) { $imap_folder = $_POST['imap_folder']; } else { $imap_folder = ""; };
+if ( isset($_POST['imap_secure']) ) { $imap_secure = 1; } else { $imap_secure = 0; };
 $jsondata = array();
 $jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
@@ -722,6 +727,61 @@ if( strlen($editorbucket) > 64 ) {
     exit(1);
 }
 $prefs['editorbucket'] = $editorbucket;
+
+$jsondata['prefname'] = "imap_server";
+if( strlen($imap_server) > 128 ) {
+    //Log it
+    loggit(2,"The value for imap server was too long: [$imap_server]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max imap server length is 128 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['imap_server'] = $imap_server;
+
+$jsondata['prefname'] = "imap_username";
+if( strlen($imap_username) > 128 ) {
+    //Log it
+    loggit(2,"The value for imap username was too long: [$imap_username]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max imap server length is 128 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['imap_username'] = $imap_username;
+
+$jsondata['prefname'] = "imap_password";
+if( strlen($imap_password) > 128 ) {
+    //Log it
+    loggit(2,"The value for imap password was too long: [$imap_password]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max imap server length is 128 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['imap_password'] = $imap_password;
+
+$jsondata['prefname'] = "imap_folder";
+if( strlen($imap_folder) > 128 ) {
+    //Log it
+    loggit(2,"The value for imap folder was too long: [$imap_folder]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max imap server length is 128 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['imap_folder'] = $imap_folder;
+
+$jsondata['prefname'] = "imap_secure";
+if( ($imap_secure < 0) || ($imap_secure > 1) ) {
+    //Log it
+    loggit(2,"The value for imap_secure pref was not within acceptable range: [$imap_secure]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Value of pref is out of range.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['imap_secure'] = $imap_secure;
 //--------------------------------------------------------
 //--------------------------------------------------------
 
@@ -799,6 +859,7 @@ setcookie($sidcookie, get_session_id(), $cookieexpire, "/");
 //Rebuild static files
 build_blog_rss_feed($uid);
 build_blog_opml_feed($uid);
+build_blog_html_archive($uid);
 build_social_outline($uid);
 
 //debug

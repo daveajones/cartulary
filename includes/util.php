@@ -812,7 +812,7 @@ function check_head_lastmod($url, $timeout = 5)
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 1);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
     //stop it from outputting stuff to stdout
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
@@ -860,7 +860,7 @@ function check_head_size($url, $timeout = 5)
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
     curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 1);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 
     loggit(1, "CURL: Head check on: [$url]");
 
@@ -921,7 +921,7 @@ function get_final_url($url, $timeout = 5)
     curl_setopt($curl, CURLOPT_TIMEOUT, 30);
     curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 1);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 
     $content = curl_exec($curl);
     $response = curl_getinfo($curl);
@@ -970,7 +970,7 @@ function fetchUrl($url, $timeout = 30)
     curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
     curl_setopt($curl, CURLOPT_ENCODING, "");
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 1);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 
     $data = curl_exec($curl);
     $response = curl_getinfo($curl);
@@ -1011,7 +1011,7 @@ function fetchFeedUrl($url, $subcount = 0, $sysver = '', $timeout = 30)
     curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
     curl_setopt($curl, CURLOPT_ENCODING, "");
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 1);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 
     $data = curl_exec($curl);
     $response = curl_getinfo($curl);
@@ -1042,7 +1042,7 @@ function fetchUrlExtra($url, $timeout = 30)
     curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
     curl_setopt($curl, CURLOPT_ENCODING, "");
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 1);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 
     $data = curl_exec($curl);
     $response = curl_getinfo($curl);

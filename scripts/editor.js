@@ -265,6 +265,17 @@ $(document).ready(function () {
         } else {
             opSetOneAtt('type', thistype);
         }
+
+        //Collaboration node
+        if( thistype == 'collaborate' ) {
+            opSetLineText("[Collaboration node - do not delete.]");
+        }
+
+        //Presentation
+        if( thistype == 'presentation' ) {
+            showMessage("Now build your slideshow structure as children below this node.", true, 5);
+        }
+
         return true;
     });
 
@@ -356,6 +367,58 @@ $(document).ready(function () {
        showEditorFileDropZone();
        $('#uploadifive-editor_upload > input[type=file]:last-child').trigger('click');
         return false;
+    });
+    menubar.find('.menuArchiveNodes').click(function() {
+        //Get a timestamp
+        var arctime = Math.round((new Date()).getTime() / 1000);
+        var arcplaceholder = "#arc#" + arctime + "#arc#";
+        var multiarc = false;
+        var hadsubs = opHasSubs();
+
+        //Convert the selected nodes to xml
+
+        //Get the filenames sorted
+        atitle = "Archived from " + title.replace(/\W/g, '').substring(0, 20) + ' at ' + arctime;
+        afilename = "archive" + title.replace(/\W/g, '').substring(0, 20) + '-' + arctime + '.opml';
+        if( outliner.find(".concord-node.selected").length > 1 ) {
+            multiarc = true;
+            atext = "Archived - " + arctime;
+        } else if ( opGetLineText() == "" ) {
+            atext = "Archived - " + arctime;
+        } else {
+            atext = opGetLineText();
+        }
+
+        //If this is a single node with subs then we treat the subs as the thing to be archived
+
+        //Delete the selected nodes and replace with a single include node that points to the url of the new archive
+        opCut();
+        opInsert(atext, down);
+        opGo(right, 1);
+        opInsert("", right);
+        opPaste();
+        opGo(up, 32767);
+        outliner.concord().op.deleteLine();
+        //opGo(left, 1);
+        var xmlArchive = outliner.concord().op.cursorToXmlSubsOnly();
+        if( !multiarc && hadsubs ) {
+            opGo(right, 1);
+            var xmlArchive = outliner.concord().op.cursorToXmlSubsOnly();
+            opGo(left, 1);
+        }
+        //alert(xmlArchive);
+        opDeleteSubs();
+        opCollapse();
+//        if( multiarc ) {
+//            opReorg(right, 1);
+//        }
+        opSetAtts({
+            "type":"include",
+            "url":arcplaceholder
+        });
+
+        //Save the file
+        saveArchive(atitle, afilename, mode, '', false, false, xmlArchive, arcplaceholder);
     });
     $('.modalsrgo').click(function () {
         //Hide the form
@@ -517,6 +580,10 @@ $(document).ready(function () {
         menubar.find('.menuSave').trigger('click');
         return false;
     });
+    key('ctrl+shift+space,command+shift+space', function() {
+        menubar.find('.menuArchiveNodes').trigger('click');
+        return false;
+    });
     key('ctrl+l,command+l', function () {
         menubar.find('.menuAddLink').trigger('click');
         return false;
@@ -618,6 +685,44 @@ $(document).ready(function () {
 
         return true;
     }
+
+    //Save an archive
+    function saveArchive(ftitle, fname, fmode, fredirect, fdisqus, fwysiwyg, fopml, arcurlstamp) {
+        //Make the ajax call
+        $.ajax({
+            type: 'POST',
+            url: '/cgi/in/save.opml',
+            data: {
+                "opml": fopml,
+                "mode": fmode,
+                "oldfilename": "",
+                "filename": fname,
+                "redirect": fredirect,
+                "disqus": fdisqus,
+                "wysiwyg": fwysiwyg,
+                "title": ftitle,
+                "rendertitle": false
+            },
+            dataType: "json",
+            success: function (data) {
+                showMessage("Nodes archived to " + '<a href="' + data.url + '">Link</a>', data.status, 2);
+
+                //Replace the placeholder in the archive include node href
+                opFirstSummit();
+                opVisitAll(function (op) {
+                    if ( op.attributes.exists("url") ) {
+                        if( op.attributes.getOne("url") == arcurlstamp ) {
+                            op.attributes.setOne("url", data.url);
+                            return false;
+                        }
+                    }
+                });
+            }
+        });
+
+        return true;
+    }
+
 
     //Linkify some text in the outline
     function editorToolAddLink() {
@@ -851,7 +956,25 @@ $(document).ready(function () {
 
     //Handle some special key stroke stuff
     function opKeystrokeCallback(event) {
-        //SHIFT+Enter should create a new blank link above the current line
+        //CTRL+SHIFT+Enter should duplicate this line above the current line
+        if ( event.which == 13 && event.shiftKey && (event.ctrlKey || event.metaKey) )  {
+            var dupline = opCursorToXml();
+            opInsertXml(dupline, 'up');
+            opSetTextMode(false);
+            opGo(up, 1);
+            outliner.op.deleteLine();
+            return false;
+        }
+        //CTRL+Enter should duplicate this line below the current line
+        if ( event.which == 13 && (event.ctrlKey || event.metaKey) )  {
+            var dupline = opCursorToXml();
+            opInsertXml(dupline, 'down');
+            opSetTextMode(false);
+            opGo(down, 1);
+            outliner.op.deleteLine();
+            return false;
+        }
+        //SHIFT+Enter should create a new blank line above the current line
         if ( event.which == 13 && event.shiftKey ) {
             opInsert("", 'up');
             opSetTextMode(false);

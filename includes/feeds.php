@@ -515,7 +515,7 @@ function get_river_info($uid = NULL)
 
 
 //Add a feed to the database
-function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL)
+function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL, $type = 0)
 {
     //Check parameters
     if ($url == NULL) {
@@ -546,9 +546,9 @@ function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL)
     if ($fid == FALSE) {
         $existed = FALSE;
         //Now that we have a good id, put the article into the database
-        $stmt = "INSERT INTO $table_newsfeed (id,url,createdon) VALUES (?,?,?)";
+        $stmt = "INSERT INTO $table_newsfeed (id,url,createdon, type) VALUES (?,?,?,?)";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssd", $id, $url, $createdon) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssdd", $id, $url, $createdon, $type) or loggit(2, "MySql error: " . $dbh->error);
         $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
         $sql->close();
     } else {
@@ -616,7 +616,7 @@ function update_feed_title($fid = NULL, $title = NULL)
 
     //Log and return
     loggit(1, "Changed feed:[$fid]'s title to: [$title].");
-    return (TRUE);
+   return (TRUE);
 }
 
 

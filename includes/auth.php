@@ -2459,6 +2459,42 @@ function get_user_prefs($uid = NULL, $noinit = FALSE)
 }
 
 
+//Get the last activity time stamp for a user
+function get_user_time_last_active($uid = NULL)
+{
+    //Check parameters
+    if ( empty($uid) ) {
+        loggit(2, "User id given is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli_Extended($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Get the active sessions for this user sorted by last activity time stamp
+    $sql = $dbh->prepare("SELECT * FROM $table_session WHERE userid=? ORDER BY lastactivity DESC LIMIT 1") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    if ($sql->num_rows() != 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No active sessions for this user: [$uid].");
+        return(0);
+    }
+    $session = $sql->fetch_assoc();
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    $la = $session['lastactivity'];
+
+    loggit(1, "Returning last activity timestamp:  for user: [$uid]");
+    return ($la);
+}
+
 //Initialize an empty set of prefs for this user
 function init_user_prefs($uid = NULL)
 {

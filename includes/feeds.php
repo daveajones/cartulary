@@ -483,14 +483,14 @@ function get_river_info($uid = NULL)
 
     //Look for the sid in the session table
     $stmt = "SELECT $table_river.id,
-		  $table_river.userid,
-		  $table_river.lastbuild,
-		  $table_river.river,
-	          $table_river.conthash,
-                  $table_river.firstid,
-                  $table_river.updated
-           FROM $table_river
-           WHERE $table_river.userid=?";
+		            $table_river.userid,
+		            $table_river.lastbuild,
+		            $table_river.river,
+	                $table_river.conthash,
+                    $table_river.firstid,
+                    $table_river.updated
+            FROM $table_river
+            WHERE $table_river.userid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
     $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
@@ -501,8 +501,8 @@ function get_river_info($uid = NULL)
     if ($sql->num_rows() < 1) {
         $sql->close()
         or loggit(2, "MySql error: " . $dbh->error);
-        loggit(2, "Failed to retrieve river info for user id: [$uid]");
-        return (FALSE);
+        loggit(1, "Failed to retrieve river info for user id: [$uid]");
+        return (array());
     }
     $river = array();
     $sql->bind_result($river['id'], $river['userid'], $river['lastbuild'], $river['river'], $river['conthash'], $river['firstid'], $river['updated']) or loggit(2, "MySql error: " . $dbh->error);
@@ -2904,7 +2904,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
     //loggit(3, "River hash: NEW: [$newhash]");
 
-    if ($pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
+    if (!empty($pubriver) && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
         loggit(1, "User: [$uid]'s river has not changed. No need to publish.");
         return ($jsonriver);
     }
@@ -4165,7 +4165,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
     //loggit(3, "River hash: NEW: [$newhash]");
 
-    if ($pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
+    if (!empty($pubriver) && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
         //loggit(3, "User: [$uid]'s river has not changed. No need to publish.");
         return ($jsonriver);
     }
@@ -4568,7 +4568,7 @@ function build_river_json3($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
     //loggit(3, "River hash: NEW: [$newhash]");
 
-    if ($pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
+    if (!empty($pubriver) && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
         //loggit(3, "User: [$uid]'s river has not changed. No need to publish.");
         return ($jsonriver);
     }
@@ -4904,7 +4904,7 @@ function build_river_json4($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
     //loggit(3, "River hash: NEW: [$newhash]");
 
-    if ($pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
+    if (!empty($pubriver) && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
         loggit(1, "User: [$uid]'s river has not changed. No need to publish.");
         return ($jsonriver);
     }

@@ -4,10 +4,8 @@
 //Let's not run twice
 if (($pid = cronHelper::lock()) !== FALSE) {
 
-
     //Track the river scan time
     $tstart = time();
-
 
     //Do we want to scan error feeds or normal feeds?
     $action = "";
@@ -24,7 +22,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         loggit(3, "Doing an old feed scan.");
     }
 
-    //Get the feed list
+    //Get the proper feed list
     if ($action == "error") {
         $feeds = get_error_feeds();
     } else
@@ -33,7 +31,6 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     } else {
         $feeds = get_all_feeds();
     }
-
 
     $totalfeeds = count($feeds);
     $totaltime = $totalfeeds * 3;

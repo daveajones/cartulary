@@ -8,7 +8,13 @@ if ( ( $pid = cronHelper::lock() ) !== FALSE ) {
     $tstart = time();
 
     //Get the feed list
-    $feeds = get_updated_feeds();
+    //Checking a single feed?
+    if ( isset($argv[1]) && !empty($argv[1]) ) {
+        $feed = get_feed_info(feed_exists($argv[1]));
+        $feeds = array( $feed );
+    } else {
+        $feeds = get_updated_feeds();
+    }
 
     $totalfeeds = count($feeds);
     $totaltime = $totalfeeds * 5;

@@ -546,7 +546,7 @@ $cg_database_updates[40][] = <<<CGDB0121
 CGDB0121;
 $cg_database_updates[40][] = <<<CGDB0122
  CREATE TABLE IF NOT EXISTS `microblogs` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT=1 COMMENT 'Standard id',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Standard id',
   `title` varchar(255) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL COMMENT 'Microblog title',
   `ownerid` varchar(64) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Linked to user id',
   `s3bucket` varchar(255) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Where the microblog is stored',
@@ -562,17 +562,20 @@ $cg_database_updates[40][] = <<<CGDB0124
   ALTER TABLE `microblogs` ADD FOREIGN KEY ( `ownerid` ) REFERENCES `cartulary`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 CGDB0124;
 $cg_database_updates[40][] = <<<CGDB0125
- INSERT INTO `dbversion` ( `version` ) VALUES ( '41' )
+  ALTER TABLE `microblogs` AUTO_INCREMENT = 1
 CGDB0125;
+$cg_database_updates[40][] = <<<CGDB0126
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '41' )
+CGDB0126;
 //----------------------------------------------------------------------------------------------------------------
 
 //Version 41 to 42 -----------------------------------------------------------------------------------------------
-$cg_database_updates[41][] = <<<CGDB0126
- ALTER TABLE `newsfeeds` CHANGE `content` `content` LONGTEXT CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL
-CGDB0126;
 $cg_database_updates[41][] = <<<CGDB0127
- INSERT INTO `dbversion` ( `version` ) VALUES ( '42' )
+ ALTER TABLE `newsfeeds` CHANGE `content` `content` LONGTEXT CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL
 CGDB0127;
+$cg_database_updates[41][] = <<<CGDB0128
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '42' )
+CGDB0128;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

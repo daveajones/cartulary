@@ -60,7 +60,7 @@ function feed_is_valid($content = NULL)
 
     //Look for rss nodes
     if (isset($x->channel)) {
-        loggit(1, "Found a channel node. This content looks like RSS.");
+        loggit(1, "Found a channel node. This content looks like RSS or RDF.");
         return (TRUE);
     }
 
@@ -1544,7 +1544,7 @@ function fetch_feed_content($fid = NULL, $force = TRUE)
     //Let's do some intelligent header checking so we don't waste time and bandwidth
     update_feed_lastcheck($fid, time());
     $lastmodtime = check_head_lastmod($url);
-    loggit(3, "DEBUG: Last-modified: [$lastmodtime]");
+    //loggit(3, "DEBUG: Last-modified: [$lastmodtime]");
     if (($lastmodtime == $feed['lastmod']) && !empty($lastmodtime) && $force == FALSE) {
         loggit(1, "Feed: [($url) $fid] hasn't been updated. Skipping.");
         return (FALSE);
@@ -1652,9 +1652,11 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Look for some kind of publish date
     if (!empty($x->channel->pubDate)) {
         $pubdate = $x->channel->pubDate;
-    } else if (!empty($x->channel->lastBuildDate)) {
+    } else
+    if (!empty($x->channel->lastBuildDate)) {
         $pubdate = $x->channel->lastBuildDate;
-    } else if (!empty($x->updated)) {
+    } else
+    if (!empty($x->updated)) {
         $pubdate = $x->updated;
     } else {
         $pubdate = time();
@@ -1688,7 +1690,6 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Freshen feed avatar
     update_feed_avatar($fid, get_feed_avatar($x));
 
-
     //Pass any namespaces to the item add routine
     $namespaces = $x->getDocNamespaces(TRUE);
 
@@ -1700,6 +1701,23 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     $items = array();
     $count = 0;
     $newcount = 0;
+    if (strtolower($x->getName()) == "rdf") {
+        //Probably an RDF feed
+        foreach ($x->item as $entry) {
+            $items[$count] = $entry;
+            if (!feed_item_exists($fid, get_unique_id_for_feed_item($entry))) { //testing
+                update_feed_lastupdate($fid, time());
+                add_feed_item($fid, $entry, "rss", $namespaces);
+                $newcount++;
+                if ($newcount > $max) {
+                    mark_feed_item_to_purge($fid, $entry->guid);
+                }
+            } else {
+                unmark_feed_item_to_purge($fid, $entry->guid);
+            }
+            $count++;
+        }
+    } else
     if (empty($x->channel->item)) {
         //This is an atom feed
         foreach ($x->entry as $entry) {
@@ -1789,7 +1807,7 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
 
     //Include old feeds?
     if ($withold == FALSE) {
-        $sqltxt .= " AND (lastupdate < $monthago OR lastcheck < $monthago)";
+        $sqltxt .= " AND (lastupdate > $monthago OR lastcheck = 0)";
     }
 
     //Sort by last check time

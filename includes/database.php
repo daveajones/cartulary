@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 41;
+$cg_database_version = 42;
 $cg_database_updates = array();
 
 
@@ -555,15 +555,24 @@ $cg_database_updates[40][] = <<<CGDB0122
   PRIMARY KEY (`id`)
  ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='List of alternate microblogs'
 CGDB0122;
-$cg_database_updates[32][] = <<<CGDB0123
+$cg_database_updates[40][] = <<<CGDB0123
   ALTER TABLE `microblogs` ADD INDEX ( `ownerid` )
 CGDB0123;
-$cg_database_updates[32][] = <<<CGDB0124
+$cg_database_updates[40][] = <<<CGDB0124
   ALTER TABLE `microblogs` ADD FOREIGN KEY ( `ownerid` ) REFERENCES `cartulary`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 CGDB0124;
 $cg_database_updates[40][] = <<<CGDB0125
  INSERT INTO `dbversion` ( `version` ) VALUES ( '41' )
 CGDB0125;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 41 to 42 -----------------------------------------------------------------------------------------------
+$cg_database_updates[41][] = <<<CGDB0126
+ ALTER TABLE `newsfeeds` CHANGE `content` `content` LONGTEXT CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL
+CGDB0126;
+$cg_database_updates[41][] = <<<CGDB0127
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '42' )
+CGDB0127;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

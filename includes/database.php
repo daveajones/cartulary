@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 40;
+$cg_database_version = 41;
 $cg_database_updates = array();
 
 
@@ -535,6 +535,35 @@ CGDB0118;
 $cg_database_updates[39][] = <<<CGDB0119
  INSERT INTO `dbversion` ( `version` ) VALUES ( '40' )
 CGDB0119;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 40 to 41 -----------------------------------------------------------------------------------------------
+$cg_database_updates[40][] = <<<CGDB0120
+ ALTER TABLE `microblog` ADD `type` TINYINT NOT NULL COMMENT 'What type of item is referenced'
+CGDB0120;
+$cg_database_updates[40][] = <<<CGDB0121
+ ALTER TABLE `mbcatalog` ADD `microblogid` BIGINT NOT NULL COMMENT 'Which microblog does this belong to'
+CGDB0121;
+$cg_database_updates[40][] = <<<CGDB0122
+ CREATE TABLE IF NOT EXISTS `microblogs` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT=1 COMMENT 'Standard id',
+  `title` varchar(255) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL COMMENT 'Microblog title',
+  `ownerid` varchar(64) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Linked to user id',
+  `s3bucket` varchar(255) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Where the microblog is stored',
+  `s3cname` varchar(767) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Optional url for the microblog',
+  `s3filename` varchar(255) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'The name of the microblog file',
+  PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='List of alternate microblogs'
+CGDB0122;
+$cg_database_updates[32][] = <<<CGDB0123
+  ALTER TABLE `microblogs` ADD INDEX ( `ownerid` )
+CGDB0123;
+$cg_database_updates[32][] = <<<CGDB0124
+  ALTER TABLE `microblogs` ADD FOREIGN KEY ( `ownerid` ) REFERENCES `cartulary`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0124;
+$cg_database_updates[40][] = <<<CGDB0125
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '41' )
+CGDB0125;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

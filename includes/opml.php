@@ -19,6 +19,11 @@ function is_outline($content = NULL)
     //Load the content into a simplexml object
     libxml_use_internal_errors(true);
     $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+    if(!$x) {
+        libxml_clear_errors();
+        loggit(2, "Parsing error when checking for opml content.");
+        return(FALSE);
+    }
     libxml_clear_errors();
 
     //Look for opml nodes with an xmlUrl attribute

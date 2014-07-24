@@ -28,6 +28,8 @@ if( !empty($s3_sys_server_redirect_bucket) && !empty($cg_external_ip_reflector_u
   $serverdec = $system_fqdn;
 }
 
+//Update this server's info in our database
+update_server_address($rguid, $raddr);
 
 //Echo current server info
 loggit(3, "Server info request from: [$raddr | $rguid].");
@@ -42,6 +44,3 @@ $jsondata['description'] = "Current server information.";
 echo json_encode($jsondata);
 
 return(0);
-
-?>
-

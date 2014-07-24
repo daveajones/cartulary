@@ -1520,7 +1520,7 @@ function delete_feed($fid = NULL)
 
 
 //Fetch the newest content for a feed
-function fetch_feed_content($fid = NULL, $force = FALSE)
+function fetch_feed_content($fid = NULL, $force = TRUE)
 {
     //Check params
     if (empty($fid)) {
@@ -1544,7 +1544,7 @@ function fetch_feed_content($fid = NULL, $force = FALSE)
     //Let's do some intelligent header checking so we don't waste time and bandwidth
     update_feed_lastcheck($fid, time());
     $lastmodtime = check_head_lastmod($url);
-    //loggit(3, "DEBUG: Last-modified: [$lastmodtime]");
+    loggit(3, "DEBUG: Last-modified: [$lastmodtime]");
     if (($lastmodtime == $feed['lastmod']) && !empty($lastmodtime) && $force == FALSE) {
         loggit(1, "Feed: [($url) $fid] hasn't been updated. Skipping.");
         return (FALSE);
@@ -1612,8 +1612,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Pull the latest content blob from the database
     if( empty($feed['content']) ) {
-        loggit(2, "Error attempting to get url: [$url]. See log for details.");
-        increment_feed_error_count($fid);
+        loggit(2, "Feed: [$fid] has no content.");
         $stats['checktime'] += (time() - $fstart);
         set_feed_stats($fid, $stats);
         return (-1);
@@ -1621,7 +1620,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Is the feed any good?
     if (!feed_is_valid($feed['content'])) {
-        loggit(3, "Feed: [$fid] doesn't seem to be a known feed format. Skip it.");
+        loggit(2, "Feed: [$fid] doesn't seem to be a known feed format. Skipping it.");
         set_feed_error_count($fid, 100);
         return (-1);
     }
@@ -1660,13 +1659,13 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     } else {
         $pubdate = time();
     }
-    loggit(3, "DEBUG: Pubdate: [$pubdate]");
+    loggit(1, "DEBUG: Pubdate: [$pubdate]");
     if ($feed['pubdate'] == $pubdate && !empty($pubdate) && $force == FALSE) {
         //The feed says that it hasn't been updated
-        loggit(1, "The pubdate in the feed has not changed.");
+        loggit(3, "The pubdate in the feed has not changed.");
         $stats['checktime'] += (time() - $fstart);
         set_feed_stats($fid, $stats);
-        return (-3);
+        //return (-3);
     }
     update_feed_pubdate($fid, $pubdate);
 
@@ -1756,10 +1755,9 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Is the feed empty?
     if ($count == 0) {
-        loggit(1, "Scan: There were no items in this feed: [$url].");
+        loggit(3, "Scan: There were no items in this feed: [$url].");
         return (-2);
     }
-
 
     //Log and leave
     loggit(1, "Scan: [$newcount] out of: [$count] items from feed: [$url] were new.");
@@ -1786,12 +1784,12 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
     if ($witherrors == FALSE) {
         $sqltxt .= " WHERE errors < 10";
     } else {
-        $sqltxt .= " WHERE errors > 0";
+        $sqltxt .= " WHERE 1=1 ";
     }
 
     //Include old feeds?
     if ($withold == FALSE) {
-        $sqltxt .= " AND (lastupdate > $monthago OR lastcheck = 0)";
+        $sqltxt .= " AND (lastupdate < $monthago OR lastcheck < $monthago)";
     }
 
     //Sort by last check time

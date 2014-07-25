@@ -129,9 +129,9 @@ echo
 touch $INSTALLDIR/logs/error.log
 touch $INSTALLDIR/logs/debug.log
 touch $INSTALLDIR/logs/access.log
-chown ubuntu.www-data $INSTALLDIR/logs >>/tmp/cartinstall.log 2>&1
-chown ubuntu.www-data $INSTALLDIR/logs/* >>/tmp/cartinstall.log 2>&1
-chown ubuntu.www-data $INSTALLDIR/spool >>/tmp/cartinstall.log 2>&1
+chown www-data $INSTALLDIR/logs >>/tmp/cartinstall.log 2>&1
+chown www-data $INSTALLDIR/logs/* >>/tmp/cartinstall.log 2>&1
+chown www-data $INSTALLDIR/spool >>/tmp/cartinstall.log 2>&1
 
 ##: 8. Create Cartulary Config File
 clear

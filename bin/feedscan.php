@@ -8,7 +8,13 @@ if ( ( $pid = cronHelper::lock() ) !== FALSE ) {
     $tstart = time();
 
     //Get the feed list
-    $feeds = get_updated_feeds();
+    //Checking a single feed?
+    if ( isset($argv[1]) && !empty($argv[1]) ) {
+        $feed = get_feed_info(feed_exists($argv[1]));
+        $feeds = array( $feed );
+    } else {
+        $feeds = get_updated_feeds();
+    }
 
     $totalfeeds = count($feeds);
     $totaltime = $totalfeeds * 5;
@@ -28,35 +34,26 @@ if ( ( $pid = cronHelper::lock() ) !== FALSE ) {
         //Make a timestamp
         $fstart = time();
 
-        $subcount = get_feed_subscriber_count($feed['id']);
-        loggit(1, "Feed: [" . $feed['title'] . "] has: [$subcount] subscribers.");
-        echo "    Feed: [" . $feed['title'] . "] has: [$subcount] subscribers.\n";
-
         //Parse the feed and add new items to the database
-        if ( $subcount > 0 ) {
-            loggit(1, "Checking feed: [ $ccount | " . $feed['title'] . " | " . $feed['url'] . "].");
-            $result = get_feed_items($feed['id']);
-            if ( $result == -1 ) {
-                loggit(1, "Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]");
-                echo "    Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]\n";
-            } else if ( $result == -2 ) {
-                loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] has no items.");
-                echo "    Feed is empty.\n";
-            } else if ( $result == -3 ) {
-                loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] is current.");
-                echo "    Feed is current.\n";
-            } else {
-                loggit(3, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] updated.");
-                echo "    Feed updated.\n";
-                $ncount++;
-                $newitems += $result;
-            }
-
-            $ccount++;
+        loggit(1, "Checking feed: [ $ccount | " . $feed['title'] . " | " . $feed['url'] . "].");
+        $result = get_feed_items($feed['id']);
+        if ( $result == -1 ) {
+            loggit(1, "Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]");
+            echo "    Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]\n";
+        } else if ( $result == -2 ) {
+            loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] has no items.");
+            echo "    Feed is empty.\n";
+        } else if ( $result == -3 ) {
+            loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] is current.");
+            echo "    Feed is current.\n";
         } else {
-            loggit(3, "No subscribers for: [" . $feed['title'] . " | " . $feed['id'] . "].");
-            echo "    No subscribers.\n";
+            loggit(3, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] updated.");
+            echo "    Feed updated.\n";
+            $ncount++;
+            $newitems += $result;
         }
+
+        $ccount++;
 
         echo "      It took " . ( time() - $fstart ) . " seconds to scan this feed.\n";
         loggit(1, "It took [" . ( time() - $fstart ) . "] seconds to scan this feed.");

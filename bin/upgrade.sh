@@ -60,6 +60,7 @@ cp -R includes/* $CARTROOT/includes
 cp -R libraries/* $CARTROOT/libraries
 cp -R scripts/* $CARTROOT/scripts
 cp -R templates/* $CARTROOT/templates
+cp -R releases/* $CARTROOT/releases
 cp -R www/* $CARTROOT/www
 
 ##: Set permissions

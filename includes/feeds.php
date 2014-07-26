@@ -60,7 +60,7 @@ function feed_is_valid($content = NULL)
 
     //Look for rss nodes
     if (isset($x->channel)) {
-        loggit(1, "Found a channel node. This content looks like RSS.");
+        loggit(1, "Found a channel node. This content looks like RSS or RDF.");
         return (TRUE);
     }
 
@@ -483,14 +483,14 @@ function get_river_info($uid = NULL)
 
     //Look for the sid in the session table
     $stmt = "SELECT $table_river.id,
-		  $table_river.userid,
-		  $table_river.lastbuild,
-		  $table_river.river,
-	          $table_river.conthash,
-                  $table_river.firstid,
-                  $table_river.updated
-           FROM $table_river
-           WHERE $table_river.userid=?";
+		            $table_river.userid,
+		            $table_river.lastbuild,
+		            $table_river.river,
+	                $table_river.conthash,
+                    $table_river.firstid,
+                    $table_river.updated
+            FROM $table_river
+            WHERE $table_river.userid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
     $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
@@ -501,8 +501,8 @@ function get_river_info($uid = NULL)
     if ($sql->num_rows() < 1) {
         $sql->close()
         or loggit(2, "MySql error: " . $dbh->error);
-        loggit(2, "Failed to retrieve river info for user id: [$uid]");
-        return (FALSE);
+        loggit(1, "Failed to retrieve river info for user id: [$uid]");
+        return (array());
     }
     $river = array();
     $sql->bind_result($river['id'], $river['userid'], $river['lastbuild'], $river['river'], $river['conthash'], $river['firstid'], $river['updated']) or loggit(2, "MySql error: " . $dbh->error);
@@ -515,7 +515,7 @@ function get_river_info($uid = NULL)
 
 
 //Add a feed to the database
-function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL)
+function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL, $type = 0)
 {
     //Check parameters
     if ($url == NULL) {
@@ -546,9 +546,9 @@ function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL)
     if ($fid == FALSE) {
         $existed = FALSE;
         //Now that we have a good id, put the article into the database
-        $stmt = "INSERT INTO $table_newsfeed (id,url,createdon) VALUES (?,?,?)";
+        $stmt = "INSERT INTO $table_newsfeed (id,url,createdon, type) VALUES (?,?,?,?)";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssd", $id, $url, $createdon) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssdd", $id, $url, $createdon, $type) or loggit(2, "MySql error: " . $dbh->error);
         $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
         $sql->close();
     } else {
@@ -616,7 +616,7 @@ function update_feed_title($fid = NULL, $title = NULL)
 
     //Log and return
     loggit(1, "Changed feed:[$fid]'s title to: [$title].");
-    return (TRUE);
+   return (TRUE);
 }
 
 
@@ -1520,7 +1520,7 @@ function delete_feed($fid = NULL)
 
 
 //Fetch the newest content for a feed
-function fetch_feed_content($fid = NULL, $force = FALSE)
+function fetch_feed_content($fid = NULL, $force = TRUE)
 {
     //Check params
     if (empty($fid)) {
@@ -1612,8 +1612,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Pull the latest content blob from the database
     if( empty($feed['content']) ) {
-        loggit(2, "Error attempting to get url: [$url]. See log for details.");
-        increment_feed_error_count($fid);
+        loggit(2, "Feed: [$fid] has no content.");
         $stats['checktime'] += (time() - $fstart);
         set_feed_stats($fid, $stats);
         return (-1);
@@ -1621,7 +1620,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Is the feed any good?
     if (!feed_is_valid($feed['content'])) {
-        loggit(3, "Feed: [$fid] doesn't seem to be a known feed format. Skip it.");
+        loggit(2, "Feed: [$fid] doesn't seem to be a known feed format. Skipping it.");
         set_feed_error_count($fid, 100);
         return (-1);
     }
@@ -1653,20 +1652,22 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Look for some kind of publish date
     if (!empty($x->channel->pubDate)) {
         $pubdate = $x->channel->pubDate;
-    } else if (!empty($x->channel->lastBuildDate)) {
+    } else
+    if (!empty($x->channel->lastBuildDate)) {
         $pubdate = $x->channel->lastBuildDate;
-    } else if (!empty($x->updated)) {
+    } else
+    if (!empty($x->updated)) {
         $pubdate = $x->updated;
     } else {
         $pubdate = time();
     }
-    loggit(3, "DEBUG: Pubdate: [$pubdate]");
+    loggit(1, "DEBUG: Pubdate: [$pubdate]");
     if ($feed['pubdate'] == $pubdate && !empty($pubdate) && $force == FALSE) {
         //The feed says that it hasn't been updated
-        loggit(1, "The pubdate in the feed has not changed.");
+        loggit(3, "The pubdate in the feed has not changed.");
         $stats['checktime'] += (time() - $fstart);
         set_feed_stats($fid, $stats);
-        return (-3);
+        //return (-3);
     }
     update_feed_pubdate($fid, $pubdate);
 
@@ -1689,7 +1690,6 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Freshen feed avatar
     update_feed_avatar($fid, get_feed_avatar($x));
 
-
     //Pass any namespaces to the item add routine
     $namespaces = $x->getDocNamespaces(TRUE);
 
@@ -1701,6 +1701,23 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     $items = array();
     $count = 0;
     $newcount = 0;
+    if (strtolower($x->getName()) == "rdf") {
+        //Probably an RDF feed
+        foreach ($x->item as $entry) {
+            $items[$count] = $entry;
+            if (!feed_item_exists($fid, get_unique_id_for_feed_item($entry))) { //testing
+                update_feed_lastupdate($fid, time());
+                add_feed_item($fid, $entry, "rss", $namespaces);
+                $newcount++;
+                if ($newcount > $max) {
+                    mark_feed_item_to_purge($fid, $entry->guid);
+                }
+            } else {
+                unmark_feed_item_to_purge($fid, $entry->guid);
+            }
+            $count++;
+        }
+    } else
     if (empty($x->channel->item)) {
         //This is an atom feed
         foreach ($x->entry as $entry) {
@@ -1756,10 +1773,9 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Is the feed empty?
     if ($count == 0) {
-        loggit(1, "Scan: There were no items in this feed: [$url].");
+        loggit(3, "Scan: There were no items in this feed: [$url].");
         return (-2);
     }
-
 
     //Log and leave
     loggit(1, "Scan: [$newcount] out of: [$count] items from feed: [$url] were new.");
@@ -1786,7 +1802,7 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
     if ($witherrors == FALSE) {
         $sqltxt .= " WHERE errors < 10";
     } else {
-        $sqltxt .= " WHERE errors > 0";
+        $sqltxt .= " WHERE 1=1 ";
     }
 
     //Include old feeds?
@@ -2904,7 +2920,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
     //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
     //loggit(3, "River hash: NEW: [$newhash]");
 
-    if ($pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
+    if (!empty($pubriver) && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
         loggit(1, "User: [$uid]'s river has not changed. No need to publish.");
         return ($jsonriver);
     }
@@ -4165,7 +4181,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
     //loggit(3, "River hash: NEW: [$newhash]");
 
-    if ($pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
+    if (!empty($pubriver) && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
         //loggit(3, "User: [$uid]'s river has not changed. No need to publish.");
         return ($jsonriver);
     }
@@ -4568,7 +4584,7 @@ function build_river_json3($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
     //loggit(3, "River hash: NEW: [$newhash]");
 
-    if ($pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
+    if (!empty($pubriver) && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
         //loggit(3, "User: [$uid]'s river has not changed. No need to publish.");
         return ($jsonriver);
     }
@@ -4904,7 +4920,7 @@ function build_river_json4($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
     //loggit(3, "River hash: NEW: [$newhash]");
 
-    if ($pubriver != FALSE && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
+    if (!empty($pubriver) && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
         loggit(1, "User: [$uid]'s river has not changed. No need to publish.");
         return ($jsonriver);
     }

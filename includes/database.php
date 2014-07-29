@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 42;
+$cg_database_version = 43;
 $cg_database_updates = array();
 
 
@@ -576,6 +576,26 @@ CGDB0127;
 $cg_database_updates[41][] = <<<CGDB0128
  INSERT INTO `dbversion` ( `version` ) VALUES ( '42' )
 CGDB0128;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 42 to 43 -----------------------------------------------------------------------------------------------
+$cg_database_updates[42][] = <<<CGDB0129
+ ALTER TABLE `newsfeeds` ADD `contenthash` VARCHAR( 40 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'An sha-1 hash of the content column.', ADD INDEX ( `contenthash` )
+CGDB0129;
+$cg_database_updates[42][] = <<<CGDB0130
+ CREATE TABLE IF NOT EXISTS `nfitem_map` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Standard id',
+  `word` varchar(255) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL COMMENT 'Microblog title',
+  `nfitemid` bigint(20) NOT NULL COMMENT 'Standard id',
+  PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Search term mapping for newsfeed items.'
+CGDB0130;
+$cg_database_updates[42][] = <<<CGDB0131
+ ALTER TABLE `nfitem_map` ADD INDEX ( `word` )
+CGDB0131;
+$cg_database_updates[42][] = <<<CGDB0132
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '43' )
+CGDB0132;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

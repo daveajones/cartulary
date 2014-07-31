@@ -16,7 +16,7 @@ $posts = get_blog_posts($g_uid, $g_prefs['maxlist']);
 $jsondata['data']['posts'] = $posts;
 $jsondata['status'] = "true";
 $jsondata['description'] = "List of posts.";
-echo json_encode($jsondata);if( isset($_REQUEST['pretty']) ) {
+if( isset($_REQUEST['pretty']) ) {
     echo format_json(json_encode($jsondata));
 } else {
     echo json_encode($jsondata);

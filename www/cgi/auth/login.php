@@ -182,6 +182,7 @@ if(is_user_active($uid)) {
   if( $type == 'json' ) {
       $jsondata['goloc'] = $startpage;
       $jsondata['status'] = "true";
+      $jsondata['sessionid'] = $sid;
       $jsondata['description'] = "Login success. Redirecting.";
       echo json_encode($jsondata);
   } else {
@@ -218,5 +219,3 @@ if(is_user_active($uid)) {
 }
 
 return(0);
-
-?>

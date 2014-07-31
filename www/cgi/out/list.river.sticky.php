@@ -22,8 +22,10 @@ $items = get_sticky_feed_items($g_uid);
 $jsondata['data']['items'] = $items;
 $jsondata['status'] = "true";
 $jsondata['description'] = "List of sticky river items.";
-echo json_encode($jsondata);
+if( isset($_REQUEST['pretty']) ) {
+    echo format_json(json_encode($jsondata));
+} else {
+    echo json_encode($jsondata);
+}
 
 return(0);
-?>
-

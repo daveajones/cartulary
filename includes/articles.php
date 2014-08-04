@@ -1083,6 +1083,7 @@ function make_article_printable($aid = NULL)
     //Assemble a printable version
     $printable = "<head>";
     $printable .= "<title>" . $article['title'] . " [Printable]</title>";
+    $printable .= "<meta charset='UTF-8'>";
     $printable .= "</head>";
     $printable .= "<body>";
     $printable .= "<div id=\"divPageArticle\">";

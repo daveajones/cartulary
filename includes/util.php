@@ -695,7 +695,7 @@ function twitter_search_to_rss($query = NULL)
 
         $twr = json_decode($twresponse, TRUE);
 
-        loggit(3, print_r($twr, TRUE));
+        loggit(1, print_r($twr, TRUE));
 
         $xml = new SimpleXMLElement('<rss version="2.0"></rss>');
         $xml->addChild('channel');
@@ -1794,16 +1794,24 @@ function get_server_river_s3_url($path = NULL, $filename = NULL)
 
 
 //Remove all characters except alphanum and dashes
-function stripText($text, $nl = TRUE, $leave = "")
+function stripText($text, $nl = TRUE, $leave = "", $dashes = TRUE)
 {
     if($nl) {
         $text = strtolower(trim($text));
     }
     // replace all white space sections with a dash
-    $text = str_replace(' ', '-', $text);
-    // strip all non alphanum or -
-    $clean = ereg_replace("[^A-Za-z0-9".$leave."\-]", "", $text);
+    if( $dashes ) {
+        $text = str_replace(' ', '-', $text);
+    }
 
+    // strip all non alphanum or -
+    if( $dashes ) {
+        $clean = ereg_replace("[^A-Za-z0-9".$leave."\-]", "", $text);
+    } else {
+        $clean = ereg_replace("[^A-Za-z0-9".$leave."]", "", $text);
+    }
+
+    
     return $clean;
 }
 
@@ -2595,7 +2603,7 @@ function parse_search_query($inq = NULL, $section = NULL)
     $psearch['like'] = array_filter($psearch['like']);
     $psearch['not'] = array_filter($psearch['not']);
 
-    loggit(1, "SEARCH: " . print_r($psearch, TRUE));
+    loggit(3, "SEARCH: " . print_r($psearch, TRUE));
     return ($psearch);
 }
 

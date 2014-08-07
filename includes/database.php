@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 43;
+$cg_database_version = 44;
 $cg_database_updates = array();
 
 
@@ -586,16 +586,46 @@ $cg_database_updates[42][] = <<<CGDB0130
  CREATE TABLE IF NOT EXISTS `nfitem_map` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Standard id',
   `word` varchar(255) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL COMMENT 'Microblog title',
-  `nfitemid` bigint(20) NOT NULL COMMENT 'Standard id',
+  `dummy` BOOLEAN NOT NULL COMMENT 'http://dev.mysql.com/doc/refman/5.0/en/insert-on-duplicate.html',
   PRIMARY KEY (`id`)
  ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Search term mapping for newsfeed items.'
 CGDB0130;
 $cg_database_updates[42][] = <<<CGDB0131
- ALTER TABLE `nfitem_map` ADD INDEX ( `word` )
+ ALTER TABLE `nfitem_map` ADD UNIQUE ( `word` )
 CGDB0131;
 $cg_database_updates[42][] = <<<CGDB0132
- INSERT INTO `dbversion` ( `version` ) VALUES ( '43' )
+ CREATE TABLE IF NOT EXISTS `nfitem_map_catalog` (
+  `wordid` bigint(20) NOT NULL COMMENT 'Word mapping id',
+  `nfitemid` bigint(20) NOT NULL COMMENT 'Newsfeed mapping id'
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Word to item catalog'
 CGDB0132;
+$cg_database_updates[42][] = <<<CGDB0133
+ ALTER TABLE `nfitem_map_catalog` ADD INDEX ( `wordid` )
+CGDB0133;
+$cg_database_updates[42][] = <<<CGDB0134
+ ALTER TABLE `nfitem_map_catalog` ADD INDEX ( `nfitemid` )
+CGDB0134;
+$cg_database_updates[42][] = <<<CGDB0135
+ ALTER TABLE `nfitem_map_catalog` ADD UNIQUE (`wordid` ,`nfitemid`)
+CGDB0135;
+$cg_database_updates[42][] = <<<CGDB0136
+ ALTER TABLE `nfitem_map_catalog` ADD FOREIGN KEY ( `wordid` ) REFERENCES `cartulary`.`nfitem_map` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0136;
+$cg_database_updates[42][] = <<<CGDB0137
+ ALTER TABLE `nfitem_map_catalog` ADD FOREIGN KEY ( `nfitemid` ) REFERENCES `cartulary`.`nfitems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0137;
+$cg_database_updates[42][] = <<<CGDB0138
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '43' )
+CGDB0138;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 43 to 44 -----------------------------------------------------------------------------------------------
+$cg_database_updates[43][] = <<<CGDB0139
+ ALTER TABLE `microblog` ADD `opmlsource` LONGTEXT NOT NULL COMMENT 'Opml source of the post.'
+CGDB0139;
+$cg_database_updates[43][] = <<<CGDB0140
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '44' )
+CGDB0140;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

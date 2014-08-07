@@ -79,10 +79,7 @@ if( !empty($opmldata) ) {
 <link rel="stylesheet" href="/style/font-awesome.css" />
 <?include "$confroot/$templates/$template_html_styles"?>
 <?include "$confroot/$templates/$template_html_scripts"?>
-<link rel="stylesheet" href="/style/concord.css" />
-<script src="/script/concord.js"></script>
-<script src="/script/concordUtils.js"></script>
-<script src="/script/bootbox.min.js"></script>
+
 <script>
     //Globals
     var mode = '<?echo $mode?>';

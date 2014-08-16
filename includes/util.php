@@ -928,6 +928,8 @@ function get_final_url($url, $timeout = 5)
     curl_close($curl);
     unlink($cookie);
 
+    loggit(3, "DEBUG: get_final_url($url) returned: [".$response['http_code']."]");
+
     //Normal re-direct
     if ($response['http_code'] == 301 || $response['http_code'] == 302) {
         ini_set("user_agent", $ua);
@@ -1811,7 +1813,7 @@ function stripText($text, $nl = TRUE, $leave = "", $dashes = TRUE)
         $clean = ereg_replace("[^A-Za-z0-9".$leave."]", "", $text);
     }
 
-    
+
     return $clean;
 }
 

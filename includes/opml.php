@@ -2190,7 +2190,11 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
                 $extrahtml .= "<div class=\"tab-pane\" id=\"$tabid\">\n";
             } else
             if ( in_array('menu', $parents) ) {
-                $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "<li>$nodetext</li>";
+                if( stripos($nodetext, "navatar") !== FALSE ) {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "</ul><ul class=\"nav navbar-nav pull-right\"><li>$nodetext</li></ul><ul class=\"nav navbar-nav\">";
+                } else {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "<li>$nodetext</li>";
+                }
             } else
             if ( in_array('html', $parents) ) {
                 $htmlcontent .= str_repeat('    ', $indent) . "$nodetext\n";
@@ -2435,7 +2439,7 @@ OPML2HTMLCSS;
         $inlinestyle = "";
     }
 
-    if( stripos($extrahead, 'togetherJS') !== FALSE ) {
+    if( strpos($extrahead, 'togetherJS') !== FALSE ) {
         $precontent .= "<div id=\"togetherjs-div\"><button id=\"start-togetherjs\" type=\"button\" onclick=\"TogetherJS(this); return false\" data-end-togetherjs-html=\"End TogetherJS\">Collaborate!</button></div>\n";
         $inlinestyle .= "<style>div#togetherjs-div { z-index:9999; position:absolute; top:10px; right:10px; float:right; }</style>";
     }

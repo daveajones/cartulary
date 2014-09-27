@@ -103,8 +103,9 @@ if ( !empty($oldfilename) ) {
 };
 
 //Put the html file in S3
-$htmldata = process_opml_to_html($opml, $title, $uid, $disqus, $s3url, $rendertitle);
 $htmlfilename = str_replace('.opml', '.html', $filename);
+$s3htmlurl = get_s3_url($uid, "/html/", $htmlfilename);
+$htmldata = process_opml_to_html($opml, $title, $uid, $disqus, $s3url, $rendertitle, $s3htmlurl);
 $s3res = putInS3($htmldata, $htmlfilename, $s3info['bucket']."/html", $s3info['key'], $s3info['secret'], "text/html");
 if(!$s3res) {
     loggit(2, "Could not create S3 file: [$htmlfilename] for user: [$uid].");

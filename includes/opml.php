@@ -2254,7 +2254,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             } else
             if ( $parent == "presentation" ) {
                 array_pop($parents);
-                $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "</section>\n";
+                $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "\n";
             } else
             if ($parent == "tabs") {
                 array_pop($parents);
@@ -2288,7 +2288,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
 
 
 //Convert an opml document to html with processing
-function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisqus = FALSE, $opmlurl = "", $rendertitle = TRUE)
+function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisqus = FALSE, $opmlurl = "", $rendertitle = TRUE, $htmlurl = "")
 {
     //Check params
     if ($content == NULL) {
@@ -2359,9 +2359,19 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
         $bodypadding = "60px";
     }
 
+    //Generate a qr code for this file
+    $qrcode = create_s3_qrcode_from_url($uid, $htmlurl);
+    $qrimg = "<img class='pull-right qrcode' title ='This code always links to this page url.' src='".$qrcode."' />";
+    if( !empty($qrcode) ) {
+        $qrline = "<div class='row'>$qrimg</div>";
+    }
+
     //See what type of build out do we need?
     //Get the title
-    if( !empty($title) ) { $titleline = '<div class="page-header"><h2>'.$title.$byline.'</h2></div>'; }
+    if( !empty($title) ) {
+        $titleline = '<div class="page-header">'.$qrimg.'<h2>'.$title.$byline.'</h2></div>';
+        $qrline = "";
+    }
     $precontent = "";
     $container_start = "<div class='container'>";
     $container_stop  = "</div>\n<div class='container text-right'><script>document.write(\"<small>Last Modified \" + document.lastModified + \" by <a href='http://freedomcontroller.com'>Freedom Controller</a></small>\")</script> $linktoopml<div class='ocomments'><div id='disqus_thread'></div></div></div>";
@@ -2372,6 +2382,10 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
 			padding-top: $bodypadding;
 			padding-bottom: 60px;
 		}
+
+        img.qrcode {
+            margin-top:-26px;
+        }
 
 		.navbar-nav > li > a {
 			padding-top: 16px;
@@ -2479,6 +2493,7 @@ OPML2HTMLCSS;
 
     $body
     $extrabody
+    $qrline
     $disqus
     $container_stop
 

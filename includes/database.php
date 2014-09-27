@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 44;
+$cg_database_version = 45;
 $cg_database_updates = array();
 
 
@@ -626,6 +626,15 @@ CGDB0139;
 $cg_database_updates[43][] = <<<CGDB0140
  INSERT INTO `dbversion` ( `version` ) VALUES ( '44' )
 CGDB0140;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 44 to 45 -----------------------------------------------------------------------------------------------
+$cg_database_updates[44][] = <<<CGDB0141
+ ALTER TABLE `recentfiles` ADD `qrcode` VARCHAR( 767 ) NOT NULL COMMENT 'QR code for this outline url.'
+CGDB0141;
+$cg_database_updates[44][] = <<<CGDB0142
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '45' )
+CGDB0142;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

@@ -2484,8 +2484,10 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $id = $sql->insert_id;
     $sql->close();
 
-    //Map the searchable terms in this item
-    map_feed_item($id, $title." ".$description);
+    //Map the searchable terms in this item if new search is enabled
+    if( $cg_search_v2_enabled ) {
+        map_feed_item($id, $title." ".$description);
+    }
 
     //Set the item properties per user
     $fusers = get_feed_subscribers($fid);

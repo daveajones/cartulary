@@ -1282,14 +1282,46 @@ function update_feed_content($fid = NULL, $content = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Now that we have a good id, put the article into the database
-    $stmt = "UPDATE $table_newsfeed SET content=? WHERE id=?";
+    $stmt = "UPDATE $table_newsfeed SET content=?, contenthash=SHA1(?) WHERE id=?";
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("ss", $content, $fid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sss", $content, $content, $fid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close();
 
     //Log and return
     loggit(1, "Updated content for feed: [$fid].");
+    return (TRUE);
+}
+
+
+//Change the url of a feed
+function update_feed_url($fid = NULL, $url = NULL)
+{
+    //Check parameters
+    if (empty($fid)) {
+        loggit(2, "The feed id is blank or corrupt: [$fid]");
+        return (FALSE);
+    }
+    if (empty($url)) {
+        loggit(2, "The feed url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Now that we have a good id, put the article into the database
+    $stmt = "UPDATE $table_newsfeed SET url=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $url, $fid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close();
+
+    //Log and return
+    loggit(1, "Updated url for feed: [$url].");
     return (TRUE);
 }
 
@@ -1556,7 +1588,8 @@ function fetch_feed_content($fid = NULL, $force = TRUE)
     }
     $goodurl = get_final_url($url);
     if ($goodurl != $url) {
-        loggit(1, "Re-direct: Feed: [$url] re-directs to: [$goodurl].");
+        loggit(3, "Changing feed url: [$url] to: [$goodurl].");
+        update_feed_url($fid, $goodurl);
     }
     $tstart = time();
     $content = fetchFeedUrl($goodurl, get_feed_subscriber_count($fid), $cg_sys_version);
@@ -1843,6 +1876,60 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
 
     loggit(1, "Returning: [$count] feeds in the system.");
     return ($feeds);
+}
+
+
+//Retrieve a list of all the feeds in the database
+function get_all_feed_items($max = NULL, $collapsebyurl = TRUE)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Get all feed items up to max
+    $sqltxt = "SELECT id,title,url,description FROM $table_nfitem";
+
+    //Collapse duplicate urls to a single item?
+    if( $collapsebyurl ) {
+        $sqltxt .= " GROUP BY url";
+    }
+
+    //Work newest to oldest
+    $sqltxt .= " ORDER BY timeadded DESC";
+
+    //Max given?
+    if ( !empty($max) && is_numeric($max) ) {
+        $sqltxt .= " LIMIT $max";
+    }
+
+    //Run the query
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any feed items returned
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "There are no feed items in the system.");
+        return (array());
+    }
+
+    $sql->bind_result($iid, $ititle, $iurl, $idescription) or loggit(2, "MySql error: " . $dbh->error);
+
+    $items = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $items[$count] = array('id' => $iid, 'title' => $ititle, 'url' => $iurl, 'description' => $idescription);
+        $count++;
+    }
+
+    $sql->close();
+
+    loggit(1, "Returning: [$count] feed items in the system.");
+    return ($items);
 }
 
 
@@ -2397,6 +2484,9 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $id = $sql->insert_id;
     $sql->close();
 
+    //Map the searchable terms in this item
+    map_feed_item($id, $title." ".$description);
+
     //Set the item properties per user
     $fusers = get_feed_subscribers($fid);
     if ($fusers != FALSE) {
@@ -2462,6 +2552,74 @@ function feed_item_exists($fid = NULL, $guid = NULL)
 
     //loggit(3,"The feed item: [$itemid] with guid: [$guid] already exists for feed: [$fid].");
     return ($itemid);
+}
+
+
+//Parse a feed item and add it's search term mapping to the feed item map table
+function map_feed_item($iid = NULL, $content = NULL)
+{
+    //Check parameters
+    if (empty($iid)) {
+        loggit(2, "The feed item id is blank or corrupt: [$iid]");
+        return (FALSE);
+    }
+    if (empty($content)) {
+        loggit(2, "The feed item content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$includes/search.php";
+
+    //Parse the content of the item
+    $words = array_unique(str_word_count(strip_tags($content), 1));
+    //loggit(3, "MAP DEBUG: ".print_r($words, TRUE));
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Put each word into the map table and link it to the newsfeed item in the map catalog table
+    foreach( $words as $word ) {
+        //We only do this for words that are 3 or more characters long
+        //since the catalog table can get huge and nobody would search for
+        //those tiny words anyway unless they are part of a phrase.  We want
+        //to exclude words that are:  less than 3 chars OR in the word exclude
+        //dictionary OR are just repeated strings of the same letter.  For
+        //phrases we drop back to standard LIKE search
+        $word = strtolower(stripText($word, NULL, NULL, FALSE));
+        if( strlen($word) >= 3 && !isset($cg_search_map_ignore[$word]) ) {
+            //See if the word exists
+            $wordid = map_get_word_id($word);
+
+            if( $wordid < 0 ) {
+                //Insert each word into the map table
+                $stmt = "INSERT INTO $table_nfitem_map (word) VALUES (?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), dummy=NOT dummy";
+                $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+                $sql->bind_param("s", $word) or loggit(2, "MySql error: " . $dbh->error);
+                $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+                $lid = $sql->insert_id;
+                $sql->close();
+            } else {
+                $lid = $wordid;
+            }
+
+            if( is_numeric($lid) && $lid > 0 ) {
+                //Now catalog the mapping
+                $stmt = "INSERT INTO $table_nfitem_map_catalog (wordid,nfitemid) VALUES (?,?) ON DUPLICATE KEY UPDATE wordid=wordid";
+                $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+                $sql->bind_param("dd", $lid, $iid) or loggit(2, "MySql error: " . $dbh->error);
+                $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+                $sql->close();
+            }
+        } else {
+            //loggit(3, "Skipping word map for: [$word]");
+        }
+    }
+
+
+    //loggit(3,"The feed item: [$itemid] with guid: [$guid] already exists for feed: [$fid].");
+    return (TRUE);
 }
 
 

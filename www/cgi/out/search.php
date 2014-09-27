@@ -40,7 +40,11 @@ $section = $query['section'];
 if( $section == "articles" ) {
   $results = search_articles($uid, $query, $query['max']);
 } elseif( $section == "river" ) {
-  $results = search_feed_items($uid, $query, $query['max']);
+    if( $cg_search_v2_enable ) {
+        $results = search2_feed_items($uid, $query, $query['max']);
+    } else {
+        $results = search_feed_items($uid, $query, $query['max']);
+    }
 } elseif( $section == "microblog" ) {
   $results = search_posts($uid, $query, $query['max']);
 } elseif( $section == "subscribe" ) {

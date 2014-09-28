@@ -32,6 +32,24 @@ if( strlen($content) > 64000 ) {
   exit(1);
 }
 
+//Is there a type defined?
+$jsondata['fieldname'] = "type";
+if ( isset($_REQUEST['type']) ) {
+    $type = $_REQUEST['type'];
+} else {
+    $type = 0;
+}
+
+//See if there was an opml source given
+if( isset($_REQUEST['opmlsource']) && !empty($_REQUEST['opmlsource']) ) {
+    $opmlsource = $_REQUEST['opmlsource'];
+    $customXML = new SimpleXMLElement($opmlsource);
+    $dom = dom_import_simplexml($customXML);
+    $opmlsource = $dom->ownerDocument->saveXML($dom->ownerDocument->documentElement);
+} else {
+    $opmlsource = "";
+}
+
 //Get the title
 $jsondata['fieldname'] = "title";
 if ( isset($_REQUEST['title']) ) {
@@ -155,7 +173,7 @@ if( !empty($url) && $shorturl == FALSE ) {
 $didtweet = FALSE;
 if( isset($_REQUEST['tweet']) ) { $didtweet = TRUE; }
 loggit(1, "Adding post: [$content | $title | $url] for user: [$uid].");
-$pid = add_post($uid, $content, $url, $shorturl, serialize($enclosures), $source, $didtweet, $title, NULL, $origin);
+$pid = add_post($uid, $content, $url, $shorturl, serialize($enclosures), $source, $didtweet, $title, NULL, $origin, $type, $opmlsource);
 
 //Does the user want his posts tweeted?
 if( isset($_REQUEST['tweet']) && twitter_is_enabled($uid) ) {

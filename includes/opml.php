@@ -2384,6 +2384,7 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
 		}
 
         img.qrcode {
+            margin:0;
             margin-top:-26px;
         }
 
@@ -2432,6 +2433,10 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
 
 		ul.outline li span {
 			cursor: pointer;
+		}
+
+		ul.outline img {
+		    margin:10px;
 		}
 
 		.collapsed li {

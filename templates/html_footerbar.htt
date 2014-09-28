@@ -69,6 +69,11 @@
                                 <input name="opmlsource" type="text" value=""/>
                             </div>
 
+                            <!-- Type -->
+                            <div class="bptype hide">
+                                <input name="type" type="text" value="0"/>
+                            </div>
+
                             <!-- Source -->
                             <div class="bpsource hide">
                                 <input class="bpsourceurl" name="source[url]" type="text" value=""/>

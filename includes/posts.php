@@ -78,7 +78,7 @@ function get_post($id = NULL)
 
 
 //Add an post to the post repository
-function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, $enclosure = FALSE, $source = FALSE, $twitter = FALSE, $title = "", $timestamp = NULL, $origin = FALSE, $opml = "")
+function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, $enclosure = FALSE, $source = FALSE, $twitter = FALSE, $title = "", $timestamp = NULL, $origin = FALSE, $type = 0, $opml = "")
 {
     //Check parameters
     if ($uid == NULL) {
@@ -139,9 +139,9 @@ function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, 
     //$content = xmlentities($content);
 
     //Now that we have a good id, put the post into the database
-    $stmt = "INSERT INTO $table_post (id,url,content,createdon,shorturl,enclosure,sourceurl,sourcetitle,twitter,title,origin,opmlsource) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+    $stmt = "INSERT INTO $table_post (id,url,content,createdon,shorturl,enclosure,sourceurl,sourcetitle,twitter,title,origin,type,opmlsource) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
     $sql = $dbh->prepare($stmt) or loggit(2, "SQL Error: [" . $dbh->error . "]");
-    $sql->bind_param("ssssssssssss", $id, $url, $content, $createdon, $shorturl, $enclosure, $source['url'], $source['title'], $twitter, $title, $origin, $opml) or loggit(2, "SQL Error: [" . $dbh->error . "]");
+    $sql->bind_param("sssssssssssds", $id, $url, $content, $createdon, $shorturl, $enclosure, $source['url'], $source['title'], $twitter, $title, $origin, $type, $opml) or loggit(2, "SQL Error: [" . $dbh->error . "]");
     loggit(1, "Executing SQL: [" . $stmt . "]");
     $sql->execute() or loggit(2, "SQL Error: [" . $dbh->error . "]");
     $sql->close() or loggit(2, "SQL Error: [" . $dbh->error . "]");
@@ -1245,6 +1245,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
 
     $html .= "</div>\n<div class=\"pageContentWrapper Archive\">\n<div class=\"row\" id=\"divArchive\">\n";
 
+    $lastpostday = "";
     foreach ($posts as $post) {
         if ($post['url'] == "") {
             $rsslink = "";
@@ -1268,9 +1269,17 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
             $enclosures = array();
         }
 
+        $newpostday = date("D, d M Y", $post['createdon']);
+        if( $lastpostday != $newpostday ) {
+            $postpubdate = "<p class=\"pubdate\">" . date("D, d M Y", $post['createdon']) . "</p>\n";
+        } else {
+            $postpubdate = "\n";
+        }
+        $lastpostday = $newpostday;
+
         $html .= "
       <div class=\"item\">
-        <p class=\"pubdate\">" . date("D, d M Y H:i", $post['createdon']) . "</p>\n        <div class=\"content\">";
+        $postpubdate        <div class=\"content\">";
         if (!empty($post['title'])) {
             $html .= "        <h3>" . xmlentities(trim($post['title'])) . "</h3>\n";
         }
@@ -1286,6 +1295,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
             }
         }
         $html .= $guid . "\n";
+        $html .= '<div class="linkage">'."\n";
         if (!empty($rsslink)) {
             $html .= $rsslink . "\n";
         }
@@ -1302,6 +1312,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
         if (!empty($post['sourceurl']) || !empty($post['sourcetitle'])) {
             $html .= '        Source: <a class="source" href="' . htmlspecialchars($post['sourceurl']) . '">' . htmlspecialchars($post['sourcetitle']) . '</a>' . "\n";
         }
+        $html .= '</div>'."\n";
         $html .= "      </div></div>\n";
     }
 

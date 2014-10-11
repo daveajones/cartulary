@@ -591,7 +591,7 @@ $(document).ready(function () {
         menubar.find('.menuAddLink').trigger('click');
         return false;
     });
-    key('ctrl+f,command+f', function () {
+    key('ctrl+shift+f,command+shift+f', function () {
         showEditorFileDropZone();
         $('#uploadifive-editor_upload > input[type=file]:last-child').trigger('click');
         return false;

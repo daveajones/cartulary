@@ -309,6 +309,9 @@ $(document).ready(function () {
         return false;
     });
     menubar.find('.menuSearchReplace').click(function () {
+        srmodal.off('shown').on('shown', function () {
+            srmodal.find('input.srsearch').focus();
+        });
         srmodal.modal('show');
     });
     menubar.find('.menuImportOutline').click(function () {

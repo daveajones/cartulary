@@ -10,6 +10,8 @@ Mostly database and api changes.
         - CMD/CTRL+SHIFT+Enter:  Duplicate the current line above this one.
     - Fixes
         - Search/replace popup now sets focus on the first input upon opening
+    - QR Codes
+        - Rendered outlines now include a qr code at the top of each pointing to it's own url.
 
 - Subscribing
     - Subscribing to twitter timelines and searches as feeds

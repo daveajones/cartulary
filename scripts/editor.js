@@ -73,7 +73,7 @@ $(document).ready(function () {
         $('#divEditOutline').append('<div class="ouitem hide"><div class="header"><a class="articlelink" href="' + htmlurl + '">' + title + '</a></div></div>');
         $('#divEditOutline .ouitem').append('<div class="footer"><span class="source"><a class="articlelink" href=""></a></span></div>');
         $('#divEditOutline .ouitem .footer').append('<span class="origin">' + url + '</span>');
-        newMicroblogPostWindow('#divEditOutline .ouitem');
+        newMicroblogPostWindow('#divEditOutline .ouitem', opOutlineToXml(), 1);
         return(false);
     });
 
@@ -309,6 +309,9 @@ $(document).ready(function () {
         return false;
     });
     menubar.find('.menuSearchReplace').click(function () {
+        srmodal.off('shown').on('shown', function () {
+            srmodal.find('input.srsearch').focus();
+        });
         srmodal.modal('show');
     });
     menubar.find('.menuImportOutline').click(function () {
@@ -588,7 +591,7 @@ $(document).ready(function () {
         menubar.find('.menuAddLink').trigger('click');
         return false;
     });
-    key('ctrl+f,command+f', function () {
+    key('ctrl+shift+f,command+shift+f', function () {
         showEditorFileDropZone();
         $('#uploadifive-editor_upload > input[type=file]:last-child').trigger('click');
         return false;

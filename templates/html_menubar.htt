@@ -78,7 +78,7 @@
                 <li class="divider-vertical"></li>
 
                 <li class="dropdown <?if($section == "Prefs"){echo " active";}?>">
-                <a style="padding:0;padding-left:8px;href="#" id="drop5" role="button" class="edgecase dropdown-toggle" data-toggle="dropdown"><?echo $myuname?> <img class="avatar48" src="<?echo $avatarurl?>" alt=""/></a>
+                <a style="padding:0;padding-left:8px;" href="#" id="drop5" role="button" class="edgecase dropdown-toggle" data-toggle="dropdown"><?echo $myuname?> <img class="avatar48" src="<?echo $avatarurl?>" alt=""/></a>
                 <ul id="menu3" role="menu" class="dropdown-menu" aria-labelledby="drop5">
                     <li><a href="<?echo $mysopml?>">Profile</a></li>
                     <li><a href="<?echo $prefspage?>">Prefs</a></li>

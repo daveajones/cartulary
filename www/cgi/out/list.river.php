@@ -6,19 +6,16 @@ header("Cache-control: no-cache, must-revalidate");
 header("Content-Type: application/json");
 $jsondata = array();
 
+// Get the river
+$river = get_river($uid);
 
-//Get all the users in the system
-$posts = get_blog_posts($g_uid, $g_prefs['maxlist']);
-
-
-//--------------------------------------------------------------------------------
-//Give feedback that all went well
-$jsondata['data']['posts'] = $posts;
+// Output
 $jsondata['status'] = "true";
-$jsondata['description'] = "List of posts.";
+$jsondata['description'] = "News river.";
+$jsondata['river'] = $river;
 if( isset($_REQUEST['pretty']) ) {
     echo format_json(json_encode($jsondata));
 } else {
     echo json_encode($jsondata);
 }
-return(0);
+loggit(1,"Sending news river for user: [$uid]");

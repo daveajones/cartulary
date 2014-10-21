@@ -2190,7 +2190,11 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
                 $extrahtml .= "<div class=\"tab-pane\" id=\"$tabid\">\n";
             } else
             if ( in_array('menu', $parents) ) {
-                $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "<li>$nodetext</li>";
+                if( stripos($nodetext, "navatar") !== FALSE ) {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "</ul><ul class=\"nav navbar-nav pull-right\"><li>$nodetext</li></ul><ul class=\"nav navbar-nav\">";
+                } else {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "<li>$nodetext</li>";
+                }
             } else
             if ( in_array('html', $parents) ) {
                 $htmlcontent .= str_repeat('    ', $indent) . "$nodetext\n";
@@ -2250,7 +2254,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             } else
             if ( $parent == "presentation" ) {
                 array_pop($parents);
-                $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "</section>\n";
+                $htmlcontent .= "\n" . str_repeat('    ', $indent+1) . "\n";
             } else
             if ($parent == "tabs") {
                 array_pop($parents);
@@ -2284,7 +2288,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
 
 
 //Convert an opml document to html with processing
-function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisqus = FALSE, $opmlurl = "", $rendertitle = TRUE)
+function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisqus = FALSE, $opmlurl = "", $rendertitle = TRUE, $htmlurl = "")
 {
     //Check params
     if ($content == NULL) {
@@ -2355,9 +2359,19 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
         $bodypadding = "60px";
     }
 
+    //Generate a qr code for this file
+    $qrcode = create_s3_qrcode_from_url($uid, $htmlurl);
+    $qrimg = "<img class='pull-right qrcode' title ='This code always links to this page url.' src='".$qrcode."' />";
+    if( !empty($qrcode) ) {
+        $qrline = "<div class='row'>$qrimg</div>";
+    }
+
     //See what type of build out do we need?
     //Get the title
-    if( !empty($title) ) { $titleline = '<div class="page-header"><h2>'.$title.$byline.'</h2></div>'; }
+    if( !empty($title) ) {
+        $titleline = '<div class="page-header">'.$qrimg.'<h2>'.$title.$byline.'</h2></div>';
+        $qrline = "";
+    }
     $precontent = "";
     $container_start = "<div class='container'>";
     $container_stop  = "</div>\n<div class='container text-right'><script>document.write(\"<small>Last Modified \" + document.lastModified + \" by <a href='http://freedomcontroller.com'>Freedom Controller</a></small>\")</script> $linktoopml<div class='ocomments'><div id='disqus_thread'></div></div></div>";
@@ -2368,6 +2382,11 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
 			padding-top: $bodypadding;
 			padding-bottom: 60px;
 		}
+
+        img.qrcode {
+            margin:0;
+            margin-top:-26px;
+        }
 
 		.navbar-nav > li > a {
 			padding-top: 16px;
@@ -2416,6 +2435,10 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
 			cursor: pointer;
 		}
 
+		ul.outline img {
+		    margin:10px;
+		}
+
 		.collapsed li {
 			display: none;
 		}
@@ -2435,7 +2458,7 @@ OPML2HTMLCSS;
         $inlinestyle = "";
     }
 
-    if( stripos($extrahead, 'togetherJS') !== FALSE ) {
+    if( strpos($extrahead, 'togetherJS') !== FALSE ) {
         $precontent .= "<div id=\"togetherjs-div\"><button id=\"start-togetherjs\" type=\"button\" onclick=\"TogetherJS(this); return false\" data-end-togetherjs-html=\"End TogetherJS\">Collaborate!</button></div>\n";
         $inlinestyle .= "<style>div#togetherjs-div { z-index:9999; position:absolute; top:10px; right:10px; float:right; }</style>";
     }
@@ -2475,6 +2498,7 @@ OPML2HTMLCSS;
 
     $body
     $extrabody
+    $qrline
     $disqus
     $container_stop
 

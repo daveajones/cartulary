@@ -13,6 +13,7 @@
   require_once "$confroot/$includes/net.php";
   require_once "$confroot/$includes/subscribe.php";
   require_once "$confroot/$includes/outline.php";
+  require_once "$confroot/$includes/search.php";
 
 
   //Is a database upgrade in progress?

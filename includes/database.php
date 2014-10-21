@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 42;
+$cg_database_version = 45;
 $cg_database_updates = array();
 
 
@@ -576,6 +576,65 @@ CGDB0127;
 $cg_database_updates[41][] = <<<CGDB0128
  INSERT INTO `dbversion` ( `version` ) VALUES ( '42' )
 CGDB0128;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 42 to 43 -----------------------------------------------------------------------------------------------
+$cg_database_updates[42][] = <<<CGDB0129
+ ALTER TABLE `newsfeeds` ADD `contenthash` VARCHAR( 40 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'An sha-1 hash of the content column.', ADD INDEX ( `contenthash` )
+CGDB0129;
+$cg_database_updates[42][] = <<<CGDB0130
+ CREATE TABLE IF NOT EXISTS `nfitem_map` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Standard id',
+  `word` varchar(255) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL COMMENT 'Microblog title',
+  `dummy` BOOLEAN NOT NULL COMMENT 'http://dev.mysql.com/doc/refman/5.0/en/insert-on-duplicate.html',
+  PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Search term mapping for newsfeed items.'
+CGDB0130;
+$cg_database_updates[42][] = <<<CGDB0131
+ ALTER TABLE `nfitem_map` ADD UNIQUE ( `word` )
+CGDB0131;
+$cg_database_updates[42][] = <<<CGDB0132
+ CREATE TABLE IF NOT EXISTS `nfitem_map_catalog` (
+  `wordid` bigint(20) NOT NULL COMMENT 'Word mapping id',
+  `nfitemid` bigint(20) NOT NULL COMMENT 'Newsfeed mapping id'
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Word to item catalog'
+CGDB0132;
+$cg_database_updates[42][] = <<<CGDB0133
+ ALTER TABLE `nfitem_map_catalog` ADD INDEX ( `wordid` )
+CGDB0133;
+$cg_database_updates[42][] = <<<CGDB0134
+ ALTER TABLE `nfitem_map_catalog` ADD INDEX ( `nfitemid` )
+CGDB0134;
+$cg_database_updates[42][] = <<<CGDB0135
+ ALTER TABLE `nfitem_map_catalog` ADD UNIQUE (`wordid` ,`nfitemid`)
+CGDB0135;
+$cg_database_updates[42][] = <<<CGDB0136
+ ALTER TABLE `nfitem_map_catalog` ADD FOREIGN KEY ( `wordid` ) REFERENCES `cartulary`.`nfitem_map` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0136;
+$cg_database_updates[42][] = <<<CGDB0137
+ ALTER TABLE `nfitem_map_catalog` ADD FOREIGN KEY ( `nfitemid` ) REFERENCES `cartulary`.`nfitems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0137;
+$cg_database_updates[42][] = <<<CGDB0138
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '43' )
+CGDB0138;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 43 to 44 -----------------------------------------------------------------------------------------------
+$cg_database_updates[43][] = <<<CGDB0139
+ ALTER TABLE `microblog` ADD `opmlsource` LONGTEXT NOT NULL COMMENT 'Opml source of the post.'
+CGDB0139;
+$cg_database_updates[43][] = <<<CGDB0140
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '44' )
+CGDB0140;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 44 to 45 -----------------------------------------------------------------------------------------------
+$cg_database_updates[44][] = <<<CGDB0141
+ ALTER TABLE `recentfiles` ADD `qrcode` VARCHAR( 767 ) NOT NULL COMMENT 'QR code for this outline url.'
+CGDB0141;
+$cg_database_updates[44][] = <<<CGDB0142
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '45' )
+CGDB0142;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

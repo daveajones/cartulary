@@ -16,9 +16,9 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     $tstart = time();
 
     //See how much space is left on the app partition, and if
-    //it's less than 2 gigabytes, put a warning in the admin feedlog
+    //it's less than 1 gigabyte, put a warning in the admin feedlog
     $dfree = disk_free_space($confroot);
-    if ($dfree < 2147483648) {
+    if ($dfree < $cg_default_disk_free_warning) {
         echo "WARNING: The server only has: [" . format_bytes($dfree) . "] of free space left.\n";
         loggit(2, "WARNING: The server only has: [" . format_bytes($dfree) . "] of free space left.");
         //Add an administrative log entry for this event

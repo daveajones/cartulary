@@ -695,7 +695,7 @@ function twitter_search_to_rss($query = NULL)
 
         $twr = json_decode($twresponse, TRUE);
 
-        loggit(3, print_r($twr, TRUE));
+        loggit(1, print_r($twr, TRUE));
 
         $xml = new SimpleXMLElement('<rss version="2.0"></rss>');
         $xml->addChild('channel');
@@ -903,8 +903,9 @@ function clean_url($url = NULL)
 
 
 //Follow redirects to get to the final, good url
-function get_final_url($url, $timeout = 5)
+function get_final_url($url, $timeout = 5, $count = 0)
 {
+    $count++;
     $url = clean_url($url);
     $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
 
@@ -913,13 +914,11 @@ function get_final_url($url, $timeout = 5)
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_COOKIEJAR, $cookie);
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_ENCODING, "");
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_AUTOREFERER, true);
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
     curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-    curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 
@@ -928,16 +927,22 @@ function get_final_url($url, $timeout = 5)
     curl_close($curl);
     unlink($cookie);
 
+    loggit(3, "DEBUG: get_final_url($url) returned: [".$response['http_code']."]");
+
     //Normal re-direct
     if ($response['http_code'] == 301 || $response['http_code'] == 302) {
+        loggit(3, "DEBUG: ".print_r($response, TRUE));
         ini_set("user_agent", $ua);
         $headers = get_headers($response['url']);
 
         $location = "";
         foreach ($headers as $value) {
-            if (substr(strtolower($value), 0, 9) == "location:")
+            //loggit(3, "HEADER: [[".trim(substr($value, 9, strlen($value)))."]]");
+            if (substr(strtolower($value), 0, 9) == "location:") {
                 //loggit(3, "DEBUG: This was a normal http redirect.");
-            return get_final_url(trim(substr($value, 9, strlen($value))));
+                loggit(3, "HEADER: [[".trim(substr($value, 9, strlen($value)))."]]");
+                return get_final_url(trim(substr($value, 9, strlen($value))), 8, $count);
+            }
         }
     }
 
@@ -1794,15 +1799,23 @@ function get_server_river_s3_url($path = NULL, $filename = NULL)
 
 
 //Remove all characters except alphanum and dashes
-function stripText($text, $nl = TRUE, $leave = "")
+function stripText($text, $nl = TRUE, $leave = "", $dashes = TRUE)
 {
     if($nl) {
         $text = strtolower(trim($text));
     }
     // replace all white space sections with a dash
-    $text = str_replace(' ', '-', $text);
+    if( $dashes ) {
+        $text = str_replace(' ', '-', $text);
+    }
+
     // strip all non alphanum or -
-    $clean = ereg_replace("[^A-Za-z0-9".$leave."\-]", "", $text);
+    if( $dashes ) {
+        $clean = ereg_replace("[^A-Za-z0-9".$leave."\-]", "", $text);
+    } else {
+        $clean = ereg_replace("[^A-Za-z0-9".$leave."]", "", $text);
+    }
+
 
     return $clean;
 }
@@ -2595,7 +2608,7 @@ function parse_search_query($inq = NULL, $section = NULL)
     $psearch['like'] = array_filter($psearch['like']);
     $psearch['not'] = array_filter($psearch['not']);
 
-    loggit(1, "SEARCH: " . print_r($psearch, TRUE));
+    loggit(3, "SEARCH: " . print_r($psearch, TRUE));
     return ($psearch);
 }
 
@@ -3126,4 +3139,62 @@ function javascript_escape($str) {
     }
 
     return $new_str;
+}
+
+
+function create_s3_qrcode_from_url($uid = NULL, $value = "", $qrfilename = "") {
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The uid is blank: [$uid]");
+        return (FALSE);
+    }
+    if (empty($value)) {
+        loggit(2, "The value is blank: [$value]");
+        return (FALSE);
+    }
+    if (empty($qrfilename)) {
+        loggit(1, "The qrfilename is blank: [$qrfilename]");
+        $qrfilename = random_gen(16).".png";
+    }
+
+    //Bring in qr code library
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    set_include_path("$confroot/$libraries".PATH_SEPARATOR.get_include_path());
+    include "phpqrcode/qrlib.php";
+    $qrtmpfile = sys_get_temp_dir()."/".$uid.time()."_qr.png";
+    QRcode::png($value, $qrtmpfile);
+
+    //Put the qrcode in s3
+    if(s3_is_enabled($uid) || sys_s3_is_enabled()) {
+        //First we get all the key info
+        $s3info = get_s3_info($uid);
+
+        //Subpath?  Must begin with a slash
+        $subpath = "/img/";
+        $qrdata = @file_get_contents($qrtmpfile);
+
+        //Put the desktop file
+        $filename = $qrfilename;
+        $s3res = putInS3(gzencode($qrdata), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "image/png", "Content-Encoding" => "gzip"));
+        if (!$s3res) {
+            loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+        } else {
+            $s3url = get_s3_url($uid, $subpath, $filename);
+            loggit(1, "Wrote desktop river to S3 at url: [$s3url].");
+        }
+    } else {
+        return "";
+    }
+
+    return $s3url;
+}
+
+
+class Rest {
+    public function __construct($req = NULL) {
+        //Try to grab the global REQUEST if none passed in
+        if( empty($req) ) {
+            $req = $_REQUEST;
+        }
+    }
 }

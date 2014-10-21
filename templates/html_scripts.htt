@@ -28,3 +28,6 @@
 <?include "$confroot/$scripts/api-people.js"?>
 </script>
 <?}?>
+<script src="/script/concord.js"></script>
+<script src="/script/concordUtils.js"></script>
+<script src="/script/bootbox.min.js"></script>

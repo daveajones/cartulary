@@ -1,0 +1,25 @@
+#Release Notes - Freedom Controller v0.6.2
+
+
+Mostly database and api changes.
+
+
+- Editor
+    - Shortcut change
+        - CMD/CTRL+SHIFT+F:  Upload a file into an outline.
+        - CMD/CTRL+SHIFT+Enter:  Duplicate the current line above this one.
+    - Fixes
+        - Search/replace popup now sets focus on the first input upon opening
+
+- Subscribing
+    - Subscribing to twitter timelines and searches as feeds
+        - To subscribe to someone's twitter timeline, just put the twitter handle, like "@adamcurry", in the subscribe box.
+        - For subscribing to a twitter search as a feed, prefix the twitter handle with a plus symbol, like "+@adamcurry", in the subscribe box.
+
+- Search 2.0
+    - There is a key in cartulary.conf called "cg_search_v2_enable".  It's "false" by default.  If you set it to "true",
+      it will enabled the new search code for river searches.  Please don't enable this feature unless you have PLENTY of
+      space on your disk.  It will grow your database size significantly.  Possibly by several gigs.
+
+    - I've aborted the search 2.0 code for now, since there are more important fish to fry.  I'll revisit it at a later date.  It does work though,
+      so if you have plenty of disk space and feel frisky you can give it a try.

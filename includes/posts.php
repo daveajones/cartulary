@@ -78,7 +78,7 @@ function get_post($id = NULL)
 
 
 //Add an post to the post repository
-function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, $enclosure = FALSE, $source = FALSE, $twitter = FALSE, $title = "", $timestamp = NULL, $origin = FALSE)
+function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, $enclosure = FALSE, $source = FALSE, $twitter = FALSE, $title = "", $timestamp = NULL, $origin = FALSE, $type = 0, $opml = "")
 {
     //Check parameters
     if ($uid == NULL) {
@@ -139,9 +139,9 @@ function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, 
     //$content = xmlentities($content);
 
     //Now that we have a good id, put the post into the database
-    $stmt = "INSERT INTO $table_post (id,url,content,createdon,shorturl,enclosure,sourceurl,sourcetitle,twitter,title,origin) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+    $stmt = "INSERT INTO $table_post (id,url,content,createdon,shorturl,enclosure,sourceurl,sourcetitle,twitter,title,origin,type,opmlsource) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
     $sql = $dbh->prepare($stmt) or loggit(2, "SQL Error: [" . $dbh->error . "]");
-    $sql->bind_param("sssssssssss", $id, $url, $content, $createdon, $shorturl, $enclosure, $source['url'], $source['title'], $twitter, $title, $origin) or loggit(2, "SQL Error: [" . $dbh->error . "]");
+    $sql->bind_param("sssssssssssds", $id, $url, $content, $createdon, $shorturl, $enclosure, $source['url'], $source['title'], $twitter, $title, $origin, $type, $opml) or loggit(2, "SQL Error: [" . $dbh->error . "]");
     loggit(1, "Executing SQL: [" . $stmt . "]");
     $sql->execute() or loggit(2, "SQL Error: [" . $dbh->error . "]");
     $sql->close() or loggit(2, "SQL Error: [" . $dbh->error . "]");
@@ -311,6 +311,7 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
 		    $table_post.sourcetitle,
 		    $table_post.twitter,
 		    $table_post.origin,
+		    $table_post.opmlsource,
                     $table_mbcatalog.linkedon
 	     FROM $table_post,$table_mbcatalog
 	     WHERE $table_mbcatalog.userid=?
@@ -346,7 +347,7 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
         return (array());
     }
 
-    $sql->bind_result($aid, $atitle, $aurl, $ashorturl, $acreatedon, $acontent, $aenclosure, $asourceurl, $asourcetitle, $tweeted, $origin, $clinkedon) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($aid, $atitle, $aurl, $ashorturl, $acreatedon, $acontent, $aenclosure, $asourceurl, $asourcetitle, $tweeted, $origin, $opmlsource, $clinkedon) or loggit(2, "MySql error: " . $dbh->error);
 
     $posts = array();
     $count = 0;
@@ -362,6 +363,7 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
             'sourcetitle' => $asourcetitle,
             'tweeted' => $tweeted,
             'origin' => $origin,
+            'opml' => $opmlsource,
             'linkedon' => $clinkedon
         );
         $count++;
@@ -722,6 +724,9 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
         if (!empty($post['sourceurl']) || !empty($post['sourcetitle'])) {
             $rss .= '        <source url="' . htmlspecialchars(trim($post['sourceurl'])) . '">' . htmlspecialchars(trim($post['sourcetitle'])) . '</source>' . "\n";
         }
+        if ( !empty($post['opml']) ) {
+            $rss .= '        <sopml:opml>'.$post['opml'].'</sopml:opml>';
+        }
         $rss .= "        <author>" . get_email_from_uid($uid) . " ($username)</author>\n";
         $rss .= $tweeted;
         $rss .= $origin;
@@ -746,7 +751,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
         }
 
         //Put the file
-        $s3res = putInS3($rss, $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], "application/rss+xml");
+        $s3res = putInS3(gzencode($rss), $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/rss+xml", "Content-Encoding" => "gzip"));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -1240,6 +1245,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
 
     $html .= "</div>\n<div class=\"pageContentWrapper Archive\">\n<div class=\"row\" id=\"divArchive\">\n";
 
+    $lastpostday = "";
     foreach ($posts as $post) {
         if ($post['url'] == "") {
             $rsslink = "";
@@ -1263,9 +1269,17 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
             $enclosures = array();
         }
 
+        $newpostday = date("D, d M Y", $post['createdon']);
+        if( $lastpostday != $newpostday ) {
+            $postpubdate = "<p class=\"pubdate\">" . date("D, d M Y", $post['createdon']) . "</p>\n";
+        } else {
+            $postpubdate = "\n";
+        }
+        $lastpostday = $newpostday;
+
         $html .= "
       <div class=\"item\">
-        <p class=\"pubdate\">" . date("D, d M Y H:i", $post['createdon']) . "</p>\n        <div class=\"content\">";
+        $postpubdate        <div class=\"content\">";
         if (!empty($post['title'])) {
             $html .= "        <h3>" . xmlentities(trim($post['title'])) . "</h3>\n";
         }
@@ -1281,6 +1295,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
             }
         }
         $html .= $guid . "\n";
+        $html .= '<div class="linkage">'."\n";
         if (!empty($rsslink)) {
             $html .= $rsslink . "\n";
         }
@@ -1297,6 +1312,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
         if (!empty($post['sourceurl']) || !empty($post['sourcetitle'])) {
             $html .= '        Source: <a class="source" href="' . htmlspecialchars($post['sourceurl']) . '">' . htmlspecialchars($post['sourcetitle']) . '</a>' . "\n";
         }
+        $html .= '</div>'."\n";
         $html .= "      </div></div>\n";
     }
 

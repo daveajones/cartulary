@@ -1,0 +1,21 @@
+#Release Notes - Freedom Controller v0.6.1
+
+
+Editor, style and INSTALL changes
+
+
+- Editor
+    - New shortcut keys
+        - CMD/CTRL+Enter:  Duplicate the current line below this one.
+        - CMD/CTRL+SHIFT+Enter:  Duplicate the current line above this one.
+    - New node types
+        - "Collaboration" node brings in TogetherJS for instant chat rooms in a page.
+        - "Presentation" node turns an outline into a powerpoint style slideshow using RevealJS.
+        - You can put them both together and do on-line presentations.  :-)
+    - Archiving
+        - There is a new archive button on the editors tool menu.  Just select the nodes you want archived and click the button.  A new outline will be created and linked into a new node as an inclusion.
+        - THe shortcut key for this is:  CMD/CTRL+SHIFT+SpaceBar
+    - Style changes
+        - Many style improvements on the editor generated html pages
+
+- INSTALL script now supports Ubuntu 14.04 LTS

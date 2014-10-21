@@ -18,9 +18,10 @@
     <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-mobile-icons.css'?>" />
     <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-mobile.css'?>" /><?
   } else {
-    ?><link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-base.css'?>" />
-    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-icons.css'?>" />
-    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle?>" /><?
+    ?><link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-base.css?ts='.$dg_timestamp?>" />
+    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'-icons.css?ts='.$dg_timestamp?>" />
+    <link rel="stylesheet" type="text/css" media="all" href="<?echo $mainstyle.'?ts='.$dg_timestamp?>" /><?
   }
 ?>
 <link rel="stylesheet" type="text/css" href="/style/bootstrap-responsive-2.3.1.min.css" />
+<link rel="stylesheet" href="/style/concord.css" />

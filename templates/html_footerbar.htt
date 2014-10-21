@@ -1,224 +1,258 @@
 </div>
 </div>
 
-<?if( isset($g_uid) ){?>
-<!-- JS API Pointers -->
-<div id="cgiUrls" style="display:none;" 
-data-unsubscribe="<?echo $unsubpage?>" 
-data-setfeedpropscgi="<?echo $setfeedpropscgi?>" 
-data-addfeedstolist="<?echo $addfeedstolistcgi?>" 
-data-addfeedstonewlist="<?echo $addfeedstonewlistcgi?>" 
-data-removefeedsfromlist="<?echo $removefeedsfromlistcgi?>"
-data-getsopml="<?echo $getsopmlcgi?>"
-data-blogpostcgi="<?echo $blogpostcgi?>"
-></div>
+<? if (isset($g_uid)) { ?>
+    <!-- JS API Pointers -->
+    <div id="cgiUrls" style="display:none;"
+         data-unsubscribe="<? echo $unsubpage ?>"
+         data-setfeedpropscgi="<? echo $setfeedpropscgi ?>"
+         data-addfeedstolist="<? echo $addfeedstolistcgi ?>"
+         data-addfeedstonewlist="<? echo $addfeedstonewlistcgi ?>"
+         data-removefeedsfromlist="<? echo $removefeedsfromlistcgi ?>"
+         data-getsopml="<? echo $getsopmlcgi ?>"
+         data-blogpostcgi="<? echo $blogpostcgi ?>"
+        ></div>
 
-</div>
-
-
-<!-- Global Modals -->
-<!-- Microblog Post -->
-<div id="mdlMicroblogPost" class="modal hide fade fcmodal" tabindex="-1">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h4 class="title">Microblog Post</h4>
-  </div>
-  <div class="modal-body">
-    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Posting. Please wait...<br/><br/></center>
-    <div class="blogpost">
-        <form class="mbpostform" name="blogpost" method="post" action="<?echo $blogpostcgi?>">
-    	<fieldset>
-      	<div class="control-group">
-        	<!-- Description -->
-        	<div class="bpdescription">
-          	<textarea name="content" placeholder="Lay your thing down here..."></textarea>
-        	</div>
-	
-		<!-- Attach files button -->
-                <?if( (s3_is_enabled($g_uid) || sys_s3_is_enabled()) && ($device != "ipad" && $device != "iphone" && $device != "wphone") ) {?>
-                <a class="pull-right" id="btnAttachFile" title="Attach enclosures."><img class="icon-attach" src="/images/blank.gif" alt="" /></a>
-                <?}?>
-
-		<!-- Title -->
-        	<div class="bptitle">
-	  	<img class="icon-text-height" src="/images/blank.gif" title="Title of Post" /><input name="title" type="text" placeholder="Title your post..." value="" />
-		</div>
-	
-		<!-- Link -->
-        	<div class="bplink">
-	  	<img class="icon-hyperlink-small" src="/images/blank.gif" title="External Link" /><input name="link" type="text" placeholder="Paste a link here..." value="" />
-		</div>
-	
-		<!-- Short link -->
-        	<div class="bpshortlink hide">
-	  	<img class="icon-hyperlink-small" src="/images/blank.gif" title="Shortened Link" /><input name="shortlink" type="text" value="" />
-		</div>
-
-		<!-- Origin -->
-        	<div class="bporigin hide">
-	  	<input name="origin" type="text" value="" />
-		</div>
-
-		<!-- Source -->
-        	<div class="bpsource hide">
-	  	<input class="bpsourceurl" name="source[url]" type="text" value="" />
-	  	<input class="bpsourcetitle" name="source[title]" type="text" value="" />
-		</div>
-
-                <!-- Enclosure drop zone. -->
-                <?if( s3_is_enabled($g_uid) || sys_s3_is_enabled() ) {?>
-                <div id="divEnclosures" class="dropzone hide">
-                        <input type="hide" name="datestamp" class="datestamp" value="" />
-                        <div id="queue"><span id="spnQueueText">Drop file(s) here...</span></div>
-                </div>
-
-                <!-- Uploadify controls. -->
-                <div id="divUpload">
-                        <?if($device=="android") {?>
-                        <input type="file" name="file_mobile" id="file_mobile" />
-                        <?} else {?>
-                        You can drag and drop files into this page to attach them.<br/>
-                        Or you can
-                        <input type="file" name="file_upload" id="file_upload" /> ... then ... <a id="aUploadTrigger" href="#"">Upload Them</a> if they don't upload automatically.
-                        <?}?>
-                </div>
-                <?}?>
-
-		<!-- External Enclosures -->
-        	<div class="bpextenc hide">
-  		  <h4>External Enclosures:</h4>
-		  <ul></ul>
-		</div>
-
-		<!-- Tweet toggle -->
-		<?if( twitter_is_enabled($g_uid) ) {?><input class="tweetcheck hide" name="tweet" type="checkbox" /><?}?>
-      	</div>
-    	</fieldset>
-        </form>
     </div>
-  </div>
-  <div class="modal-footer">
-    <span style="float:left;">Length: <span class="mbcharcount"></span></span>
-    <?if( twitter_is_enabled($g_uid) ) {?>
-    <span class="tweeters"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt="" /><span class="warntweet hide">Tweet will be truncated...</span></span>
-    <?}?>
-    <button type="button" class="btn btn-success mbsubmit pull-right" aria-hidden="true">Post It!</button>
-  </div>
-</div>
-<!-- Microblog Post -->
 
 
-<!-- Editor search+replace dialog -->
-<div id="mdlEditorSearchReplace" class="modal hide fade" tabindex="-1">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="title">Search and Replace</h4>
-    </div>
-    <div class="modal-body">
-        <div class="blogpost">
-            <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Replacing. Please wait...<br/><br/></center>
-            <form class="srpostform" name="searchreplace">
-                <fieldset>
-                    <div class="control-group">
-                        <!-- Search term -->
-                        <div class="srsearch">
-                            <img class="icon-text-height" src="/images/blank.gif" title="Term to find" /><input class="srsearch" name="search" type="text" placeholder="Term to find" value="" />
+    <!-- Global Modals -->
+    <!-- Microblog Post -->
+    <div id="mdlMicroblogPost" class="modal hide fade fcmodal" tabindex="-1">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="title">Microblog Post</h4>
+        </div>
+        <div class="modal-body">
+            <center class="spinner"><br/><img src="/images/spinner.gif" alt=""/> Posting. Please wait...<br/><br/>
+            </center>
+            <div class="blogpost">
+                <form class="mbpostform" name="blogpost" method="post" action="<? echo $blogpostcgi ?>">
+                    <fieldset>
+                        <div class="control-group">
+                            <!-- Description -->
+                            <div class="bpdescription">
+                                <textarea name="content" placeholder="Lay your thing down here..."></textarea>
+                            </div>
+
+                            <!-- Attach files button -->
+                            <? if ((s3_is_enabled($g_uid) || sys_s3_is_enabled()) && ($device != "ipad" && $device != "iphone" && $device != "wphone")) { ?>
+                                <a class="pull-right" id="btnAttachFile" title="Attach enclosures."><img
+                                        class="icon-attach" src="/images/blank.gif" alt=""/></a>
+                            <? } ?>
+
+                            <!-- Title -->
+                            <div class="bptitle">
+                                <img class="icon-text-height" src="/images/blank.gif" title="Title of Post"/><input
+                                    name="title" type="text" placeholder="Title your post..." value=""/>
+                            </div>
+
+                            <!-- Link -->
+                            <div class="bplink">
+                                <img class="icon-hyperlink-small" src="/images/blank.gif" title="External Link"/><input
+                                    name="link" type="text" placeholder="Paste a link here..." value=""/>
+                            </div>
+
+                            <!-- Short link -->
+                            <div class="bpshortlink hide">
+                                <img class="icon-hyperlink-small" src="/images/blank.gif" title="Shortened Link"/><input
+                                    name="shortlink" type="text" value=""/>
+                            </div>
+
+                            <!-- Origin -->
+                            <div class="bporigin hide">
+                                <input name="origin" type="text" value=""/>
+                            </div>
+
+                            <!-- Opml source -->
+                            <div class="bpopmlsource hide">
+                                <input name="opmlsource" type="text" value=""/>
+                            </div>
+
+                            <!-- Type -->
+                            <div class="bptype hide">
+                                <input name="type" type="text" value="0"/>
+                            </div>
+
+                            <!-- Source -->
+                            <div class="bpsource hide">
+                                <input class="bpsourceurl" name="source[url]" type="text" value=""/>
+                                <input class="bpsourcetitle" name="source[title]" type="text" value=""/>
+                            </div>
+
+                            <!-- Enclosure drop zone. -->
+                            <? if (s3_is_enabled($g_uid) || sys_s3_is_enabled()) { ?>
+                                <div id="divEnclosures" class="dropzone hide">
+                                    <input type="hide" name="datestamp" class="datestamp" value=""/>
+
+                                    <div id="queue"><span id="spnQueueText">Drop file(s) here...</span></div>
+                                </div>
+
+                                <!-- Uploadify controls. -->
+                                <div id="divUpload">
+                                    <? if ($device == "android") { ?>
+                                        <input type="file" name="file_mobile" id="file_mobile"/>
+                                    <? } else { ?>
+                                        You can drag and drop files into this page to attach them.<br/>
+                                        Or you can
+                                        <input type="file" name="file_upload" id="file_upload"/> ... then ... <a
+                                            id="aUploadTrigger" href="#">Upload Them</a> if they don't upload automatically.
+                        <?} ?>
+                                </div>
+                            <? } ?>
+
+                            <!-- External Enclosures -->
+                            <div class="bpextenc hide">
+                                <h4>External Enclosures:</h4>
+                                <ul></ul>
+                            </div>
+
+                            <!-- Tweet toggle -->
+                            <? if (twitter_is_enabled($g_uid)) { ?><input class="tweetcheck hide" name="tweet"
+                                                                          type="checkbox"/><? } ?>
                         </div>
-                        <!-- Replace term -->
-                        <div class="srreplace">
-                            <img class="icon-text-width" src="/images/blank.gif" title="Term to use as replacement" /><input class="srreplace" name="replace" type="text" placeholder="Term to replace with" value="" />
-                        </div>
-                    </div>
-                </fieldset>
-            </form>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span style="float:left;">Length: <span class="mbcharcount"></span></span>
+            <? if (twitter_is_enabled($g_uid)) { ?>
+                <span class="tweeters"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt=""/><span
+                        class="warntweet hide">Tweet will be truncated...</span></span>
+            <? } ?>
+            <button type="button" class="btn btn-success mbsubmit pull-right" aria-hidden="true">Post It!</button>
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-success srsubmit pull-right modalsrgo" aria-hidden="true">Go!</button>
+    <!-- Microblog Post -->
+
+
+    <!-- Editor search+replace dialog -->
+    <div id="mdlEditorSearchReplace" class="modal hide fade" tabindex="-1">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="title">Search and Replace</h4>
+        </div>
+        <div class="modal-body">
+            <div class="blogpost">
+                <center class="spinner"><br/><img src="/images/spinner.gif" alt=""/> Replacing. Please wait...<br/><br/>
+                </center>
+                <form class="srpostform" name="searchreplace">
+                    <fieldset>
+                        <div class="control-group">
+                            <!-- Search term -->
+                            <div class="srsearch">
+                                <img class="icon-text-height" src="/images/blank.gif" title="Term to find"/><input
+                                    class="srsearch" name="search" type="text" placeholder="Term to find" value=""/>
+                            </div>
+                            <!-- Replace term -->
+                            <div class="srreplace">
+                                <img class="icon-text-width" src="/images/blank.gif"
+                                     title="Term to use as replacement"/><input class="srreplace" name="replace"
+                                                                                type="text"
+                                                                                placeholder="Term to replace with"
+                                                                                value=""/>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-success srsubmit pull-right modalsrgo" aria-hidden="true">Go!</button>
+        </div>
     </div>
-</div>
-<!-- Editor search+replace dialog -->
+    <!-- Editor search+replace dialog -->
 
 
-<!-- Social Outline View/Subscribe -->
-<div id="mdlSocialOutlineView" class="modal hide fade fcmodal" tabindex="-1">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h4 class="soname">&nbsp;</h4>
-  </div>
-  <div class="modal-body">
-    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Retrieving. Please wait...<br/><br/></center>
-    <div class="sobody">
+    <!-- Social Outline View/Subscribe -->
+    <div id="mdlSocialOutlineView" class="modal hide fade fcmodal" tabindex="-1">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="soname">&nbsp;</h4>
+        </div>
+        <div class="modal-body">
+            <center class="spinner"><br/><img src="/images/spinner.gif" alt=""/> Retrieving. Please wait...<br/><br/>
+            </center>
+            <div class="sobody">
       <span class="sonameblock">
-        <img class="soavatar riverminitar" src="/images/blank.gif" alt="" />
+        <img class="soavatar riverminitar" src="/images/blank.gif" alt=""/>
         <span class="soraw"></span>
       </span>
       <span class="sofeedblock">
         <h4 class="sopubfeedheader">Published Feeds:</h4>
         <ul class="sopubfeeds"></ul>
       </span>
-      <div class="soactivity">
-        <h4 class="sorecentactivity">Recent Activity:</h4>
-        <ul class="sorecentitems"></ul>
-      </div>
+
+                <div class="soactivity">
+                    <h4 class="sorecentactivity">Recent Activity:</h4>
+                    <ul class="sorecentitems"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="soserver">Server: <a class="serverlink" href="#"></a></div>
+            <a class="aSubscribe pull-right" data-sourceurl="#">Subscribe</a>
+        </div>
     </div>
-  </div>
-  <div class="modal-footer">
-    <div class="soserver">Server: <a class="serverlink" href="#"></a></div>
-    <a class="aSubscribe pull-right" data-sourceurl="#">Subscribe</a>
-  </div>
-</div>
-<!-- Social Outline View/Subscribe -->
+    <!-- Social Outline View/Subscribe -->
 
 
-<!-- Show article modal dialog -->
-<div id="mdlShowArticle" class="modal hide fade" tabindex="-1">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h4 class="artitle">&nbsp;</h4>
-  </div>
-  <div class="modal-body">
-    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Cartulizing. Please wait...<br/><br/></center>
-    <div class="arbody"></div>
-  </div>
-  <div class="modal-footer">
-    <center class="arfooter hide">
-      <?if($platform != "mobile"){?>
-      <a class="opml" title="OPML Version" href="#"><img class="icon-opml" src="/images/blank.gif" alt="" /> </a>
-      <?}?>
-      <a class="print" title="Printer Friendly" href="#"><img class="icon-print" src="/images/blank.gif" alt="" /> </a>
-      <a class="rt" title="Send to Microblog" href="#"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
-      <a class="link" title="Link to Original" href="#"><img class="icon-hyperlink" src="/images/blank.gif" alt="" /> </a>
-    </center>
-  </div>
-</div>
-<!-- Show article modal dialog -->
+    <!-- Show article modal dialog -->
+    <div id="mdlShowArticle" class="modal hide fade" tabindex="-1">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="artitle">&nbsp;</h4>
+        </div>
+        <div class="modal-body">
+            <center class="spinner"><br/><img src="/images/spinner.gif" alt=""/> Cartulizing. Please wait...<br/><br/>
+            </center>
+            <div class="arbody"></div>
+        </div>
+        <div class="modal-footer">
+            <center class="arfooter hide">
+                <? if ($platform != "mobile") { ?>
+                    <a class="opml" title="OPML Version" href="#"><img class="icon-opml" src="/images/blank.gif"
+                                                                       alt=""/> </a>
+                <? } ?>
+                <a class="print" title="Printer Friendly" href="#"><img class="icon-print" src="/images/blank.gif"
+                                                                        alt=""/> </a>
+                <a class="rt" title="Send to Microblog" href="#"><img class="icon-retweet-1" src="/images/blank.gif"
+                                                                      alt=""/> </a>
+                <a class="link" title="Link to Original" href="#"><img class="icon-hyperlink" src="/images/blank.gif"
+                                                                       alt=""/> </a>
+            </center>
+        </div>
+    </div>
+    <!-- Show article modal dialog -->
 
 
-<!-- Media display shadow box modal -->
-<div id="mdlMediaShadowbox" class="modal hide fade fcmodal" tabindex="-1">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h4 class="artitle">&nbsp;</h4>
-  </div>
-  <div class="modal-body">
-    <center class="spinner"><br/><img src="/images/spinner.gif" alt="" /> Loading image. Please wait...<br/><br/></center>
-    <div class="sbbody"></div>
-  </div>
-  <div class="modal-footer">
-    <center class="sbfooter hide">
-      <a class="rt" title="Send to Microblog" href="#"><img class="icon-retweet-1" src="/images/blank.gif" alt="" /> </a>
-    </center>
-  </div>
-</div>
-<!-- Media display shadow box modal -->
-<!-- Global Modals -->
+    <!-- Media display shadow box modal -->
+    <div id="mdlMediaShadowbox" class="modal hide fade fcmodal" tabindex="-1">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="artitle">&nbsp;</h4>
+        </div>
+        <div class="modal-body">
+            <center class="spinner"><br/><img src="/images/spinner.gif" alt=""/> Loading image. Please wait...<br/><br/>
+            </center>
+            <div class="sbbody"></div>
+        </div>
+        <div class="modal-footer">
+            <center class="sbfooter hide">
+                <a class="rt" title="Send to Microblog" href="#"><img class="icon-retweet-1" src="/images/blank.gif"
+                                                                      alt=""/> </a>
+            </center>
+        </div>
+    </div>
+    <!-- Media display shadow box modal -->
+    <!-- Global Modals -->
 
-<!-- End-of-body content -->
-<script>
-<?include "$confroot/$scripts/upload.js"?>
-</script>
-<script>
-<?include "$confroot/$scripts/global-postload.js"?>
-</script>
-<?}?>
+    <!-- End-of-body content -->
+    <script>
+        <?include "$confroot/$scripts/upload.js"?>
+    </script>
+    <script>
+        <?include "$confroot/$scripts/global-postload.js"?>
+    </script>
+<? } ?>

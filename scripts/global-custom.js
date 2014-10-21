@@ -596,9 +596,11 @@ function modalFullHeight(el, loading) {
 
 
 //Spawn a microblog post box
-function newMicroblogPostWindow(item) {
+function newMicroblogPostWindow(item, opmlsource, type) {
     var modal = '#mdlMicroblogPost';
 	var item  = (typeof item === "undefined") ? false : item;
+    var opmlsource  = (typeof opmlsource === "undefined") ? false : opmlsource;
+    var type  = (typeof type === "undefined") ? 0 : type;
 	var compact = true;
 
 	//Set the description
@@ -629,6 +631,16 @@ function newMicroblogPostWindow(item) {
 		$(modal + ' .bpsourceurl').val( $(item + ' .footer span.source a').attr('href').trim() );
 		$(modal + ' .bpsourcetitle').val( $(item + ' .footer span.source a').text().trim() );
 	}
+
+    //Attach opml source if there was any
+    if( opmlsource != false ) {
+        $(modal + ' .bpopmlsource input').val( opmlsource );
+    }
+
+    //Set the type
+    if( type != 0) {
+        $(modal + ' .bptype input').val( type );
+    }
 
 	//Set the origin
 	$(modal + ' .bporigin input').val("");
@@ -744,7 +756,7 @@ function newMicroblogPostWindow(item) {
 
 	//Set focus to the textarea
 	$(modal).on('shown', function () {
-		$(modal + ' .bpdescription textarea').focus();		
+		$(modal + ' .bpdescription textarea').focus();
 	});
 
 

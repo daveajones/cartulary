@@ -73,7 +73,9 @@
 	    </div>
             <input id="btnSubmitDates" type="submit" class="btn btn-success" name="submitdateget" value="Get" />
 		<div style="float:left;clear:both;">
-          <a href="<?echo $s3cartfeed?>" label="RSS"><img class="icon-rss" alt="" src="/images/blank.gif" /></a><a id="aOpmlExport" href="<?echo $s3cartopml?>" label="OPML"><img class="icon-opml" alt="" src="/images/blank.gif" /></a>
+          <a href="<?echo $s3cartfeed?>" label="RSS"><img class="icon-rss" alt="" src="/images/blank.gif" /></a>
+          <a id="aOpmlExport" href="<?echo $s3cartopml?>" label="OPML"><img class="icon-opml" alt="" src="/images/blank.gif" /></a>
+          <a id="aEmailImport" href="#" label="EMAIL"><img class="icon-email-import" alt="" src="/images/blank.gif" /></a>
 		</div>
           </fieldset>
 	</form>

@@ -1174,3 +1174,12 @@ function get_article_static_url($aid = NULL, $uid = NULL)
     loggit(1, "Article: [$aid] has static url: [$staticurl] for user: [$uid].");
     return ($staticurl);
 }
+
+
+//Fetch email as articles from an IMAP server
+function imap_fetch_emails_to_articles($uid = NULL, $hostname = "", $username = "", $password = "", $foldername = "") {
+
+
+
+    return $count;
+}

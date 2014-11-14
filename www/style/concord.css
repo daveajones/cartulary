@@ -47,10 +47,10 @@
 .concord .concord-node.collapsed.selected > .concord-wrapper.type-icon .node-icon {
 	color: #fff;
 	}
-.concord .concord-node.selected.collapsed > .concord-wrapper.type-icon .node-icon.icon-caret-right {
+.concord .concord-node.selected.collapsed > .concord-wrapper.type-icon .node-icon.fa-caret-right {
 	color: #fff;
 	}
-.concord .concord-node.selected > .concord-wrapper.type-icon .node-icon.icon-caret-right {
+.concord .concord-node.selected > .concord-wrapper.type-icon .node-icon.fa-caret-right {
 	color: silver;
 	}
 .concord .concord-node.collapsed > .concord-wrapper{
@@ -127,7 +127,7 @@
 .ui-loader-default {
 	display: none;
 	}
-.icon-wordpress {
+.fa-wordpress {
 	min-width: 20px;
 	background: url('http://static.smallpicture.com/concord-assets/wordpress128.png') no-repeat;
 	background-size: 100% auto;

@@ -669,7 +669,7 @@ $(document).ready(function () {
             beforeSend: function () {
                 //Disable the save button and show a spinner
                 menubar.find('.saves').attr('disabled', true);
-                menubar.find('#dropdownSave').html('<i class="icon-spinner"></i> Saving...');
+                menubar.find('#dropdownSave').html('<i class="fa fa-spinner"></i> Saving...');
             },
             success: function (data) {
                 //Show returned info and re-enable the save button
@@ -898,16 +898,16 @@ $(document).ready(function () {
         menubar.find('.menubar li.extLink').remove();
         menubar.find('.menubar li.extEditLink').remove();
         if ( nodetype == "include" || nodetype == "import" ) {
-            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="icon-external-link" style="color:#090;"></i></a></li>');
-            menubar.find('.menubar').append('<li class="extEditLink"><a target="_blank" href="/editor?url=' + op.attributes.getOne('url') + '"><i class="icon-edit-sign" style="color:#090;"></i></a></li>');
+            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
+            menubar.find('.menubar').append('<li class="extEditLink"><a target="_blank" href="/editor?url=' + op.attributes.getOne('url') + '"><i class="fa fa-edit-sign" style="color:#090;"></i></a></li>');
             return true;
         }
         if ( nodetype == "link" ) {
-            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="icon-external-link" style="color:#090;"></i></a></li>');
+            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
             return true;
         }
         if ( nodetype == "rss" ) {
-            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('xmlUrl') + '"><i class="icon-external-link" style="color:#090;"></i></a></li>');
+            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('xmlUrl') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
             return true;
         }
 

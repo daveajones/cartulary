@@ -10,7 +10,7 @@ $jsondata = array();
 /* connect to imap */
 $constring = ":143/imap/notls/norsh";
 if( $g_prefs['imap_secure'] == 1 ) {
-    $constring = ":993/imap/ssl/norsh";
+    $constring = ":993/imap/ssl/norsh/novalidate-cert";
 }
 $hostname = '{'.$g_prefs['imap_server'].$constring.'}'.$g_prefs['imap_folder'];
 $username = $g_prefs['imap_username'];
@@ -18,6 +18,7 @@ $password = $g_prefs['imap_password'];
 
 
 /* try to connect */
+imap_timeout(IMAP_OPENTIMEOUT, 5);
 $inbox = imap_open($hostname,$username,$password);
 if(!$inbox) {
     $imaperr = imap_last_error();

@@ -49,7 +49,8 @@ if($emails) {
         /* get information specific to this email */
         $overview = imap_fetch_overview($inbox,$email_number,0);
         loggit(3, "IMAP: ".print_r($overview, TRUE));
-        $message = imap_fetchbody($inbox,$email_number,2);
+        //$message = imap_fetchbody($inbox,$email_number,2);
+        $message = imap_qprint(imap_body($inbox, $email_number));
 
         //output the email body */
         $content = $message;

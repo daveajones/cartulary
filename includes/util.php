@@ -506,7 +506,7 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
     $content = stripAttributes($content, array('href', 'src'));
 
     //Replace continuous whitespace with just one space
-    $content = preg_replace("/\ \ +/", " ", $content);
+    $content = preg_replace("/\ \ +/", ' ', $content);
 
     //Strip tab codes
     $content = preg_replace('/\t+/', '', $content);
@@ -3154,7 +3154,7 @@ function create_s3_qrcode_from_url($uid = NULL, $value = "", $qrfilename = "") {
     }
     if (empty($qrfilename)) {
         loggit(1, "The qrfilename is blank: [$qrfilename]");
-        $qrfilename = random_gen(16).".png";
+        $qrfilename = time()."-".random_gen(16).".png";
     }
 
     //Bring in qr code library

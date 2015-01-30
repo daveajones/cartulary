@@ -2579,7 +2579,7 @@ function get_recent_files($uid = NULL, $max = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Do the query
-    $sqltxt = "SELECT title, url, time, disqus, wysiwyg FROM $table_recentfiles WHERE userid=?";
+    $sqltxt = "SELECT title, url, time, disqus, wysiwyg, watched FROM $table_recentfiles WHERE userid=?";
 
     $sqltxt .= " ORDER BY time DESC";
 
@@ -2603,7 +2603,7 @@ function get_recent_files($uid = NULL, $max = NULL)
         return (array());
     }
 
-    $sql->bind_result($ftitle, $furl, $ftime, $fdisqus, $fwysiwyg) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched) or loggit(2, "MySql error: " . $dbh->error);
 
     $files = array();
     $count = 0;
@@ -2612,7 +2612,8 @@ function get_recent_files($uid = NULL, $max = NULL)
             'url' => $furl,
             'time' => $ftime,
             'disqus' => $fdisqus,
-            'wysiwyg' => $fwysiwyg
+            'wysiwyg' => $fwysiwyg,
+            'watched' => $fwatched
         );
         $count++;
     }
@@ -2644,7 +2645,7 @@ function get_recent_file_by_url($uid = NULL, $url = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Do the query
-    $sqltxt = "SELECT title, url, time, disqus, wysiwyg FROM $table_recentfiles WHERE userid=? AND url=?";
+    $sqltxt = "SELECT title, url, time, disqus, wysiwyg, watched FROM $table_recentfiles WHERE userid=? AND url=?";
 
     loggit(1, "[$sqltxt]");
     $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
@@ -2660,7 +2661,7 @@ function get_recent_file_by_url($uid = NULL, $url = NULL)
         return (array());
     }
 
-    $sql->bind_result($ftitle, $furl, $ftime, $fdisqus, $fwysiwyg) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched) or loggit(2, "MySql error: " . $dbh->error);
 
     $files = array();
     $count = 0;
@@ -2669,7 +2670,8 @@ function get_recent_file_by_url($uid = NULL, $url = NULL)
             'url' => $furl,
             'time' => $ftime,
             'disqus' => $fdisqus,
-            'wysiwyg' => $fwysiwyg
+            'wysiwyg' => $fwysiwyg,
+            'watched' => $fwatched
         );
         $count++;
     }
@@ -2682,7 +2684,7 @@ function get_recent_file_by_url($uid = NULL, $url = NULL)
 
 
 //Update a file into the recent files table
-function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE)
+function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE)
 {
     //Check parameters
     if (empty($uid)) {
@@ -2707,6 +2709,11 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     } else {
         $wysiwyg = 1;
     }
+    if (!$watched) {
+        $watched = 0;
+    } else {
+        $watched = 1;
+    }
 
     //Timestamp
     $time = time();
@@ -2717,15 +2724,17 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-    //Database call
+    //Insert recent file entry
     if( empty($oldurl) ) {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched) VALUES (?,?,?,?,?,?,?,?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?, watched=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssdddsdsdd", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $title, $time, $outline, $disqus, $wysiwyg) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsdsddd", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $title, $time, $outline, $disqus, $wysiwyg, $watched) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched) VALUES (?,?,?,?,?,?,?,?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?, watched=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssdddsdssdd", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $title, $time, $outline, $url, $disqus, $wysiwyg) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsdssddd", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched) or loggit(2, "MySql error: " . $dbh->error);
         loggit(3, "User: [$uid] changed old url: [$oldurl] to new url: [$url].");
     }
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);

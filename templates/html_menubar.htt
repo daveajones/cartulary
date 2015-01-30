@@ -108,6 +108,7 @@
                 <li class="divider-vertical34"></li>
                 <li class="<?if($mode == "article"){echo "active";}?>"><a class="rendertoggle" href="#" title="Toggle html rendering">WYSIWYG</a></li>
                 <?if(!empty($myprefs['disqus_shortname'])) { ?><li><a class="menuDisqusToggle" href="#" title="Include Disqus comments in rendered version?">Disqus</a></li><?}?>
+                <?if(!empty($myprefs['imap_server'])) { ?><li><a class="menuWatchToggle" href="#" title="Get notified if this outline changes?">Watch</a></li><?}?>
                 <li class="dropdown menuType" title="What type of outline is this?">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Type <b class="caret"></b></a>
                     <ul class="dropdown-menu" data-container="body">

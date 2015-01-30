@@ -102,6 +102,7 @@ if( !empty($opmldata) ) {
     <?}?>
     var includeDisqus = <?if(!isset($seenfile) || $seenfile[0]['disqus'] == 0) { echo "false"; } else { echo "true"; }?>;
     var wysiwygOn = <?if(!isset($seenfile) || $seenfile[0]['wysiwyg'] == 0) { echo "false"; } else { echo "true"; }?>;
+    var watchedOutline = <?if(!isset($seenfile) || $seenfile[0]['watched'] == 0) { echo "false"; } else { echo "true"; }?>;
     <?if( isset($badurl) ) {?>
     badurl = true;
     <?}?>

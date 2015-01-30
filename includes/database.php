@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 45;
+$cg_database_version = 47;
 $cg_database_updates = array();
 
 
@@ -635,6 +635,37 @@ CGDB0141;
 $cg_database_updates[44][] = <<<CGDB0142
  INSERT INTO `dbversion` ( `version` ) VALUES ( '45' )
 CGDB0142;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 45 to 46 -----------------------------------------------------------------------------------------------
+$cg_database_updates[45][] = <<<CGDB0143
+ ALTER TABLE `recentfiles` ADD `watched` TINYINT NOT NULL COMMENT 'watch this files links for changes?'
+CGDB0143;
+$cg_database_updates[45][] = <<<CGDB0144
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '46' )
+CGDB0144;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 46 to 47 -----------------------------------------------------------------------------------------------
+$cg_database_updates[46][] = <<<CGDB0145
+ CREATE TABLE IF NOT EXISTS `watched_urls` (
+  `rid` bigint(20) NOT NULL COMMENT 'recent files table id',
+  `url` varchar(2048) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'url of outline',
+  `lastmodified` varchar(40) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'content of last last-modified header'
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Linkage between articles and external outlines.'
+CGDB0145;
+$cg_database_updates[46][] = <<<CGDB0146
+ ALTER TABLE `watched_urls` ADD INDEX ( `rid` )
+CGDB0146;
+$cg_database_updates[46][] = <<<CGDB0147
+ ALTER TABLE `watched_urls` ADD `content` TEXT CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Content of watched outline'
+CGDB0147;
+$cg_database_updates[46][] = <<<CGDB0148
+ ALTER TABLE `watched_urls` ADD FOREIGN KEY ( `rid` ) REFERENCES `cartulary`.`recentfiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0148;
+$cg_database_updates[46][] = <<<CGDB0149
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '47' )
+CGDB0149;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

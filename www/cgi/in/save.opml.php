@@ -127,7 +127,8 @@ if(!$s3res) {
 }
 
 //Update recent file table
-update_recent_file($uid, $s3url, $title, $opml, $s3oldurl, $disqus, $wysiwyg, $watched);
+$rid = update_recent_file($uid, $s3url, $title, $opml, $s3oldurl, $disqus, $wysiwyg, $watched);
+loggit(3, "DEBUG: Recent file id is [$rid].");
 
 //Go ahead and put in the urls we saved
 $jsondata['url'] = $s3url;
@@ -188,6 +189,12 @@ if( !empty($rhost) ) {
             loggit(3, "DEBUG: Wrote html to S3 at url: [$redhtml].");
         }
     }
+}
+
+//Extract and add watched urls if this is a watched outline
+$includes = get_includes_from_outline($opml);
+foreach( $includes as $include ) {
+    add_watched_url($rid, $include);
 }
 
 //Log it

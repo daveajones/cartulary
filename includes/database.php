@@ -650,12 +650,15 @@ CGDB0144;
 $cg_database_updates[46][] = <<<CGDB0145
  CREATE TABLE IF NOT EXISTS `watched_urls` (
   `rid` bigint(20) NOT NULL COMMENT 'recent files table id',
-  `url` varchar(2048) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'url of outline',
+  `url` varchar(747) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'url of outline',
   `lastmodified` varchar(40) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'content of last last-modified header'
  ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Linkage between articles and external outlines.'
 CGDB0145;
 $cg_database_updates[46][] = <<<CGDB0146
  ALTER TABLE `watched_urls` ADD INDEX ( `rid` )
+CGDB0146;
+$cg_database_updates[46][] = <<<CGDB0146
+ ALTER TABLE `watched_urls` ADD PRIMARY KEY ( `rid`,`url` )
 CGDB0146;
 $cg_database_updates[46][] = <<<CGDB0147
  ALTER TABLE `watched_urls` ADD `content` TEXT CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Content of watched outline'

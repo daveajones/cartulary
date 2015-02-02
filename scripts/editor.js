@@ -915,7 +915,7 @@ $(document).ready(function () {
         menubar.find('.menubar li.extEditLink').remove();
         if ( nodetype == "include" || nodetype == "import" ) {
             menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
-            menubar.find('.menubar').append('<li class="extEditLink"><a target="_blank" href="/editor?url=' + op.attributes.getOne('url') + '"><i class="fa fa-edit-sign" style="color:#090;"></i></a></li>');
+            menubar.find('.menubar').append('<li class="extEditLink"><a target="_blank" href="/editor?url=' + op.attributes.getOne('url') + '"><i class="fa fa-edit" style="color:#090;"></i></a></li>');
             return true;
         }
         if ( nodetype == "link" ) {

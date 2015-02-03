@@ -93,3 +93,43 @@ function getFilenameFromPart($part) {
     return $filename;
 
 }
+
+//Send an email using PHPMailer
+//__via: http://help.mandrill.com/entries/23737696-How-do-I-send-with-PHPMailer-
+function send_url_change_email($uid = NULL, $url = "", $username = "Freedom Controller")
+{
+    //Check params
+    if ( empty($uid) ) {
+        loggit(2, "The uid is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ( empty($url) ) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    $prefs = get_user_prefs($uid);
+
+    $mail = new PHPMailer;
+    $mail->IsSMTP();
+    $mail->SMTPDebug = 0;
+    $mail->SMTPAuth = 'login';
+    if( $prefs['smtp_secure'] == 1 ) {
+        $mail->SMTPSecure = 'ssl';
+    }
+    $mail->Host = $prefs['smtp_server'];
+    $mail->Port = $prefs['smtp_port'];
+    $mail->Username = $prefs['imap_username'];
+    $mail->Password = $prefs['imap_password'];
+    $mail->SetFrom($prefs['imap_email'], $username);
+    $mail->Subject = 'FC - URL Change Notice';
+    $mail->Body = "The content at: [$url] has changed.<br><br>View it <a href=\"$system_url/editor?url=$url\">here</a>.";
+    $mail->IsHTML(true);
+    $mail->AddAddress($prefs['imap_email']);
+    $mail->Send();
+
+    return(TRUE);
+}

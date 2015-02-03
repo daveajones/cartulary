@@ -1240,7 +1240,7 @@ function get_includes_from_outline($content = NULL, $max = NULL)
 
     //Grab only nodes that have an xmlUrl attribute
     $feeds = array();
-    $nodes = $x->xpath('//outline[@url and @type="include"]');
+    $nodes = $x->xpath('//outline[@url and @type="include" or @type="link"]');
     if (empty($nodes)) {
         loggit(2, "This outline content didn't have any include nodes.");
         return (-2);
@@ -2959,13 +2959,162 @@ function add_watched_url($rid = NULL, $url = NULL, $lastmodified = "", $content 
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Insert watched file entry
-    $stmt = "INSERT INTO $table_watched_urls (rid, url, lastmodified, content) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE rid=?";
+    $stmt = "INSERT INTO $table_watched_urls (rid, url, lastmodified, content)
+             VALUES (?,?,?,?)
+             ON DUPLICATE KEY UPDATE rid=?, lastmodified=?, content=?";
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dsssd", $rid, $url, $lastmodified, $content, $rid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("dsssdss", $rid, $url, $lastmodified, $content, $rid, $lastmodified, $content) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
     //Log and return
     loggit(3, "Added url: [$url] from recent file: [$rid] to watched url table.");
+    return (TRUE);
+}
+
+
+//Return a list of files recently edited by this user in the editor
+function get_watched_urls($max = NULL)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT urls.rid, urls.url, urls.lastmodified, files.userid
+               FROM $table_watched_urls as urls
+               JOIN $table_recentfiles as files ON urls.rid = files.id";
+
+    $sqltxt .= " ORDER BY time DESC";
+
+    if (!empty($max) && is_numeric($max)) {
+        $sqltxt .= " LIMIT $max";
+    } else {
+        $sqltxt .= " LIMIT $default_max_list";
+    }
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "There are no watched files in the system.");
+        return (array());
+    }
+
+    $sql->bind_result($frid, $furl, $flastmod, $fuid) or loggit(2, "MySql error: " . $dbh->error);
+
+    $files = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $files[$count] = array(
+            'rid' => $frid,
+            'url' => $furl,
+            'lastmodified' => $flastmod,
+            'uid' => $fuid
+        );
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning: [$count] watched files.");
+    return ($files);
+}
+
+
+//Return information about a watched url
+function get_watched_url_by_url($url = NULL)
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT urls.rid, urls.url, urls.lastmodified, files.userid, urls.content
+               FROM $table_watched_urls as urls
+               JOIN $table_recentfiles as files ON urls.rid = files.id
+               WHERE urls.url = ?";
+
+    $sqltxt .= " ORDER BY time DESC";
+
+    if (!empty($max) && is_numeric($max)) {
+        $sqltxt .= " LIMIT $max";
+    } else {
+        $sqltxt .= " LIMIT $default_max_list";
+    }
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "Url: [$url] is not in the watch list.");
+        return (array());
+    }
+
+    $sql->bind_result($frid, $furl, $flastmod, $fuid, $fcontent) or loggit(2, "MySql error: " . $dbh->error);
+
+    $files = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $files[$count] = array(
+            'rid' => $frid,
+            'url' => $furl,
+            'lastmodified' => $flastmod,
+            'uid' => $fuid,
+            'content' => $fcontent
+        );
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning info about url: [$url]");
+    return ($files[0]);
+}
+
+
+//Retrieve an array of info about an outline
+function remove_watched_urls_by_file_id($id = NULL)
+{
+    //Check parameters
+    if (empty($id)) {
+        loggit(2, "The file id given is corrupt or blank: [$id]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("DELETE FROM $table_watched_urls WHERE rid=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $id) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //loggit(3,"Returning info for outline: [$id]");
     return (TRUE);
 }

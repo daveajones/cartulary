@@ -192,9 +192,18 @@ if( !empty($rhost) ) {
 }
 
 //Extract and add watched urls if this is a watched outline
-$includes = get_includes_from_outline($opml);
-foreach( $includes as $include ) {
-    add_watched_url($rid, $include);
+if($watched) {
+    $includes = get_includes_from_outline($opml);
+    foreach( $includes as $include ) {
+        $u = get_watched_url_by_url($include);
+        if( empty($u) ) {
+            $u['lastmodified'] = "";
+            $u['content'] = "";
+        }
+        add_watched_url($rid, $include, $u['lastmodified'], $u['content']);
+    }
+} else {
+    remove_watched_urls_by_file_id($rid);
 }
 
 //Log it

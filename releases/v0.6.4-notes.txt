@@ -1,0 +1,19 @@
+#Release Notes - Freedom Controller v0.6.4
+
+
+Two new email related features.
+
+
+- IMAP importing
+    - The prefs page now has an "Email" section where you can fill out your IMAP/SMTP server details.  Once you fill those prefs out you'll see a new icon on the Articles page that looks like
+      a little in-box tray.  Just click that icon, and any emails you put in the designated (in the prefs) folder within your mailbox will be imported as articles into your Freedom Controller
+      account.  Emails come in with the article title prepended with "Email: ", so you'll always know where it came from.
+    - Once the emails have been imported you can export them to the editor and mark them up just like any other article content.
+
+- OPML inclusion/link change tracking
+    - If you also fill out the new SMTP prefs, another option will show up in the Editor menu called "Watch".  You can enable "Watch" for any outline that contains include nodes or link nodes.
+      Once you click "Watch" and save the outline, the server will begin monitoring the linked/included urls within that outline for changes every 30 minutes.  If the content at one of the urls
+      changes, you'll get an email alerting you about it.
+    - The main purpose of this feature is to facilitate easier back and forth when using the editor as an "Instant Outline" type chat.  The email alerts allow you to not have to remember to go
+      check for updates all the time.
+    - I'm sure plenty of other uses can be found for this.

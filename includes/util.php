@@ -835,6 +835,46 @@ function check_head_lastmod($url, $timeout = 5)
 }
 
 
+//Check if content at a url has been modified since a certain time
+function check_url_if_modified($url, $lastmod, $timeout = 5)
+{
+
+    //Check parameters
+    if ($url == NULL) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+    $url = clean_url($url);
+
+    $curl = curl_init();
+
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array("If-Modified-Since: $lastmod"));
+    //don't fetch the actual page, you only want headers
+    curl_setopt($curl, CURLOPT_NOBODY, true);
+    curl_setopt($curl, CURLOPT_HEADER, true);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+    //stop it from outputting stuff to stdout
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
+
+    // attempt to retrieve the modification date
+    curl_setopt($curl, CURLOPT_FILETIME, true);
+
+    $result = curl_exec($curl);
+
+    $info = curl_getinfo($curl);
+
+    echo print_r($info, TRUE);
+
+}
+
+
 //Do a HEAD request on a url to see what the Last-Modified time is
 function check_head_size($url, $timeout = 5)
 {

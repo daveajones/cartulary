@@ -23,13 +23,16 @@ MAILTO=""
 */5  * * * * root php [$CONF_ROOT]/bin/usercheck.php
 
 ##: Server maint
-*/15  * * * * root php [$CONF_ROOT]/bin/clean.php
+*/15 * * * * root php [$CONF_ROOT]/bin/clean.php
 
 ##: Build main user rivers
 */5  * * * * root php [$CONF_ROOT]/bin/buildrivers.php
 
 ##: Build alternate rivers
-*/20  * * * * root php [$CONF_ROOT]/bin/buildsysrivers.php
+*/20 * * * * root php [$CONF_ROOT]/bin/buildsysrivers.php
+
+##: Check watched outlines for changes
+*/30 * * * * root php [$CONF_ROOT]/bin/watchedscan.php
 
 ##: Build user-level archives
 27   * * * * root php [$CONF_ROOT]/bin/archive.php

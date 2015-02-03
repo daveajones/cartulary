@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 47;
+$cg_database_version = 50;
 $cg_database_updates = array();
 
 
@@ -670,6 +670,40 @@ $cg_database_updates[46][] = <<<CGDB0149
  INSERT INTO `dbversion` ( `version` ) VALUES ( '47' )
 CGDB0149;
 //----------------------------------------------------------------------------------------------------------------
+
+//Version 47 to 48 -----------------------------------------------------------------------------------------------
+$cg_database_updates[47][] = <<<CGDB0150
+ ALTER TABLE `prefs` ADD `imap_email` VARCHAR( 254 ) NOT NULL COMMENT 'email address to use for imap'
+CGDB0150;
+$cg_database_updates[47][] = <<<CGDB0151
+ ALTER TABLE `prefs` ADD `imap_port` VARCHAR( 5 ) NOT NULL COMMENT 'imap port override'
+CGDB0151;
+$cg_database_updates[47][] = <<<CGDB0152
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '48' )
+CGDB0152;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 48 to 49 -----------------------------------------------------------------------------------------------
+$cg_database_updates[48][] = <<<CGDB0153
+ ALTER TABLE `prefs` ADD `smtp_server` VARCHAR( 128 ) NOT NULL COMMENT 'host to use for smtp'
+CGDB0153;
+$cg_database_updates[48][] = <<<CGDB0154
+ ALTER TABLE `prefs` ADD `smtp_port` VARCHAR( 5 ) NOT NULL COMMENT 'smtp server port'
+CGDB0154;
+$cg_database_updates[48][] = <<<CGDB0155
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '49' )
+CGDB0155;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 49 to 50 -----------------------------------------------------------------------------------------------
+$cg_database_updates[49][] = <<<CGDB0156
+ ALTER TABLE `prefs` ADD `smtp_secure` TINYINT NOT NULL
+CGDB0156;
+$cg_database_updates[49][] = <<<CGDB0157
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '50' )
+CGDB0157;
+//----------------------------------------------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------------------------------------------
 
 

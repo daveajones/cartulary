@@ -196,11 +196,17 @@
         <div class="divPrefSubmit pull-right divPrefEmail"><img class="imgSpinner imgSpinnerSub" src="/images/spinner.gif" /><span class="message"></span><button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button></div>
         <h3>Email</h3>
         <ul>
-            <li>My IMAP server address is: <input name="imap_server" class="urlinput" type="text" value="<?echo $prefs['imap_server']?>" /></li>
-            <li class="privacy"><label class="checkbox inline"><input name="imap_secure" type="checkbox" <?if ($prefs['imap_secure'] == 1) echo "checked ";?>/> My IMAP server uses secure sockets.</label></li>
+            <li>My IMAP email address is: <input name="imap_email" class="urlinput" type="text" value="<?echo $prefs['imap_email']?>" /></li>
+            <li>My IMAP server address is: <input name="imap_server" id="txtImapServer" class="urlinput" type="text" value="<?echo $prefs['imap_server']?>" /></li>
+            <li class="privacy"><label class="checkbox inline"><input name="imap_secure" id="chkImapSecure" type="checkbox" <?if ($prefs['imap_secure'] == 1) echo "checked ";?>/> My IMAP server uses SSL/TLS.</label></li>
+            <li>My IMAP server port is: <input name="imap_port" id="txtImapPort" class="urlinput" type="text" value="<?if(empty($prefs['imap_port'])) { if ($prefs['imap_secure'] == 1) { echo "993"; } else { echo "143"; } } else { echo $prefs['imap_port']; }?>" /></li>
             <li>My IMAP username is: <input name="imap_username" class="urlinput" type="text" value="<?echo $prefs['imap_username']?>" /></li>
             <li>My IMAP password is: <input name="imap_password" class="urlinput" type="text" value="<?echo $prefs['imap_password']?>" /></li>
             <li>The IMAP folder I want to import from is: <input name="imap_folder" class="urlinput" type="text" value="<?echo $prefs['imap_folder']?>" /></li>
+            <hr>
+            <li>My SMTP server address is: <input name="smtp_server" id="txtSmtpServer" class="urlinput" type="text" value="<?echo $prefs['smtp_server']?>" /></li>
+            <li class="privacy"><label class="checkbox inline"><input name="smtp_secure" id="chkSmtpSecure" type="checkbox" <?if ($prefs['smtp_secure'] == 1) echo "checked ";?>/> My SMTP server uses SSL/TLS.</label></li>
+            <li>My SMTP server port is: <input name="smtp_port" id="txtSmtpPort" class="urlinput" type="text" value="<?if(empty($prefs['smtp_port'])) { if ($prefs['smtp_secure'] == 1) { echo "465"; } else { echo "25"; } } else { echo $prefs['smtp_port']; }?>" /></li>
         </ul>
     </div>
 

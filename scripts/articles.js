@@ -68,14 +68,39 @@ $(document).ready(function () {
         }
     });
 
+    //Set up the article deletion links
+    $('#aEmailImport').click(function () {
+        $('#aEmailImport img').removeClass('fa-envelope').addClass('fa-spinner').addClass('fa-spin');
+        $.ajax({
+            url: '/cgi/in/importEmailsAsArticles',
+            type: "GET",
+            dataType: 'json',
+            success: function (data) {
+                $('#aEmailImport img').removeClass('fa-spinner').addClass('fa-envelope').removeClass('fa-spin');
+                if (data.status == "false") {
+                    showMessage(data.description, data.status, 5);
+                } else {
+                    showMessage(data.count + ' ' + data.description, data.status, 5);
+                    if( data.count > 0 ) {
+                        location.reload();
+                    }
+                }
+            },
+            error: function (data) {
+                $('#aEmailImport img').removeClass('fa-spinner').addClass('fa-envelope').removeClass('fa-spin');
+            }
+        });
+        return false;
+    });
+
     //Set up date pickers
     $('#start-date').datepicker({showOn: "button", buttonImage: "/images/glyph/glyphicons_halflings_108_calendar.png"});
     $('#end-date').datepicker({showOn: "button", buttonImage: "/images/glyph/glyphicons_halflings_108_calendar.png"});
-    <?if($platform == "mobile" || $platform == "tablet") {?>
-        $('.showdatepicker').click( function() {
-        $('#date-line').show();
-        });
-        <?}?>
+        if(platform == "mobile" || platform == "tablet") {
+            $('.showdatepicker').click( function() {
+                $('#date-line').show();
+            });
+        }
         $('#btnSubmitDates').click( function() {
         $('#start-date').prop('disabled', false);
         $('#end-date').prop('disabled', false);

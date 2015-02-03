@@ -158,4 +158,31 @@ $(document).ready(function () {
         $('#divPubriver').toggle($('#chkPubriver').prop("checked"));
     });
     $('#chkPubriver').trigger('change');
+
+    //Toggle imap secure port number if standard
+    $('#chkImapSecure').bind('change', function () {
+        if( $(this).is(':checked') && $('#txtImapPort').val() == "143" ) {
+            $('#txtImapPort').val("993");
+        } else
+        if( !$(this).is(':checked') && $('#txtImapPort').val() == "993" ) {
+            $('#txtImapPort').val("143");
+        }
+    });
+
+    //Toggle smtp secure port number if standard
+    $('#chkSmtpSecure').bind('change', function () {
+        if( $(this).is(':checked') && $('#txtSmtpPort').val() == "25" ) {
+            $('#txtSmtpPort').val("465");
+        } else
+        if( !$(this).is(':checked') && $('#txtSmtpPort').val() == "465" ) {
+            $('#txtSmtpPort').val("25");
+        }
+    });
+
+    //SMTP should stop tracking on imap focus out
+    $('#txtImapServer').bind('blur', function() {
+        if( $('#txtSmtpServer').val() == "" ) {
+            $('#txtSmtpServer').val( $('#txtImapServer').val() );
+        }
+    });
 });

@@ -1,25 +1,25 @@
 // Copyright 2013, Small Picture, Inc.
 var appTypeIcons = {
-	"blogpost": "file-text-alt",
+	"blogpost": "file-text-o",
 	"code": "laptop",
-	"html": "file-text-alt",
-	"include": "share-alt", //5/19/13 by DW
-	"index": "file-text-alt",
-	"link": "bookmark-empty",
-	"outline": "file-text-alt",
+	"html": "file-text-o",
+	"include": "share", //5/19/13 by DW
+	"index": "file-text-o",
+	"link": "bookmark-o",
+	"outline": "file-text-o",
 	"photo": "camera",
-	"presentation": "file-text-alt",
+	"presentation": "file-text-o",
 	"redirect": "refresh",
-	"river": "file-text-alt",
+	"river": "file-text-o",
 	"rss": "rss",
-	"tabs": "file-text-alt",
+	"tabs": "file-text-o",
 	"thread": "comments",
 	"thumblist": "th",
 	"profile": "user", //5/14/13 by DW
 	"calendar": "calendar", //6/3/13 by DW
-	"markdown": "file-text-alt", //6/3/13 by DW
+	"markdown": "file-text-o", //6/3/13 by DW
 	"tweet": "twitter", //6/10/13 by DW
-	"metaWeblogPost": "file-text-alt"
+	"metaWeblogPost": "file-text-o"
 	}
 var initialOpmltext = 
 	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><opml version=\"2.0\"><head><title>Untitled</title></head><body><outline text=\"\"/></body></opml>";

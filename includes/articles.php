@@ -164,9 +164,42 @@ $opmlout .= <<<OPMLOUT1
 </head>
 <body>
 OPMLOUT1;
+    $uniform = preg_replace("/[\r\n]{2,}/", "\n", $article['content']);
 
-    foreach ( explode("</p>", trim( str_replace("\n", '', $article['content'] ))) as $line ) {
-        $opmlout .= "<outline text=\"\"></outline><outline text=\"".xmlentities(trim(strip_tags(str_replace("\n", '', $line), '<a><img>')))."\" />";
+
+    //We need to know if this document had html tags
+    $washtml = FALSE;
+    if($uniform != strip_tags($uniform)) {
+        $washtml = TRUE;
+        loggit(3, "DEBUG: This article has HTML");
+        $parts = preg_split("/(<\/p>|<br>|<br\/>|<\/li>|<hr>|<hr\/>|<\/h1>|<\/h2>|<\/h3>|<\/h4>|<\/h5>)/", $uniform, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+        $sentences = array();
+        for ($i=0, $n=count($parts)-1; $i<$n; $i+=2) {
+            $sentences[] = $parts[$i].$parts[$i+1];
+        }
+        if ($parts[$n] != '') {
+            $sentences[] = $parts[$n];
+        }
+    } else {
+        loggit(3, "DEBUG: This article is plain text.");
+        $sentences = explode("\n", $uniform);
+    }
+
+
+    loggit(3, "DEBUG: ".print_r($sentences,TRUE));
+    //$delims = array("</p>","<br>","<br/>","</li>","<hr>","<hr/>","</h1>","</h2>","</h3>","</h4>","</h5>");
+    //$uniform = str_replace($delims, "[$@$]", trim( str_replace("\n", '', $article['content'] )));
+    
+    foreach ( $sentences as $line ) {
+        if($washtml) {
+            $line = str_replace('<ul>', '', $line);
+            $line = str_replace('<li>', '<ul><li>', $line);
+            $line = str_replace('</li>', '</li></ul>', $line);
+        }
+        $line = str_replace("\n", '', $line);
+        $line = str_replace("\r", '', $line);
+        $opmlout .= "<outline text=\"".xmlentities(trim(strip_tags($line, '<a><b><i><em><u><img><ul><li><h1><h2><h3><h4><h5>')))."\" /><outline text=\"\"></outline>";
     }
 
 $opmlout .= <<<OPMLOUT2
@@ -1173,4 +1206,13 @@ function get_article_static_url($aid = NULL, $uid = NULL)
 
     loggit(1, "Article: [$aid] has static url: [$staticurl] for user: [$uid].");
     return ($staticurl);
+}
+
+
+//Fetch email as articles from an IMAP server
+function imap_fetch_emails_to_articles($uid = NULL, $hostname = "", $username = "", $password = "", $foldername = "") {
+
+
+
+    return $count;
 }

@@ -2084,6 +2084,7 @@ function get_user_time_last_active($uid = NULL)
     return ($la);
 }
 
+
 //Initialize an empty set of prefs for this user
 function init_user_prefs($uid = NULL)
 {
@@ -2196,11 +2197,16 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                   imap_username=?,
                   imap_password=?,
                   imap_folder=?,
-                  imap_secure=?
+                  imap_secure=?,
+                  imap_email=?,
+                  imap_port=?,
+                  smtp_server=?,
+                  smtp_secure=?,
+                  smtp_port=?
            WHERE uid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssds",
+    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdss",
         $prefs['publicdefault'],
         $prefs['publicrss'],
         $prefs['publicopml'],
@@ -2260,6 +2266,11 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
         $prefs['imap_password'],
         $prefs['imap_folder'],
         $prefs['imap_secure'],
+        $prefs['imap_email'],
+        $prefs['imap_port'],
+        $prefs['smtp_server'],
+        $prefs['smtp_secure'],
+        $prefs['smtp_port'],
         $uid
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -2400,6 +2411,56 @@ function s3_is_enabled($uid = NULL)
 
     //Check credentials
     if (!empty($prefs['s3bucket']) && !empty($prefs['s3key']) && !empty($prefs['s3secret'])) {
+        return (TRUE);
+    }
+
+    //At least one pref was bad
+    return (FALSE);
+}
+
+
+//Return true or false if the user has valid imap prefs
+function imap_is_enabled($uid = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "User id given is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Get user prefs
+    $prefs = get_user_prefs($uid);
+
+    //Check credentials
+    if (!empty($prefs['imap_server']) && !empty($prefs['imap_username']) && !empty($prefs['imap_port']) && !empty($prefs['imap_password'])) {
+        return (TRUE);
+    }
+
+    //At least one pref was bad
+    return (FALSE);
+}
+
+
+//Return true or false if the user has valid smtp prefs
+function smtp_is_enabled($uid = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "User id given is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Get user prefs
+    $prefs = get_user_prefs($uid);
+
+    //Check credentials
+    if (!empty($prefs['smtp_server']) && !empty($prefs['smtp_port'])) {
         return (TRUE);
     }
 

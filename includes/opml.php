@@ -1221,6 +1221,51 @@ function get_feeds_from_outline($content = NULL, $max = NULL)
 }
 
 
+//Get and parse out the include nodes from an outline
+function get_includes_from_outline($content = NULL, $max = NULL)
+{
+    //Check params
+    if ($content == NULL) {
+        loggit(2, "The outline content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Parse it
+    libxml_use_internal_errors(true);
+    $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+    libxml_clear_errors();
+
+    //Grab only nodes that have an xmlUrl attribute
+    $feeds = array();
+    $nodes = $x->xpath('//outline[@url and @type="include" or @type="link"]');
+    if (empty($nodes)) {
+        loggit(2, "This outline content didn't have any include nodes.");
+        return (-2);
+    }
+
+    //Run through each node and get the url into an array
+    $count = 0;
+    foreach ($nodes as $entry) {
+        $urls[$count] = $entry->attributes()->url;
+        $count++;
+    }
+
+    //loggit(3, "DEBUG: ".print_r($urls));
+
+    if ($count == 0) {
+        loggit(2, "There were no include nodes in this outline.");
+        return (-2);
+    }
+
+    //Log and leave
+    loggit(3, "Got [$count] include nodes from the outline.");
+    return ($urls);
+}
+
+
 //Get and parse out the pub feeds from a social outline
 function get_pub_feeds_from_outline($content = NULL, $max = NULL, $withattr = FALSE)
 {
@@ -2579,7 +2624,7 @@ function get_recent_files($uid = NULL, $max = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Do the query
-    $sqltxt = "SELECT title, url, time, disqus, wysiwyg FROM $table_recentfiles WHERE userid=?";
+    $sqltxt = "SELECT title, url, time, disqus, wysiwyg, watched FROM $table_recentfiles WHERE userid=?";
 
     $sqltxt .= " ORDER BY time DESC";
 
@@ -2603,7 +2648,7 @@ function get_recent_files($uid = NULL, $max = NULL)
         return (array());
     }
 
-    $sql->bind_result($ftitle, $furl, $ftime, $fdisqus, $fwysiwyg) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched) or loggit(2, "MySql error: " . $dbh->error);
 
     $files = array();
     $count = 0;
@@ -2612,7 +2657,8 @@ function get_recent_files($uid = NULL, $max = NULL)
             'url' => $furl,
             'time' => $ftime,
             'disqus' => $fdisqus,
-            'wysiwyg' => $fwysiwyg
+            'wysiwyg' => $fwysiwyg,
+            'watched' => $fwatched
         );
         $count++;
     }
@@ -2625,7 +2671,59 @@ function get_recent_files($uid = NULL, $max = NULL)
 
 
 //Return a list of files recently edited by this user in the editor
-function get_recent_file_by_url($uid = NULL, $url = NULL)
+function get_watched_files($max = NULL)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT userid, url FROM $table_recentfiles WHERE watched=1";
+
+    $sqltxt .= " ORDER BY time DESC";
+
+    if (!empty($max) && is_numeric($max)) {
+        $sqltxt .= " LIMIT $max";
+    } else {
+        $sqltxt .= " LIMIT $default_max_list";
+    }
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "There are no watched files in the system.");
+        return (array());
+    }
+
+    $sql->bind_result($fuserid, $furl) or loggit(2, "MySql error: " . $dbh->error);
+
+    $files = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $files[$count] = array(
+            'uid' => $fuserid,
+            'url' => $furl
+        );
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning: [$count] watched files.");
+    return ($files);
+}
+
+
+//Return a list of files recently edited by this user in the editor
+function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 {
     //Check parameters
     if (empty($uid)) {
@@ -2644,7 +2742,12 @@ function get_recent_file_by_url($uid = NULL, $url = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Do the query
-    $sqltxt = "SELECT title, url, time, disqus, wysiwyg FROM $table_recentfiles WHERE userid=? AND url=?";
+    if( $blob ) {
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, outline FROM $table_recentfiles WHERE userid=? AND url=?";
+    } else {
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched FROM $table_recentfiles WHERE userid=? AND url=?";
+    }
+
 
     loggit(1, "[$sqltxt]");
     $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
@@ -2660,17 +2763,27 @@ function get_recent_file_by_url($uid = NULL, $url = NULL)
         return (array());
     }
 
-    $sql->bind_result($ftitle, $furl, $ftime, $fdisqus, $fwysiwyg) or loggit(2, "MySql error: " . $dbh->error);
+    if( $blob ) {
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+    } else {
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched) or loggit(2, "MySql error: " . $dbh->error);
+    }
+
 
     $files = array();
     $count = 0;
     while ($sql->fetch()) {
-        $files[$count] = array('title' => $ftitle,
+        $files[$count] = array('id' => $fid,
+            'title' => $ftitle,
             'url' => $furl,
             'time' => $ftime,
             'disqus' => $fdisqus,
-            'wysiwyg' => $fwysiwyg
+            'wysiwyg' => $fwysiwyg,
+            'watched' => $fwatched,
         );
+        if( $blob ) {
+            $files[$count]['content'] = $foutline;
+        }
         $count++;
     }
 
@@ -2682,7 +2795,7 @@ function get_recent_file_by_url($uid = NULL, $url = NULL)
 
 
 //Update a file into the recent files table
-function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE)
+function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE)
 {
     //Check parameters
     if (empty($uid)) {
@@ -2707,6 +2820,11 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     } else {
         $wysiwyg = 1;
     }
+    if (!$watched) {
+        $watched = 0;
+    } else {
+        $watched = 1;
+    }
 
     //Timestamp
     $time = time();
@@ -2717,23 +2835,26 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-    //Database call
+    //Insert recent file entry
     if( empty($oldurl) ) {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched) VALUES (?,?,?,?,?,?,?,?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?, watched=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssdddsdsdd", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $title, $time, $outline, $disqus, $wysiwyg) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsdsddd", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $title, $time, $outline, $disqus, $wysiwyg, $watched) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched) VALUES (?,?,?,?,?,?,?,?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?, watched=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssdddsdssdd", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $title, $time, $outline, $url, $disqus, $wysiwyg) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsdssddd", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched) or loggit(2, "MySql error: " . $dbh->error);
         loggit(3, "User: [$uid] changed old url: [$oldurl] to new url: [$url].");
     }
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $rid = $sql->insert_id;
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
     //Log and return
     loggit(3, "User: [$uid] edited a file: [$url] at: [$title].");
-    return (TRUE);
+    return ($rid);
 }
 
 
@@ -2815,4 +2936,185 @@ function search_editor_files($uid = NULL, $query = NULL, $max = NULL)
 
     loggit(3, "Returning: [$count] editor files for user: [$uid]");
     return ($files);
+}
+
+
+//Update a file into the recent files table
+function add_watched_url($rid = NULL, $url = NULL, $lastmodified = "", $content = "")
+{
+    //Check parameters
+    if (empty($rid)) {
+        loggit(2, "The recent file id is blank or corrupt: [$rid]");
+        return (FALSE);
+    }
+    if (empty($url)) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Insert watched file entry
+    $stmt = "INSERT INTO $table_watched_urls (rid, url, lastmodified, content)
+             VALUES (?,?,?,?)
+             ON DUPLICATE KEY UPDATE rid=?, lastmodified=?, content=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("dsssdss", $rid, $url, $lastmodified, $content, $rid, $lastmodified, $content) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "Added url: [$url] from recent file: [$rid] to watched url table.");
+    return (TRUE);
+}
+
+
+//Return a list of files recently edited by this user in the editor
+function get_watched_urls($max = NULL)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT urls.rid, urls.url, urls.lastmodified, files.userid
+               FROM $table_watched_urls as urls
+               JOIN $table_recentfiles as files ON urls.rid = files.id";
+
+    $sqltxt .= " ORDER BY time DESC";
+
+    if (!empty($max) && is_numeric($max)) {
+        $sqltxt .= " LIMIT $max";
+    } else {
+        $sqltxt .= " LIMIT $default_max_list";
+    }
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "There are no watched files in the system.");
+        return (array());
+    }
+
+    $sql->bind_result($frid, $furl, $flastmod, $fuid) or loggit(2, "MySql error: " . $dbh->error);
+
+    $files = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $files[$count] = array(
+            'rid' => $frid,
+            'url' => $furl,
+            'lastmodified' => $flastmod,
+            'uid' => $fuid
+        );
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning: [$count] watched files.");
+    return ($files);
+}
+
+
+//Return information about a watched url
+function get_watched_url_by_url($url = NULL)
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT urls.rid, urls.url, urls.lastmodified, files.userid, urls.content
+               FROM $table_watched_urls as urls
+               JOIN $table_recentfiles as files ON urls.rid = files.id
+               WHERE urls.url = ?";
+
+    $sqltxt .= " ORDER BY time DESC";
+
+    if (!empty($max) && is_numeric($max)) {
+        $sqltxt .= " LIMIT $max";
+    } else {
+        $sqltxt .= " LIMIT $default_max_list";
+    }
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "Url: [$url] is not in the watch list.");
+        return (array());
+    }
+
+    $sql->bind_result($frid, $furl, $flastmod, $fuid, $fcontent) or loggit(2, "MySql error: " . $dbh->error);
+
+    $files = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $files[$count] = array(
+            'rid' => $frid,
+            'url' => $furl,
+            'lastmodified' => $flastmod,
+            'uid' => $fuid,
+            'content' => $fcontent
+        );
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning info about url: [$url]");
+    return ($files[0]);
+}
+
+
+//Retrieve an array of info about an outline
+function remove_watched_urls_by_file_id($id = NULL)
+{
+    //Check parameters
+    if (empty($id)) {
+        loggit(2, "The file id given is corrupt or blank: [$id]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the sid in the session table
+    $sql = $dbh->prepare("DELETE FROM $table_watched_urls WHERE rid=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $id) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //loggit(3,"Returning info for outline: [$id]");
+    return (TRUE);
 }

@@ -11,6 +11,7 @@
 .icon-remove-small { display:inline-block; background:url('/images/glyph/glyphicons_halflings_086_remove.png') 3px 3px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .icon-share { background:url('/images/glyph/glyphicons_222_share.png') 0px 1px no-repeat; width:24px; height:24px; border:0; margin-right:8px; }
 .icon-rss { display:inline-block; background:url('/images/glyph/glyphicons_397_rss.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
+.icon-email-import { display:inline-block; background:url('/images/glyph/glyphicons_010_envelope-import.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
 .icon-html { display:inline-block; background:url('/images/glyph/glyphicons_329_web_browser.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
 .icon-opml { display:inline-block; background:url('/images/glyph/glyphicons_359_file_export.png') 2px 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
 .icon-editor { display:inline-block; background:url('/images/glyph/glyphicons_039_notes.png') 4px 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
@@ -54,6 +55,7 @@
 .btnFeedNotHidden { display:inline-block; background:url('/images/glyph/glyphicons_halflings_104_eye_open.png') 0 4px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .btnFeedNotFullText { display:inline-block; background:url('/images/glyph/glyphicons_halflings_050_text-width.png') 0 4px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .btnFeedFullText { display:inline-block; background:url('/images/glyph/glyphicons_halflings_049_text-height.png') 0 4px no-repeat; width:20px; height:20px; border:none; outline:none; }
+.icon-refreshing { display:inline-block; background:url('/images/glyph/glyphicons_365_restart.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
 
 /* Navbar icons */
 .icn-nav-home { display:inline-block; background:url('/images/glyph/glyphicons_020_home.png') 0px 0px no-repeat; width:30px; height:28px; border:0; }
@@ -66,3 +68,17 @@
 .icn-nav-admin-user { display:inline-block; background:url('/images/glyph/glyphicons_024_parents.png') 0px 1px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-admin-feed { display:inline-block; background:url('/images/glyph/glyphicons_114_list.png') 0px 1px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-search { display:inline-block; background:url('/images/glyph/glyphicons_027_search.png') 4px 2px no-repeat; width:30px; height:28px; border:0; }
+
+/* Animated rotating icon */
+.icon-spinning {
+    display: inline-block;
+    -moz-animation: spin 2s infinite linear;
+    -o-animation: spin 2s infinite linear;
+    -webkit-animation: spin 2s infinite linear;
+    animation: spin 2s infinite linear;
+}
+/* Prevent stack and spinners from being taken inline when inside a link */
+a .icon-spinning {
+    display: inline-block;
+    text-decoration: none;
+}

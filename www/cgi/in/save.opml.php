@@ -49,6 +49,12 @@ if ( isset($_REQUEST['wysiwyg']) && $_REQUEST['wysiwyg'] == "true" ) {
     $wysiwyg = TRUE;
 }
 
+//Get watched bool
+$watched = FALSE;
+if ( isset($_REQUEST['watched']) && $_REQUEST['watched'] == "true" ) {
+    $watched = TRUE;
+}
+
 //Make sure we have a filename to use
 if ( isset($_REQUEST['filename']) ) {
     $filename = $_REQUEST['filename'];
@@ -121,7 +127,8 @@ if(!$s3res) {
 }
 
 //Update recent file table
-update_recent_file($uid, $s3url, $title, $opml, $s3oldurl, $disqus, $wysiwyg);
+$rid = update_recent_file($uid, $s3url, $title, $opml, $s3oldurl, $disqus, $wysiwyg, $watched);
+loggit(3, "DEBUG: Recent file id is [$rid].");
 
 //Go ahead and put in the urls we saved
 $jsondata['url'] = $s3url;
@@ -182,6 +189,21 @@ if( !empty($rhost) ) {
             loggit(3, "DEBUG: Wrote html to S3 at url: [$redhtml].");
         }
     }
+}
+
+//Extract and add watched urls if this is a watched outline
+if($watched) {
+    $includes = get_includes_from_outline($opml);
+    foreach( $includes as $include ) {
+        $u = get_watched_url_by_url($include);
+        if( empty($u) ) {
+            $u['lastmodified'] = "";
+            $u['content'] = "";
+        }
+        add_watched_url($rid, $include, $u['lastmodified'], $u['content']);
+    }
+} else {
+    remove_watched_urls_by_file_id($rid);
 }
 
 //Log it

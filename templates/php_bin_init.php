@@ -13,7 +13,7 @@
   require_once "$confroot/$includes/net.php";
   require_once "$confroot/$includes/subscribe.php";
   require_once "$confroot/$includes/outline.php";
+  require_once "$confroot/$includes/email.php";
 
   //Set the right timezone
   date_default_timezone_set($default_timezone);
-?>

@@ -102,6 +102,7 @@ if( !empty($opmldata) ) {
     <?}?>
     var includeDisqus = <?if(!isset($seenfile) || $seenfile[0]['disqus'] == 0) { echo "false"; } else { echo "true"; }?>;
     var wysiwygOn = <?if(!isset($seenfile) || $seenfile[0]['wysiwyg'] == 0) { echo "false"; } else { echo "true"; }?>;
+    var watchedOutline = <?if(!isset($seenfile) || $seenfile[0]['watched'] == 0) { echo "false"; } else { echo "true"; }?>;
     <?if( isset($badurl) ) {?>
     badurl = true;
     <?}?>
@@ -141,7 +142,7 @@ if( !empty($opmldata) ) {
     <div class="divOutlineTitle">
         <input class="rendertitle" checked="checked" type="checkbox" title="Render title and byline in the HTML?" /> <input class="title" placeholder="Title" type="text" />
     </div>
-    <div class="loading" style="display:none;"><i class="icon-refresh icon-spin"></i> Loading...</div>
+    <div class="loading" style="display:none;"><i class="fa fa-refresh fa-spin"></i> Loading...</div>
     <div class="outlineinfo pull-right"></div>
 
     <div class="divOutlinerContainer">

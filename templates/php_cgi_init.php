@@ -14,6 +14,7 @@
   require_once "$confroot/$includes/subscribe.php";
   require_once "$confroot/$includes/outline.php";
   require_once "$confroot/$includes/search.php";
+  require_once "$confroot/$includes/email.php";
 
 
   //Is a database upgrade in progress?
@@ -75,4 +76,3 @@
   $g_myname = get_user_name_from_uid($g_uid);
   $username = $g_myname;
   $g_myemail = get_email_from_uid($g_uid);
-?>

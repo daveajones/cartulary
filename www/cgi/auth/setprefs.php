@@ -73,6 +73,11 @@ if ( isset($_POST['imap_username']) ) { $imap_username = $_POST['imap_username']
 if ( isset($_POST['imap_password']) ) { $imap_password = $_POST['imap_password']; } else { $imap_password = ""; };
 if ( isset($_POST['imap_folder']) ) { $imap_folder = $_POST['imap_folder']; } else { $imap_folder = ""; };
 if ( isset($_POST['imap_secure']) ) { $imap_secure = 1; } else { $imap_secure = 0; };
+if ( isset($_POST['imap_email']) ) { $imap_email = $_POST['imap_email']; } else { $imap_email = ""; };
+if ( isset($_POST['imap_port']) ) { $imap_port = $_POST['imap_port']; } else { $imap_port = ""; };
+if ( isset($_POST['smtp_server']) ) { $smtp_server = $_POST['smtp_server']; } else { $smtp_server = ""; };
+if ( isset($_POST['smtp_secure']) ) { $smtp_secure = 1; } else { $smtp_secure = 0; };
+if ( isset($_POST['smtp_port']) ) { $smtp_port = $_POST['smtp_port']; } else { $smtp_port = ""; };
 $jsondata = array();
 $jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
@@ -782,6 +787,61 @@ if( ($imap_secure < 0) || ($imap_secure > 1) ) {
     exit(1);
 }
 $prefs['imap_secure'] = $imap_secure;
+
+$jsondata['prefname'] = "imap_email";
+if( strlen($imap_email) > 254 ) {
+    //Log it
+    loggit(2,"The value for imap email was too long: [$imap_email]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max imap email length is 254 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['imap_email'] = $imap_email;
+
+$jsondata['prefname'] = "imap_port";
+if( ($imap_port < 1) || ($imap_port > 65535) || !is_numeric($imap_port) ) {
+    //Log it
+    loggit(2,"The value for imap port is out of range: [$imap_port]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "IMAP port has to be between 1 and 65535.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['imap_port'] = $imap_port;
+
+$jsondata['prefname'] = "smtp_server";
+if( strlen($smtp_server) > 128 ) {
+    //Log it
+    loggit(2,"The value for smtp server was too long: [$smtp_server]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max smtp server length is 128 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['smtp_server'] = $smtp_server;
+
+$jsondata['prefname'] = "smtp_secure";
+if( ($smtp_secure < 0) || ($smtp_secure > 1) ) {
+    //Log it
+    loggit(2,"The value for smtp_secure pref was not within acceptable range: [$smtp_secure]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Value of pref is out of range.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['smtp_secure'] = $smtp_secure;
+
+$jsondata['prefname'] = "smtp_port";
+if( ($smtp_port < 1) || ($smtp_port > 65535) || !is_numeric($smtp_port) ) {
+    //Log it
+    loggit(2,"The value for smtp port is out of range: [$smtp_port]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Smtp port has to be between 1 and 65535.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['smtp_port'] = $smtp_port;
 //--------------------------------------------------------
 //--------------------------------------------------------
 

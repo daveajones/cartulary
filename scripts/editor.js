@@ -8,6 +8,7 @@ $(document).ready(function () {
     var sheetimport = $('#divEditSheetImport');
     var chkToggleRender = $('.rendertoggle');
     var chkDisqusInclude = $('.menuDisqusToggle');
+    var chkToggleWatch = $('.menuWatchToggle');
     var menubar = $('#menubarEditor');
     var elTitle = $('.divOutlineTitle input.title');
 
@@ -33,7 +34,7 @@ $(document).ready(function () {
                 filename = result.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
 
                 //Save the file
-                saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, opOutlineToXml(ownerName, ownerEmail));
+                saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, watchedOutline, opOutlineToXml(ownerName, ownerEmail));
             }
         });
         $('#dropdownSave').dropdown('toggle');
@@ -58,7 +59,7 @@ $(document).ready(function () {
         lasttitle = title;
 
         //Save the file
-        saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, opOutlineToXml(ownerName, ownerEmail));
+        saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, watchedOutline, opOutlineToXml(ownerName, ownerEmail));
         $('#dropdownSave').dropdown('hide');
         return false;
     });
@@ -303,6 +304,17 @@ $(document).ready(function () {
         }
     });
 
+    //Toggle watch this outline
+    chkToggleWatch.click(function () {
+        if ( $(this).parent().hasClass('active') ) {
+            $(this).parent().removeClass('active');
+            watchedOutline = false;
+        } else {
+            $(this).parent().addClass('active');
+            watchedOutline = true;
+        }
+    });
+
     //Toolbox buttons
     menubar.find('.menuAddLink').click(function () {
         editorToolAddLink();
@@ -540,6 +552,9 @@ $(document).ready(function () {
                     outliner.concord().op.setRenderMode(true);
                     chkToggleRender.parent().addClass('active');
                 }
+                if ( watchedOutline ) {
+                    chkToggleWatch.parent().addClass('active');
+                }
                 loading.hide();
             }
         });
@@ -640,7 +655,7 @@ $(document).ready(function () {
     $('#divEditorEnclosures').offset({top:0,left:0}).offset( $('#divEditOutline').offset() );
 
     //Save a file
-    function saveFile(ftitle, fname, fmode, fredirect, fdisqus, fwysiwyg, fopml, foldname) {
+    function saveFile(ftitle, fname, fmode, fredirect, fdisqus, fwysiwyg, fwatched, fopml, foldname) {
         var _foldname = (typeof foldname === "undefined") ? "" : foldname;
         var menubar = $('#menubarEditor');
 
@@ -662,6 +677,7 @@ $(document).ready(function () {
                 "redirect": fredirect,
                 "disqus": fdisqus,
                 "wysiwyg": fwysiwyg,
+                "watched" : fwatched,
                 "title": ftitle,
                 "rendertitle": rendertitle
             },
@@ -669,7 +685,7 @@ $(document).ready(function () {
             beforeSend: function () {
                 //Disable the save button and show a spinner
                 menubar.find('.saves').attr('disabled', true);
-                menubar.find('#dropdownSave').html('<i class="icon-spinner"></i> Saving...');
+                menubar.find('#dropdownSave').html('<i class="fa fa-spinner"></i> Saving...');
             },
             success: function (data) {
                 //Show returned info and re-enable the save button
@@ -898,16 +914,16 @@ $(document).ready(function () {
         menubar.find('.menubar li.extLink').remove();
         menubar.find('.menubar li.extEditLink').remove();
         if ( nodetype == "include" || nodetype == "import" ) {
-            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="icon-external-link" style="color:#090;"></i></a></li>');
-            menubar.find('.menubar').append('<li class="extEditLink"><a target="_blank" href="/editor?url=' + op.attributes.getOne('url') + '"><i class="icon-edit-sign" style="color:#090;"></i></a></li>');
+            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
+            menubar.find('.menubar').append('<li class="extEditLink"><a target="_blank" href="/editor?url=' + op.attributes.getOne('url') + '"><i class="fa fa-edit" style="color:#090;"></i></a></li>');
             return true;
         }
         if ( nodetype == "link" ) {
-            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="icon-external-link" style="color:#090;"></i></a></li>');
+            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
             return true;
         }
         if ( nodetype == "rss" ) {
-            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('xmlUrl') + '"><i class="icon-external-link" style="color:#090;"></i></a></li>');
+            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('xmlUrl') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
             return true;
         }
 

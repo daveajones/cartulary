@@ -464,7 +464,8 @@ $(document).ready(function () {
                 morsestring = new String(morsestring);
             }
 
-            morsestring.replace(/[\W_\.\?]+/g," ");
+            morsestring = stripTags(morsestring);
+            morsestring.replace(/[^a-zA-Z 0-9?.]+/g,'');
             morsestring = morsestring.toLowerCase().split("");
 
             //Initialize values according to current speed
@@ -479,6 +480,7 @@ $(document).ready(function () {
 
 
         morsestring.forEach(function(letter) {
+            console.log("STarting letter: [" + letter + "]");
             if( letter !== " ") nextStep += clGap;
             if( letter === " ") {
                 nextStep += cwGap;

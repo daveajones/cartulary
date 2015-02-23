@@ -126,6 +126,24 @@ if(!$s3res) {
     loggit(1, "Wrote html to S3 at url: [$s3html].");
 }
 
+//Put the myword json in S3
+$jsonfilename = str_replace('.opml', '.json', $filename);
+$s3jsonurl = get_s3_url($uid, "/json/", $jsonfilename);
+$jsdata = convert_opml_to_myword($opml);
+$s3res = putInS3($jsdata, $jsonfilename, $s3info['bucket']."/json", $s3info['key'], $s3info['secret'], "application/json");
+if(!$s3res) {
+    loggit(2, "Could not create S3 file: [$jsonfilename] for user: [$uid].");
+    loggit(3, "Could not create S3 file: [$jsonfilename] for user: [$uid].");
+    //Log it
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Error writing JSON to S3.";
+    echo json_encode($jsondata);
+    exit(1);
+} else {
+    $s3json = get_s3_url($uid, "/json/", $jsonfilename);
+    loggit(1, "Wrote json to S3 at url: [$s3json].");
+}
+
 //Update recent file table
 $rid = update_recent_file($uid, $s3url, $title, $opml, $s3oldurl, $disqus, $wysiwyg, $watched);
 loggit(3, "DEBUG: Recent file id is [$rid].");
@@ -133,6 +151,7 @@ loggit(3, "DEBUG: Recent file id is [$rid].");
 //Go ahead and put in the urls we saved
 $jsondata['url'] = $s3url;
 $jsondata['html'] = $s3html;
+$jsondata['json'] = $s3json;
 
 //Update the redirector table
 if( !empty($rhost) ) {
@@ -192,6 +211,7 @@ if( !empty($rhost) ) {
 }
 
 //Extract and add watched urls if this is a watched outline
+remove_watched_urls_by_file_id($rid);
 if($watched) {
     $includes = get_includes_from_outline($opml);
     foreach( $includes as $include ) {
@@ -202,8 +222,6 @@ if($watched) {
         }
         add_watched_url($rid, $include, $u['lastmodified'], $u['content']);
     }
-} else {
-    remove_watched_urls_by_file_id($rid);
 }
 
 //Log it

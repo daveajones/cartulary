@@ -96,7 +96,7 @@ function getFilenameFromPart($part) {
 
 //Send an email using PHPMailer
 //__via: http://help.mandrill.com/entries/23737696-How-do-I-send-with-PHPMailer-
-function send_url_change_email($uid = NULL, $url = "", $username = "Freedom Controller")
+function send_url_change_email($uid = NULL, $url = "", $username = "Freedom Controller", $extra = "")
 {
     //Check params
     if ( empty($uid) ) {
@@ -110,6 +110,14 @@ function send_url_change_email($uid = NULL, $url = "", $username = "Freedom Cont
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Structure for extra content if any
+    $more="";
+    if( !empty($extra) ) {
+        $more .= "<br><br><hr><br><br>".$extra;
+    } else {
+        $more .= "<br><br><hr><br><br><b>No change preview available.</b>";
+    }
 
     $prefs = get_user_prefs($uid);
 
@@ -126,7 +134,7 @@ function send_url_change_email($uid = NULL, $url = "", $username = "Freedom Cont
     $mail->Password = $prefs['imap_password'];
     $mail->SetFrom($prefs['imap_email'], $username);
     $mail->Subject = 'FC - URL Change Notice';
-    $mail->Body = "The content at: [$url] has changed.<br><br>View it <a href=\"$system_url/editor?url=$url\">here</a>.";
+    $mail->Body = "The content at: [$url] has changed.<br><br>View it <a href=\"$system_url/editor?url=$url\">here</a>.<br><br>A best guess at the content of what changed is below.".$more;
     $mail->IsHTML(true);
     $mail->AddAddress($prefs['imap_email']);
     $mail->Send();

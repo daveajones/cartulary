@@ -68,13 +68,16 @@ $(document).ready(function () {
         }
     });
 
-    //Set up the article deletion links
+    //Email importing
     $('#aEmailImport').click(function () {
         $('#aEmailImport img').removeClass('fa-envelope').addClass('fa-spinner').addClass('fa-spin');
         $.ajax({
             url: '/cgi/in/importEmailsAsArticles',
             type: "GET",
             dataType: 'json',
+            beforeSend: function () {
+                  showMessage("<i class='fa-spinner fa-spin'></i> Retrieving emails...", 99);
+            },
             success: function (data) {
                 $('#aEmailImport img').removeClass('fa-spinner').addClass('fa-envelope').removeClass('fa-spin');
                 if (data.status == "false") {

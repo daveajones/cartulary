@@ -79,7 +79,7 @@ if( !empty($opmldata) ) {
 <link rel="stylesheet" href="/style/font-awesome.css" />
 <?include "$confroot/$templates/$template_html_styles"?>
 <?include "$confroot/$templates/$template_html_scripts"?>
-
+<script src="/script/webaudio_tools.js"></script>
 <script>
     //Globals
     var mode = '<?echo $mode?>';

@@ -123,6 +123,7 @@
                         <li><a href="#" class="menuTypeSelection menuTypeMenu" title="A menu bar structure." data-type="menu">Menu</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeLink" title="Link to a url." data-type="link">Link</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeInclude" title="Bring in another outline's content." data-type="include">Include</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeImage" title="Add an image node to the outline." data-type="image">Image</a></li>
                     </ul>
                 </li>
                 <li class="<?if(!empty($rhost)){echo "active";}?>"><a class="menuRedirect" href="#" <?if(!empty($rhost)){echo "data-redirect=\"".$rhost."\"";}?> title="Set a dns redirect for this document.">Redirect<?if(!empty($rhost)){echo ": ".$rhost;}?></a></li>
@@ -132,6 +133,7 @@
                 <li><a class="menuImportOutline" href="#" title="Import an outline into this node."><i class="fa fa-sign-in"></i></a></li>
                 <li><a class="menuInsertFiles" href="#" title="Insert files into this outline."><i class="fa fa-paperclip"></i></a></li>
                 <li><a class="menuArchiveNodes" href="#" title="Archive selected nodes."><i class="fa fa-archive"></i></a></li>
+                <li><a class="menuGenerateMorse" href="#" title="Generate morse tones for this article."><i class="fa fa-tty"></i></a></li>
             </ul>
             <ul class="nav pull-right outlineinfo"></ul>
         </div>

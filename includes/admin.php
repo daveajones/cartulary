@@ -88,7 +88,7 @@ function create_user($email = NULL, $silent = NULL, $inside = NULL, $active = NU
 
     //Send the email
     if ($silent != TRUE) {
-        send_newuser_email($email, $password);
+        //send_newuser_email($email, $password);
     }
 
     //Create an initial prefs entry

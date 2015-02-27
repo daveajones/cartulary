@@ -195,7 +195,7 @@ function get_feed_link($content = NULL)
 }
 
 
-//Does the feed contain a microblog:avatar or sopml:avatar?
+//Does the feed contain a source:avatar or sopml:avatar?
 function get_feed_avatar($x = NULL)
 {
     //Check parameters
@@ -211,14 +211,14 @@ function get_feed_avatar($x = NULL)
     $namespaces = $x->getDocNamespaces();
 
     //If there's no namespace
-    if (!isset($namespaces['microblog'])) {
+    if (!isset($namespaces['source'])) {
         //None of the tests passed so return FALSE
         loggit(1, "No microblog namespace defined for this feed.");
         return (FALSE);
     }
 
     //Search for an avatar
-    $ns_microblog = $x->channel->children($namespaces['microblog']);
+    $ns_microblog = $x->channel->children($namespaces['source']);
     if (isset($ns_microblog->avatar)) {
         $url = $ns_microblog->avatar;
         loggit(1, "The avatar of this feed is at: [$url].");
@@ -2460,11 +2460,11 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                 loggit(1, "add_feed_item(): using scripting2:source as the origin: " . print_r($scripting2, TRUE));
             }
         }
-        if (isset($namespaces['microblog'])) {
-            $microblog = $item->children($namespaces['microblog']);
+        if (isset($namespaces['source'])) {
+            $microblog = $item->children($namespaces['source']);
             if (isset($microblog->linkFull)) {
                 $origin = (string)trim($microblog->linkFull);
-                loggit(1, "add_feed_item(): using microblog:linkFull as the origin: " . print_r($microblog, TRUE));
+                loggit(1, "add_feed_item(): using source:linkFull as the origin: " . print_r($microblog, TRUE));
             }
         }
         if (isset($namespaces['sopml'])) {

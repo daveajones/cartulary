@@ -766,7 +766,7 @@ function build_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles = 
     $title = get_cartulary_title($uid);
 
     //The feed string
-    $rss = '<?xml version="1.0"?>' . "\n  <rss version=\"2.0\" xmlns:sopml=\"http://v1.sopml.com/\" xmlns:microblog=\"http://microblog.reallysimple.org/\">\n    <channel>";
+    $rss = '<?xml version="1.0"?>' . "\n  <rss version=\"2.0\" xmlns:sopml=\"http://v1.sopml.com/\" xmlns:source=\"http://source.smallpict.com/2014/07/12/theSourceNamespace.html\">\n    <channel>";
 
     $rss .= "\n
       <title>$title</title>
@@ -784,7 +784,7 @@ function build_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles = 
     }
 
     if (!empty($prefs['avatarurl'])) {
-        $rss .= "      <microblog:avatar>" . $prefs['avatarurl'] . "</microblog:avatar>\n";
+        $rss .= "      <source:avatar>" . $prefs['avatarurl'] . "</source:avatar>\n";
         $rss .= "      <sopml:avatar>" . $prefs['avatarurl'] . "</sopml:avatar>\n";
     }
 
@@ -809,7 +809,7 @@ function build_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles = 
         <pubDate>" . date("D, d M Y H:i:s O", $article['createdon']) . "</pubDate>
         <guid>" . htmlspecialchars($rssurl) . "</guid>
         <sopml:origin>" . htmlspecialchars($linkfull) . "</sopml:origin>
-        <microblog:linkFull>" . htmlspecialchars($linkfull) . "</microblog:linkFull>\n";
+        <source:linkFull>" . htmlspecialchars($linkfull) . "</source:linkFull>\n";
         if (!empty($article['sourceurl']) || !empty($article['sourcetitle'])) {
             $rss .= '
         <source url="' . htmlspecialchars(trim($article['sourceurl'])) . '">' . htmlspecialchars(trim($article['sourcetitle'])) . '</source>' . "\n";

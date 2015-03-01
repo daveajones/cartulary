@@ -142,6 +142,7 @@ if(!$s3res) {
 } else {
     $s3json = get_s3_url($uid, "/json/", $jsonfilename);
     loggit(1, "Wrote json to S3 at url: [$s3json].");
+    set_s3_bucket_cors($s3info['key'], $s3info['secret'], $s3info['bucket']);
 }
 
 //Update recent file table

@@ -2143,7 +2143,7 @@ function transform_opml_to_html($content = NULL)
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-    loggit(3, "DEBUG:\n[$content]");
+    //loggit(3, "DEBUG:\n[$content]");
 
     $content = "<body>$content</body>";
 
@@ -2152,7 +2152,8 @@ function transform_opml_to_html($content = NULL)
   <xsl:param name="owner" select="'Owner Name'"/>
   <xsl:output method="html" encoding="iso-8859-1" indent="yes"/>
 
-<xsl:variable name="markerNormal">&#9658;</xsl:variable>
+<xsl:variable name="markerNormal">&#9656;</xsl:variable>
+<xsl:variable name="markerClosed">&#9662;</xsl:variable>
 <xsl:variable name="markerComment">&#8810;</xsl:variable>
 <xsl:variable name="markerLink">&#9788;</xsl:variable>
 
@@ -3229,7 +3230,7 @@ function get_watched_url_users_by_url($url = NULL)
     $sqltxt = "SELECT files.userid
                FROM $table_watched_urls as urls
                JOIN $table_recentfiles as files ON urls.rid = files.id
-               WHERE urls.url = ?";
+               WHERE urls.url = ? GROUP BY files.userid";
 
     $sqltxt .= " ORDER BY files.userid ASC";
 
@@ -3312,6 +3313,7 @@ function diff_opml($opml1 = "", $opml2 = "")
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
     $diff = diff(explode("\n",$opml1),explode("\n",$opml2));
+    echo print_r($diff, TRUE)."\n";
     $changed = "";
 
     $bodygo = FALSE;
@@ -3333,7 +3335,7 @@ function diff_opml($opml1 = "", $opml2 = "")
         }
     }
 
-    loggit(1, print_r($diff, TRUE));
+    echo print_r("DEBUG [changed]: ".$changed, TRUE)."\n";
     return($changed);
 }
 
@@ -3411,7 +3413,7 @@ function convert_opml_to_myword($content = NULL, $max = NULL)
     }
 
     //Grab outline nodes
-    $nodes = $x->xpath('//outline');
+    $nodes = $x->xpath('//outline[not(ancestor-or-self::outline[@type="menu" or @type="collaborate"])]');
     if (empty($nodes)) {
         loggit(2, "This outline content didn't have any outline nodes.");
         return (-2);

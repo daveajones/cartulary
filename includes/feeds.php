@@ -275,7 +275,7 @@ function feed_exists($url = NULL)
     //See if any rows came back
     if ($sql->num_rows() < 1) {
         $sql->close();
-        loggit(3, "The feed at url: [$url] does not exist in the repository.");
+        loggit(1, "The feed at url: [$url] does not exist in the repository.");
         return (FALSE);
     }
     $sql->bind_result($feedid) or loggit(2, "MySql error: " . $dbh->error);
@@ -997,7 +997,7 @@ function flip_purge_to_old($fid = NULL)
 
     //Now that we have a good id, put the article into the database
     $stmt = "UPDATE $table_nfitem SET `old`=1 WHERE feedid=? AND `purge`=1";
-    $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
+    $sql = $dbh->prepare($stmt) or loggit(2, $dbh->error);
     $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $updcount = $sql->affected_rows;
@@ -1026,7 +1026,7 @@ function mark_river_as_updated($uid = NULL)
 
     //Now that we have a good id, put the article into the database
     $stmt = "UPDATE $table_river SET updated=1 WHERE userid=?";
-    $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
+    $sql = $dbh->prepare($stmt) or loggit(2, $dbh->error);
     $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $updcount = $sql->affected_rows;
@@ -1606,7 +1606,7 @@ function fetch_feed_content($fid = NULL, $force = TRUE)
     mark_feed_as_updated($fid);
 
     //Log and leave
-    loggit(3, "Fetched: [$consize] new bytes of content for feed: [$goodurl].");
+    loggit(1, "Fetched: [$consize] new bytes of content for feed: [$goodurl].");
     return ($consize);
 }
 
@@ -1697,7 +1697,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     loggit(1, "DEBUG: Pubdate: [$pubdate]");
     if ($feed['pubdate'] == $pubdate && !empty($pubdate) && $force == FALSE) {
         //The feed says that it hasn't been updated
-        loggit(3, "The pubdate in the feed has not changed.");
+        loggit(1, "The pubdate in the feed has not changed.");
         $stats['checktime'] += (time() - $fstart);
         set_feed_stats($fid, $stats);
         //return (-3);
@@ -3119,7 +3119,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
             }
         }
     } else {
-        loggit(3, "Skipping S3 upload of river json since user wants it private.");
+        loggit(1, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");
@@ -4380,7 +4380,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
             }
         }
     } else {
-        loggit(3, "Skipping S3 upload of river json since user wants it private.");
+        loggit(1, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");
@@ -4403,7 +4403,7 @@ function build_river_json3($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     require_once "$confroot/$libraries/s3/S3.php";
     require_once "$confroot/$includes/opml.php";
 
-    loggit(3, "DEBUG: build_river_json3($uid, $max, $force, $mobile)");
+    loggit(1, "DEBUG: build_river_json3($uid, $max, $force, $mobile)");
 
     //Get the users prefs
     $prefs = get_user_prefs($uid);
@@ -4783,7 +4783,7 @@ function build_river_json3($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
             }
         }
     } else {
-        loggit(3, "Skipping S3 upload of river json since user wants it private.");
+        loggit(1, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");
@@ -5119,7 +5119,7 @@ function build_river_json4($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
             }
         }
     } else {
-        loggit(3, "Skipping S3 upload of river json since user wants it private.");
+        loggit(1, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");

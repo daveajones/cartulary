@@ -273,12 +273,28 @@ $(document).ready(function () {
             opSetOneAtt('type', thistype);
         }
 
+        //None type
+        if( thistype == 'none' ) {
+            outliner.concord().op.attributes.removeOne('icon');
+            outliner.concord().op.attributes.removeOne('type');
+            outliner.concord().op.attributes.removeOne('url');
+        }
+
         //Image type node
         if( thistype == 'image' ) {
             if( !opGetOneAtt('url') ) {
                 var text = opGetLineText();
                 var match = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/.exec(text);
-                opSetOneAtt('url', match[0]);
+                if( match !== null ) {
+                    opSetOneAtt('url', match[0]);
+                } else {
+                    bootbox.prompt("What is the url of the image?", function (result) {
+                        if ( result !== null ) {
+                            opSetOneAtt('type', thistype);
+                            opSetOneAtt('url', result);
+                        }
+                    });
+                }
             }
             opSetOneAtt('icon', 'image');
         }

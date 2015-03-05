@@ -863,6 +863,84 @@ class S3
 	}
 
 
+    /**
+     * Put a CORS configuration on a bucket
+     *
+     * @param string $bucket Bucket name
+     * @param string $origins The origins to allow requests from
+     * @param string $methods The methods allowed on this bucket
+     * @param string $age Cache age for pre-flight OPTIONS response
+     * @param string $headers Headers that are allowed from the browser
+     * @param string $exposed Headers to give back to the client
+     * @return boolean
+     */
+    public static function setBucketCrossOriginConfiguration($bucket = NULL, $origins = array("*"), $methods = array("GET"), $age = 3000, $headers = array("*"), $exposed = array())
+    {
+        $rest = new S3Request('PUT', $bucket, '', self::$endpoint);
+
+        if( empty($bucket) || empty($origins) || empty($methods) || !is_numeric($age) || empty($headers) ) {
+            self::__triggerError("S3::getBucketCrossOriginConfiguration({$bucket},{$origins},{$methods},{$age},{$headers},{$exposed}): Empty parameter.", __FILE__, __LINE__);
+            return false;
+        }
+
+        $dom = new DOMDocument;
+        $CORSConfiguration = $dom->createElement('CORSConfiguration');
+        $CORSRule = $dom->createElement('CORSRule');
+        foreach($origins as $origin) {
+            $CORSRule->appendChild($dom->createElement('AllowedOrigin', $origin));
+        }
+        foreach($methods as $method) {
+            $CORSRule->appendChild($dom->createElement('AllowedMethod', $method));
+        }
+        foreach($headers as $header) {
+            $CORSRule->appendChild($dom->createElement('AllowedHeader', $header));
+        }
+        foreach($exposed as $expose) {
+            $CORSRule->appendChild($dom->createElement('ExposeHeader', $expose));
+        }
+        $CORSRule->appendChild($dom->createElement('MaxAgeSeconds', $age));
+        $CORSConfiguration->appendChild($CORSRule);
+        $dom->appendChild($CORSConfiguration);
+        $rest->setParameter('cors', null);
+        $rest->data = $dom->saveXML();
+        $rest->size = strlen($rest->data);
+        $rest->setHeader('Content-Type', 'application/xml');
+        $rest = $rest->getResponse();
+
+        if ($rest->error === false && $rest->code !== 200)
+            $rest->error = array('code' => $rest->code, 'message' => 'Unexpected HTTP status');
+        if ($rest->error !== false)
+        {
+            self::__triggerError("S3::getBucketCrossOriginConfiguration({$bucket},{$origins},{$methods},{$age},{$headers},{$exposed}): ".$rest->error['code'].$rest->error['message'], __FILE__, __LINE__);
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
+     * Get a CORS configuration from a bucket
+     *
+     * @param string $bucket Bucket name
+     * @return string | false
+     */
+    public static function getBucketCrossOriginConfiguration($bucket = NULL)
+    {
+        $rest = new S3Request('GET', $bucket, '', self::$endpoint);
+        $rest->setParameter('cors', null);
+        $rest = $rest->getResponse();
+        if ($rest->error === false && $rest->code !== 200)
+            $rest->error = array('code' => $rest->code, 'message' => 'Unexpected HTTP status');
+        if ($rest->error !== false)
+        {
+            self::__triggerError(sprintf("S3::getBucketCrossOriginConfiguration({$bucket}): [%s] %s",
+                $rest->error['code'], $rest->error['message']), __FILE__, __LINE__);
+            return false;
+        }
+        return (isset($rest->body[0]) && (string)$rest->body[0] !== '') ? (string)$rest->body[0] : 'US';
+    }
+
+
 	/**
 	* Set logging for a bucket
 	*

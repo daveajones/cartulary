@@ -88,7 +88,7 @@ function create_user($email = NULL, $silent = NULL, $inside = NULL, $active = NU
 
     //Send the email
     if ($silent != TRUE) {
-        send_newuser_email($email, $password);
+        //send_newuser_email($email, $password);
     }
 
     //Create an initial prefs entry
@@ -252,7 +252,7 @@ function build_admin_log_rss_feed($max = NULL)
     $feedlink = $system_url;
 
     //The feed string
-    $rss = '<?xml version="1.0"?>' . "\n  <rss version=\"2.0\" xmlns:microblog=\"http://microblog.reallysimple.org/\" xmlns:sopml=\"$sopmlnamespaceurlv1\">\n    <channel>";
+    $rss = '<?xml version="1.0"?>' . "\n  <rss version=\"2.0\" xmlns:source=\"http://source.smallpict.com/2014/07/12/theSourceNamespace.html\" xmlns:sopml=\"$sopmlnamespaceurlv1\">\n    <channel>";
 
     $rss .= "\n
       <title>" . htmlspecialchars($title) . "</title>

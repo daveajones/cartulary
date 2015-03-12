@@ -79,11 +79,12 @@ if( !empty($opmldata) ) {
 <link rel="stylesheet" href="/style/font-awesome.css" />
 <?include "$confroot/$templates/$template_html_styles"?>
 <?include "$confroot/$templates/$template_html_scripts"?>
-
+<script src="/script/webaudio_tools.js"></script>
 <script>
     //Globals
     var mode = '<?echo $mode?>';
     var url = '<?echo $url?>';
+    <?if(!empty($aid)) { ?>var aid = '<?echo $aid?>';<?; } else { ?>var aid = false; <?}?>
     var htmlurl = "";
     var title = "";
     var redirect = '<?echo $rhost?>';
@@ -103,6 +104,11 @@ if( !empty($opmldata) ) {
     var includeDisqus = <?if(!isset($seenfile) || $seenfile[0]['disqus'] == 0) { echo "false"; } else { echo "true"; }?>;
     var wysiwygOn = <?if(!isset($seenfile) || $seenfile[0]['wysiwyg'] == 0) { echo "false"; } else { echo "true"; }?>;
     var watchedOutline = <?if(!isset($seenfile) || $seenfile[0]['watched'] == 0) { echo "false"; } else { echo "true"; }?>;
+    var lockedOutline = <?if(!isset($seenfile) || $seenfile[0]['locked'] == 0) { echo "false"; } else { echo "true"; }?>;
+    var wasLocked = <?if(!isset($seenfile) || $seenfile[0]['locked'] == 0) { echo "false"; } else { echo "true"; }?>;
+    <?if( !empty($rhost) ) {?>
+    var redirectHits = <?echo get_redirection_hit_count_by_host($rhost)?>;
+    <?}?>
     <?if( isset($badurl) ) {?>
     badurl = true;
     <?}?>

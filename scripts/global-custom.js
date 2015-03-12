@@ -683,51 +683,50 @@ function newMicroblogPostWindow(item, opmlsource, type) {
 	}
 
 	//Clear the upload queue
-        $(modal + ' #divEnclosures').hide();
-        $(modal + ' #divUpload').hide();
-        $(modal + ' #file_upload').uploadifive('clearQueue');
+    $(modal + ' #divEnclosures').hide();
+    $(modal + ' #divUpload').hide();
+    $(modal + ' #file_upload').uploadifive('clearQueue');
 
+	//Show the modal
+    $(modal).modal('show');
+    modalFullHeight(modal, compact);
 
-	//Show the modal	
-        $(modal).modal('show');
-        modalFullHeight(modal, compact);
-
-        //Ajaxify the form
-        $(modal + ' .mbpostform').ajaxForm({
-                dataType:       'json',
-                cache:          false,
-                clearForm:      true,
-                resetForm:      true,
-                timeout:        60000,
-                beforeSubmit:   function() {
-                        $(modal + ' .spinner').show();
-                        $(modal + ' input,textarea,button').attr("disabled", true);
-                },
-                success:        function(data) {
-                        if(data.status == "false") {
-                                showMessage( data.description, data.status, 5 );
-                        } else {
-                                showMessage( "Post Successful!", data.status, 5 );
-                        }
-                        $(modal + ' .spinner').hide();
-                        $(modal + ' input,textarea,button').attr("disabled", false);
-                        $(modal).modal('hide');
-			reloadMicroblogWidget();
-                },
-                error:          function(x, t, m) {
-                        showMessage( "Error: " + m + "(" + t + ")", false, 60 );
-                        $(modal + ' input,textarea,button').attr("disabled", false);
-                }
-        });
-        $(modal + ' .mbsubmit').click(function() {
-                $(modal + ' .mbpostform').submit();
-                return false;
-        });	
+    //Ajaxify the form
+    $(modal + ' .mbpostform').ajaxForm({
+            dataType:       'json',
+            cache:          false,
+            clearForm:      true,
+            resetForm:      true,
+            timeout:        60000,
+            beforeSubmit:   function() {
+                    $(modal + ' .spinner').show();
+                    $(modal + ' input,textarea,button').attr("disabled", true);
+            },
+            success:        function(data) {
+                    if(data.status == "false") {
+                            showMessage( data.description, data.status, 5 );
+                    } else {
+                            showMessage( "Post Successful!", data.status, 5 );
+                    }
+                    $(modal + ' .spinner').hide();
+                    $(modal + ' input,textarea,button').attr("disabled", false);
+                    $(modal).modal('hide');
+        reloadMicroblogWidget();
+            },
+            error:          function(x, t, m) {
+                    showMessage( "Error: " + m + "(" + t + ")", false, 60 );
+                    $(modal + ' input,textarea,button').attr("disabled", false);
+            }
+    });
+    $(modal + ' .mbsubmit').click(function() {
+            $(modal + ' .mbpostform').submit();
+            return false;
+    });
 
 	//Set the twitter toggle
 	$(modal + ' .tweeticon').removeClass('icon-twitter').addClass('icon-notwitter');
 	$(modal + ' .tweetcheck').prop('checked', false);
-        $(modal + ' .tweeticon').bind('click', function() {
+    $(modal + ' .tweeticon').bind('click', function() {
                 $(modal + ' .tweetcheck').prop('checked', !$(modal + ' .tweetcheck').prop('checked'));
                 $(modal + ' .tweeticon').toggleClass('icon-twitter');
                 $(modal + ' .tweeticon').toggleClass('icon-notwitter');
@@ -735,7 +734,7 @@ function newMicroblogPostWindow(item, opmlsource, type) {
         });
 
 	//Track text length
-        $(modal + ' .mbcharcount').text( $(modal + ' .bpdescription textarea').val().length );	
+    $(modal + ' .mbcharcount').text( $(modal + ' .bpdescription textarea').val().length );
 	$(modal + ' .bpdescription textarea').bind('keyup', function() {
 		var cc = $(modal + ' .bpdescription textarea').val().length;
 		$(modal + ' .mbcharcount').text( cc );
@@ -871,4 +870,12 @@ function openMediaShadowbox(imgtag) {
 
 
         return false;
+}
+
+
+function stripTags(html)
+{
+    var tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText;
 }

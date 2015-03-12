@@ -9,9 +9,16 @@ $(document).ready(function () {
     var chkToggleRender = $('.rendertoggle');
     var chkDisqusInclude = $('.menuDisqusToggle');
     var chkToggleWatch = $('.menuWatchToggle');
+    var chkToggleLock = $('.menuLockToggle');
     var menubar = $('#menubarEditor');
     var elTitle = $('.divOutlineTitle input.title');
-
+    var oscillator;
+    var amp;
+    var nextStep = 0;
+    var speed = 0.9;
+    var dit = 60;
+    var audioOut = false;
+    var audioAnimate;
 
     //New button
     menubar.find('.menuNew').click(function () {
@@ -20,7 +27,12 @@ $(document).ready(function () {
 
     //Save buttons
     menubar.find('.menuSaveAs').click(function () {
-        bootbox.prompt("What file name do you want to use?", function (result) {
+        if(lockedOutline) {
+            bbCaption = "This outline is locked. Type a new file name.";
+        } else {
+            bbCaption = "What file name do you want to use?";
+        }
+        bootbox.prompt(bbCaption, function (result) {
             if ( result !== null ) {
                 //Grab the current title
                 title = elTitle.val();
@@ -34,7 +46,7 @@ $(document).ready(function () {
                 filename = result.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
 
                 //Save the file
-                saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, watchedOutline, opOutlineToXml(ownerName, ownerEmail));
+                saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, opOutlineToXml(ownerName, ownerEmail));
             }
         });
         $('#dropdownSave').dropdown('toggle');
@@ -59,19 +71,57 @@ $(document).ready(function () {
         lasttitle = title;
 
         //Save the file
-        saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, watchedOutline, opOutlineToXml(ownerName, ownerEmail));
+        if(lockedOutline && wasLocked) {
+            menubar.find('.menuSaveAs').trigger('click');
+        } else {
+            saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, opOutlineToXml(ownerName, ownerEmail));
+        }
+        $('#dropdownSave').dropdown('hide');
+        return false;
+    });
+    menubar.find('.menuSaveArticle').click(function () {
+        //Grab the current title
+        title = elTitle.val();
+
+        //Get a file name
+        oldfilename = "";
+        if ( filename == "" ) {
+            if ( title != "" ) {
+                filename = title.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
+            } else {
+                filename = bufilename;
+            }
+        }
+
+        //Set a title
+        opSetTitle(title);
+        lasttitle = title;
+
+        //Save the file
+        if(lockedOutline && wasLocked) {
+            alert("This file is currently locked for editing.");
+        } else {
+            saveFile(title, filename, mode, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, opOutlineToXml(ownerName, ownerEmail), undefined, true);
+        }
         $('#dropdownSave').dropdown('hide');
         return false;
     });
 
     //Publish button
     menubar.find('.menuPublish').click(function () {
+        var pburl = "";
         if ( isEmpty(url) ) {
             showMessage("You must save the document first.", false, 3);
             return(false);
         }
+        if(isEmpty(redirect)) {
+            pburl = htmlurl;
+        } else {
+            pburl = redirect;
+        }
+
         $('#divEditOutline .ouitem').remove();
-        $('#divEditOutline').append('<div class="ouitem hide"><div class="header"><a class="articlelink" href="' + htmlurl + '">' + title + '</a></div></div>');
+        $('#divEditOutline').append('<div class="ouitem hide"><div class="header"><a class="articlelink" href="' + pburl + '">' + title + '</a></div></div>');
         $('#divEditOutline .ouitem').append('<div class="footer"><span class="source"><a class="articlelink" href=""></a></span></div>');
         $('#divEditOutline .ouitem .footer').append('<span class="origin">' + url + '</span>');
         newMicroblogPostWindow('#divEditOutline .ouitem', opOutlineToXml(), 1);
@@ -113,6 +163,9 @@ $(document).ready(function () {
                 var opml = opOutlineToXml();
                 redirect = result;
                 updateOutlineInfo('', '', result);
+            } else {
+                redirect = "";
+                updateOutlineInfo('', '', '');
             }
         });
 
@@ -267,6 +320,32 @@ $(document).ready(function () {
             opSetOneAtt('type', thistype);
         }
 
+        //None type
+        if( thistype == 'none' ) {
+            outliner.concord().op.attributes.removeOne('icon');
+            outliner.concord().op.attributes.removeOne('type');
+            outliner.concord().op.attributes.removeOne('url');
+        }
+
+        //Image type node
+        if( thistype == 'image' ) {
+            if( !opGetOneAtt('url') ) {
+                var text = opGetLineText();
+                var match = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/.exec(text);
+                if( match !== null ) {
+                    opSetOneAtt('url', match[0]);
+                } else {
+                    bootbox.prompt("What is the url of the image?", function (result) {
+                        if ( result !== null ) {
+                            opSetOneAtt('type', thistype);
+                            opSetOneAtt('url', result);
+                        }
+                    });
+                }
+            }
+            opSetOneAtt('icon', 'image');
+        }
+
         //Collaboration node
         if( thistype == 'collaborate' ) {
             opSetLineText("[Collaboration node - do not delete.]");
@@ -312,6 +391,18 @@ $(document).ready(function () {
         } else {
             $(this).parent().addClass('active');
             watchedOutline = true;
+        }
+    });
+
+    //Toggle locked outline
+    chkToggleLock.click(function () {
+        if ( $(this).parent().hasClass('active') ) {
+            $(this).parent().removeClass('active');
+            lockedOutline = false;
+            wasLocked = false;
+        } else {
+            $(this).parent().addClass('active');
+            lockedOutline = true;
         }
     });
 
@@ -435,6 +526,48 @@ $(document).ready(function () {
         //Save the file
         saveArchive(atitle, afilename, mode, '', false, false, xmlArchive, arcplaceholder);
     });
+    menubar.find('.menuGenerateMorse').click(function() {
+            if( audioOut == true ) {
+                nextStep = stopTone();
+                return false;
+            }
+
+            var morsestring = getSelected();
+            if( morsestring == "" || morsestring == "..." ) {
+                morsestring = opGetLineText();
+            } else {
+                morsestring = new String(morsestring);
+            }
+
+            morsestring = stripTags(morsestring);
+            morsestring.replace(/[^a-zA-Z 0-9?.]+/g,'');
+            morsestring = morsestring.toLowerCase().split("");
+
+            //Initialize values according to current speed
+            cDit = (dit / speed) / 1000;
+            cDot = (dit / speed) / 1000;
+            cDash = (cDot * 3);
+            clGap = cDash + cDot;
+            cwGap = (cDot * 7);
+
+            initAudio();
+            nextStep = startTone(700);
+
+
+        morsestring.forEach(function(letter) {
+            console.log("STarting letter: [" + letter + "]");
+            if( letter !== " ") nextStep += clGap;
+            if( letter === " ") {
+                nextStep += cwGap;
+            } else {
+                var md = convertLetterToMorseData(letter);
+                nextStep = outputLetter(md, nextStep);
+            }
+        });
+
+            nextStep = stopTone(nextStep + 1);
+            return false;
+    });
     $('.modalsrgo').click(function () {
         //Hide the form
         srmodal.find('form.srpostform').hide();
@@ -555,6 +688,9 @@ $(document).ready(function () {
                 if ( watchedOutline ) {
                     chkToggleWatch.parent().addClass('active');
                 }
+                if ( lockedOutline ) {
+                    chkToggleLock.parent().addClass('active');
+                }
                 loading.hide();
             }
         });
@@ -568,9 +704,8 @@ $(document).ready(function () {
     }
     title = opGetTitle();
 
-
     //Refresh the outliner info pane
-    updateOutlineInfo(url, "", redirect);
+    updateOutlineInfo(url, {}, redirect);
     if ( badurl == true ) {
         showMessage('Parse error. Please check the url.', false, 5);
     }
@@ -655,8 +790,9 @@ $(document).ready(function () {
     $('#divEditorEnclosures').offset({top:0,left:0}).offset( $('#divEditOutline').offset() );
 
     //Save a file
-    function saveFile(ftitle, fname, fmode, fredirect, fdisqus, fwysiwyg, fwatched, fopml, foldname) {
+    function saveFile(ftitle, fname, fmode, fredirect, fdisqus, fwysiwyg, fwatched, flocked, fopml, foldname, asarticle) {
         var _foldname = (typeof foldname === "undefined") ? "" : foldname;
+        var _asarticle = (typeof asarticle === "undefined") ? false : asarticle;
         var menubar = $('#menubarEditor');
 
         //Render the title and byline?
@@ -678,8 +814,11 @@ $(document).ready(function () {
                 "disqus": fdisqus,
                 "wysiwyg": fwysiwyg,
                 "watched" : fwatched,
+                "locked" : flocked,
                 "title": ftitle,
-                "rendertitle": rendertitle
+                "rendertitle": rendertitle,
+                "aid": aid,
+                "articleoverwrite" : asarticle
             },
             dataType: "json",
             beforeSend: function () {
@@ -691,11 +830,16 @@ $(document).ready(function () {
                 //Show returned info and re-enable the save button
                 url = data.url;
                 htmlurl = data.html;
-                updateOutlineInfo(url, data.html, redirect);
+                updateOutlineInfo(url, data, redirect);
 
-                showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
+                if(data.status === "true") {
+                    showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
+                } else {
+                    showMessage(data.description, data.status, 8);
+                }
                 menubar.find('#dropdownSave').html('Save');
                 menubar.find('.saves').attr('disabled', false);
+                wasLocked = true;
 
                 //Set the title of the html document
                 document.title = ftitle + " - FC";
@@ -741,7 +885,6 @@ $(document).ready(function () {
 
         return true;
     }
-
 
     //Linkify some text in the outline
     function editorToolAddLink() {
@@ -881,22 +1024,44 @@ $(document).ready(function () {
     }
 
     //Display outline info
-    function updateOutlineInfo(url, html, redirect) {
+    function updateOutlineInfo(url, data, redirect) {
         var elOutlineinfo = $('#menubarEditor').find('.outlineinfo');
 
         elOutlineinfo.html('');
         if ( url != "" ) {
             elOutlineinfo.html('<li><a target="_blank" title="Link to opml source of this outline." href="' + url + '">OPML</a></li>');
-            if ( html == "" ) {
+            if ( data.html == "" || data.html === undefined ) {
                 htmlurl = url.replace("/opml/", "/html/");
                 htmlurl = htmlurl.substr(0, htmlurl.lastIndexOf(".")) + ".html";
+            } else {
+                htmlurl = data.html;
+            }
+            if ( data.json == "" || data.json === undefined ) {
+                jsurl = url.replace("/opml/", "/json/");
+                jsurl = jsurl.substr(0, jsurl.lastIndexOf(".")) + ".json";
+            } else {
+                jsurl = data.json;
             }
             elOutlineinfo.append('<li><a target="_blank" title="Link to rendered html version of this outline." href="' + htmlurl + '">HTML</a></li>');
+            elOutlineinfo.append('<li><a target="_blank" title="Link to myword.io rendering of this outline." href="http://myword.io/?url=' + jsurl + '">MYWORD</a></li>');
+        }
+
+        if ( aid !== false ) {
+            menubar.find('.menuSaveArticle').show();
+        } else {
+            menubar.find('.menuSaveArticle').hide();
         }
 
         if ( redirect != "" ) {
-            $('#menubarEditor').find('.menuRedirect').html("Redirect: " + redirect);
+            if(redirectHits > 0) {
+                $('#menubarEditor').find('.menuRedirect').html("Redirect: " + redirect + " (" + redirectHits + ")");
+            } else {
+                $('#menubarEditor').find('.menuRedirect').html("Redirect: " + redirect);
+            }
             $('#menubarEditor').find('.menuRedirect').parent().addClass('active');
+        } else {
+            $('#menubarEditor').find('.menuRedirect').html("Redirect");
+            $('#menubarEditor').find('.menuRedirect').parent().removeClass('active');
         }
         return true;
     }
@@ -1083,6 +1248,9 @@ $(document).ready(function () {
                     $('.complete .filename:contains("' + file.name + '")').each(function (index) {
                             if ( isImage(jdata.url) ) {
                                 opInsertImage(jdata.url);
+                                opSetOneAtt('type', 'image');
+                                opSetOneAtt('icon', 'image');
+                                opSetOneAtt('url', jdata.url);
                             } else {
                                 opInsert('<a href="' + jdata.url + '">' + file.name + '</a>', down);
                                 opSetOneAtt('type', 'link');
@@ -1125,4 +1293,140 @@ $(document).ready(function () {
     $('body').on('dragenter', function () {
         return showEditorFileDropZone();
     });
+
+    // Create an oscillator and an amplifier.
+    function initAudio()
+    {
+        // Use audioContext from webaudio_tools.js
+        if( audioContext )
+        {
+            oscillator = audioContext.createOscillator();
+            fixOscillator(oscillator);
+            oscillator.frequency.value = 440;
+            amp = audioContext.createGain();
+            amp.gain.value = 0;
+
+            // Connect oscillator to amp and amp to the mixer of the audioContext.
+            // This is like connecting cables between jacks on a modular synth.
+            oscillator.connect(amp);
+            amp.connect(audioContext.destination);
+            //writeMessageToID( "soundStatus", "<p>Audio initialized.</p>");
+        }
+    }
+
+    // Set the frequency of the oscillator and start it running.
+    function startTone( frequency )
+    {
+        audioOut = true;
+        var now = audioContext.currentTime;
+
+        oscillator.start(0);
+        oscillator.frequency.setValueAtTime(frequency, now);
+
+        audioAnimate = setInterval(function() {
+            if(menubar.find('.menuGenerateMorse').find('i.fa').hasClass('fa-tty')) {
+                menubar.find('.menuGenerateMorse').find('i.fa').removeClass('fa-tty').addClass('fa-volume-off');
+            } else
+            if(menubar.find('.menuGenerateMorse').find('i.fa').hasClass('fa-volume-off')) {
+                menubar.find('.menuGenerateMorse').find('i.fa').removeClass('fa-volume-off').addClass('fa-volume-down');
+            } else
+            if(menubar.find('.menuGenerateMorse').find('i.fa').hasClass('fa-volume-down')) {
+                menubar.find('.menuGenerateMorse').find('i.fa').removeClass('fa-volume-down').addClass('fa-volume-up');
+            } else
+            if(menubar.find('.menuGenerateMorse').find('i.fa').hasClass('fa-volume-up')) {
+                menubar.find('.menuGenerateMorse').find('i.fa').removeClass('fa-volume-up').addClass('fa-volume-off');
+            }
+        }, 300);
+        // Ramp up the gain so we can hear the sound.
+        // We can ramp smoothly to the desired value.
+        // First we should cancel any previous scheduled events that might interfere.
+        amp.gain.cancelScheduledValues(now);
+        // Anchor beginning of ramp at current value.
+        amp.gain.setValueAtTime(0, now);
+        //amp.gain.setValueAtTime(amp.gain.value, now);
+        //amp.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.1);
+
+        //writeMessageToID( "soundStatus", "<p>Play tone at frequency = " + frequency  + "</p>");
+
+        return now + 1;
+    }
+
+    function stopTone( atTime )
+    {
+        var now = audioContext.currentTime;
+        if( typeof atTime !== "undefined" ) {
+            now = atTime;
+        }
+        oscillator.onended = function() {
+            audioOut = false;
+            clearInterval(audioAnimate);
+            menubar.find('.menuGenerateMorse').find('i.fa').removeClass('fa-volume-up').removeClass('fa-volume-down').removeClass('fa-volume-off').addClass('fa-tty');
+        };
+        amp.gain.cancelScheduledValues(now);
+        amp.gain.setValueAtTime(amp.gain.value, now);
+        amp.gain.linearRampToValueAtTime(0.0, audioContext.currentTime + 1.0);
+        //writeMessageToID( "soundStatus", "<p>Stop tone.</p>");
+        oscillator.stop(now);
+
+        return 0;
+    }
+
+    function convertLetterToMorseData( letter ) {
+        var dash = cDash;
+        var dot = cDot;
+        var letters = {
+            "a":function() { return [dot,dash]; },
+            "b":function() { return [dash,dot,dot,dot]; },
+            "c":function() { return [dash,dot,dash,dot]; },
+            "d":function() { return [dash,dot,dot]; },
+            "e":function() { return [dot]; },
+            "f":function() { return [dot,dot,dash,dot]; },
+            "g":function() { return [dash,dash,dot]; },
+            "h":function() { return [dot,dot,dot,dot]; },
+            "i":function() { return [dot,dot]; },
+            "j":function() { return [dot,dash,dash]; },
+            "k":function() { return [dash,dot,dash]; },
+            "l":function() { return [dot,dash,dot,dot]; },
+            "m":function() { return [dash,dash]; },
+            "n":function() { return [dash,dot]; },
+            "o":function() { return [dash,dash,dash]; },
+            "p":function() { return [dot,dash,dash,dot]; },
+            "q":function() { return [dash,dash,dot,dash]; },
+            "r":function() { return [dot,dash,dot]; },
+            "s":function() { return [dot,dot,dot]; },
+            "t":function() { return [dash]; },
+            "u":function() { return [dot,dot,dash]; },
+            "v":function() { return [dot,dot,dot,dash]; },
+            "w":function() { return [dot,dash,dash]; },
+            "x":function() { return [dash,dot,dot,dash]; },
+            "y":function() { return [dash,dot,dash,dash]; },
+            "z":function() { return [dash,dash,dot,dot]; },
+            "0":function() { return [dash,dash,dash,dash,dash]; },
+            "1":function() { return [dot,dash,dash,dash,dash]; },
+            "2":function() { return [dot,dot,dash,dash,dash]; },
+            "3":function() { return [dot,dot,dot,dash,dash]; },
+            "4":function() { return [dot,dot,dot,dot,dash]; },
+            "5":function() { return [dot,dot,dot,dot,dot]; },
+            "6":function() { return [dot,dot,dot,dash,dash]; },
+            "7":function() { return [dash,dash,dot,dot,dot]; },
+            "8":function() { return [dash,dash,dash,dot,dot]; },
+            "9":function() { return [dash,dash,dash,dash,dot]; },
+            ".":function() { return [dot,dash,dot,dash,dot,dash]; },
+            "?":function() { return [dot,dot,dash,dash,dot,dot]; }
+        };
+        console.log("Letter: ["+letter+"] values: "+ letters[letter]());
+        return letters[letter]();
+    }
+
+    function outputLetter( letter, nextStep ) {
+
+        letter.forEach(function(value) {
+            amp.gain.setValueAtTime(0.5, nextStep);
+            nextStep += value;
+            amp.gain.setValueAtTime(0, nextStep);
+            nextStep += cDit;
+        });
+
+        return nextStep;
+    }
 });

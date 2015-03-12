@@ -2113,6 +2113,7 @@ function convert_opml_to_html($content = NULL, $max = NULL)
     $count = 0;
     $html = "";
     foreach ($nodes as $entry) {
+        $line = "";
         //loggit(3, "DEBUG: ".print_r($entry, TRUE));
 
         $text = (string)$entry->attributes()->text;
@@ -2120,14 +2121,75 @@ function convert_opml_to_html($content = NULL, $max = NULL)
         $link = (string)$entry->attributes()->url;
         $type = (string)$entry->attributes()->type;
 
-        $html .= "$text\n";
+        $text = trim(html_entity_decode($text));
+
+        if(!empty($link)) {
+            $line .= "<p><a href=\"$link\">$text</a></p>";
+        } else {
+            $line .= "<p>$text</p>";
+        }
+
+        if(empty($text)) {
+            $line ="<br/>";
+        }
+
+        $html .= $line."\n";
+
+        $count++;
+    }
+
+    //Collapse muliple br tags
+    $output = preg_replace("/(<br\s*\/?>\s*)+/", "<br/>", $html);
+
+    //Log and leave
+    loggit(3, "Got [$count] items from the opml document.");
+    return ($output);
+}
+
+
+//Convert an opml document to html
+function convert_opml_to_text($content = NULL, $max = NULL)
+{
+    //Check params
+    if ($content == NULL) {
+        loggit(2, "The opml content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Parse it
+    libxml_use_internal_errors(true);
+    $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+    libxml_clear_errors();
+
+    //Roll through all of the outline nodes
+    $nodes = $x->xpath('//outline');
+    if (empty($nodes)) {
+        loggit(3, "This opml document is blank.");
+        return (-2);
+    }
+
+    //Run through each node and convert it to an html element
+    $count = 0;
+    $raw = "";
+    foreach ($nodes as $entry) {
+        //loggit(3, "DEBUG: ".print_r($entry, TRUE));
+
+        $text = (string)$entry->attributes()->text;
+        $name = (string)$entry->attributes()->name;
+        $link = (string)$entry->attributes()->url;
+        $type = (string)$entry->attributes()->type;
+
+        $raw .= "$text\n";
 
         $count++;
     }
 
     //Log and leave
     loggit(3, "Got [$count] items from the opml document.");
-    return ($html);
+    return ($raw);
 }
 
 
@@ -2832,9 +2894,9 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 
     //Do the query
     if( $blob ) {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, outline FROM $table_recentfiles WHERE userid=? AND url=?";
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, locked, outline FROM $table_recentfiles WHERE userid=? AND url=?";
     } else {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched FROM $table_recentfiles WHERE userid=? AND url=?";
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, locked FROM $table_recentfiles WHERE userid=? AND url=?";
     }
 
 
@@ -2853,9 +2915,9 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
     }
 
     if( $blob ) {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $flocked, $foutline) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $flocked) or loggit(2, "MySql error: " . $dbh->error);
     }
 
 
@@ -2869,6 +2931,7 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
             'disqus' => $fdisqus,
             'wysiwyg' => $fwysiwyg,
             'watched' => $fwatched,
+            'locked' => $flocked
         );
         if( $blob ) {
             $files[$count]['content'] = $foutline;
@@ -2884,7 +2947,7 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 
 
 //Update a file into the recent files table
-function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE)
+function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE, $articleid = NULL, $locked = FALSE)
 {
     //Check parameters
     if (empty($uid)) {
@@ -2914,6 +2977,11 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     } else {
         $watched = 1;
     }
+    if (!$locked) {
+        $locked = 0;
+    } else {
+        $locked = 1;
+    }
 
     //Timestamp
     $time = time();
@@ -2926,15 +2994,15 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
 
     //Insert recent file entry
     if( empty($oldurl) ) {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched) VALUES (?,?,?,?,?,?,?,?)
-                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?, watched=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked) VALUES (?,?,?,?,?,?,?,?,?,?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssddddsdsddd", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $title, $time, $outline, $disqus, $wysiwyg, $watched) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsdsdsdddsd", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $title, $time, $outline, $disqus, $wysiwyg, $watched, $articleid, $locked) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched) VALUES (?,?,?,?,?,?,?,?)
-                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?, watched=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked) VALUES (?,?,?,?,?,?,?,?,?,?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssddddsdssddd", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsdsdssdddsd", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched, $articleid, $locked) or loggit(2, "MySql error: " . $dbh->error);
         loggit(3, "User: [$uid] changed old url: [$oldurl] to new url: [$url].");
     }
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -2942,7 +3010,7 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
     //Log and return
-    loggit(3, "User: [$uid] edited a file: [$url] at: [$title].");
+    loggit(3, "User: [$uid] edited a file: [$title] at: [$url]. Article: [$articleid].");
     return ($rid);
 }
 

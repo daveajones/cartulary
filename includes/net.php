@@ -400,3 +400,170 @@ function update_redirection_host_name_by_url($url = NULL, $host = NULL, $uid = N
     loggit(3, "Updated: [$host -> $url] redirection.");
     return (TRUE);
 }
+
+
+//Remove a redirection host from the redirector table
+function remove_redirection_by_host_name($host = NULL, $uid = NULL)
+{
+    //Check parameters
+    if (empty($host)) {
+        loggit(2, "The host is blank or corrupt: [$host]");
+        return (FALSE);
+    }
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Database call
+    $stmt = "DELETE FROM $table_redirect WHERE host=? AND userid=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $host, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "Removed: [$host] redirection for user: [$uid].");
+    return (TRUE);
+}
+
+
+//Remove a redirection url from the redirector table
+function remove_redirection_by_url($url = NULL, $uid = NULL)
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Database call
+    $stmt = "DELETE FROM $table_redirect WHERE url=? AND userid=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $url, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "Removed: [$url] redirection for user: [$uid].");
+    return (TRUE);
+}
+
+
+//Remove a redirection url from the redirector table
+function add_redirection_hit_by_url($url = NULL)
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Database call
+    $stmt = "UPDATE $table_redirect SET hits = hits + 1 WHERE url=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "Added 1 hit for url: [$url].");
+    return (TRUE);
+}
+
+
+//Get a hit count for a given destination url
+function get_redirection_hit_count_by_url($url = NULL)
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "The destination url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Database call
+    $sql = $dbh->prepare("SELECT hits FROM $table_redirect WHERE url=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if any rows came back
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(3, "No redirect found for: [$url].");
+        return ("");
+    }
+    $sql->bind_result($hits) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch();
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+
+    loggit(3, "Returning hit count: [$hits] for url: [$url].");
+    return ($hits);
+}
+
+
+//Get a hit count for a given destination url
+function get_redirection_hit_count_by_host($host = NULL)
+{
+    //Check parameters
+    if (empty($host)) {
+        loggit(2, "The redirection host is blank or corrupt: [$host]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Database call
+    $sql = $dbh->prepare("SELECT hits FROM $table_redirect WHERE host=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $host) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if any rows came back
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(3, "No redirect found for: [$host].");
+        return ("");
+    }
+    $sql->bind_result($hits) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch();
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+
+    loggit(3, "Returning hit count: [$hits] for host: [$host].");
+    return ($hits);
+}

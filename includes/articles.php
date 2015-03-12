@@ -51,13 +51,26 @@ function get_article($id = NULL, $uid = NULL)
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$includes/opml.php";
 
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Look for the sid in the session table
-    $sql = $dbh->prepare("SELECT id,title,url,shorturl,createdon,content,sourceurl,sourcetitle FROM $table_article WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("s", $id) or loggit(2, "MySql error: " . $dbh->error);
+    $sql = $dbh->prepare("SELECT a.id,
+                                 a.title,
+                                 a.url,
+                                 a.shorturl,
+                                 a.createdon,
+                                 a.content,
+                                 a.sourceurl,
+                                 a.sourcetitle,
+                                 c.edited
+                          FROM $table_article AS a
+                          JOIN $table_catalog AS c ON a.id = c.articleid
+                          WHERE a.id=? AND c.userid = ?
+    ") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $id, $uid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
     //See if the session is valid
@@ -75,10 +88,17 @@ function get_article($id = NULL, $uid = NULL)
         $article['createdon'],
         $article['content'],
         $article['sourceurl'],
-        $article['sourcetitle']
+        $article['sourcetitle'],
+        $article['edited']
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //If edited was non-blank, convert it from opml to html
+    if(!empty($article['edited'])) {
+        $article['content'] = $article['edited'];
+        unset($article['edited']);
+    }
 
     //If a user id was given, get those details
     if (!empty($uid)) {
@@ -91,7 +111,7 @@ function get_article($id = NULL, $uid = NULL)
 
 
 //Retrieve an article from the repository
-function get_article_as_opml($id = NULL, $uid = NULL)
+function get_article_as_opml($id = NULL, $uid = NULL, $withmeta = FALSE)
 {
     //Check parameters
     if ($id == NULL) {
@@ -106,8 +126,20 @@ function get_article_as_opml($id = NULL, $uid = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Look for the sid in the session table
-    $sql = $dbh->prepare("SELECT id,title,url,shorturl,createdon,content,sourceurl,sourcetitle FROM $table_article WHERE id=?") or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("s", $id) or loggit(2, "MySql error: " . $dbh->error);
+    $sql = $dbh->prepare("SELECT a.id,
+                                 a.title,
+                                 a.url,
+                                 a.shorturl,
+                                 a.createdon,
+                                 a.content,
+                                 a.sourceurl,
+                                 a.sourcetitle,
+                                 c.edited
+                          FROM $table_article AS a
+                          JOIN $table_catalog AS c ON a.id = c.articleid
+                          WHERE a.id=? AND c.userid = ?
+    ") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $id, $uid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
     //See if the session is valid
@@ -125,10 +157,17 @@ function get_article_as_opml($id = NULL, $uid = NULL)
         $article['createdon'],
         $article['content'],
         $article['sourceurl'],
-        $article['sourcetitle']
+        $article['sourcetitle'],
+        $article['edited']
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //If edited was non-blank, convert it from opml to html
+    if(!empty($article['edited'])) {
+        $article['content'] = $article['edited'];
+        unset($article['edited']);
+    }
 
     //If a user id was given, get those details
     if (!empty($uid)) {
@@ -164,8 +203,19 @@ $opmlout .= <<<OPMLOUT1
 </head>
 <body>
 OPMLOUT1;
-    $uniform = preg_replace("/[\r\n]{2,}/", "\n", $article['content']);
+    if( $withmeta ) {
+        $opmlout .= "<outline text=\"Link to Article\" type=\"link\" url=\"$arurl\" />";
+        if (!empty($article['staticurl'])) {
+            $opmlout .= "    <outline text=\"Archived Version\" type=\"link\" url=\"" . xmlentities($article['staticurl']) . "\" />" . "\n";
+        }
+        if (!empty($article['sourceurl']) || !empty($article['sourcetitle'])) {
+            $opmlout .= '    <outline text="Source: ' . htmlspecialchars(trim($article['sourcetitle'])) . '" type="link" url="' . htmlspecialchars(trim($article['sourceurl'])) . '" />' . "\n";
+        }
+        $opmlout .= "      <outline text=\"" . date("D, d M Y H:i", $article['createdon']) . "\" />";
+        $opmlout .= "      <outline text=\"\" />";
+    }
 
+    $uniform = preg_replace("/[\r\n]{2,}/", "\n", $article['content']);
 
     //We need to know if this document had html tags
     $washtml = FALSE;
@@ -1165,6 +1215,42 @@ function update_article_static_url($aid = NULL, $uid = NULL, $url = NULL)
 
     //Log and return
     loggit(3, "Changed article: [$aid]'s url to: [$url] for user: [$uid].");
+    return (TRUE);
+}
+
+
+//Change the content of an article
+function add_edited_content_to_article($aid = NULL, $uid = NULL, $content = NULL)
+{
+    //Check parameters
+    if ($aid == NULL) {
+        loggit(2, "The article id is blank or corrupt: [$aid]");
+        return (FALSE);
+    }
+    if ($uid == NULL) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ($content == NULL) {
+        loggit(2, "The edited content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the thing
+    $stmt = "UPDATE $table_catalog SET edited=? WHERE articleid=? AND userid=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sss", $content, $aid, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "Added edited content to article: [$aid] for user: [$uid].");
     return (TRUE);
 }
 

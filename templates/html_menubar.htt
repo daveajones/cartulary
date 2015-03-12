@@ -102,6 +102,7 @@
                     <ul class="dropdown-menu" data-container="body">
                         <li><a href="#" class="menuSave saves" title="Save">Save</a></li>
                         <li><a href="#" class="menuSaveAs saves" title="Save As">Save as...</a></li>
+                        <li><a href="#" class="menuSaveArticle saves hide" title="Save Edited Article">Save Edited Article</a></li>
                     </ul>
                 </li>
                 <li><a class="menuPublish" href="#" title="Publish">Publish</a></li>
@@ -109,6 +110,7 @@
                 <li class="<?if($mode == "article"){echo "active";}?>"><a class="rendertoggle" href="#" title="Toggle html rendering"><i class="fa fa-file-code-o"></i></a></li>
                 <?if(!empty($myprefs['disqus_shortname'])) { ?><li><a class="menuDisqusToggle" href="#" title="Include Disqus comments in rendered version?"><i class="fa fa-comments"></i></a></li><?}?>
                 <?if(imap_is_enabled($myuid) && smtp_is_enabled($myuid)) { ?><li><a class="menuWatchToggle" href="#" title="Get notified if linked-to pages in this outline change?"><i class="fa fa-eye"></i></a></li><?}?>
+                <li><a class="menuLockToggle" href="#" title="Lock this outline to prevent changes."><i class="fa fa-lock"></i></a></li>
                 <li class="dropdown menuType" title="What type of outline is this?">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Type <b class="caret"></b></a>
                     <ul class="dropdown-menu" data-container="body">

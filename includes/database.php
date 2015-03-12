@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 50;
+$cg_database_version = 54;
 $cg_database_updates = array();
 
 
@@ -702,6 +702,51 @@ CGDB0156;
 $cg_database_updates[49][] = <<<CGDB0157
  INSERT INTO `dbversion` ( `version` ) VALUES ( '50' )
 CGDB0157;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 50 to 51 -----------------------------------------------------------------------------------------------
+$cg_database_updates[50][] = <<<CGDB0158
+ ALTER TABLE `recentfiles` ADD `articleid` VARCHAR( 128 ) NOT NULL COMMENT 'article id this file corresponds to'
+CGDB0158;
+$cg_database_updates[50][] = <<<CGDB0159
+ ALTER TABLE `recentfiles` ADD INDEX (articleid)
+CGDB0159;
+$cg_database_updates[50][] = <<<CGDB0160
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '51' )
+CGDB0160;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 51 to 52 -----------------------------------------------------------------------------------------------
+$cg_database_updates[51][] = <<<CGDB0161
+ ALTER TABLE `catalog` ADD `edited` MEDIUMTEXT NOT NULL COMMENT 'edited version of the article'
+CGDB0161;
+$cg_database_updates[51][] = <<<CGDB0162
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '52' )
+CGDB0162;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 52 to 53 -----------------------------------------------------------------------------------------------
+$cg_database_updates[52][] = <<<CGDB0163
+ ALTER TABLE `recentfiles` ADD `locked` TINYINT NOT NULL COMMENT 'Is this article locked?'
+CGDB0163;
+$cg_database_updates[52][] = <<<CGDB0164
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '53' )
+CGDB0164;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 53 to 54 -----------------------------------------------------------------------------------------------
+$cg_database_updates[53][] = <<<CGDB0165
+ CREATE TABLE IF NOT EXISTS `user_domains` (
+  `userid` varchar(64) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'User id',
+  `domain` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Domain name'
+ ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Domain names claimed by users'
+CGDB0165;
+$cg_database_updates[53][] = <<<CGDB0166
+ ALTER TABLE `user_domains` ADD INDEX (domain)
+CGDB0166;
+$cg_database_updates[53][] = <<<CGDB0167
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '54' )
+CGDB0167;
 //----------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------

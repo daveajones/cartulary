@@ -49,10 +49,28 @@ if ( isset($_REQUEST['wysiwyg']) && $_REQUEST['wysiwyg'] == "true" ) {
     $wysiwyg = TRUE;
 }
 
+//Is this an article that was edited
+$aid = "";
+if ( isset($_REQUEST['aid']) && $_REQUEST['aid'] != "false" ) {
+    $aid = $_REQUEST['aid'];
+}
+
+//Do we need to overwrite the existing article
+$articleoverwrite = "";
+if ( isset($_REQUEST['articleoverwrite']) && $_REQUEST['articleoverwrite'] != "false" ) {
+    $articleoverwrite = $_REQUEST['articleoverwrite'];
+}
+
 //Get watched bool
 $watched = FALSE;
 if ( isset($_REQUEST['watched']) && $_REQUEST['watched'] == "true" ) {
     $watched = TRUE;
+}
+
+//Get locked bool
+$locked = FALSE;
+if ( isset($_REQUEST['locked']) && $_REQUEST['locked'] == "true" ) {
+    $locked = TRUE;
 }
 
 //Make sure we have a filename to use
@@ -146,16 +164,50 @@ if(!$s3res) {
 }
 
 //Update recent file table
-$rid = update_recent_file($uid, $s3url, $title, $opml, $s3oldurl, $disqus, $wysiwyg, $watched);
+$rid = update_recent_file($uid, $s3url, $title, $opml, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked);
 loggit(3, "DEBUG: Recent file id is [$rid].");
+
+//Was this an edited article content request
+if( $articleoverwrite && !empty($aid) ) {
+    add_edited_content_to_article($aid, $uid, convert_opml_to_html($opml));
+}
 
 //Go ahead and put in the urls we saved
 $jsondata['url'] = $s3url;
 $jsondata['html'] = $s3html;
 $jsondata['json'] = $s3json;
 
+//Extract and add watched urls if this is a watched outline
+remove_watched_urls_by_file_id($rid);
+if($watched) {
+    $includes = get_includes_from_outline($opml);
+    foreach( $includes as $include ) {
+        $u = get_watched_url_by_url($include);
+        if( empty($u) ) {
+            $u['lastmodified'] = "";
+            $u['content'] = "";
+        }
+        add_watched_url($rid, $include, $u['lastmodified'], $u['content']);
+    }
+}
+
 //Update the redirector table
 if( !empty($rhost) ) {
+    //Let's not clobber existing redirects
+    $erurl = get_redirection_url_by_host_name($rhost);
+    if( !empty($erurl) ) {
+        $erurl = str_replace('.html', '.opml', $erurl);
+        $erurl = str_replace('/html/', '/opml/', $erurl);
+
+        //Log it
+        loggit(2,"Attempted redirection hostname already exists: [$rhost].");
+        $jsondata['status'] = "false";
+        $jsondata['duration'] = 20;
+        $jsondata['description'] = "Attempted redirection hostname already in use by <a target='_blank' href=\"/editor?url=$erurl\">this</a> outline.";
+        echo json_encode($jsondata);
+        exit(1);
+    }
+
     //Update the redirection table
     update_redirection_host_name_by_url($s3html, $rhost, $uid);
 
@@ -209,20 +261,8 @@ if( !empty($rhost) ) {
             loggit(3, "DEBUG: Wrote html to S3 at url: [$redhtml].");
         }
     }
-}
-
-//Extract and add watched urls if this is a watched outline
-remove_watched_urls_by_file_id($rid);
-if($watched) {
-    $includes = get_includes_from_outline($opml);
-    foreach( $includes as $include ) {
-        $u = get_watched_url_by_url($include);
-        if( empty($u) ) {
-            $u['lastmodified'] = "";
-            $u['content'] = "";
-        }
-        add_watched_url($rid, $include, $u['lastmodified'], $u['content']);
-    }
+} else {
+    remove_redirection_by_url($s3html, $uid);
 }
 
 //Log it

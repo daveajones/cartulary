@@ -3504,7 +3504,7 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
             } else {
                 $rftemplate = fetchUrl($s3info['rivertemplate']);
                 if (is_outline($rftemplate)) {
-                    $rftemplate = convert_opml_to_html($rftemplate);
+                    $rftemplate = convert_opml_to_text($rftemplate);
                     $rftemplate = str_replace('<%opmlUrl%>', $s3info['rivertemplate'], $rftemplate);
                 }
             }
@@ -3832,7 +3832,7 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
             } else {
                 $rftemplate = fetchUrl($prefs['pubrivertemplate']);
                 if (is_outline($rftemplate)) {
-                    $rftemplate = convert_opml_to_html($rftemplate);
+                    $rftemplate = convert_opml_to_text($rftemplate);
                     $rftemplate = str_replace('<%opmlUrl%>', $prefs['pubrivertemplate'], $rftemplate);
                 }
             }

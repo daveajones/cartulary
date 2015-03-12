@@ -967,7 +967,7 @@ function get_final_url($url, $timeout = 5, $count = 0)
     curl_close($curl);
     unlink($cookie);
 
-    loggit(3, "DEBUG: get_final_url($url) returned: [".$response['http_code']."]");
+    //loggit(3, "DEBUG: get_final_url($url) returned: [".$response['http_code']."]");
 
     //Normal re-direct
     if ($response['http_code'] == 301 || $response['http_code'] == 302 || $response['http_code'] == 303) {

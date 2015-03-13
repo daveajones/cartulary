@@ -2485,7 +2485,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     $sql->close();
 
     //Map the searchable terms in this item if new search is enabled
-    if( $cg_search_v2_enabled ) {
+    if( $cg_search_v2_enable ) {
         map_feed_item($id, $title." ".$description);
     }
 

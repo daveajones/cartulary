@@ -19,4 +19,4 @@
   $tree_location = "Show Article";
 ?>
 <?include "$confroot/$templates/$template_html_prehead"?>
-<?echo make_article_printable($aid);?>
+<?echo make_article_printable($aid, $uid);?>

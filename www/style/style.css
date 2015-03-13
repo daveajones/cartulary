@@ -1,3 +1,4 @@
+a {  outline: 0;  }
 .aPreauthLogout {  float:right;  }
 #divNavSearchResults {  display:none;  }
 img { outline:none; }
@@ -53,7 +54,7 @@ img { outline:none; }
   position:relative;
   display:block;
   width:500px;
-  padding:50px 20px;
+  padding:20px 20px;
   margin-left:auto;
   margin-right:auto;
   font-size:14px;

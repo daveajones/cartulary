@@ -237,8 +237,13 @@ $.extend($.expr[':'],{
 
 //Display something in the global dropdown message box
 function showMessage( text, status, timeout) {
-   clearInterval(msgtimer);
-   $('#divMessageBox').slideUp("normal", function(){ $('#divMessageBox').remove(); });
+   clearTimeout(msgtimer);
+   //closeMessage();
+   //$('#divMessageBox').slideUp("normal", function(){ $('#divMessageBox').remove(); });
+
+    if(isMessageBoxVisible()) {
+        return changeMessage(text, status, timeout);
+    }
 
    $('.msganchor').after('<div style="display:none;" id="divMessageBox"><p id="messagebox"></p></div>');
 
@@ -265,8 +270,7 @@ function showMessage( text, status, timeout) {
       $('#divMessageBox').center(true, false);
       $('#divMessageBox').slideDown();
 
-      clearInterval(msgtimer);
-      msgtimer = setInterval( function() {
+      msgtimer = setTimeout( function() {
          closeMessage();
       },
       (timeout * 1000));
@@ -274,6 +278,34 @@ function showMessage( text, status, timeout) {
 
 }
 
+//See if messagebox is showing
+function isMessageBoxVisible() {
+    return ($('#messagebox').length > 0);
+}
+
+//Change message in box
+function changeMessage(text, status, timeout) {
+    clearTimeout(msgtimer);
+    $('#messagebox').empty();
+    $('#messagebox').removeClass('msggood');
+    $('#messagebox').removeClass('msgbad');
+    $('#messagebox').removeClass('msgwarn');
+
+    $('#messagebox').html('<a id="btnMessageBoxClose" title="Close message box." onclick="javascript:closeMessage();"><img class="icon-collapse-up" src="/images/blank.gif" /></a>' + text);
+
+    if(status == false || status == "false") {
+        $('#messagebox').addClass('msgbad');
+    } else if (status == "warning") {
+        $('#messagebox').addClass('msgwarn');
+    } else {
+        $('#messagebox').addClass('msggood');
+    }
+
+    msgtimer = setTimeout( function() {
+            closeMessage();
+        },
+    (timeout * 1000));
+}
 
 //Close the global message box
 function closeMessage() {
@@ -683,51 +715,50 @@ function newMicroblogPostWindow(item, opmlsource, type) {
 	}
 
 	//Clear the upload queue
-        $(modal + ' #divEnclosures').hide();
-        $(modal + ' #divUpload').hide();
-        $(modal + ' #file_upload').uploadifive('clearQueue');
+    $(modal + ' #divEnclosures').hide();
+    $(modal + ' #divUpload').hide();
+    $(modal + ' #file_upload').uploadifive('clearQueue');
 
+	//Show the modal
+    $(modal).modal('show');
+    modalFullHeight(modal, compact);
 
-	//Show the modal	
-        $(modal).modal('show');
-        modalFullHeight(modal, compact);
-
-        //Ajaxify the form
-        $(modal + ' .mbpostform').ajaxForm({
-                dataType:       'json',
-                cache:          false,
-                clearForm:      true,
-                resetForm:      true,
-                timeout:        60000,
-                beforeSubmit:   function() {
-                        $(modal + ' .spinner').show();
-                        $(modal + ' input,textarea,button').attr("disabled", true);
-                },
-                success:        function(data) {
-                        if(data.status == "false") {
-                                showMessage( data.description, data.status, 5 );
-                        } else {
-                                showMessage( "Post Successful!", data.status, 5 );
-                        }
-                        $(modal + ' .spinner').hide();
-                        $(modal + ' input,textarea,button').attr("disabled", false);
-                        $(modal).modal('hide');
-			reloadMicroblogWidget();
-                },
-                error:          function(x, t, m) {
-                        showMessage( "Error: " + m + "(" + t + ")", false, 60 );
-                        $(modal + ' input,textarea,button').attr("disabled", false);
-                }
-        });
-        $(modal + ' .mbsubmit').click(function() {
-                $(modal + ' .mbpostform').submit();
-                return false;
-        });	
+    //Ajaxify the form
+    $(modal + ' .mbpostform').ajaxForm({
+            dataType:       'json',
+            cache:          false,
+            clearForm:      true,
+            resetForm:      true,
+            timeout:        60000,
+            beforeSubmit:   function() {
+                    $(modal + ' .spinner').show();
+                    $(modal + ' input,textarea,button').attr("disabled", true);
+            },
+            success:        function(data) {
+                    if(data.status == "false") {
+                            showMessage( data.description, data.status, 5 );
+                    } else {
+                            showMessage( "Post Successful!", data.status, 5 );
+                    }
+                    $(modal + ' .spinner').hide();
+                    $(modal + ' input,textarea,button').attr("disabled", false);
+                    $(modal).modal('hide');
+        reloadMicroblogWidget();
+            },
+            error:          function(x, t, m) {
+                    showMessage( "Error: " + m + "(" + t + ")", false, 60 );
+                    $(modal + ' input,textarea,button').attr("disabled", false);
+            }
+    });
+    $(modal + ' .mbsubmit').click(function() {
+            $(modal + ' .mbpostform').submit();
+            return false;
+    });
 
 	//Set the twitter toggle
 	$(modal + ' .tweeticon').removeClass('icon-twitter').addClass('icon-notwitter');
 	$(modal + ' .tweetcheck').prop('checked', false);
-        $(modal + ' .tweeticon').bind('click', function() {
+    $(modal + ' .tweeticon').bind('click', function() {
                 $(modal + ' .tweetcheck').prop('checked', !$(modal + ' .tweetcheck').prop('checked'));
                 $(modal + ' .tweeticon').toggleClass('icon-twitter');
                 $(modal + ' .tweeticon').toggleClass('icon-notwitter');
@@ -735,7 +766,7 @@ function newMicroblogPostWindow(item, opmlsource, type) {
         });
 
 	//Track text length
-        $(modal + ' .mbcharcount').text( $(modal + ' .bpdescription textarea').val().length );	
+    $(modal + ' .mbcharcount').text( $(modal + ' .bpdescription textarea').val().length );
 	$(modal + ' .bpdescription textarea').bind('keyup', function() {
 		var cc = $(modal + ' .bpdescription textarea').val().length;
 		$(modal + ' .mbcharcount').text( cc );

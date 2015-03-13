@@ -249,7 +249,7 @@ OPMLOUT1;
         }
         $line = str_replace("\n", '', $line);
         $line = str_replace("\r", '', $line);
-        $opmlout .= "<outline text=\"".xmlentities(trim(strip_tags($line, '<a><b><i><em><u><img><ul><li><h1><h2><h3><h4><h5>')))."\" /><outline text=\"\"></outline>";
+        $opmlout .= "<outline text=\"".xmlentities(trim(strip_tags($line, '<a><b><i><em><u><img><ul><li><h1><h2><h3><h4><h5>')))."\" />";
     }
 
 $opmlout .= <<<OPMLOUT2

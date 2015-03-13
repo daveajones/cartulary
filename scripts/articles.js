@@ -29,7 +29,7 @@ $(document).ready(function () {
             if (data.status == "false") {
                 showMessage(data.description, data.status, 5);
             } else {
-                showMessage(data.description + ' <a href="' + data.url + '">Open</a> or <a href="/editor?url=' + data.url + '&title=Export">Edit</a>', data.status, 60);
+                    showMessage(data.description + ' <a href="' + data.url + '">Open</a> or <a href="/editor?url=' + data.url + '&title=Export">Edit</a>', data.status, 99);
             }
         }
     });
@@ -63,6 +63,7 @@ $(document).ready(function () {
     //If any articles are check-marked, the opml icon becomes an export button
     $('#aOpmlExport').click(function () {
         if ($('.exparticle:checked').length > 0) {
+            showMessage("<i class='fa fa-spinner fa-spin'></i> Exporting articles. Please wait...", "warning", 99);
             $('#frmArticleExport').submit();
             return false;
         }
@@ -76,7 +77,7 @@ $(document).ready(function () {
             type: "GET",
             dataType: 'json',
             beforeSend: function () {
-                  showMessage("<i class='fa-spinner fa-spin'></i> Retrieving emails...", 99);
+                  showMessage("<i class='fa fa-spinner fa-spin'></i> Retrieving emails. Please wait...", "warning", 99);
             },
             success: function (data) {
                 $('#aEmailImport img').removeClass('fa-spinner').addClass('fa-envelope').removeClass('fa-spin');

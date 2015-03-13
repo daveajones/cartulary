@@ -621,7 +621,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
 
 
     //The feed string
-    $rss = '<?xml version="1.0"?>' . "\n  <rss version=\"2.0\" xmlns:microblog=\"http://microblog.reallysimple.org/\" xmlns:sopml=\"$sopmlnamespaceurlv1\">\n    <channel>";
+    $rss = '<?xml version="1.0"?>' . "\n  <rss version=\"2.0\" xmlns:source=\"http://source.smallpict.com/2014/07/12/theSourceNamespace.html\" xmlns:sopml=\"$sopmlnamespaceurlv1\">\n    <channel>";
 
     $rss .= "\n
       <title>" . htmlspecialchars($title) . "</title>
@@ -635,21 +635,21 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
     if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
         $rss .= "
       <sopml:url>$sopmlurl</sopml:url>
-      <microblog:archive>
-          <microblog:url>" . htmlspecialchars(get_s3_url($uid, "arc")) . "/</microblog:url>
-          <microblog:filename>" . get_microblog_feed_filename($uid) . "</microblog:filename>
-          <microblog:startDay>$firstpostDate</microblog:startDay>
-          <microblog:endDay>$lastpostDate</microblog:endDay>
-      </microblog:archive>\n";
+      <source:archive>
+          <source:url>" . htmlspecialchars(get_s3_url($uid, "arc")) . "/</source:url>
+          <source:filename>" . get_microblog_feed_filename($uid) . "</source:filename>
+          <source:startDay>$firstpostDate</source:startDay>
+          <source:endDay>$lastpostDate</source:endDay>
+      </source:archive>\n";
     }
-    $rss .= "      <microblog:localTime>" . date('n/j/Y; g:i:s A') . "</microblog:localTime>\n";
+    $rss .= "      <source:localTime>" . date('n/j/Y; g:i:s A') . "</source:localTime>\n";
 
     if ($cg_opmlcloud_enabled == 1) {
         $rss .= "      <sopml:updates host=\"" . $cg_opmlcloud_host . "\" port=\"" . $cg_opmlcloud_port . "\" type=\"" . $cg_opmlcloud_type . "\" value=\"" . random_gen(16) . "\" />\n";
     }
 
     if (!empty($prefs['avatarurl'])) {
-        $rss .= "      <microblog:avatar>" . $prefs['avatarurl'] . "</microblog:avatar>\n";
+        $rss .= "      <source:avatar>" . $prefs['avatarurl'] . "</source:avatar>\n";
         $rss .= "      <sopml:avatar>" . $prefs['avatarurl'] . "</sopml:avatar>\n";
     }
 
@@ -663,7 +663,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
                 $rssurl = htmlspecialchars($post['shorturl']);
                 $rsslink = "        <link>$rssurl</link>";
                 $guid = "        <guid>$rssurl</guid>";
-                $linkfull = "        <microblog:linkFull>" . htmlspecialchars(trim($post['url'])) . "</microblog:linkFull>";
+                $linkfull = "        <source:linkFull>" . htmlspecialchars(trim($post['url'])) . "</source:linkFull>";
             } else {
                 $rssurl = htmlspecialchars($post['url']);
                 $rsslink = "        <link>$rssurl</link>";

@@ -8,6 +8,7 @@ if ( isset($_SERVER['HTTP_HOST']) && !empty($_SERVER['HTTP_HOST']) && $_SERVER['
     require_once "$confroot/$includes/net.php";
     $newurl = get_redirection_url_by_host_name($_SERVER['HTTP_HOST']);
     if( !empty($newurl) ) {
+        add_redirection_hit_by_url($newurl);
         header("Location: ".$newurl);
         return(0);
     }

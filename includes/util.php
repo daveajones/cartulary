@@ -967,10 +967,10 @@ function get_final_url($url, $timeout = 5, $count = 0)
     curl_close($curl);
     unlink($cookie);
 
-    loggit(3, "DEBUG: get_final_url($url) returned: [".$response['http_code']."]");
+    //loggit(3, "DEBUG: get_final_url($url) returned: [".$response['http_code']."]");
 
     //Normal re-direct
-    if ($response['http_code'] == 301 || $response['http_code'] == 302) {
+    if ($response['http_code'] == 301 || $response['http_code'] == 302 || $response['http_code'] == 303) {
         loggit(3, "DEBUG: ".print_r($response, TRUE));
         ini_set("user_agent", $ua);
         $headers = get_headers($response['url']);
@@ -1001,6 +1001,65 @@ function get_final_url($url, $timeout = 5, $count = 0)
 }
 
 
+//Follow redirects to get to the final, good url
+function get_final_url_with_cookie($url, $timeout = 5, $count = 0, $cookie = "")
+{
+    echo "get_final_url_with_cookie($url, $timeout, $count, $cookie)\n";
+
+    $count++;
+    if($count == 10) {
+        loggit(3, "Too many redirects for url: [$url]");
+        return("");
+    }
+    $url = clean_url($url);
+    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_USERAGENT, $ua);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    if(empty($cookie)) {
+        $cookie = tempnam("/tmp", "CURLCOOKIE");
+        curl_setopt($curl, CURLOPT_COOKIEJAR, $cookie);
+    } else {
+        //echo "COOKIEFILE: [".$cookie."]\n";
+        curl_setopt($curl, CURLOPT_COOKIEFILE, $cookie);
+    }
+    curl_setopt($curl, CURLOPT_ENCODING, "");
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_AUTOREFERER, true);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+
+    $content = curl_exec($curl);
+    $response = curl_getinfo($curl);
+    curl_close($curl);
+    //unlink($cookie);
+
+    //loggit(3, "DEBUG: get_final_url($url) returned: [".$response['http_code']."]");
+
+    //Normal re-direct
+    if ($response['http_code'] == 301 || $response['http_code'] == 302 || $response['http_code'] == 303) {
+        //loggit(3, "DEBUG get_final_url($url): ".print_r($response, TRUE));
+        ini_set("user_agent", $ua);
+        $headers = get_headers($response['url']);
+
+        $location = "";
+        foreach ($headers as $value) {
+            //loggit(3, "HEADER: [[".trim(substr($value, 9, strlen($value)))."]]");
+            if (substr(strtolower($value), 0, 9) == "location:") {
+                //loggit(3, "DEBUG: This was a normal http redirect.");
+                //loggit(3, "HEADER: [[".trim(substr($value, 9, strlen($value)))."]]");
+                return array('url' => get_final_url_with_cookie(trim(substr($value, 9, strlen($value))), 8, $count, $cookie), 'cookie' => $cookie);
+            }
+        }
+    }
+
+    return array('url' => $response['url'], 'cookie' => $cookie);
+}
+
+
 //Gets the data from a URL
 function fetchUrl($url, $timeout = 30)
 {
@@ -1010,6 +1069,8 @@ function fetchUrl($url, $timeout = 30)
     $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_COOKIEFILE, "");
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
     curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
@@ -1020,6 +1081,9 @@ function fetchUrl($url, $timeout = 30)
     $data = curl_exec($curl);
     $response = curl_getinfo($curl);
     curl_close($curl);
+    if(!empty($cookie)) {
+        //unlink($cookie);
+    }
 
     $rcode = $response['http_code'];
     if ($rcode != 200) {
@@ -1052,6 +1116,8 @@ function fetchFeedUrl($url, $subcount = 0, $sysver = '', $timeout = 30)
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_COOKIEFILE, "");
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
     curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
     curl_setopt($curl, CURLOPT_ENCODING, "");
@@ -1083,6 +1149,8 @@ function fetchUrlExtra($url, $timeout = 30)
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_HEADER, 1);
+    curl_setopt($curl, CURLOPT_COOKIEFILE, "");
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
     curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
     curl_setopt($curl, CURLOPT_ENCODING, "");
@@ -1309,6 +1377,84 @@ function get_s3_bucket_location($key, $secret, $bucket)
 }
 
 
+//Set the CORS configuration on a bucket
+function set_s3_bucket_cors($key, $secret, $bucket)
+{
+    //Check parameters
+    if (empty($key)) {
+        loggit(2, "Key missing from S3 put call: [$key].");
+        return (FALSE);
+    }
+    if (empty($secret)) {
+        loggit(2, "Secret missing from S3 put call: [$secret].");
+        return (FALSE);
+    }
+    if (empty($bucket)) {
+        loggit(2, "Bucket missing from S3 put call: [$bucket].");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Set up
+    require_once "$confroot/$libraries/s3/S3.php";
+    $s3 = new S3($key, $secret);
+
+    //Set the CORS policy of this bucket
+    $res = $s3->setBucketCrossOriginConfiguration($bucket);
+
+    //Were we able to set the cors config?
+    if (!$res) {
+        loggit(2, "Could not set cors config on bucket using: [$key | $secret | $bucket].");
+        return (FALSE);
+    }
+
+    //Give back the buckets array
+    //loggit(3, "DEBUG: Bucket: [$bucket] is located in: [$bucketloc].");
+    return ($res);
+}
+
+
+//Get the regional location of an S3 bucket
+function get_s3_bucket_cors($key, $secret, $bucket)
+{
+    //Check parameters
+    if (empty($key)) {
+        loggit(2, "Key missing from S3 put call: [$key].");
+        return (FALSE);
+    }
+    if (empty($secret)) {
+        loggit(2, "Secret missing from S3 put call: [$secret].");
+        return (FALSE);
+    }
+    if (empty($bucket)) {
+        loggit(2, "Bucket missing from S3 put call: [$bucket].");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Set up
+    require_once "$confroot/$libraries/s3/S3.php";
+    $s3 = new S3($key, $secret);
+
+    //Get the CORS policy of this bucket
+    $cors = $s3->getBucketCrossOriginConfiguration($bucket);
+
+    //Were we able to get it?
+    if (!$cors) {
+        loggit(2, "Could not get the cors policy of the bucket using: [$key | $secret | $bucket].");
+        return (FALSE);
+    }
+
+    //Give back the buckets array
+    //loggit(3, "DEBUG: Bucket: [$bucket] is located in: [$bucketloc].");
+    return ($cors);
+}
+
+
 //Get the regional endpoint name for an S3 bucket
 function get_s3_regional_dns($location)
 {
@@ -1482,7 +1628,7 @@ function get_next_short_url($previousNumber)
 {
     // Begin Config
     $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    $bannedWords = "fuck,ass,dick,balls,pussy,tits,bitch,shit,cunt,shit";
+    $bannedWords = "fuck,ass,dick,balls,pussy,tits,bitch,shit,cunt";
     $bannedWordCaseSensitive = FALSE;
     // End Config
 
@@ -3237,4 +3383,43 @@ class Rest {
             $req = $_REQUEST;
         }
     }
+}
+
+//Diff engine for text
+//__via: https://github.com/paulgb/simplediff/blob/master/php/simplediff.php
+function diff($old, $new){
+    $matrix = array();
+    $maxlen = 0;
+    foreach($old as $oindex => $ovalue){
+        $nkeys = array_keys($new, $ovalue);
+        foreach($nkeys as $nindex){
+            $matrix[$oindex][$nindex] = isset($matrix[$oindex - 1][$nindex - 1]) ?
+                $matrix[$oindex - 1][$nindex - 1] + 1 : 1;
+            if($matrix[$oindex][$nindex] > $maxlen){
+                $maxlen = $matrix[$oindex][$nindex];
+                $omax = $oindex + 1 - $maxlen;
+                $nmax = $nindex + 1 - $maxlen;
+            }
+        }
+    }
+    if($maxlen == 0) return array(array('d'=>$old, 'i'=>$new));
+    return array_merge(
+        diff(array_slice($old, 0, $omax), array_slice($new, 0, $nmax)),
+        array_slice($new, $nmax, $maxlen),
+        diff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen)));
+}
+
+
+//Diff engine for html
+//__via: https://github.com/paulgb/simplediff/blob/master/php/simplediff.php
+function htmlDiff($old, $new){
+    $ret = '';
+    $diff = diff(preg_split("/[\s]+/", $old), preg_split("/[\s]+/", $new));
+    foreach($diff as $k){
+        if(is_array($k))
+            $ret .= (!empty($k['d'])?"<del>".implode(' ',$k['d'])."</del> ":'').
+                (!empty($k['i'])?"<ins>".implode(' ',$k['i'])."</ins> ":'');
+        else $ret .= $k . ' ';
+    }
+    return $ret;
 }

@@ -187,7 +187,8 @@ if ($test !== false && $test !== null && preg_match('!^https?://!', $url)) {
 }
 
 //Resolve re-directs
-$newurl = get_final_url($url);
+//$newurl = get_final_url($url);
+$newurl = $url;
 
 //Remove feedburner garbage
 $url = trim(rtrim(preg_replace("/&?utm_(.*?)\=[^&]+/", "", $newurl), '?'));
@@ -558,5 +559,3 @@ if (isset($_REQUEST['json'])) {
 
 //Redirect to the article viewer to see it
 header("Location: $showarticlepage?aid=$aid");
-
-?>

@@ -102,16 +102,19 @@
                     <ul class="dropdown-menu" data-container="body">
                         <li><a href="#" class="menuSave saves" title="Save">Save</a></li>
                         <li><a href="#" class="menuSaveAs saves" title="Save As">Save as...</a></li>
+                        <li><a href="#" class="menuSaveArticle saves hide" title="Save Edited Article">Save Edited Article</a></li>
                     </ul>
                 </li>
                 <li><a class="menuPublish" href="#" title="Publish">Publish</a></li>
                 <li class="divider-vertical34"></li>
-                <li class="<?if($mode == "article"){echo "active";}?>"><a class="rendertoggle" href="#" title="Toggle html rendering">WYSIWYG</a></li>
-                <?if(!empty($myprefs['disqus_shortname'])) { ?><li><a class="menuDisqusToggle" href="#" title="Include Disqus comments in rendered version?">Disqus</a></li><?}?>
-                <?if(imap_is_enabled($myuid) && smtp_is_enabled($myuid)) { ?><li><a class="menuWatchToggle" href="#" title="Get notified if this outline changes?">Watch</a></li><?}?>
+                <li class="<?if($mode == "article"){echo "active";}?>"><a class="rendertoggle" href="#" title="Toggle html rendering"><i class="fa fa-file-code-o"></i></a></li>
+                <?if(!empty($myprefs['disqus_shortname'])) { ?><li><a class="menuDisqusToggle" href="#" title="Include Disqus comments in rendered version?"><i class="fa fa-comments"></i></a></li><?}?>
+                <?if(imap_is_enabled($myuid) && smtp_is_enabled($myuid)) { ?><li><a class="menuWatchToggle" href="#" title="Get notified if linked-to pages in this outline change?"><i class="fa fa-eye"></i></a></li><?}?>
+                <li><a class="menuLockToggle" href="#" title="Lock this outline to prevent changes."><i class="fa fa-lock"></i></a></li>
                 <li class="dropdown menuType" title="What type of outline is this?">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Type <b class="caret"></b></a>
                     <ul class="dropdown-menu" data-container="body">
+                        <li><a href="#" class="menuTypeSelection menuTypeNone" title="No type." data-type="none">not set</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeOutline" title="A basic indented look." data-type="outline">Outline</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeDocument" title="A flat, fully expanded document." data-type="document">Document</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeIndex" title="A collapsible outline." data-type="index">Index</a></li>
@@ -123,8 +126,10 @@
                         <li><a href="#" class="menuTypeSelection menuTypeMenu" title="A menu bar structure." data-type="menu">Menu</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeLink" title="Link to a url." data-type="link">Link</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeInclude" title="Bring in another outline's content." data-type="include">Include</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeImage" title="Add an image node to the outline." data-type="image">Image</a></li>
                     </ul>
                 </li>
+
                 <li class="<?if(!empty($rhost)){echo "active";}?>"><a class="menuRedirect" href="#" <?if(!empty($rhost)){echo "data-redirect=\"".$rhost."\"";}?> title="Set a dns redirect for this document.">Redirect<?if(!empty($rhost)){echo ": ".$rhost;}?></a></li>
                 <li class="divider-vertical34"></li>
                 <li><a class="menuAddLink" href="#" title="Make selection a link."><i class="fa fa-link"></i></a></li>
@@ -132,6 +137,7 @@
                 <li><a class="menuImportOutline" href="#" title="Import an outline into this node."><i class="fa fa-sign-in"></i></a></li>
                 <li><a class="menuInsertFiles" href="#" title="Insert files into this outline."><i class="fa fa-paperclip"></i></a></li>
                 <li><a class="menuArchiveNodes" href="#" title="Archive selected nodes."><i class="fa fa-archive"></i></a></li>
+                <li><a class="menuGenerateMorse" href="#" title="Generate morse tones for this article."><i class="fa fa-tty"></i></a></li>
             </ul>
             <ul class="nav pull-right outlineinfo"></ul>
         </div>

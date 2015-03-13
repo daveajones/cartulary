@@ -195,7 +195,7 @@ function get_feed_link($content = NULL)
 }
 
 
-//Does the feed contain a microblog:avatar or sopml:avatar?
+//Does the feed contain a source:avatar or sopml:avatar?
 function get_feed_avatar($x = NULL)
 {
     //Check parameters
@@ -211,14 +211,14 @@ function get_feed_avatar($x = NULL)
     $namespaces = $x->getDocNamespaces();
 
     //If there's no namespace
-    if (!isset($namespaces['microblog'])) {
+    if (!isset($namespaces['source'])) {
         //None of the tests passed so return FALSE
         loggit(1, "No microblog namespace defined for this feed.");
         return (FALSE);
     }
 
     //Search for an avatar
-    $ns_microblog = $x->channel->children($namespaces['microblog']);
+    $ns_microblog = $x->channel->children($namespaces['source']);
     if (isset($ns_microblog->avatar)) {
         $url = $ns_microblog->avatar;
         loggit(1, "The avatar of this feed is at: [$url].");
@@ -275,7 +275,7 @@ function feed_exists($url = NULL)
     //See if any rows came back
     if ($sql->num_rows() < 1) {
         $sql->close();
-        loggit(3, "The feed at url: [$url] does not exist in the repository.");
+        loggit(1, "The feed at url: [$url] does not exist in the repository.");
         return (FALSE);
     }
     $sql->bind_result($feedid) or loggit(2, "MySql error: " . $dbh->error);
@@ -997,7 +997,7 @@ function flip_purge_to_old($fid = NULL)
 
     //Now that we have a good id, put the article into the database
     $stmt = "UPDATE $table_nfitem SET `old`=1 WHERE feedid=? AND `purge`=1";
-    $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
+    $sql = $dbh->prepare($stmt) or loggit(2, $dbh->error);
     $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $updcount = $sql->affected_rows;
@@ -1026,7 +1026,7 @@ function mark_river_as_updated($uid = NULL)
 
     //Now that we have a good id, put the article into the database
     $stmt = "UPDATE $table_river SET updated=1 WHERE userid=?";
-    $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
+    $sql = $dbh->prepare($stmt) or loggit(2, $dbh->error);
     $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $updcount = $sql->affected_rows;
@@ -1606,7 +1606,7 @@ function fetch_feed_content($fid = NULL, $force = TRUE)
     mark_feed_as_updated($fid);
 
     //Log and leave
-    loggit(3, "Fetched: [$consize] new bytes of content for feed: [$goodurl].");
+    loggit(1, "Fetched: [$consize] new bytes of content for feed: [$goodurl].");
     return ($consize);
 }
 
@@ -1697,7 +1697,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     loggit(1, "DEBUG: Pubdate: [$pubdate]");
     if ($feed['pubdate'] == $pubdate && !empty($pubdate) && $force == FALSE) {
         //The feed says that it hasn't been updated
-        loggit(3, "The pubdate in the feed has not changed.");
+        loggit(1, "The pubdate in the feed has not changed.");
         $stats['checktime'] += (time() - $fstart);
         set_feed_stats($fid, $stats);
         //return (-3);
@@ -2460,11 +2460,11 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                 loggit(1, "add_feed_item(): using scripting2:source as the origin: " . print_r($scripting2, TRUE));
             }
         }
-        if (isset($namespaces['microblog'])) {
-            $microblog = $item->children($namespaces['microblog']);
+        if (isset($namespaces['source'])) {
+            $microblog = $item->children($namespaces['source']);
             if (isset($microblog->linkFull)) {
                 $origin = (string)trim($microblog->linkFull);
-                loggit(1, "add_feed_item(): using microblog:linkFull as the origin: " . print_r($microblog, TRUE));
+                loggit(1, "add_feed_item(): using source:linkFull as the origin: " . print_r($microblog, TRUE));
             }
         }
         if (isset($namespaces['sopml'])) {
@@ -3119,7 +3119,7 @@ function build_river_json($uid = NULL, $max = NULL, $force = FALSE, $mobile = FA
             }
         }
     } else {
-        loggit(3, "Skipping S3 upload of river json since user wants it private.");
+        loggit(1, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");
@@ -3504,7 +3504,7 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
             } else {
                 $rftemplate = fetchUrl($s3info['rivertemplate']);
                 if (is_outline($rftemplate)) {
-                    $rftemplate = convert_opml_to_html($rftemplate);
+                    $rftemplate = convert_opml_to_text($rftemplate);
                     $rftemplate = str_replace('<%opmlUrl%>', $s3info['rivertemplate'], $rftemplate);
                 }
             }
@@ -3832,7 +3832,7 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
             } else {
                 $rftemplate = fetchUrl($prefs['pubrivertemplate']);
                 if (is_outline($rftemplate)) {
-                    $rftemplate = convert_opml_to_html($rftemplate);
+                    $rftemplate = convert_opml_to_text($rftemplate);
                     $rftemplate = str_replace('<%opmlUrl%>', $prefs['pubrivertemplate'], $rftemplate);
                 }
             }
@@ -4380,7 +4380,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
             }
         }
     } else {
-        loggit(3, "Skipping S3 upload of river json since user wants it private.");
+        loggit(1, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");
@@ -4403,7 +4403,7 @@ function build_river_json3($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     require_once "$confroot/$libraries/s3/S3.php";
     require_once "$confroot/$includes/opml.php";
 
-    loggit(3, "DEBUG: build_river_json3($uid, $max, $force, $mobile)");
+    loggit(1, "DEBUG: build_river_json3($uid, $max, $force, $mobile)");
 
     //Get the users prefs
     $prefs = get_user_prefs($uid);
@@ -4783,7 +4783,7 @@ function build_river_json3($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
             }
         }
     } else {
-        loggit(3, "Skipping S3 upload of river json since user wants it private.");
+        loggit(1, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");
@@ -5119,7 +5119,7 @@ function build_river_json4($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
             }
         }
     } else {
-        loggit(3, "Skipping S3 upload of river json since user wants it private.");
+        loggit(1, "Skipping S3 upload of river json since user wants it private.");
     }
 
     loggit(1, "Returning: [$drcount] items in user: [$uid]'s desktop river.");

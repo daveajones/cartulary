@@ -17,7 +17,7 @@ if (!user_can_view_article($aid, $uid)) {
 }
 
 //Get the requested article
-$article = get_article($aid);
+$article = get_article($aid, $uid);
 
 $section = "Articles";
 $tree_location = "Show Article";

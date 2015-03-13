@@ -33,6 +33,8 @@ if(!$inbox) {
 /* grab emails */
 $emails = imap_search($inbox,'ALL');
 
+loggit(3, "DEBUG: [".count($emails)."] emails to import.");
+
 /* if emails are returned, cycle through each... */
 $count = 0;
 if($emails) {
@@ -112,8 +114,6 @@ if($emails) {
             $count++;
         }
 
-        //debug
-        break;
     }
 }
 

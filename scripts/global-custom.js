@@ -237,8 +237,13 @@ $.extend($.expr[':'],{
 
 //Display something in the global dropdown message box
 function showMessage( text, status, timeout) {
-   clearInterval(msgtimer);
-   $('#divMessageBox').slideUp("normal", function(){ $('#divMessageBox').remove(); });
+   clearTimeout(msgtimer);
+   //closeMessage();
+   //$('#divMessageBox').slideUp("normal", function(){ $('#divMessageBox').remove(); });
+
+    if(isMessageBoxVisible()) {
+        return changeMessage(text, status, timeout);
+    }
 
    $('.msganchor').after('<div style="display:none;" id="divMessageBox"><p id="messagebox"></p></div>');
 
@@ -265,8 +270,7 @@ function showMessage( text, status, timeout) {
       $('#divMessageBox').center(true, false);
       $('#divMessageBox').slideDown();
 
-      clearInterval(msgtimer);
-      msgtimer = setInterval( function() {
+      msgtimer = setTimeout( function() {
          closeMessage();
       },
       (timeout * 1000));
@@ -274,6 +278,34 @@ function showMessage( text, status, timeout) {
 
 }
 
+//See if messagebox is showing
+function isMessageBoxVisible() {
+    return ($('#messagebox').length > 0);
+}
+
+//Change message in box
+function changeMessage(text, status, timeout) {
+    clearTimeout(msgtimer);
+    $('#messagebox').empty();
+    $('#messagebox').removeClass('msggood');
+    $('#messagebox').removeClass('msgbad');
+    $('#messagebox').removeClass('msgwarn');
+
+    $('#messagebox').html('<a id="btnMessageBoxClose" title="Close message box." onclick="javascript:closeMessage();"><img class="icon-collapse-up" src="/images/blank.gif" /></a>' + text);
+
+    if(status == false || status == "false") {
+        $('#messagebox').addClass('msgbad');
+    } else if (status == "warning") {
+        $('#messagebox').addClass('msgwarn');
+    } else {
+        $('#messagebox').addClass('msggood');
+    }
+
+    msgtimer = setTimeout( function() {
+            closeMessage();
+        },
+    (timeout * 1000));
+}
 
 //Close the global message box
 function closeMessage() {

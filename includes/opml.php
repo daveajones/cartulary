@@ -1240,7 +1240,7 @@ function get_includes_from_outline($content = NULL, $max = NULL)
 
     //Grab only nodes that have an xmlUrl attribute
     $feeds = array();
-    $nodes = $x->xpath('//outline[@url and @type="include" or @type="link"]');
+    $nodes = $x->xpath('//outline[@url and @type="include"]');
     if (empty($nodes)) {
         loggit(2, "This outline content didn't have any include nodes.");
         return (-2);
@@ -2113,6 +2113,7 @@ function convert_opml_to_html($content = NULL, $max = NULL)
     $count = 0;
     $html = "";
     foreach ($nodes as $entry) {
+        $line = "";
         //loggit(3, "DEBUG: ".print_r($entry, TRUE));
 
         $text = (string)$entry->attributes()->text;
@@ -2120,14 +2121,164 @@ function convert_opml_to_html($content = NULL, $max = NULL)
         $link = (string)$entry->attributes()->url;
         $type = (string)$entry->attributes()->type;
 
-        $html .= "$text\n";
+        $text = trim(html_entity_decode($text));
+
+        if(!empty($link)) {
+            $line .= "<p><a href=\"$link\">$text</a></p>";
+        } else {
+            $line .= "<p>$text</p>";
+        }
+
+        if(empty($text)) {
+            $line ="<br/>";
+        }
+
+        $html .= $line."\n";
+
+        $count++;
+    }
+
+    //Collapse muliple br tags
+    $output = preg_replace("/(<br\s*\/?>\s*)+/", "<br/>", $html);
+
+    //Log and leave
+    loggit(3, "Got [$count] items from the opml document.");
+    return ($output);
+}
+
+
+//Convert an opml document to html
+function convert_opml_to_text($content = NULL, $max = NULL)
+{
+    //Check params
+    if ($content == NULL) {
+        loggit(2, "The opml content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Parse it
+    libxml_use_internal_errors(true);
+    $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+    libxml_clear_errors();
+
+    //Roll through all of the outline nodes
+    $nodes = $x->xpath('//outline');
+    if (empty($nodes)) {
+        loggit(3, "This opml document is blank.");
+        return (-2);
+    }
+
+    //Run through each node and convert it to an html element
+    $count = 0;
+    $raw = "";
+    foreach ($nodes as $entry) {
+        //loggit(3, "DEBUG: ".print_r($entry, TRUE));
+
+        $text = (string)$entry->attributes()->text;
+        $name = (string)$entry->attributes()->name;
+        $link = (string)$entry->attributes()->url;
+        $type = (string)$entry->attributes()->type;
+
+        $raw .= "$text\n";
 
         $count++;
     }
 
     //Log and leave
     loggit(3, "Got [$count] items from the opml document.");
-    return ($html);
+    return ($raw);
+}
+
+
+//Convert an opml document to html using xslt transformation
+function transform_opml_to_html($content = NULL)
+{
+    //Check params
+    if (empty($content)) {
+        loggit(2, "The opml content is blank, corrupt or not valid opml.");
+        return ("");
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //loggit(3, "DEBUG:\n[$content]");
+
+    $content = "<body>$content</body>";
+
+    $xslt_string = <<<XSLTSTRING
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:param name="owner" select="'Owner Name'"/>
+  <xsl:output method="html" encoding="iso-8859-1" indent="yes"/>
+
+<xsl:variable name="markerNormal">&#9656;</xsl:variable>
+<xsl:variable name="markerClosed">&#9662;</xsl:variable>
+<xsl:variable name="markerComment">&#8810;</xsl:variable>
+<xsl:variable name="markerLink">&#9788;</xsl:variable>
+
+<xsl:template match = "/opml" >
+<html>
+  <script language="JavaScript" src="http://www.netcrucible.com/xslt/opml.js" />
+  <link rel="stylesheet" href="http://www.netcrucible.com/xslt/opml.css" />
+  <head><title><xsl:value-of select="head/title" /></title></head>
+  <body>
+    <div id="outlineRoot" class="outlineRoot">
+        <xsl:for-each select="head/*" >
+        <span class="outlineAttribute" title="{name()}"><xsl:value-of select="." /></span>
+        </xsl:for-each>
+  	<xsl:apply-templates select="body"/>
+    </div>
+    <span id="markerNormal" style="display:none"><xsl:value-of select="\$markerNormal" /></span>
+    <span id="markerComment" style="display:none"><xsl:value-of select="\$markerComment" /></span>
+    <span id="markerLink" style="display:none"><xsl:value-of select="\$markerLink" /></span>
+  </body>
+</html>
+</xsl:template>
+
+<xsl:template match = "outline" >
+  <div class="outline">
+       <xsl:attribute name="style">
+           <xsl:if test="parent::outline">margin-left:20px;</xsl:if>
+       </xsl:attribute>
+       <span style="margin-top:10px;">
+           <xsl:attribute name="class">
+               <xsl:choose>
+                   <xsl:when test="./*">markerClosed</xsl:when>
+                   <xsl:when test="contains(@url,'.opml') or contains(@url,'.OPML')">markerClosed</xsl:when>
+                   <xsl:otherwise>markerOpen</xsl:otherwise>
+               </xsl:choose>
+           </xsl:attribute>
+           <xsl:choose>
+               <xsl:when test="@isComment = 'true'"><xsl:value-of select="\$markerComment" /></xsl:when>
+               <xsl:when test="@type = 'link' and not(contains(@url,'.opml') or contains(@url,'.OPML'))"><xsl:value-of select="\$markerLink" /></xsl:when>
+               <xsl:otherwise><xsl:value-of select="\$markerNormal" /></xsl:otherwise>
+           </xsl:choose>
+       </span>
+       <span class="outlineText" style="margin-top:10px;">
+           <xsl:value-of select="@text" disable-output-escaping="yes" />
+       </span>
+       <xsl:apply-templates />
+  </div>
+</xsl:template>
+</xsl:stylesheet>
+XSLTSTRING;
+
+    libxml_use_internal_errors(true);
+    $xslt = new XSLTProcessor();
+    $xslt->importStylesheet(new SimpleXMLElement($xslt_string));
+    $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+    if(!$x) {
+        libxml_clear_errors();
+        loggit(2, "Parsing error when checking for opml content.");
+        return("");
+    }
+    $xml = $xslt->transformToXml($x);
+    libxml_clear_errors();
+
+    return($xml);
 }
 
 
@@ -2743,9 +2894,9 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 
     //Do the query
     if( $blob ) {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, outline FROM $table_recentfiles WHERE userid=? AND url=?";
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, locked, outline FROM $table_recentfiles WHERE userid=? AND url=?";
     } else {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched FROM $table_recentfiles WHERE userid=? AND url=?";
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, locked FROM $table_recentfiles WHERE userid=? AND url=?";
     }
 
 
@@ -2764,9 +2915,9 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
     }
 
     if( $blob ) {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $flocked, $foutline) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $flocked) or loggit(2, "MySql error: " . $dbh->error);
     }
 
 
@@ -2780,6 +2931,7 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
             'disqus' => $fdisqus,
             'wysiwyg' => $fwysiwyg,
             'watched' => $fwatched,
+            'locked' => $flocked
         );
         if( $blob ) {
             $files[$count]['content'] = $foutline;
@@ -2795,7 +2947,7 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 
 
 //Update a file into the recent files table
-function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE)
+function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE, $articleid = NULL, $locked = FALSE)
 {
     //Check parameters
     if (empty($uid)) {
@@ -2825,6 +2977,11 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     } else {
         $watched = 1;
     }
+    if (!$locked) {
+        $locked = 0;
+    } else {
+        $locked = 1;
+    }
 
     //Timestamp
     $time = time();
@@ -2837,15 +2994,15 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
 
     //Insert recent file entry
     if( empty($oldurl) ) {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched) VALUES (?,?,?,?,?,?,?,?)
-                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?, watched=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked) VALUES (?,?,?,?,?,?,?,?,?,?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssddddsdsddd", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $title, $time, $outline, $disqus, $wysiwyg, $watched) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsdsdsdddsd", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $title, $time, $outline, $disqus, $wysiwyg, $watched, $articleid, $locked) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched) VALUES (?,?,?,?,?,?,?,?)
-                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?, watched=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked) VALUES (?,?,?,?,?,?,?,?,?,?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssddddsdssddd", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsdsdssdddsd", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched, $articleid, $locked) or loggit(2, "MySql error: " . $dbh->error);
         loggit(3, "User: [$uid] changed old url: [$oldurl] to new url: [$url].");
     }
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -2853,7 +3010,7 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
     //Log and return
-    loggit(3, "User: [$uid] edited a file: [$url] at: [$title].");
+    loggit(3, "User: [$uid] edited a file: [$title] at: [$url]. Article: [$articleid].");
     return ($rid);
 }
 
@@ -2969,6 +3126,34 @@ function add_watched_url($rid = NULL, $url = NULL, $lastmodified = "", $content 
 
     //Log and return
     loggit(3, "Added url: [$url] from recent file: [$rid] to watched url table.");
+    return (TRUE);
+}
+
+
+//Update content of a watched url
+function update_watched_url_content_by_url($url = NULL, $lastmodified = "", $content = "")
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Insert watched file entry
+    $stmt = "UPDATE $table_watched_urls SET lastmodified=?,content=? WHERE url=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sss", $lastmodified, $content, $url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "Updated content for url: [$url] with data modified at: [$lastmodified].");
     return (TRUE);
 }
 
@@ -3094,6 +3279,65 @@ function get_watched_url_by_url($url = NULL)
 }
 
 
+//Return information about a watched url
+function get_watched_url_users_by_url($url = NULL)
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT files.userid
+               FROM $table_watched_urls as urls
+               JOIN $table_recentfiles as files ON urls.rid = files.id
+               WHERE urls.url = ? GROUP BY files.userid";
+
+    $sqltxt .= " ORDER BY files.userid ASC";
+
+    if (!empty($max) && is_numeric($max)) {
+        $sqltxt .= " LIMIT $max";
+    } else {
+        $sqltxt .= " LIMIT $default_max_list";
+    }
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "Url: [$url] is not in the watch list.");
+        return (array());
+    }
+
+    $sql->bind_result($fuid) or loggit(2, "MySql error: " . $dbh->error);
+
+    $users = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $users[$count] = $fuid;
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning list of watching users for url: [$url]");
+    return ($users);
+}
+
+
 //Retrieve an array of info about an outline
 function remove_watched_urls_by_file_id($id = NULL)
 {
@@ -3117,4 +3361,157 @@ function remove_watched_urls_by_file_id($id = NULL)
 
     //loggit(3,"Returning info for outline: [$id]");
     return (TRUE);
+}
+
+
+//Return the diff between two opml files
+function diff_opml($opml1 = "", $opml2 = "")
+{
+    //Check parameters
+    if (empty($opml1)) {
+        loggit(2, "The opml 1 input is blank or corrupt: [$opml1]");
+        return (FALSE);
+    }
+    if (empty($opml2)) {
+        loggit(2, "The opml 2 input is blank or corrupt: [$opml2]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    $diff = diff(explode("\n",$opml1),explode("\n",$opml2));
+    echo print_r($diff, TRUE)."\n";
+    $changed = "";
+
+    $bodygo = FALSE;
+    foreach ($diff as $line) {
+        if( is_string($line) && trim($line) == "</body>") {
+            $bodygo = FALSE;
+        }
+
+        if( $bodygo && is_array($line) && isset($line['i'])) {
+            foreach( $line['i'] as $subline ) {
+                if( !empty($subline) ) {
+                    $changed .= trim($subline)."\n";
+                }
+            }
+        }
+
+        if( is_string($line) && trim($line) == "<body>") {
+            $bodygo = TRUE;
+        }
+    }
+
+    echo print_r("DEBUG [changed]: ".$changed, TRUE)."\n";
+    return($changed);
+}
+
+
+//Convert opml to a php multidimensional array
+function convert_opml_to_array($opml = "")
+{
+    if(empty($opml)) {
+        return(array());
+    }
+
+    $xml = simplexml_load_string($opml);
+    $json = json_encode($xml);
+    $array = json_decode($json,TRUE);
+
+    return($array);
+}
+
+
+//Convert opml to a json object
+function convert_opml_to_json($opml = "")
+{
+
+    $xml = simplexml_load_string($opml);
+    $json = json_encode($xml);
+
+    return($json);
+}
+
+
+//Convert opml to myword.io format json
+function convert_opml_to_myword($content = NULL, $max = NULL)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Check params
+    if (empty($content) || !is_outline($content)) {
+        loggit(2, "The outline content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Array for building
+    $converted = array();
+    $converted['title'] = "";
+    $converted['authorname'] = "";
+    $converted['when'] = "";
+    $converted['img'] = "";
+    $converted['subs'] = "";
+
+    //Parse it
+    libxml_use_internal_errors(true);
+    $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+    libxml_clear_errors();
+
+    //Meta-data
+    if(isset($x->head->title)) {
+        $converted['title'] = (string)$x->head->title;
+    }
+    if(isset($x->head->ownerName)) {
+        $converted['authorname'] = (string)$x->head->ownerName;
+    }
+    if(isset($x->head->dateModified)) {
+        $converted['when'] = (string)$x->head->dateModified;
+    }
+    $converted['img'] = "";
+
+    //Grab an image node
+    $nodes = $x->xpath('//outline[@url and @type="image"]');
+    if (!empty($nodes)) {
+        foreach ($nodes as $entry) {
+            $converted['img'] = (string)$entry->attributes()->url;
+            break;
+        }
+    }
+
+    //Grab outline nodes
+    $nodes = $x->xpath('//outline[not(ancestor-or-self::outline[@type="menu" or @type="collaborate"])]');
+    if (empty($nodes)) {
+        loggit(2, "This outline content didn't have any outline nodes.");
+        return (-2);
+    }
+
+    //Run through each node and get the text into the array
+    $count = 0;
+    foreach ($nodes as $entry) {
+        if( (string)$entry->attributes()->type == "link") {
+            if( empty($entry->attributes()->text) ) {
+                $converted['subs'][] = '<a href="'.(string)$entry->attributes()->url.'">'.(string)$entry->attributes()->url.'</a>';
+            } else {
+                $converted['subs'][] = '<a href="'.(string)$entry->attributes()->url.'">'.(string)$entry->attributes()->text.'</a>';
+            }
+            $count++;
+        } else
+        if( empty($entry->attributes()->type)) {
+            $converted['subs'][] = (string)$entry->attributes()->text;
+            $count++;
+        }
+    }
+
+    //loggit(3, "DEBUG: ".print_r($json, TRUE));
+
+    if ($count == 0) {
+        loggit(2, "There were no outline nodes in this outline.");
+        return (-2);
+    }
+
+    //Log and leave
+    loggit(3, "Got [$count] include nodes from the outline.");
+    return (json_encode($converted));
 }

@@ -130,6 +130,10 @@ $(document).ready(function () {
 
     //Open button
     menubar.find('.menuOpen').click(function () {
+        if(sheetopen.hasClass('open')) {
+            $('div.sheet a.sheetclose').trigger('click');
+            return false;
+        }
 
         //Make the ajax call
         $.ajax({
@@ -144,11 +148,21 @@ $(document).ready(function () {
                 $.each(data.files, function (i, item) {
                     var re = /\.$/;
                     var newtitle = item.title.replace(re, "").toLowerCase();
-                    $('.recentfilesopen').append('<li><a href="/editor?url=' + item.url + '">' + newtitle + '</a> ' + prettyDate(item.time * 1000).toLowerCase() + '.</li>');
+                    var rfLocked = "";
+                    if( item.locked === 1) {
+                        rfLocked = ' <i class="fa fa-lock"></i> ';
+                    }
+                    var rfEye = "";
+                    if( item.watched === 1) {
+                        rfEye = ' <i class="fa fa-eye"></i> ';
+                    }
+                    $('.recentfilesopen').append('<li><a style="text-transform: capitalize;" href="/editor?url=' + item.url + '">' + newtitle + '</a> ' + prettyDate(item.time * 1000).toLowerCase() + '. '+ rfLocked + rfEye + '</li>');
                 });
 
                 //Open the dropdown sheet
                 sheetopen.toggleClass('open');
+                sheetopen.css('min-height', '80%');
+                sheetopen.find('.list-container').css('min-height', '90%');
             }
         });
 
@@ -177,6 +191,8 @@ $(document).ready(function () {
 
     //Close sheet button
     $('div.sheet a.sheetclose').click(function () {
+        sheetopen.css('min-height', '');
+        sheetopen.find('.list-container').css('min-height', '');
         $('div.sheet').removeClass('open');
     });
 
@@ -839,7 +855,7 @@ $(document).ready(function () {
                 }
                 menubar.find('#dropdownSave').html('Save');
                 menubar.find('.saves').attr('disabled', false);
-                wasLocked = true;
+                wasLocked = flocked;
 
                 //Set the title of the html document
                 document.title = ftitle + " - FC";

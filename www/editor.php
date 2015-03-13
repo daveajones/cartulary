@@ -106,9 +106,7 @@ if( !empty($opmldata) ) {
     var watchedOutline = <?if(!isset($seenfile) || $seenfile[0]['watched'] == 0) { echo "false"; } else { echo "true"; }?>;
     var lockedOutline = <?if(!isset($seenfile) || $seenfile[0]['locked'] == 0) { echo "false"; } else { echo "true"; }?>;
     var wasLocked = <?if(!isset($seenfile) || $seenfile[0]['locked'] == 0) { echo "false"; } else { echo "true"; }?>;
-    <?if( !empty($rhost) ) {?>
-    var redirectHits = <?echo get_redirection_hit_count_by_host($rhost)?>;
-    <?}?>
+    var redirectHits = <?if(empty($rhost)) { echo 0; } else { echo get_redirection_hit_count_by_host($rhost); }?>;
     <?if( isset($badurl) ) {?>
     badurl = true;
     <?}?>
@@ -128,7 +126,9 @@ if( !empty($opmldata) ) {
 <div id="divEditSheetOpen" class="sheet">
     <a class="sheetclose pull-right" href="#"> X </a>
     <div class="openbyurl"><a class="openbyurl" href="#">Open</a> by url or...</div>
-    <ul class="recentfilesopen"></ul>
+    <div class="list-container pre-scrollable">
+        <ul class="recentfilesopen"></ul>
+    </div>
 </div>
 
 <div id="divEditSheetInclude" class="sheet">

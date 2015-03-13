@@ -2775,7 +2775,7 @@ function get_recent_files($uid = NULL, $max = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Do the query
-    $sqltxt = "SELECT title, url, time, disqus, wysiwyg, watched FROM $table_recentfiles WHERE userid=?";
+    $sqltxt = "SELECT title, url, time, disqus, wysiwyg, watched, locked FROM $table_recentfiles WHERE userid=?";
 
     $sqltxt .= " ORDER BY time DESC";
 
@@ -2799,7 +2799,7 @@ function get_recent_files($uid = NULL, $max = NULL)
         return (array());
     }
 
-    $sql->bind_result($ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $flocked) or loggit(2, "MySql error: " . $dbh->error);
 
     $files = array();
     $count = 0;
@@ -2809,7 +2809,8 @@ function get_recent_files($uid = NULL, $max = NULL)
             'time' => $ftime,
             'disqus' => $fdisqus,
             'wysiwyg' => $fwysiwyg,
-            'watched' => $fwatched
+            'watched' => $fwatched,
+            'locked' => $flocked
         );
         $count++;
     }

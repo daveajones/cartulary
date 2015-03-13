@@ -520,7 +520,7 @@ function get_redirection_hit_count_by_url($url = NULL)
         $sql->close()
         or loggit(2, "MySql error: " . $dbh->error);
         loggit(3, "No redirect found for: [$url].");
-        return ("");
+        return (0);
     }
     $sql->bind_result($hits) or loggit(2, "MySql error: " . $dbh->error);
     $sql->fetch();
@@ -528,7 +528,7 @@ function get_redirection_hit_count_by_url($url = NULL)
 
 
     loggit(3, "Returning hit count: [$hits] for url: [$url].");
-    return ($hits);
+    return ((integer)$hits);
 }
 
 
@@ -557,7 +557,7 @@ function get_redirection_hit_count_by_host($host = NULL)
         $sql->close()
         or loggit(2, "MySql error: " . $dbh->error);
         loggit(3, "No redirect found for: [$host].");
-        return ("");
+        return (0);
     }
     $sql->bind_result($hits) or loggit(2, "MySql error: " . $dbh->error);
     $sql->fetch();
@@ -565,5 +565,5 @@ function get_redirection_hit_count_by_host($host = NULL)
 
 
     loggit(3, "Returning hit count: [$hits] for host: [$host].");
-    return ($hits);
+    return ((integer)$hits);
 }

@@ -217,7 +217,7 @@ loggit(3, "Received request for article at: [$url].");
 $aid = article_exists($url);
 if ($aid) {
     loggit(3, "Article: [$url] already exists as: [$aid].");
-    $art = get_article($aid);
+    $art = get_article($aid, $uid);
 
     if (user_can_view_article($aid, $uid)) {
         loggit(3, "Article already linked to user: [$uid].");
@@ -476,6 +476,7 @@ if (isset($_REQUEST['title'])) {
         }
     }
 }
+$title = trim($title);
 // ---------- END TITLE HANDLING ----------
 
 
@@ -524,7 +525,7 @@ if ($prefs['staticarticles'] == 1) {
     $s3info = get_s3_info($g_uid);
     if ($s3info != FALSE) {
         $targetS3File = time() . "_" . random_gen(8) . ".html";
-        putInS3(make_article_printable($aid), $targetS3File, $s3info['bucket'] . "/art", $s3info['key'], $s3info['secret'], "text/html");
+        putInS3(make_article_printable($aid, $uid), $targetS3File, $s3info['bucket'] . "/art", $s3info['key'], $s3info['secret'], "text/html");
         $staticurl = get_s3_url($uid, '/art/', $targetS3File);
         loggit(3, "Stored article in S3 at location: [$staticurl].");
         update_article_static_url($aid, $uid, $staticurl);

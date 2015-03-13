@@ -44,9 +44,12 @@ function article_exists($url = NULL)
 function get_article($id = NULL, $uid = NULL)
 {
     //Check parameters
-    if ($id == NULL) {
+    if (empty($id)) {
         loggit(2, "The article id given is corrupt or blank: [$id]");
         return (FALSE);
+    }
+    if (empty($uid)) {
+
     }
 
     //Includes
@@ -1149,11 +1152,15 @@ function get_cartulary_title($uid = NULL)
 
 
 //Get a printer friendly version of an article
-function make_article_printable($aid = NULL)
+function make_article_printable($aid = NULL, $uid = NULL)
 {
-    //If aid is bad then balk
+    //Parameter check
     if (empty($aid)) {
         loggit(2, "Article id is blank or corrupt: [$aid]");
+        return (FALSE);
+    }
+    if (empty($uid)) {
+        loggit(2, "User id is blank or corrupt: [$uid]");
         return (FALSE);
     }
 
@@ -1161,7 +1168,7 @@ function make_article_printable($aid = NULL)
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
     //Get the article in question
-    $article = get_article($aid);
+    $article = get_article($aid, $uid);
 
     //Assemble a printable version
     $printable = "<head>";
@@ -1177,6 +1184,7 @@ function make_article_printable($aid = NULL)
     $printable .= "</body>";
     $printable .= "</html>";
 
+    loggit(3, "DEBUG: ".print_r($article, TRUE));
 
     //Give back
     return ($printable);

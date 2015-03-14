@@ -195,7 +195,7 @@ if($watched) {
 if( !empty($rhost) ) {
     //Let's not clobber existing redirects
     $erurl = get_redirection_url_by_host_name($rhost);
-    if( !empty($erurl) ) {
+    if( !empty($erurl) && $erurl != $s3htmlurl ) {
         $erurl = str_replace('.html', '.opml', $erurl);
         $erurl = str_replace('/html/', '/opml/', $erurl);
 

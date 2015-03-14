@@ -1,7 +1,7 @@
 #Release Notes - Freedom Controller v0.6.6
 
 
-Two new email related features.
+This is a big one.
 
 
 - Bug Fixes

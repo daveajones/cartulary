@@ -1338,6 +1338,82 @@ function get_s3_buckets($key, $secret)
 }
 
 
+//Test to see if we have read/write access to a bucket
+function test_s3_bucket_access($key, $secret, $bucket)
+{
+    //Check parameters
+    if (empty($key)) {
+        loggit(2, "Key missing from S3 put call: [$key].");
+        return (FALSE);
+    }
+    if (empty($secret)) {
+        loggit(2, "Secret missing from S3 put call: [$secret].");
+        return (FALSE);
+    }
+    if (empty($bucket)) {
+        loggit(2, "Bucket missing from S3 put call: [$bucket].");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Set up
+    require_once "$confroot/$libraries/s3/S3.php";
+    $s3 = new S3($key, $secret);
+
+    //Get a list of buckets
+    $s3res = $s3->putObject("Test write from FC", $bucket, "fctestwrite", S3::ACL_PRIVATE, array());
+
+    //Were we able to get a list?
+    if (!$s3res) {
+        loggit(2, "Could not write to bucket: [$bucket] using supplied credentials.");
+        return (FALSE);
+    }
+
+    //Give back the buckets array
+    return (TRUE);
+}
+
+
+//Create a bucket in s3
+function create_s3_bucket($key, $secret, $bucket)
+{
+    //Check parameters
+    if (empty($key)) {
+        loggit(2, "Key missing from S3 put call: [$key].");
+        return (FALSE);
+    }
+    if (empty($secret)) {
+        loggit(2, "Secret missing from S3 put call: [$secret].");
+        return (FALSE);
+    }
+    if (empty($bucket)) {
+        loggit(2, "Bucket missing from S3 put call: [$bucket].");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Set up
+    require_once "$confroot/$libraries/s3/S3.php";
+    $s3 = new S3($key, $secret);
+
+    //Get a list of buckets
+    $s3res = $s3->putBucket($bucket, S3::ACL_PUBLIC_READ);
+
+    //Were we able to get a list?
+    if (!$s3res) {
+        loggit(2, "Could not create s3 bucket: [$bucket] using supplied credentials.");
+        return (FALSE);
+    }
+
+    //Give back the buckets array
+    return (TRUE);
+}
+
+
 //Get the regional location of an S3 bucket
 function get_s3_bucket_location($key, $secret, $bucket)
 {

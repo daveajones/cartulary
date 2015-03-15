@@ -847,13 +847,14 @@ $prefs['smtp_port'] = $smtp_port;
 
 
 //If S3 prefs changed, check key credentials to make sure they are correct and warn the user if not
-if( $oldprefs['s3key'] != $prefs['s3key'] || $oldprefs['s3secret'] != $prefs['s3secret'] ) {
+if( ($oldprefs['s3key'] != $prefs['s3key'] || $oldprefs['s3secret'] != $prefs['s3secret'] || $oldprefs['s3bucket'] != $prefs['s3bucket'])
+    && !empty($prefs['s3key']) && !empty($prefs['s3secret']) && !empty($prefs['s3bucket']) ) {
   $jsondata['prefname'] = "s3key";
-  if(!get_s3_buckets($s3key, $s3secret)) {
+  if(!test_s3_bucket_access($s3key, $s3secret, $prefs['s3bucket'])) {
     //Log it
-    loggit(2,"S3 credentials: [$s3key | $s3secret] were wrong for user: [$uid].");
+    loggit(2,"S3 credentials were wrong for user: [$uid].");
     $jsondata['status'] = "false";
-    $jsondata['description'] = "Your S3 credentials didn't work.";
+    $jsondata['description'] = "Could not write to bucket: [$s3bucket]. Check your S3 policy and credentials.";
     echo json_encode($jsondata);
     exit(1);
   } else {

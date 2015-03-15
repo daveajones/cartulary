@@ -103,10 +103,10 @@
 	<h3>Amazon S3</h3>
 	<ul>
         	<div class="control-group">
-			<li>My Amazon S3 key is <input name="s3key" type="text" value="<?echo $prefs['s3key']?>" /></li>
+			<li>My Amazon S3 key is <input name="s3key" type="password" value="<?echo $prefs['s3key']?>" /></li>
         	</div>
         	<div class="control-group">
-			<li>My Amazon S3 secret is <input name="s3secret" type="text" value="<?echo $prefs['s3secret']?>" /></li>
+			<li>My Amazon S3 secret is <input name="s3secret" type="password" value="<?echo $prefs['s3secret']?>" /></li>
         	</div>
         	<div class="control-group">
 			<li>I want to store my feeds in an Amazon S3 bucket named: <input id="s3bucket" name="s3bucket" type="text" value="<?echo $prefs['s3bucket']?>" /></li>
@@ -126,7 +126,7 @@
 	<h3>Subscriptions</h3>
 	<ul>
         <li class="privacy"><label class="checkbox inline"><input name="hidesublist" type="checkbox" <?if ($prefs['hidesublist'] == 1) echo "checked ";?>/> I don't want my subscription list in my social outline.</label></li>
-		<li class="privacy"><label class="checkbox inline"><input name="opensubs" type="checkbox" <?if ($prefs['opensubs'] == 1) echo "checked ";?>/> Allow open subscriptions.</label></li>
+		<li class="privacy"><label class="checkbox inline"><input id="chkOpenSubs" name="opensubs" type="checkbox" <?if ($prefs['opensubs'] == 1) echo "checked ";?>/> Allow open subscriptions. <?if ($prefs['opensubs'] == 1) echo "<span>(Use <a href='$system_url.$opensubscribepage?u=$g_uid'> this</a> url for open subs page.)</span>";?></label></li>
 	</ul>
 	</div>
 
@@ -201,7 +201,7 @@
             <li class="privacy"><label class="checkbox inline"><input name="imap_secure" id="chkImapSecure" type="checkbox" <?if ($prefs['imap_secure'] == 1) echo "checked ";?>/> My IMAP server uses SSL/TLS.</label></li>
             <li>My IMAP server port is: <input name="imap_port" id="txtImapPort" class="urlinput" type="text" value="<?if(empty($prefs['imap_port'])) { if ($prefs['imap_secure'] == 1) { echo "993"; } else { echo "143"; } } else { echo $prefs['imap_port']; }?>" /></li>
             <li>My IMAP username is: <input name="imap_username" class="urlinput" type="text" value="<?echo $prefs['imap_username']?>" /></li>
-            <li>My IMAP password is: <input name="imap_password" class="urlinput" type="text" value="<?echo $prefs['imap_password']?>" /></li>
+            <li>My IMAP password is: <input name="imap_password" class="urlinput" type="password" value="<?echo $prefs['imap_password']?>" /></li>
             <li>The IMAP folder I want to import from is: <input name="imap_folder" class="urlinput" type="text" value="<?echo $prefs['imap_folder']?>" /></li>
             <hr>
             <li>My SMTP server address is: <input name="smtp_server" id="txtSmtpServer" class="urlinput" type="text" value="<?echo $prefs['smtp_server']?>" /></li>

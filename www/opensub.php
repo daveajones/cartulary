@@ -39,7 +39,12 @@ $(document).ready( function() {
                         $('#frmSubscribe .btnSubmit').attr("disabled", true);
                 },
                 success:        function(data) {
-                        showMessage( data.description, data.status, 5 );
+                        $('#spnMessage').html(" " + data.description);
+                        if(data.status == "true") {
+                            $('#spnMessage').removeClass('msgbad').removeClass('msgwarn').addClass('msggood');
+                        } else {
+                            $('#spnMessage').removeClass('msggood').removeClass('msgwarn').addClass('msgbad');
+                        }
                         $('#frmSubscribe .imgSpinner').hide();
                         $('#frmSubscribe .btnSubmit').attr("disabled", false);
                 }
@@ -66,6 +71,7 @@ $(document).ready( function() {
     <div id="divSubscribeButtons">
       <img class="imgSpinner" src="/images/spinner.gif" />
       <input id="btnSubscribe" name="submitSubscribe" class="btn btn-primary btnSubmit" type="submit" value="Subscribe" />
+        <span id="spnMessage"></span>
     </div>
   </div>
   </fieldset>

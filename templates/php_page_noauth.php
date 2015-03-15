@@ -27,4 +27,3 @@
   //Set the right timezone
   $g_timezone = $default_timezone;
   date_default_timezone_set($g_timezone);
-?>

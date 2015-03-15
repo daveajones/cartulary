@@ -3845,9 +3845,10 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
             $rftemplate = str_replace('[RIVER_JSON_URL]', $s3url, $rftemplate);
             $rftemplate = str_replace('[SCRIPT_JQUERY]', $cg_script_js_jquery, $rftemplate);
             $rftemplate = str_replace('[SCRIPT_JQTEMPLATES]', $cg_script_js_jqtemplates, $rftemplate);
-            $rftemplate = str_replace('[DATE]', date("D, d M Y H:i:s O"), $rftemplate);
+            $rftemplate = str_replace('[DATE]', date("D, d M Y H:i:s"), $rftemplate);
             $rftemplate = str_replace('[SYS_NAME]', $system_name, $rftemplate);
             $rftemplate = str_replace('[SYS_VERSION]', $cg_sys_version, $rftemplate);
+            $rftemplate = str_replace('[SYS_HOME]', $cg_producthome, $rftemplate);
             $sopmlurl = get_s3_url($uid, NULL, $default_social_outline_file_name);
             $rftemplate = str_replace('<%sopmlUrl%>', $sopmlurl, $rftemplate);
             $rftemplate = str_replace('[SOPML_URL]', $sopmlurl, $rftemplate);

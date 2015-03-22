@@ -405,7 +405,7 @@ function get_river_as_json($uid = NULL, $mobile = FALSE)
         return (FALSE);
     }
 
-    return (json_encode(get_river($uid, $mobile)));
+    return (json_encode(utf8ize(get_river($uid, $mobile))));
 }
 
 
@@ -4076,11 +4076,14 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
 
     //See if there were any items returned
-    if ($sql->num_rows() < 1) {
+    $nr = $sql->num_rows();
+    if ( $nr < 1) {
         $sql->close()
         or loggit(2, "MySql error: " . $dbh->error);
         loggit(1, "The user: [$uid] has an empty river.");
         return (FALSE);
+    } else {
+        loggit(3, "$nr rows returned for user: [$uid]'s river.");
     }
 
     $sql->bind_result($id, $title, $url, $timestamp, $feedid,
@@ -4196,6 +4199,8 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
             'link' => $url,
             'id' => $id
         );
+
+        //loggit(3, "TITLE: $title");
 
         //Is there an author attribution?
         if (!empty($author)) {
@@ -4341,6 +4346,8 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
 
     //loggit(3, "River hash: OLD: [".$pubriver['conthash']."]");
     //loggit(3, "River hash: NEW: [$newhash]");
+    //loggit(3, "River XML: ".print_r($driver, TRUE));
+    //loggit(3, "River JSON: ".$djsonriver);
 
     if (!empty($pubriver) && ($pubriver['firstid'] == $firstid && $force == FALSE) && ($pubriver['conthash'] == $newhash)) {
         //loggit(3, "User: [$uid]'s river has not changed. No need to publish.");

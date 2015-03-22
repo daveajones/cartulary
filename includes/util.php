@@ -1167,7 +1167,7 @@ function fetchUrlExtra($url, $timeout = 30)
 
     curl_close($curl);
 
-    //loggit(3, "DEBUG: [" . print_r($response,TRUE) . "]");
+    loggit(3, "DEBUG: [" . substr($response['body'], 0, 10) . "]");
 
     return $response;
 }
@@ -3498,4 +3498,17 @@ function htmlDiff($old, $new){
         else $ret .= $k . ' ';
     }
     return $ret;
+}
+
+
+//Make sure all strings are utf-8 valid for json
+function utf8ize($d) {
+    if (is_array($d)) {
+        foreach ($d as $k => $v) {
+            $d[$k] = utf8ize($v);
+        }
+    } else if (is_string ($d)) {
+        return utf8_encode($d);
+    }
+    return $d;
 }

@@ -1,0 +1,32 @@
+{
+    "name": "smalot/pdfparser",
+    "description": "Pdf parser library. Can read and extract information from pdf file.",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Sebastien MALOT",
+            "email": "sebastien@malot.fr",
+            "role": "Developer",
+            "homepage": "http://www.malot.fr"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/smalot/pdfparser/issues"
+    },
+    "homepage": "http://www.pdfparser.org",
+    "require": {
+        "php": ">=5.3.0",
+        "tecnick.com/tcpdf": ">=6.0.050"
+    },
+    "require-dev": {
+        "atoum/atoum": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Smalot\\PdfParser\\": "src/"
+        }
+    },
+    "config": {
+        "process-timeout": 1200
+    }
+}

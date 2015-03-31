@@ -1581,6 +1581,18 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
      -moz-border-radius: 0px;
           border-radius: 0px;
 }
+.pageContentWrapper.Prefs #divPrefs #divPayments {
+    margin-left:10px;
+    position: relative;
+    padding:20px;
+    margin-bottom:10px;
+    *padding-top: 19px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+}
 .pageContentWrapper.Prefs #divPrefs #divSetpw ul {  list-style: none;  }
 .pageContentWrapper.Prefs #divPrefs #divSetpw input.urlinput {  width: 95%;  }
 .pageContentWrapper.Prefs #divPrefs #divSetpw #btnPwdSubmit {  float:none;  }
@@ -1741,6 +1753,7 @@ li.menubar-search-container { display:inline; }
 
 /* --------------------------------------------------- */
 /* ----- Prefs ----- */
+
 .pageContentWrapper.Prefs #divPrefs #divBookmarklets {
   float:left;
   position: relative;

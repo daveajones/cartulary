@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 54;
+$cg_database_version = 56;
 $cg_database_updates = array();
 
 
@@ -749,6 +749,25 @@ $cg_database_updates[53][] = <<<CGDB0167
 CGDB0167;
 //----------------------------------------------------------------------------------------------------------------
 
+//Version 54 to 55 -----------------------------------------------------------------------------------------------
+$cg_database_updates[54][] = <<<CGDB0168
+ INSERT INTO `servers` (`guid` ,`address`)
+ VALUES ('HfzAmnCq2jb4MXnZp9CzLVPrgvzpEybytunDNY4FkNsqcu76vXGydKBj58GYAtY2', 'cart.sobr.org')
+ ON DUPLICATE KEY UPDATE guid=guid
+CGDB0168;
+$cg_database_updates[54][] = <<<CGDB0169
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '55' )
+CGDB0169;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 55 to 56 -----------------------------------------------------------------------------------------------
+$cg_database_updates[55][] = <<<CGDB0170
+ ALTER TABLE `prefs` ADD `payment_made` TINYINT NOT NULL
+CGDB0170;
+$cg_database_updates[55][] = <<<CGDB0171
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '56' )
+CGDB0171;
+//----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 
 

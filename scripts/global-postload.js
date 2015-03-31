@@ -73,6 +73,23 @@ $(document).ready(function () {
     //Bindings
     freedomController.v1.people.methods.bindSocialOutlineLinks("body");
 
+    //Attach payment handler
+    $('#btnPaypalSubmit').on('click', function() {
+        $.ajax({
+            type: 'POST',
+            url:  '/cgi/auth/setsinglepref',
+            data: {
+                prefs: {
+                    payment_made: 1
+                }
+            },
+            success: function() {
+                $('#frmPaypalButton').hide();
+                $('#divPayments').hide();
+            }
+        });
+        return true;
+    });
 
     //Keyboard shortcuts
     key('ctrl+m', function () {           //----- Spawn a new microblog post modal

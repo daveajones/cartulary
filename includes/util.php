@@ -971,7 +971,7 @@ function get_final_url($url, $timeout = 5, $count = 0)
 
     //Normal re-direct
     if ($response['http_code'] == 301 || $response['http_code'] == 302 || $response['http_code'] == 303) {
-        loggit(3, "DEBUG: ".print_r($response, TRUE));
+        //loggit(3, "DEBUG: ".print_r($response, TRUE));
         ini_set("user_agent", $ua);
         $headers = get_headers($response['url']);
 
@@ -1167,7 +1167,7 @@ function fetchUrlExtra($url, $timeout = 30)
 
     curl_close($curl);
 
-    loggit(3, "DEBUG: [" . substr($response['body'], 0, 10) . "]");
+    //loggit(3, "DEBUG: [" . substr($response['body'], 0, 10) . "]");
 
     return $response;
 }

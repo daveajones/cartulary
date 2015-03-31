@@ -30,6 +30,15 @@
 
 <div class="row" id="divPrefs">
 <div id="divPrefsInner">
+    <?if(!empty($cg_paypal_button) && $cg_paypal_enabled && $prefs['payment_made'] == 0) {?>
+    <div id="divPayments">
+        <h3>Pitch In!</h3>
+        <p>This server operator has payments enabled.  That's their way of asking nicely for you to pitch in and help cover
+            the monthly costs of running this server.  Please consider doing so.  Thanks!</p>
+        <?echo str_replace('[$$PAYPAL_BUTTON_ID$$]', $cg_paypal_button_id, $cg_paypal_button)?>
+    </div>
+    <?}?>
+
 	<div id="divBookmarklets">
 	<h3>Bookmarklets</h3>
 	<ul>
@@ -57,8 +66,7 @@
 	</form>
 	</div>
 
-
-	<form name="prefs" id="frmPrefs" method="POST" action="/cgi/auth/setprefs">
+    <form name="prefs" id="frmPrefs" method="POST" action="/cgi/auth/setprefs">
 	<fieldset>
 	<div id="divPref" class="control-group">
 
@@ -103,10 +111,10 @@
 	<h3>Amazon S3</h3>
 	<ul>
         	<div class="control-group">
-			<li>My Amazon S3 key is <input name="s3key" type="password" value="<?echo $prefs['s3key']?>" /></li>
+			<li>My Amazon S3 key is <input name="s3key" type="text" value="<?echo $prefs['s3key']?>" /></li>
         	</div>
         	<div class="control-group">
-			<li>My Amazon S3 secret is <input name="s3secret" type="password" value="<?echo $prefs['s3secret']?>" /></li>
+			<li>My Amazon S3 secret is <input name="s3secret" type="text" value="<?echo $prefs['s3secret']?>" /></li>
         	</div>
         	<div class="control-group">
 			<li>I want to store my feeds in an Amazon S3 bucket named: <input id="s3bucket" name="s3bucket" type="text" value="<?echo $prefs['s3bucket']?>" /></li>
@@ -201,7 +209,7 @@
             <li class="privacy"><label class="checkbox inline"><input name="imap_secure" id="chkImapSecure" type="checkbox" <?if ($prefs['imap_secure'] == 1) echo "checked ";?>/> My IMAP server uses SSL/TLS.</label></li>
             <li>My IMAP server port is: <input name="imap_port" id="txtImapPort" class="urlinput" type="text" value="<?if(empty($prefs['imap_port'])) { if ($prefs['imap_secure'] == 1) { echo "993"; } else { echo "143"; } } else { echo $prefs['imap_port']; }?>" /></li>
             <li>My IMAP username is: <input name="imap_username" class="urlinput" type="text" value="<?echo $prefs['imap_username']?>" /></li>
-            <li>My IMAP password is: <input name="imap_password" class="urlinput" type="password" value="<?echo $prefs['imap_password']?>" /></li>
+            <li>My IMAP password is: <input name="imap_password" class="urlinput" type="text" value="<?echo $prefs['imap_password']?>" /></li>
             <li>The IMAP folder I want to import from is: <input name="imap_folder" class="urlinput" type="text" value="<?echo $prefs['imap_folder']?>" /></li>
             <hr>
             <li>My SMTP server address is: <input name="smtp_server" id="txtSmtpServer" class="urlinput" type="text" value="<?echo $prefs['smtp_server']?>" /></li>

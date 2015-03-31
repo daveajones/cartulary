@@ -23,9 +23,9 @@ $jsondata['data']['items'] = $items;
 $jsondata['status'] = "true";
 $jsondata['description'] = "List of sticky river items.";
 if( isset($_REQUEST['pretty']) ) {
-    echo format_json(json_encode($jsondata));
+    echo format_json(json_encode(utf8ize($jsondata)));
 } else {
-    echo json_encode($jsondata);
+    echo json_encode(utf8ize($jsondata));
 }
 
 return(0);

@@ -240,7 +240,7 @@ OPMLOUT1;
     }
 
 
-    loggit(3, "DEBUG: ".print_r($sentences,TRUE));
+    //loggit(3, "DEBUG: ".print_r($sentences,TRUE));
     //$delims = array("</p>","<br>","<br/>","</li>","<hr>","<hr/>","</h1>","</h2>","</h3>","</h4>","</h5>");
     //$uniform = str_replace($delims, "[$@$]", trim( str_replace("\n", '', $article['content'] )));
     
@@ -1184,7 +1184,7 @@ function make_article_printable($aid = NULL, $uid = NULL)
     $printable .= "</body>";
     $printable .= "</html>";
 
-    loggit(3, "DEBUG: ".print_r($article, TRUE));
+    //loggit(3, "DEBUG: ".print_r($article, TRUE));
 
     //Give back
     return ($printable);

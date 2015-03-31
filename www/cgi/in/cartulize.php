@@ -14,6 +14,7 @@ if (isset($_REQUEST['json'])) {
 
 //Globals
 $html_only = true;
+$ispdf = FALSE;
 $linkonly = FALSE;
 
 // set include path
@@ -209,7 +210,39 @@ if (($mret > 0) && !empty($mrmatches[1])) {
     $url = get_final_url($mrmatches[1]);
     $response = fetchUrlExtra($url);
 }
+$html = $response['body'];
 
+//Reddit
+if (preg_match('/^https?\:\/\/(www\.)?reddit\.com/i', $url)) {
+    loggit(3, "Getting a reddit link.");
+
+    $luie = libxml_use_internal_errors(true);
+    $doc = new DOMDocument();
+    $doc->loadHTML($html);
+    //Get the title
+    $nodes = $doc->getElementsByTagName("title");
+    $title = $nodes->item(0)->nodeValue;
+    loggit(3, "Reddit title: $title");
+    libxml_use_internal_errors($luie);
+
+    if( preg_match("/\<p.*class=\"title.*\<a.*class=\"title.*href=\"(.*)\"/iU", $html, $matches) ) {
+        $url = get_final_url($matches[1]);
+        loggit(3, "Reddit link: [".$url."]");
+        $response = fetchUrlExtra($url);
+        $html = $response['body'];
+    } else {
+        loggit(2, "Couldn't extract Reddit link.");
+    }
+}
+
+//Is this a PDF?
+if( substr($response['body'], 0, 4) == "%PDF" ) {
+    $ispdf = TRUE;
+    $pdfbody = $response['body'];
+    loggit(3, "IS PDF");
+} else {
+    loggit(3, "NOT PDF");
+}
 
 // ---------- BEGIN ARTICLE EXISTENCE CHECK ----------
 //Is this URL already in the database?
@@ -350,13 +383,33 @@ if ($linkonly == FALSE) {
         if (preg_match('/youtube\.com/i', $url)) {
             loggit(3, "Cartulizing a Youtube video.");
             preg_match("/v[\/\=]([A-Za-z0-9\_\-]*)/i", $url, $matches) || die("Couldn't extract YouTube ID string.");
-            $content = '<br/><iframe class="bodyvid" src="http://www.youtube.com/embed/' . $matches[1] . '" frameborder="0" allowfullscreen></iframe>';
+            $content = '<br/><iframe class="bodyvid" src="https://www.youtube.com/embed/' . $matches[1] . '" frameborder="0" allowfullscreen></iframe>';
             preg_match("/\<meta.*property\=\"og\:title\".*content\=\"(.*)\".*\>/i", $html, $matches) || die("Couldn't extract the YouTube video title.");
             $title = $matches[1];
             loggit(3, "Youtube video title: [$title].");
             $analysis = "";
             $slimcontent = $content;
+
+        //Is this a PDF?
+        } else
+        if ( $ispdf ) {
+            loggit(3, "Cartulizing a PDF.");
+            $content = '';
+            include "$confroot/$libraries/PDFParser/vendor/autoload.php";
+            $parser = new \Smalot\PdfParser\Parser();
+            $pdf    = $parser->parseContent($pdfbody);
+            foreach ($pdf->getPages() as $page) {
+                $content .= "<p>".$page->getText()."</p>";
+            }
+            //$content = $pdf->getText();
+            //Do textual analysis and save it in the database
+            $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
+            //Reduce all that whitespace
+            $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE);
+
+        //Normal web page
         } else {
+            loggit(3, "Cartulizing html.");
             //Set up an extraction
             if ($auto_extract) {
                 $extract_result = $extractor->process($html, $effective_url);

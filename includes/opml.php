@@ -20,8 +20,13 @@ function is_outline($content = NULL)
     libxml_use_internal_errors(true);
     $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
     if(!$x) {
-        libxml_clear_errors();
         loggit(2, "Parsing error when checking for opml content.");
+        loggit(2, "---------------------------------------------");
+        foreach(libxml_get_errors() as $error) {
+            loggit(2, "XML PARSER[is_outline()]: ".$error->message);
+        }
+        loggit(2, "---------------------------------------------");
+        libxml_clear_errors();
         return(FALSE);
     }
     libxml_clear_errors();

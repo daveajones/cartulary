@@ -67,6 +67,7 @@
         <?//if( $g_platform == "mobile" ) {?>
         <!-- Only show this part of the menu when not mobile -->
             <ul class="nav pull-right">
+                <li><?if(!empty($cg_paypal_button) && $cg_paypal_enabled && $myprefs['payment_made'] == 0) echo str_replace('[$$PAYPAL_BUTTON_ID$$]', $cg_paypal_button_id, $cg_paypal_button)?></li>
                 <li class="menubar-search-container">
                     <form class="navbar-search" id="navsearch" name="navsearch" method="POST" action="<?echo $searchcgi?>">
                         <input id="navsearchs" type="hidden" name="s" value="<?echo $section?>"/>

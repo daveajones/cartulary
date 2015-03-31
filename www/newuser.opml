@@ -8,6 +8,7 @@
       </head>
 
       <body>
+              <outline text="Freedom Controller Group" description="" xmlUrl="https://groups.google.com/forum/feed/sopml/msgs/rss_v2_0.xml" />
               <outline text="InterfaceLIFT: Newest Wallpaper" description="" htmlUrl="http://interfacelift.com/wallpaper/downloads/date/any/" xmlUrl="http://interfacelift.com/wallpaper_beta/rss/" />
               <outline text="9to5Mac" description="" htmlUrl="http://9to5mac.com" xmlUrl="http://9to5mac.com/feed/" />
               <outline text="xkcd.com" description="" htmlUrl="http://xkcd.com/" xmlUrl="http://xkcd.com/rss.xml" />

@@ -20,7 +20,7 @@ php5enmod imap
 apt-get install -y php5-xsl
 php5enmod xsl
 
-apt-get install -y nodejs
+apt-get install -y nodejs npm
 cd $CARTROOT/aggrivate
 npm install
 

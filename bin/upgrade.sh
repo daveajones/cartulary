@@ -55,6 +55,7 @@ cd cartulary-$BRANCH
 cp $CARTROOT/www/newuser.opml /tmp
 
 ##: Put new files in place
+cp -R aggrivate/* $CARTROOT/aggrivate
 cp -R bin/* $CARTROOT/bin
 cp -R includes/* $CARTROOT/includes
 cp -R libraries/* $CARTROOT/libraries

@@ -3448,6 +3448,9 @@ function create_s3_qrcode_from_url($uid = NULL, $value = "", $qrfilename = "") {
         return "";
     }
 
+    //Clean up
+    unlink($qrtmpfile);
+
     return $s3url;
 }
 

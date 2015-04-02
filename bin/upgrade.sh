@@ -81,6 +81,9 @@ cd ..
 rm -rf cartulary-$BRANCH/
 rm $BRANCH.zip
 
+##: Run supplemental version scripts
+$CARTROOT/releases/
+
 ##: Run confcheck
 clear
 echo
@@ -104,6 +107,11 @@ php $CARTROOT/bin/dbcheck.php
 ##: Restart cron daemon
 echo
 start cron
+
+##: Run any side-scripts that were shipped with this version
+php $CARTROOT/bin/sidegrade.php
+
+service apache2 restart
 
 echo
 echo 'Upgrade is finished.'

@@ -1,0 +1,37 @@
+#Release Notes - Freedom Controller v0.6.7
+
+
+Getting paid and saving pdfs.
+
+
+- Bug Fixes
+    - JSON river generation would fail sometimes when invalid utf-8 was present
+    - Some no-auth pages would fail because showMessage() wasn't in the unauthenticated auth templates
+
+- New Feature: myword.io support
+    - There is a new option on the right side of the editor for myword.io when you save a file.  To get this working, you must enable a CORS policy on your S3 bucket for myword.io.
+    - Example:  http://myword.io/?url=http://dave.sobr.org/json/ReasonsB12doesntwork-1423072306.json
+    - To get an image in the headline area, you need to insert an image in the outline and make sure it's set to type "image".  This is a new node type.
+    - Dragging in an image for upload sets the type automatically.
+
+- New Feature: Article Editing
+    - You can now edit an article from the articles archive, and then save it back to the archive - essentially overwriting it.
+    - This does not change the original static copy that gets saved in S3.  That remains untouched.
+    - To do this, there is a new menu option on the save menu called "Save Edited Article".
+    - This is a great way to do annotations.
+    - More cools stuff is planned for this in the future.  Keep your eyes peeled. :-)
+
+- New Feature: Morse code in the editor!
+    - You can now select any peice of text or outline node and click new little teletype icon and it will produce the morse code for that text.
+    - I actually split this out into a new project called Morsel (https://github.com/daveajones/morsel)
+    - If you get no audio, restart your browser (Firefox).  It has a bad habit of losing audio for some reason.
+
+- Improvements:
+    - The editor now blocks you from setting a host redirect on an outline when that hostname is already being used by another outline.
+    - You can now "lock" an outline to prevent overwriting it.  The lock icon is in the menu bar.
+    - More "recent files" in the open menu in the editor.
+    - Publish button in the editor now uses the redirection host name as the link if there is one.
+    - Changed "microblog" namespace to "source" since DW deprecated microblog.
+    - New icons in the editor menu bar
+    - Hit tracking for outline hostname redirects. Hits show up in () next to the redirect name in the menu bar.
+    - Better notifying when doing email imports and article exports on the articles archive screen.

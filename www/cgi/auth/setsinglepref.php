@@ -12,14 +12,21 @@ if($prefs == FALSE) {
 
 // Get the input
 if( isset($_POST['prefs']) ) {
-    $newprefs = $_POST['prefs'];
+    $pref = $_POST['prefs'];
+} else {
+    //Give feedback
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Prefs not updated.";
+    $jsondata['prefname'] = "";
+    echo json_encode($jsondata);
+    exit(0);
 }
 
 loggit(3, "DEBUG: ".print_r($_POST, TRUE));
 
 //--------------------------------------------------------
 
-$newprefs = array_merge($prefs, $newprefs);
+$newprefs = array_merge($prefs, $pref);
 
 //--------------------------------------------------------
 

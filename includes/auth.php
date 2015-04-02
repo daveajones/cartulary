@@ -2202,11 +2202,12 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                   imap_port=?,
                   smtp_server=?,
                   smtp_secure=?,
-                  smtp_port=?
+                  smtp_port=?,
+                  payment_made=?
            WHERE uid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdss",
+    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdsds",
         $prefs['publicdefault'],
         $prefs['publicrss'],
         $prefs['publicopml'],
@@ -2271,6 +2272,7 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
         $prefs['smtp_server'],
         $prefs['smtp_secure'],
         $prefs['smtp_port'],
+        $prefs['payment_made'],
         $uid
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);

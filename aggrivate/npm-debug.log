@@ -1,0 +1,85 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'install', 'node-feedparser' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.33
+4 verbose node symlink /usr/bin/node
+5 verbose cache add [ 'node-feedparser', null ]
+6 verbose cache add name=undefined spec="node-feedparser" args=["node-feedparser",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: 'node-feedparser',
+7 verbose parsed url   path: 'node-feedparser',
+7 verbose parsed url   href: 'node-feedparser' }
+8 silly lockFile 951348a2-node-feedparser node-feedparser
+9 verbose lock node-feedparser /home/dave/.npm/951348a2-node-feedparser.lock
+10 silly lockFile 951348a2-node-feedparser node-feedparser
+11 silly lockFile 951348a2-node-feedparser node-feedparser
+12 verbose addNamed [ 'node-feedparser', '' ]
+13 verbose addNamed [ null, '*' ]
+14 silly lockFile 7dac45d1-node-feedparser node-feedparser@
+15 verbose lock node-feedparser@ /home/dave/.npm/7dac45d1-node-feedparser.lock
+16 silly addNameRange { name: 'node-feedparser', range: '*', hasData: false }
+17 verbose request where is /node-feedparser
+18 verbose request registry https://registry.npmjs.org/
+19 verbose request id a95508dc484e9e32
+20 verbose url raw /node-feedparser
+21 verbose url resolving [ 'https://registry.npmjs.org/', './node-feedparser' ]
+22 verbose url resolved https://registry.npmjs.org/node-feedparser
+23 verbose request where is https://registry.npmjs.org/node-feedparser
+24 info trying registry request attempt 1 at 20:05:22
+25 http GET https://registry.npmjs.org/node-feedparser
+26 http 404 https://registry.npmjs.org/node-feedparser
+27 verbose headers { date: 'Wed, 18 Mar 2015 20:05:23 GMT',
+27 verbose headers   server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+27 verbose headers   'content-type': 'application/json',
+27 verbose headers   'cache-control': 'max-age=0',
+27 verbose headers   'content-length': '51',
+27 verbose headers   'accept-ranges': 'bytes',
+27 verbose headers   via: '1.1 varnish',
+27 verbose headers   age: '0',
+27 verbose headers   'x-served-by': 'cache-iad2124-IAD',
+27 verbose headers   'x-cache': 'MISS',
+27 verbose headers   'x-cache-hits': '0',
+27 verbose headers   'x-timer': 'S1426709123.064917,VS0,VE355',
+27 verbose headers   'keep-alive': 'timeout=10, max=50',
+27 verbose headers   connection: 'Keep-Alive' }
+28 silly registry.get cb [ 404,
+28 silly registry.get   { date: 'Wed, 18 Mar 2015 20:05:23 GMT',
+28 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+28 silly registry.get     'content-type': 'application/json',
+28 silly registry.get     'cache-control': 'max-age=0',
+28 silly registry.get     'content-length': '51',
+28 silly registry.get     'accept-ranges': 'bytes',
+28 silly registry.get     via: '1.1 varnish',
+28 silly registry.get     age: '0',
+28 silly registry.get     'x-served-by': 'cache-iad2124-IAD',
+28 silly registry.get     'x-cache': 'MISS',
+28 silly registry.get     'x-cache-hits': '0',
+28 silly registry.get     'x-timer': 'S1426709123.064917,VS0,VE355',
+28 silly registry.get     'keep-alive': 'timeout=10, max=50',
+28 silly registry.get     connection: 'Keep-Alive' } ]
+29 silly lockFile 7dac45d1-node-feedparser node-feedparser@
+30 silly lockFile 7dac45d1-node-feedparser node-feedparser@
+31 error 404 404 Not Found: node-feedparser
+31 error 404
+31 error 404 'node-feedparser' is not in the npm registry.
+31 error 404 You should bug the author to publish it
+31 error 404
+31 error 404 Maybe try 'npm search feedparser'
+31 error 404
+31 error 404 Note that you can also install from a
+31 error 404 tarball, folder, or http url, or git url.
+32 error System Linux 3.2.0-23-virtual
+33 error command "/usr/bin/node" "/usr/bin/npm" "install" "node-feedparser"
+34 error cwd /home/dave/Dropbox/cartulary/aggrivate
+35 error node -v v0.10.33
+36 error npm -v 1.4.28
+37 error code E404
+38 verbose exit [ 1, true ]

@@ -1,0 +1,19 @@
+{
+  "name": "aggrivate",
+  "version": "1.0.0",
+  "description": "Feed puller for Freedom Controller.",
+  "main": "aggrivate.js",
+  "dependencies": {
+    "graceful-fs": "^3.0.6",
+    "ini": "^1.3.3",
+    "mysql": "^2.5.5",
+    "request": "^2.53.0",
+    "iconv-lite": "^0.4.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dave Jones",
+  "license": "Apache"
+}

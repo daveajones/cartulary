@@ -40,7 +40,7 @@ if( $oid == FALSE) {
   echo json_encode($jsondata);
   exit(1);
 }
-
+loggit(3, "DEBUG: Reading list id: [$oid].");
 
 //Change the feeds
 foreach($fid as $feed) {
@@ -60,5 +60,3 @@ $jsondata['description'] = "List created.";
 echo json_encode($jsondata);
 
 return(0);
-
-?>

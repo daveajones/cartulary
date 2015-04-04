@@ -255,7 +255,7 @@ function build_admin_log_rss_feed($max = NULL)
     $rss = '<?xml version="1.0"?>' . "\n  <rss version=\"2.0\" xmlns:source=\"http://source.smallpict.com/2014/07/12/theSourceNamespace.html\" xmlns:sopml=\"$sopmlnamespaceurlv1\">\n    <channel>";
 
     $rss .= "\n
-      <title>" . htmlspecialchars($title) . "</title>
+      <title>" . htmlspecialchars($title." - ".$system_fqdn) . "</title>
       <link>" . htmlspecialchars($feedlink) . "</link>
       <description>$title</description>
       <language>en-us</language>

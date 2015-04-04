@@ -303,11 +303,11 @@ if( strlen($urlshortener) > 254 ) {
 $prefs['urlshortener'] = $urlshortener;
 
 $jsondata['prefname'] = "avatarurl";
-if( strlen($avatarurl) > 1023 ) {
+if( !empty($avatarurl) && (strlen($avatarurl) > 1023 || filter_var($avatarurl, FILTER_VALIDATE_URL) === FALSE)) {
   //Log it
-  loggit(2,"The value for avatarurl pref was too long: [$avatarurl]");
+  loggit(2,"The value for avatarurl pref was not valid: [$avatarurl]");
   $jsondata['status'] = "false";
-  $jsondata['description'] = "Max avatar url length is 1023 characters.";
+  $jsondata['description'] = "Max avatar url length is 1023 characters and must be a raw url (no html tags).";
   echo json_encode($jsondata);
   exit(1);
 }

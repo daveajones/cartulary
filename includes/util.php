@@ -538,7 +538,7 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
 
 
 //Send a status update to twitter
-function tweet($uid = NULL, $content = NULL, $link = "")
+function tweet($uid = NULL, $content = NULL, $link = "", $media_id = "")
 {
     //Check parameters
     if ($uid == NULL) {
@@ -586,8 +586,13 @@ function tweet($uid = NULL, $content = NULL, $link = "")
     //Assemble tweet
     $tweet = $twcontent . " " . $link;
 
+    $twstatus = array('status' => $tweet);
+    if(!empty($media_id)) {
+        $twstatus['media_ids'] = array($media_id);
+    }
+
     //Make an API call to post the tweet
-    $code = $connection->request('POST', $connection->url('1.1/statuses/update'), array('status' => $tweet));
+    $code = $connection->request('POST', $connection->url('1.1/statuses/update'), $twstatus);
 
     //Log and return
     if ($code == 200) {
@@ -598,6 +603,63 @@ function tweet($uid = NULL, $content = NULL, $link = "")
         $twresponse = $connection->response['response'];
         $twrcode = $connection->response['code'];
         loggit(2, "Twitter post did not work posting: [$tweet] for user: [$uid]. Response code: [$twrcode|$twresponse].");
+        //loggit(3,"Twitter post did not work posting: [$tweet] for user: [$uid]. Response code: [$twrcode|$twresponse].");
+        return (FALSE);
+    }
+}
+
+
+//Send a status update to twitter
+function tweet_upload_picture($uid = NULL, $content = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if (empty($content)) {
+        loggit(2, "The media content is blank or corrupt.");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/oauth/tmhOAuth.php";
+
+    //Globals
+    $prefs = get_user_prefs($uid);
+    //loggit(3, "Twitter key: [".$prefs['twitterkey']."]");
+    //loggit(3, "Twitter secret: [".$prefs['twittersecret']."]");
+    //loggit(3, "Twitter user token: [".$prefs['twittertoken']."]");
+    //loggit(3, "Twitter user secret: [".$prefs['twittertokensecret']."]");
+    $charcount = 138;
+
+    //Connect to twitter using oAuth
+    $connection = new tmhOAuth(array(
+        'host'              => 'upload.twitter.com',
+        'consumer_key'      => $prefs['twitterkey'],
+        'consumer_secret'   => $prefs['twittersecret'],
+        'user_token'        => $prefs['twittertoken'],
+        'user_secret'       => $prefs['twittertokensecret'],
+        'curl_ssl_verifypeer' => false
+    ));
+
+    //Make an API call to post the tweet
+    $code = $connection->request('POST', $connection->url('1.1/media/upload'), array('media' => $content));
+
+    //Log and return
+    if ($code == 200) {
+        loggit(1, "Uploaded a picture to twitter for user: [$uid].");
+        loggit(3, "DEBUG: ".print_r($connection->response['response'], TRUE));
+        //loggit(3,"Tweeted a new post: [$tweet] for user: [$uid].");
+
+        //Decode the json
+        $response = json_decode($connection->response['response'], TRUE);
+        return ($response['media_id_string']);
+    } else {
+        $twresponse = $connection->response['response'];
+        $twrcode = $connection->response['code'];
+        loggit(2, "Twitter post did not work uploading picture for user: [$uid]. Response code: [$twrcode|$twresponse].");
         //loggit(3,"Twitter post did not work posting: [$tweet] for user: [$uid]. Response code: [$twrcode|$twresponse].");
         return (FALSE);
     }

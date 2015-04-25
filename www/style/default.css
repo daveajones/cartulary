@@ -973,6 +973,173 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
 
 
 /* --------------------------------------------------- */
+/* ----- Feeditor Page ----- */
+.submenuEditor {
+    z-index: 2;
+    margin-top:44px;
+}
+.submenuEditor li.menuType {
+    min-width:160px;
+}
+body#bodyEditOutline {
+    background:white;
+}
+body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
+    width: 97%;
+}
+.pageContentWrapper.Feeditor .divOutlineTitle {
+    /* border-bottom:solid #dddddd 1px; */
+    opacity:1.0;
+}
+.pageContentWrapper.Feeditor #divEditOutline li.concord-node {
+    /* margin-bottom:10px; */
+
+}
+.pageContentWrapper.Feeditor #divEditOutline {
+    background:white;
+    position: relative;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    width:900px;
+    margin-left:auto;
+    margin-right:auto;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    min-height: 400px;
+}
+.pageContentWrapper.Feeditor #divEditSheetOpen {
+    background: #eee;
+    color:#333;
+    font-size:160%;
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:0;
+    overflow:hidden;
+    z-index:1;
+    transition: height 500ms;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.165);
+}
+.pageContentWrapper.Feeditor #divEditSheetOpen.open {
+    min-height: 70%;
+    padding-top:120px;
+}
+.pageContentWrapper.Feeditor #divEditSheetOpen .recentfilesopen {
+    display:none;
+}
+.pageContentWrapper.Feeditor #divEditSheetOpen.open .recentfilesopen {
+    display:block;
+    list-style-type: none;
+    margin-left:60px;
+}
+.pageContentWrapper.Feeditor #divEditSheetOpen.open .recentfilesopen li {
+    margin-bottom:10px;
+}
+.pageContentWrapper.Feeditor #divEditSheetOpen.open .sheetclose {
+    margin-right:30px;
+}
+.pageContentWrapper.Feeditor #divEditSheetOpen.open div.openbyurl {
+    margin-left:20px;
+    margin-bottom:20px;
+}
+.pageContentWrapper.Feeditor #divEditSheetImport,
+.pageContentWrapper.Feeditor #divEditSheetInclude {
+    background: #eee;
+    color:#333;
+    font-size:160%;
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:0;
+    overflow:hidden;
+    z-index:1;
+    transition: height 500ms;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.165);
+}
+.pageContentWrapper.Feeditor #divEditSheetImport .templateopen,
+.pageContentWrapper.Feeditor #divEditSheetInclude .templateopen {
+    display:none;
+}
+.pageContentWrapper.Feeditor #divEditSheetImport.open,
+.pageContentWrapper.Feeditor #divEditSheetInclude.open {
+    height:70%;
+    padding-top:120px;
+}
+.pageContentWrapper.Feeditor #divEditSheetImport.open .templateopen,
+.pageContentWrapper.Feeditor #divEditSheetInclude.open .templateopen {
+    display:block;
+    list-style-type: none;
+    margin-left:60px;
+}
+.pageContentWrapper.Feeditor #divEditSheetImport.open .templateopen li,
+.pageContentWrapper.Feeditor #divEditSheetInclude.open .templateopen li {
+    margin-bottom:10px;
+}
+.pageContentWrapper.Feeditor #divEditSheetImport.open .sheetclose,
+.pageContentWrapper.Feeditor #divEditSheetInclude.open .sheetclose {
+    margin-right:30px;
+}
+.pageContentWrapper.Feeditor #divEditSheetImport.open div.openbyurl,
+.pageContentWrapper.Feeditor #divEditSheetInclude.open div.openbyurl {
+    margin-left:20px;
+    margin-bottom:20px;
+}
+.pageContentWrapper.Feeditor #divEditOutline div.outlineinfo {
+    text-align:right;
+    margin-right:10px;
+}
+.pageContentWrapper.Feeditor #divEditOutline .divOutlinerContainer {
+    margin-top:40px;
+    padding-left:10px;
+}
+.pageContentWrapper.Feeditor #divEditOutline .rendertitle,
+.pageContentWrapper.Feeditor #divEditOutline .loading {
+    margin-left:10px;
+}
+.pageContentWrapper.Feeditor #divEditOutline .title {
+    box-shadow: inset 0 3px 1px -1px white;
+    margin-top:18px;
+    font-weight:bold;
+    font-size:20px;
+    border: none;
+    outline:none;
+    background: white;
+    width: 600px;
+    height: 28px;
+}
+.pageContentWrapper.Feeditor #divEditOutline .title:focus, input:focus {
+    outline: 0;
+}
+.pageContentWrapper.Feeditor #divEditorEnclosures {
+    padding:20px;
+    transition: display 500ms;
+    position: absolute;
+    border:dashed rgba(250,250,250,1) 4px;
+    background-color:rgba(80, 80, 180, 0.9)
+}
+.pageContentWrapper.Feeditor #divEditorEnclosures #editor_queue {
+    position: relative;
+    width:100%;
+    min-height: 200px;
+    height:100%;
+}
+.pageContentWrapper.Feeditor #divEditorEnclosures #spnEditorQueueText {
+    margin:20px;
+    font-size:200%;
+    display:block;
+    color: #eee;
+    text-shadow:0 1px 0 #555;
+}
+.pageContentWrapper.Feeditor .uploadifive-button {
+    display:none;
+}
+/* --------------------------------------------------- */    
+    
+
+/* --------------------------------------------------- */
 /* ----- Microblog ----- */
 .pageContentWrapper.Microblog #divBlogPost {
   position: relative;

@@ -47,6 +47,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     $l_cg_session_hijack_checking = 0;
     $l_cg_paypal_enabled = FALSE;
     $l_cg_paypal_button_id = "";
+    $l_cg_search_v2_enable = FALSE;
 
 
     //If there is already a config file, let's hang on to it
@@ -108,6 +109,9 @@ if (($pid = cronHelper::lock()) !== FALSE) {
             }
             if (isset($cg_paypal_button_id)) {
                 $l_cg_paypal_button_id = $cg_paypal_button_id;
+            }
+            if (isset($cg_search_v2_enable)) {
+                $l_cg_search_v2_enable = $cg_search_v2_enable;
             }
         }
 
@@ -319,6 +323,11 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
     //Preserve paypal button id
     $template = str_replace('cg_paypal_button_id=""', 'cg_paypal_button_id="'.$l_cg_paypal_button_id.'"', $template);
+
+    //Search v2 enabled?
+    if ($l_cg_search_v2_enable == TRUE) {
+        $template = str_replace('cg_search_v2_enable=false', 'cg_search_v2_enable=true', $template);
+    }
 
     //Eliminate the newinstall flag if it's set
     if (!isset($cartularynewinstall)) {

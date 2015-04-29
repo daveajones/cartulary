@@ -296,6 +296,7 @@ freedomController.v1.river.methods = (function () {
         //Put focus on an article by post id reference
         $(pathToStreamItem + '.activeItem').removeClass("activeItem");
         $(pathToStreamItem + '#' + elid).addClass("activeItem");
+        console.log("_focusThisArticle("+elid+")");
         $('html, body').animate({scrollTop: $(pathToStreamItem + '#' + elid).offset().top - gPlatformMenubarTopOffset}, 300);
         return false;
     }
@@ -722,11 +723,12 @@ freedomController.v1.river.methods = (function () {
             var idx = bobj.attr("data-idx");
             console.log("idx: " + idx);
 
-            //Focus the next sticky article
-            _focusNextArticle(elid);
-
             //Hide the item first
             $('#' + id).hide();
+
+            //Focus the next sticky article
+            var nextId = $('#' + id).next().attr('id');
+            _focusThisArticle(nextId);
 
             //Get any sticky subitems so we can un-sticky them too
             var subitems = $('#' + id + ' .subitem.sticky').map(function () {

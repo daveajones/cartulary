@@ -662,6 +662,11 @@ freedomController.v1.river.methods = (function () {
             //Kill any existing messages
             $(pathToPost + ' .description .inlinecartmsg').remove();
 
+            //Make sure a description exists
+            if( $(pathToPost + ' .description').length === 0 ) {
+                $(pathToPost + ' .header').after('<div class="description"></div>');
+            }
+
             //Build a cartulize url from the post attributes
             var postUrl = encodeURIComponent($(pathToPost).attr("data-url"));
             var postTitle = encodeURIComponent($(pathToPost + ' .header h3').text());

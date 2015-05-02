@@ -61,6 +61,9 @@ freedomController.v1.river.methods = (function () {
         //Bind embed activation links
         _bindEmbedActivations(_elid);
 
+        //Bind sopml profile links
+        freedomController.v1.people.methods.bindSocialOutlineLinks(_elid);
+
         return false;
     }
 

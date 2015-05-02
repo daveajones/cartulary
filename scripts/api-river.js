@@ -715,7 +715,7 @@ freedomController.v1.river.methods = (function () {
 
         //Bind some new clicks to the stickybuttons
         $(elid + ' .aUnSticky').unbind('click');
-        $(elid + ' .aUnSticky').click(function () {
+        $(elid + ' .aUnSticky').click(function (e, data) {
             var bobj = $(this);
             var id = bobj.attr("data-id");
             var fid = bobj.attr("data-feedid");
@@ -727,8 +727,10 @@ freedomController.v1.river.methods = (function () {
             $('#' + id).hide();
 
             //Focus the next sticky article
-            var nextId = $('#' + id).next().attr('id');
-            _focusThisArticle(nextId);
+            if( data && (data.source === "swipe" || data.source ==="hotkey") ) {
+                var nextId = $('#' + id).next().attr('id');
+                _focusThisArticle(nextId);
+            }
 
             //Get any sticky subitems so we can un-sticky them too
             var subitems = $('#' + id + ' .subitem.sticky').map(function () {
@@ -980,7 +982,7 @@ freedomController.v1.river.methods = (function () {
                         $(pathToStreamItem + '#' + item.id).swipe({
                             swipeRight: function () {
                                 $(pathToStreamItem + '#' + item.id).hide();
-                                $(pathToStreamItem + '#' + item.id + ' .aUnSticky').trigger('click');
+                                $(pathToStreamItem + '#' + item.id + ' .aUnSticky').trigger('click', {source:"swipe"});
                             }
                         });
                     })();

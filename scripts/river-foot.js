@@ -24,7 +24,7 @@ $(document).ready( function() {
         });
 	key('u', function() {		//----- Un-sticky the currently targeted item
 		if( $(freedomController.v1.river.statics.pathToStreamItem + ".activeItem").hasClass("sticky") ) {
-			$(freedomController.v1.river.statics.pathToStreamItem + ".activeItem .aUnSticky").trigger('click');
+			$(freedomController.v1.river.statics.pathToStreamItem + ".activeItem .aUnSticky").trigger('click', {source:'hotkey'});
 		}
 		return false;
         });

@@ -1,5 +1,6 @@
 <!-- Core -->
-<script type="text/javascript" src="/script/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="/script/pace.min.js"></script>
+<script type="text/javascript" src="/script/jquery-1.11.2.min.js"></script>
 <script type="text/javascript" src="/script/jquery.form.js"></script>
 <script type="text/javascript" src="/script/bootstrap-2.3.1.min.js"></script>
 <script><?include "$confroot/$scripts/freedomcontroller.utils.js"?></script>

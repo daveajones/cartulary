@@ -3,6 +3,7 @@
 // API for general utility type functions
 //########################################################################################
 
+use Aws\S3\S3Client;
 
 // Logging function
 function loggit($lognum, $message)
@@ -1536,20 +1537,31 @@ function set_s3_bucket_cors($key, $secret, $bucket)
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
     //Set up
-    require_once "$confroot/$libraries/s3/S3.php";
-    $s3 = new S3($key, $secret);
+    require_once "$confroot/$libraries/aws/aws-autoloader.php";
+
+    $client = S3Client::factory(array("key" => $key, "secret" => $secret));
 
     //Set the CORS policy of this bucket
-    $res = $s3->setBucketCrossOriginConfiguration($bucket);
-
-    //Were we able to set the cors config?
-    if (!$res) {
-        loggit(2, "Could not set cors config on bucket using: [$key | $secret | $bucket].");
-        return (FALSE);
+    try {
+        $res = $client->putBucketCors(array(
+            'Bucket' => $bucket,
+            'CORSRules' => array(
+                array(
+                    'AllowedHeaders' => array('*'),
+                    'AllowedMethods' => array('GET'),
+                    'AllowedOrigins' => array('*'),
+                    'ExposeHeaders' =>  array('Content-Type', 'Content-Length', 'Date'),
+                    'MaxAgeSeconds' =>  3000
+                )
+            )
+        ));
+    } catch (\Aws\S3\Exception\S3Exception $e) {
+        loggit(3, "Error setting s3 cors config: ".$e->getAwsErrorCode()." : ".$e->getMessage());
+        return(FALSE);
     }
 
     //Give back the buckets array
-    //loggit(3, "DEBUG: Bucket: [$bucket] is located in: [$bucketloc].");
+    loggit(3, "S3 CORS config is now set for bucket: [$bucket]");
     return ($res);
 }
 

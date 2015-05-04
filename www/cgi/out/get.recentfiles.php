@@ -7,16 +7,22 @@ header("Content-Type: application/json");
 $jsondata = array();
 //--------------------------------------------------------------------------------
 
+//Check for parameters
+if(isset($_REQUEST['type']) && is_numeric($_REQUEST['type'])) {
+    $type = $_REQUEST['type'];
+} else {
+    $type = -1;
+}
 
 //Pull a list of recently edited files for this user
-$files = get_recent_files($g_uid, 30);
+$files = get_recent_files($g_uid, 30, $type);
 
 
 //--------------------------------------------------------------------------------
 //Give feedback that all went well
 $jsondata['status'] = "true";
 $jsondata['files'] = $files;
-$jsondata['description'] = "Parsed social outline content.";
+$jsondata['description'] = "Pulled recent files list.";
 echo json_encode($jsondata);
 
 return(0);

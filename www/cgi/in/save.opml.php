@@ -24,6 +24,13 @@ if ( isset($_REQUEST['title']) ) {
     $title = $_REQUEST['title'];
 }
 
+//Opml type
+if(isset($_REQUEST['type']) && is_numeric($_REQUEST['type'])) {
+    $type = $_REQUEST['type'];
+} else {
+    $type = 0;
+}
+
 //Render the title?
 $rendertitle = TRUE;
 if ( isset($_REQUEST['rendertitle']) && $_REQUEST['rendertitle'] == "false" ) {
@@ -164,7 +171,7 @@ if(!$s3res) {
 }
 
 //Update recent file table
-$rid = update_recent_file($uid, $s3url, $title, $opml, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked);
+$rid = update_recent_file($uid, $s3url, $title, $opml, $type, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked);
 loggit(3, "DEBUG: Recent file id is [$rid].");
 
 //Was this an edited article content request

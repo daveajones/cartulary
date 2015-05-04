@@ -405,7 +405,13 @@ function get_river_as_json($uid = NULL, $mobile = FALSE)
         return (FALSE);
     }
 
-    return (json_encode(utf8ize(get_river($uid, $mobile))));
+    $jr = json_encode(utf8ize(get_river($uid, $mobile)));
+
+    if(empty($jr)) {
+        $jr = json_encode(get_river($uid, $mobile));
+    }
+
+    return($jr);
 }
 
 
@@ -2509,7 +2515,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     }
 
     //Log and return
-    loggit(3, "New feed item for feed: [$fid].");
+    loggit(1, "New feed item for feed: [$fid].");
     return ($id);
 }
 
@@ -4370,7 +4376,7 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
             $filename = $default_river_json_file_name;
             $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
             if (!$s3res) {
-                loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+                loggit(2, "Could not create S3 file: [$filename] for user: [$uid].");
                 //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
             } else {
                 $s3url = get_s3_url($uid, $subpath, $filename);

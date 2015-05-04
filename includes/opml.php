@@ -2759,12 +2759,18 @@ function get_social_outline_directory($query = NULL, $max = NULL)
 
 
 //Return a list of files recently edited by this user in the editor
-function get_recent_files($uid = NULL, $max = NULL)
+function get_recent_files($uid = NULL, $max = NULL, $type = 0)
 {
     //Check parameters
     if (empty($uid)) {
         loggit(2, "The user id given is corrupt or blank: [$uid]");
         return (FALSE);
+    }
+
+    //Type check?
+    $notype = FALSE;
+    if ($type == -1) {
+        $notype = TRUE;
     }
 
     //Includes
@@ -2774,7 +2780,11 @@ function get_recent_files($uid = NULL, $max = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Do the query
-    $sqltxt = "SELECT title, url, time, disqus, wysiwyg, watched, locked FROM $table_recentfiles WHERE userid=?";
+    if($notype) {
+        $sqltxt = "SELECT title, url, time, disqus, wysiwyg, watched, locked FROM $table_recentfiles WHERE userid=?";
+    } else {
+        $sqltxt = "SELECT title, url, time, disqus, wysiwyg, watched, locked FROM $table_recentfiles WHERE userid=? AND type=?";
+    }
 
     $sqltxt .= " ORDER BY time DESC";
 
@@ -2786,7 +2796,11 @@ function get_recent_files($uid = NULL, $max = NULL)
 
     loggit(1, "[$sqltxt]");
     $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    if($notype) {
+        $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    } else {
+        $sql->bind_param("sd", $uid, $type) or loggit(2, "MySql error: " . $dbh->error);
+    }
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
 
@@ -2947,7 +2961,7 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 
 
 //Update a file into the recent files table
-function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE, $articleid = NULL, $locked = FALSE)
+function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $type = 0, $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE, $articleid = NULL, $locked = FALSE)
 {
     //Check parameters
     if (empty($uid)) {
@@ -2994,15 +3008,17 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
 
     //Insert recent file entry
     if( empty($oldurl) ) {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked) VALUES (?,?,?,?,?,?,?,?,?,?)
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type)
+                                         VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?)
                  ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssddddsdsdsdddsd", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $title, $time, $outline, $disqus, $wysiwyg, $watched, $articleid, $locked) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsddsdsdddsd", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $title, $time, $outline, $disqus, $wysiwyg, $watched, $articleid, $locked) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked) VALUES (?,?,?,?,?,?,?,?,?,?)
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type)
+                                         VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?)
                  ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssddddsdsdssdddsd", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched, $articleid, $locked) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsddsdssdddsd", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched, $articleid, $locked) or loggit(2, "MySql error: " . $dbh->error);
         loggit(3, "User: [$uid] changed old url: [$oldurl] to new url: [$url].");
     }
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -3502,6 +3518,89 @@ function convert_opml_to_myword($content = NULL, $max = NULL)
             $converted['subs'][] = (string)$entry->attributes()->text;
             $count++;
         }
+    }
+
+    //loggit(3, "DEBUG: ".print_r($json, TRUE));
+
+    if ($count == 0) {
+        loggit(2, "There were no outline nodes in this outline.");
+        return (-2);
+    }
+
+    //Log and leave
+    loggit(3, "Got [$count] include nodes from the outline.");
+    return (json_encode($converted));
+}
+
+
+//Convert a news feed to opml structure
+function convert_feed_to_opml($content = NULL, $max = NULL)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Check params
+    if (empty($content) || !is_feed($content)) {
+        loggit(2, "The feed content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Array for building
+    $converted = array();
+    $converted['title'] = "";
+    $converted['authorname'] = "";
+    $converted['when'] = "";
+    $converted['img'] = "";
+    $converted['subs'] = "";
+
+    //Parse it
+    libxml_use_internal_errors(true);
+    $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+    libxml_clear_errors();
+
+    //Meta-data
+    if(isset($x->head->title)) {
+        $converted['title'] = (string)$x->head->title;
+    }
+    if(isset($x->head->ownerName)) {
+        $converted['authorname'] = (string)$x->head->ownerName;
+    }
+    if(isset($x->head->dateModified)) {
+        $converted['when'] = (string)$x->head->dateModified;
+    }
+    $converted['img'] = "";
+
+    //Grab an image node
+    $nodes = $x->xpath('//outline[@url and @type="image"]');
+    if (!empty($nodes)) {
+        foreach ($nodes as $entry) {
+            $converted['img'] = (string)$entry->attributes()->url;
+            break;
+        }
+    }
+
+    //Grab outline nodes
+    $nodes = $x->xpath('//outline[not(ancestor-or-self::outline[@type="menu" or @type="collaborate"])]');
+    if (empty($nodes)) {
+        loggit(2, "This outline content didn't have any outline nodes.");
+        return (-2);
+    }
+
+    //Run through each node and get the text into the array
+    $count = 0;
+    foreach ($nodes as $entry) {
+        if( (string)$entry->attributes()->type == "link") {
+            if( empty($entry->attributes()->text) ) {
+                $converted['subs'][] = '<a href="'.(string)$entry->attributes()->url.'">'.(string)$entry->attributes()->url.'</a>';
+            } else {
+                $converted['subs'][] = '<a href="'.(string)$entry->attributes()->url.'">'.(string)$entry->attributes()->text.'</a>';
+            }
+            $count++;
+        } else
+            if( empty($entry->attributes()->type)) {
+                $converted['subs'][] = (string)$entry->attributes()->text;
+                $count++;
+            }
     }
 
     //loggit(3, "DEBUG: ".print_r($json, TRUE));

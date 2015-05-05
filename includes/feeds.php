@@ -367,6 +367,7 @@ function get_river($uid = NULL, $mobile = FALSE)
 
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+    $dbh->set_charset("utf-8");
 
     //Look for the sid in the session table
     if ($mobile == TRUE) {
@@ -405,13 +406,7 @@ function get_river_as_json($uid = NULL, $mobile = FALSE)
         return (FALSE);
     }
 
-    $jr = json_encode(utf8ize(get_river($uid, $mobile)));
-
-    if(empty($jr)) {
-        $jr = json_encode(get_river($uid, $mobile));
-    }
-
-    return($jr);
+    return(json_encode(get_river($uid, $mobile)));
 }
 
 

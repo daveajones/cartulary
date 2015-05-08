@@ -573,7 +573,11 @@ function tweet($uid = NULL, $content = NULL, $link = "", $media_id = "")
     ));
 
     if (!empty($link)) {
-        $charcount -= 21;
+        $charcount -= 22;
+    }
+
+    if (!empty($media_id)) {
+        $charcount -= 22;
     }
 
     //Truncate text if too long to fit in remaining space

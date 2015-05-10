@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 56;
+$cg_database_version = 61;
 $cg_database_updates = array();
 
 
@@ -767,6 +767,96 @@ CGDB0170;
 $cg_database_updates[55][] = <<<CGDB0171
  INSERT INTO `dbversion` ( `version` ) VALUES ( '56' )
 CGDB0171;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 56 to 57 -----------------------------------------------------------------------------------------------
+$cg_database_updates[56][] = <<<CGDB0172
+ ALTER TABLE `recentfiles` ADD `type` INT NOT NULL
+CGDB0172;
+$cg_database_updates[56][] = <<<CGDB0173
+ ALTER TABLE `recentfiles` ADD INDEX (`type`)
+CGDB0173;
+$cg_database_updates[56][] = <<<CGDB0174
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '57' )
+CGDB0174;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 57 to 58 -----------------------------------------------------------------------------------------------
+$cg_database_updates[57][] = <<<CGDB0175
+ TRUNCATE TABLE `nfitem_map_catalog`
+CGDB0175;
+$cg_database_updates[57][] = <<<CGDB0176
+ DELETE FROM `nfitem_map` where 1
+CGDB0176;
+$cg_database_updates[57][] = <<<CGDB0177
+ ALTER TABLE `nfitem_map_catalog` ADD `added` DATETIME NOT NULL COMMENT 'Date the correlation was added',
+ ADD INDEX ( `added` )
+CGDB0177;
+$cg_database_updates[57][] = <<<CGDB0178
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '58' )
+CGDB0178;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 58 to 59 -----------------------------------------------------------------------------------------------
+$cg_database_updates[58][] = <<<CGDB0179
+ CREATE TABLE IF NOT EXISTS `nfenclosures` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Enclosure id',
+  `iid` bigint(20) NOT NULL COMMENT 'Newsfeed item id',
+  `url` varchar(2048) NOT NULL COMMENT 'Url of the enclosure',
+  `mimetype` varchar(64) NOT NULL COMMENT 'Mimetype of the enclosure',
+  `length` bigint(20) NOT NULL COMMENT 'Size in bytes of the enclosure',
+  `time` DATETIME NOT NULL COMMENT 'Incoming enclosure time',
+  `type` int(11) NOT NULL COMMENT 'Internal type spec',
+  `marker` int(11) NOT NULL COMMENT 'TImestampe of last play marker',
+  PRIMARY KEY (`id`),
+  KEY `iid` (`iid`),
+  KEY `type` (`type`),
+  KEY `time` (`time`)
+ ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Enclosures from the newsfeed item table' AUTO_INCREMENT=1
+CGDB0179;
+$cg_database_updates[58][] = <<<CGDB0180
+ ALTER TABLE `nfenclosures`
+ ADD CONSTRAINT `nfenclosures_ibfk_1` FOREIGN KEY (`iid`) REFERENCES `nfitems` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0180;
+$cg_database_updates[58][] = <<<CGDB0181
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '59' )
+CGDB0181;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 59 to 60 -----------------------------------------------------------------------------------------------
+$cg_database_updates[59][] = <<<CGDB0182
+ CREATE TABLE IF NOT EXISTS `nfitem_map_count` (
+  `wordid` bigint(20) NOT NULL COMMENT 'Id of word in map table',
+  `totals` int(11) NOT NULL COMMENT 'Number of occurences in nfitems table'
+ ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Keeps a running total of the occurences of each word'
+ AUTO_INCREMENT=1
+CGDB0182;
+$cg_database_updates[59][] = <<<CGDB0183
+ ALTER TABLE `nfitem_map_count` ADD FOREIGN KEY ( `wordid` ) REFERENCES `cartulary`.`nfitem_map` (
+ `id`
+ ) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0183;
+$cg_database_updates[59][] = <<<CGDB0184
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '60' )
+CGDB0184;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 60 to 61 -----------------------------------------------------------------------------------------------
+$cg_database_updates[60][] = <<<CGDB0185
+ CREATE TABLE IF NOT EXISTS `nfitem_map_count_today` (
+  `wordid` bigint(20) NOT NULL COMMENT 'Id of word in map table',
+  `totals` int(11) NOT NULL COMMENT 'Number of occurences in nfitems table'
+ ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Total of the occurences of each word for last 23 hours'
+ AUTO_INCREMENT=1
+CGDB0185;
+$cg_database_updates[60][] = <<<CGDB0186
+ ALTER TABLE `nfitem_map_count_today` ADD FOREIGN KEY ( `wordid` ) REFERENCES `cartulary`.`nfitem_map` (
+ `id`
+ ) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0186;
+$cg_database_updates[60][] = <<<CGDB0187
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '61' )
+CGDB0187;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

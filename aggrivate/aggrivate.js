@@ -12,9 +12,10 @@ var dbcheck = 0;
 var query = 0;
 
 //Get the database and table info
-var config = ini.parse(fs.readFileSync('../conf/cartulary.conf', 'utf-8'));
+var config = ini.parse(fs.readFileSync('/opt/cartulary/conf/cartulary.conf', 'utf-8'));
 
 //console.log(config.database);
+loggit(3, "DEBUG: Aggrivate is runnning.");
 
 //Get a connection to mysql
 var connection = mysql.createConnection({
@@ -123,7 +124,7 @@ dbcheck = setInterval(function() {
 }, 5000);
 
 
-loggit = function loggit(lognum, message) {
+function loggit(lognum, message) {
     //Timestamp for this log
     tstamp = new Date(Date.now()).toLocaleString();
     var fd;
@@ -134,13 +135,13 @@ loggit = function loggit(lognum, message) {
             if (config.logging.log_errors_only == 1) {
                 return true;
             }
-            fd = fs.createWriteStream('../'+config.folders.log+'/' + config.logging.acclog, {'flags': 'a'});
+            fd = fs.createWriteStream('/opt/cartulary/'+config.folders.log+'/' + config.logging.acclog, {'flags': 'a'});
             break;
         case 2:
-            fd = fs.createWriteStream('../'+config.folders.log+'/' + config.logging.errlog, {'flags': 'a'});
+            fd = fs.createWriteStream('/opt/cartulary/'+config.folders.log+'/' + config.logging.errlog, {'flags': 'a'});
             break;
         case 3:
-            fd = fs.createWriteStream('../'+config.folders.log+'/' + config.logging.dbglog, {'flags': 'a'});
+            fd = fs.createWriteStream('/opt/cartulary/'+config.folders.log+'/' + config.logging.dbglog, {'flags': 'a'});
             break;
     }
 

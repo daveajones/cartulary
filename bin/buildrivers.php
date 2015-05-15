@@ -7,7 +7,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     loggit(1, "Building rivers...");
 
     //Build the individual rivers for each user in the system
-    $users = get_users();
+    $users = get_users(NULL, NULL, TRUE);
     echo "Building " . count($users) . " rivers.\n\n";
     loggit(1, "Building " . count($users) . " rivers.");
     $tstart = time();
@@ -17,9 +17,8 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
         //We don't want to waste time building rivers for users that are not active
         //so if the user hasn't logged in for 3 weeks we just build twice a day
-        $ri = get_river_info($user['id']);
-        if( !is_user_active($user['id']) || ($user['lastlogin'] < ($tstart - 2419200) && get_user_time_last_active($user['id']) == 0 && (!empty($ri) && ($tstart - $ri['lastbuild']) < 43200)) ) {
-            loggit(3, "Skipping river build for inactive user: [".$user['id']."]. River last built at: [".$ri['lastbuild']."]");
+        if( ($user['lastlogin'] < ($tstart - 2419200) && $user['lastactive'] == 0 && (!empty($user['lastriverbuild']) && ($tstart - $user['lastriverbuild']) < 43200)) ) {
+            loggit(3, "Skipping river build for inactive user: [".$user['id']."].");
         } else {
             if (river_updated($user['id'])) {
                 if ($prefs['collapseriver'] == 1) {

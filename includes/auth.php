@@ -2052,7 +2052,7 @@ function get_user_prefs($uid = NULL, $noinit = FALSE)
 function get_user_time_last_active($uid = NULL)
 {
     //Check parameters
-    if ( empty($uid) ) {
+    if (empty($uid)) {
         loggit(2, "User id given is blank or corrupt: [$uid]");
         return (FALSE);
     }
@@ -2073,7 +2073,7 @@ function get_user_time_last_active($uid = NULL)
         $sql->close()
         or loggit(2, "MySql error: " . $dbh->error);
         loggit(1, "No active sessions for this user: [$uid].");
-        return(0);
+        return (0);
     }
     $session = $sql->fetch_assoc();
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
@@ -2285,13 +2285,20 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
 
 
 //Retrieve a list of all the users in the database
-function get_users($max = NULL)
+function get_users($max = NULL, $time = NULL, $activeonly = FALSE)
 {
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Only active users?
+    if($activeonly) {
+        $active = " WHERE $table_user.active = 1 ";
+    } else {
+        $active = "";
+    }
 
     //Look for the
     $sqltxt = "SELECT $table_user.id,
@@ -2303,9 +2310,15 @@ function get_users($max = NULL)
                     $table_user.badlogins,
                     $table_user.username,
                     $table_user.admin,
-                    $table_prefs.avatarurl
+                    $table_prefs.avatarurl,
+                    MAX($table_session.lastactivity),
+		            MAX($table_river.lastbuild)
              FROM $table_user
-	     LEFT JOIN $table_prefs ON $table_user.id = $table_prefs.uid
+	         LEFT JOIN $table_prefs ON $table_user.id = $table_prefs.uid
+             LEFT JOIN $table_session ON $table_user.id = $table_session.userid
+             LEFT JOIN $table_river ON $table_user.id = $table_river.userid
+             $active
+             GROUP BY $table_user.id
              ORDER BY $table_user.name DESC";
 
     if (!empty($max) && is_numeric($max)) {
@@ -2325,7 +2338,7 @@ function get_users($max = NULL)
         return (array());
     }
 
-    $sql->bind_result($uid, $uname, $uemail, $ulastlogin, $ustage, $uactive, $ubadlogins, $uusername, $uadmin, $uavatarurl) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($uid, $uname, $uemail, $ulastlogin, $ustage, $uactive, $ubadlogins, $uusername, $uadmin, $uavatarurl, $ulastactivity, $urlastbuild) or loggit(2, "MySql error: " . $dbh->error);
 
     $users = array();
     $count = 0;
@@ -2340,7 +2353,9 @@ function get_users($max = NULL)
             'username' => $uusername,
             'sopmlurl' => get_social_outline_url($uid),
             'avatarurl' => $uavatarurl,
-            'admin' => $uadmin);
+            'admin' => $uadmin,
+            'lastactive' => $ulastactivity,
+            'lastriverbuild' => $urlastbuild);
         $count++;
     }
 

@@ -985,6 +985,41 @@ function check_head_size($url, $timeout = 5)
 }
 
 
+//Do a HEAD request on a url to see what the Last-Modified time is
+function check_head_content_type($url, $timeout = 5)
+{
+    //Check parameters
+    if ($url == NULL) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+    $url = clean_url($url);
+
+    $curl = curl_init();
+
+    curl_setopt($curl, CURLOPT_URL, $url);
+    //don't fetch the actual page, you only want headers
+    //curl_setopt($curl, CURLOPT_NOBODY, true);
+    curl_setopt($curl, CURLOPT_HEADER, true);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
+    //stop it from outputting stuff to stdout
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+
+    curl_exec($curl);
+
+    $ct = curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
+    loggit(3, "DEBUG: CURL: Content-type check on: [$url] returned: [$ct]");
+
+    return($ct);
+}
+
+
 //Clean up potentially problematic urls
 function clean_url($url = NULL)
 {
@@ -2546,6 +2581,12 @@ function make_mime_type($url = NULL, $type = NULL)
     if (strposa($url, array('.gif')) !== FALSE) {
         return ('image/gif');
     }
+    if (strposa($url, array('.bmp')) !== FALSE) {
+        return ('image/bmp');
+    }
+    if (strposa($url, array('gravatar.com/avatar')) !== FALSE) {
+        return ('image/jpeg');
+    }
 
     // ----- Textual
     if (strposa($url, array('.htm', '.html')) !== FALSE) {
@@ -2554,7 +2595,6 @@ function make_mime_type($url = NULL, $type = NULL)
     if (strposa($url, array('.pdf')) !== FALSE) {
         return ('application/pdf');
     }
-
 
     // ----- Audio
     if (strposa($url, array('.mp3')) !== FALSE) {
@@ -2579,7 +2619,6 @@ function make_mime_type($url = NULL, $type = NULL)
         return ('audio/ogg');
     }
 
-
     // ----- Video
     if (strposa($url, array('.m4v')) !== FALSE) {
         return ('video/mp4');
@@ -2599,7 +2638,15 @@ function make_mime_type($url = NULL, $type = NULL)
     if (strposa($url, array('.mov')) !== FALSE) {
         return ('video/quicktime');
     }
+    if (strposa($url, array('.mkv')) !== FALSE) {
+        return ('video/unknown');
+    }
 
+    //If nothing matched, do a head check and see if we can get it
+    $ct = check_head_content_type($url);
+    if (strpos($ct, '/') !== FALSE) {
+        return ($ct);
+    }
 
     //If none of those matched, see if there was a type hint
     if (!empty($type)) {
@@ -2680,6 +2727,16 @@ function url_is_video($url = NULL)
     }
 
     return (FALSE);
+}
+
+
+function get_mimetype_parent($mt = NULL) {
+    if(empty($mt)) {
+        loggit(2, "Mimetype parameter is either blank or corrupt: [$mt].");
+        return ("");
+    }
+
+    return (strtok($mt, '/'));
 }
 
 
@@ -3589,7 +3646,7 @@ function utf8ize($d) {
             $d[$k] = utf8ize($v);
         }
     } else if (is_string ($d)) {
-        return to_utf8($d);
+        return iconv(mb_detect_encoding($d, mb_detect_order(), true), "UTF-8", $d);
     }
     return $d;
 }

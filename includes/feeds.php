@@ -367,7 +367,7 @@ function get_river($uid = NULL, $mobile = FALSE)
 
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
-    $dbh->set_charset("utf-8");
+    $dbh->set_charset("utf8");
 
     //Look for the sid in the session table
     if ($mobile == TRUE) {
@@ -406,7 +406,7 @@ function get_river_as_json($uid = NULL, $mobile = FALSE)
         return (FALSE);
     }
 
-    return(json_encode(get_river($uid, $mobile)));
+    return(json_encode(utf8ize(get_river($uid, $mobile))));
 }
 
 
@@ -2480,10 +2480,16 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     }
     $sql->execute() or loggit(3, $dbh->error);
 
-
     //Get the last item id that was generated
     $id = $sql->insert_id;
     $sql->close();
+
+    //Put enclosures in the database
+    if(!empty($enclosures)) {
+        foreach($enclosures as $e) {
+            add_feed_item_enclosure($id, $e);
+        }
+    }
 
     //Map the searchable terms in this item if new search is enabled
     if( $cg_search_v2_enable ) {
@@ -2609,7 +2615,7 @@ function map_feed_item($iid = NULL, $content = NULL)
 
             if( is_numeric($lid) && $lid > 0 ) {
                 //Now catalog the mapping
-                $stmt = "INSERT INTO $table_nfitem_map_catalog (wordid,nfitemid) VALUES (?,?) ON DUPLICATE KEY UPDATE wordid=wordid";
+                $stmt = "INSERT INTO $table_nfitem_map_catalog (wordid,nfitemid,added) VALUES (?,?, NOW()) ON DUPLICATE KEY UPDATE wordid=wordid,added=NOW()";
                 $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
                 $sql->bind_param("dd", $lid, $iid) or loggit(2, "MySql error: " . $dbh->error);
                 $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -5274,6 +5280,108 @@ function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL
 }
 
 
+//Retrieve the feed items that have media in them
+function get_feed_items_with_enclosures2($uid = NULL, $tstart = NULL, $max = NULL, $start = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Set up max limit
+    if (empty($max)) {
+        $max = $default_max_list;
+    }
+
+    //Set up start time
+    if (empty($tstart)) {
+        $tstart = time() - 86400;
+    }
+
+    //Run the query
+    $sqltxt = "SELECT enc.id,
+                      enc.iid,
+                      enc.url,
+                      enc.mimetype,
+                      enc.length,
+                      enc.time,
+                      enc.type,
+                      enc.marker,
+                      nfi.title,
+                      nfi.sourceurl,
+                      nfi.sourcetitle,
+                      nfi.origin,
+                      nfi.author
+             FROM $table_nfenclosures AS enc
+             LEFT JOIN $table_nfitem AS nfi ON nfi.id = enc.iid
+             INNER JOIN $table_nfcatalog AS nfc ON nfi.feedid = nfc.feedid AND nfc.userid = ?
+             ORDER BY enc.time DESC
+	     LIMIT ?,?";
+
+    //loggit(3, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sdd", $uid, $start, $max) or loggit(2, $sql->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any items returned
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No feed items returned for: [$fid].");
+        return (array());
+    }
+
+    $sql->bind_result(
+        $aid,
+        $aiid,
+        $aurl,
+        $amimetype,
+        $alength,
+        $atime,
+        $atype,
+        $amarker,
+        $atitle,
+        $asourceurl,
+        $asourcetitle,
+        $aorigin,
+        $aauthor
+    ) or loggit(2, "MySql error: " . $dbh->error);
+
+    $items = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $items[$count] = array(
+            'id' => $aiid,
+            'url' => $aurl,
+            'title' => $atitle,
+            'type' => $atype,
+            'timestamp' => $atime,
+            'timeadded' => $atime,
+            'sourceurl' => $asourceurl,
+            'sourcetitle' => $asourcetitle,
+            'origin' => $aorigin,
+            'author' => $aauthor
+        );
+        $count++;
+    }
+
+    $sql->close();
+
+    //loggit(3, print_r($items, TRUE));
+
+    loggit(1, "Returning: [$count] items.");
+    return ($items);
+}
+
+
 //Retrieve the feed items that are sticky
 function get_sticky_feed_items($uid = NULL)
 {
@@ -5440,4 +5548,172 @@ function get_sticky_feed_items($uid = NULL)
 
     loggit(1, "Returning: [$count] items.");
     return ($items);
+}
+
+
+//Add an enclosure for a feed item
+function add_feed_item_enclosure($iid = NULL, $enclosure = array()) {
+    //Check parameters
+    if (empty($iid)) {
+        loggit(2, "The item id is blank or corrupt: [$iid]");
+        return (FALSE);
+    }
+    if(empty($enclosure)) {
+        loggit(2, "Enclosure array is blank or corrupt.");
+        return (FALSE);
+    }
+
+    //Set an integer for the given type
+    $t = get_mimetype_parent($enclosure['type']);
+    $enclosure['t'] = $t;
+    switch ($t) {
+        case 'image':
+            $type = 1;
+            break;
+        case 'audio':
+            $type = 2;
+            break;
+        case 'video':
+            $type = 3;
+            break;
+        default:
+            $type = 0;
+            break;
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    $stmt = "INSERT INTO $table_nfenclosures
+                        (iid,
+                         url,
+                         mimetype,
+                         length,
+                         time,
+                         type)
+             VALUES     (?,?,?,?,NOW(),?)";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("dssdd", $iid, $enclosure['url'], $enclosure['type'], $enclosure['length'], $type) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(3, $dbh->error);
+    $sql->close();
+
+    loggit(1, "NEW ENCLOSURE: ".print_r($enclosure, TRUE));
+    return(TRUE);
+}
+
+
+//Re-calculate the counts for the v2 search table
+function calculate_map_word_counts() {
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //First kill the existing records
+    $stmt = "TRUNCATE TABLE $table_nfitem_map_count";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the word count insert
+    $stmt = "INSERT INTO $table_nfitem_map_count
+                SELECT wordid,count(nfitemid) as totals
+                FROM $table_nfitem_map_catalog AS catalog
+                GROUP BY wordid
+                ORDER BY totals DESC";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Close the connection
+    $sql->close();
+
+    //Log and leave
+    loggit(3, "Re-built search map word counts.");
+    return(TRUE);
+}
+
+
+//Re-calculate the counts for the v2 search table for the last 23 hours
+function calculate_map_word_today_counts() {
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //First kill the existing records
+    $stmt = "TRUNCATE TABLE $table_nfitem_map_count_today";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the word count insert
+    $stmt = "INSERT INTO nfitem_map_count_today
+                SELECT wordid,count(nfitemid) as totals
+                FROM nfitem_map_catalog AS catalog
+                WHERE catalog.added >= (NOW() - INTERVAL 23 HOUR)
+                GROUP BY wordid
+                ORDER BY totals DESC";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Close the connection
+    $sql->close();
+
+    //Log and leave
+    loggit(3, "Re-built search map word counts.");
+    return(TRUE);
+}
+
+
+//Get the counts for the v2 search table for the last 23 hours
+function get_map_word_today_counts($max = 100) {
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //First kill the existing records
+    $stmt = "TRUNCATE TABLE $table_nfitem_map_count_today";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the word count insert
+    $stmt = "SELECT nfm.word
+              FROM nfitem_map_count_today AS nfc
+              INNER JOIN nfitem_map AS nfm ON nfm.id = nfc.wordid
+              ORDER BY nfc.totals DESC";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any items returned
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No words returned for the last 23 hours.");
+        return (array());
+    }
+
+    $sql->bind_result(
+        $fword
+    ) or loggit(2, "MySql error: " . $dbh->error);
+
+    $words = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        //Construct the word array
+        $words[$count] = $fword;
+        $count++;
+    }
+
+    //Close the connection
+    $sql->close();
+
+    //Log and leave
+    loggit(3, "Returning: [$count] words in the last 23 hours.");
+    return(TRUE);
 }

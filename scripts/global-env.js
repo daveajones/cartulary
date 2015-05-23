@@ -10,3 +10,11 @@ var msgtimer;
 //User globals
 var cuTwitterIsEnabled = <?if( twitter_is_enabled($g_uid) ) {?>true<?}else{?>false<?}?>;
 var cuRiverColumnCount = <?echo $g_prefs['rivercolumns']?>;
+
+//Library prefs
+$.Finger = {
+    pressDuration: 500,
+    doubleTapInterval: 300,
+    flickDuration: 150,
+    motionThreshold: 5
+};

@@ -696,6 +696,10 @@ freedomController.v1.river.methods = (function () {
                         }
                         $(pathToPost + ' .description').html(data.article.body);
                         $(pathToPost + ' .description a').attr('target', '_blank');
+                        $(pathToPost + ' .description a').on('press', function() {
+                            var url = '/cgi/in/cartulize?url=' + $(this).attr('href');
+                            window.open(url);
+                        });
                         //Change to a reading-friendly style
                         $(pathToPost).addClass('cartulized');
                     } else {
@@ -986,13 +990,13 @@ freedomController.v1.river.methods = (function () {
                 //Add a swipe handler for mobile
                 if ( platform == "mobile" ) {
                     (function () {
-                        $(pathToStreamItem + '#' + item.id).swipe('destroy');
-                        $(pathToStreamItem + '#' + item.id).swipe({
-                            swipeRight: function () {
+                        $(pathToStreamItem + '#' + item.id).on('flick', function(e) {
+                            //The following if criteria denotes left to right flick
+                            if( e.orientation === 'horizontal' && e.direction === 1 ) {
                                 $(pathToStreamItem + '#' + item.id).hide();
                                 $(pathToStreamItem + '#' + item.id + ' .aUnSticky').trigger('click', {source:"swipe"});
                             }
-                        });
+                        })
                     })();
                 }
             }

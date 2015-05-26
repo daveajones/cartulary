@@ -299,7 +299,7 @@ freedomController.v1.river.methods = (function () {
         //Put focus on an article by post id reference
         $(pathToStreamItem + '.activeItem').removeClass("activeItem");
         $(pathToStreamItem + '#' + elid).addClass("activeItem");
-        console.log("_focusThisArticle("+elid+")");
+        console.log("_focusThisArticle(" + elid + ")");
         $('html, body').animate({scrollTop: $(pathToStreamItem + '#' + elid).offset().top - gPlatformMenubarTopOffset}, 300);
         return false;
     }
@@ -666,7 +666,7 @@ freedomController.v1.river.methods = (function () {
             $(pathToPost + ' .description .inlinecartmsg').remove();
 
             //Make sure a description exists
-            if( $(pathToPost + ' .description').length === 0 ) {
+            if ( $(pathToPost + ' .description').length === 0 ) {
                 $(pathToPost + ' .header').after('<div class="description"></div>');
             }
 
@@ -690,18 +690,51 @@ freedomController.v1.river.methods = (function () {
                     if ( data.status == 'true' ) {
                         //Kill wait message
                         $(pathToPost + ' .description .inlinecartmsg').remove();
+                        //Save the article id in the post
+                        $(pathToPost).attr('data-articleid', data.article.id);
                         //Replace the body text with what we got back
                         if ( $(pathToPost + ' .description').length < 1 ) {
                             $(pathToPost + ' .header').after('<div class="description" />');
                         }
                         $(pathToPost + ' .description').html(data.article.body);
                         $(pathToPost + ' .description a').attr('target', '_blank');
-                        $(pathToPost + ' .description a').on('press', function() {
+                        $(pathToPost + ' .description a').on('press', function () {
                             var url = '/cgi/in/cartulize?url=' + $(this).attr('href');
                             window.open(url);
                         });
                         //Change to a reading-friendly style
                         $(pathToPost).addClass('cartulized');
+                        //Set the title based on what came back
+                        $(pathToPost).find('div.header h3 a').empty().html(data.article.title);
+                        //Add an edit button next to the title
+                        $(pathToPost).find('div.header button.changetitle').remove();
+                        $(pathToPost).find('div.header').prepend('<button class="changetitle"><i class="fa fa-edit"></i></button>');
+                        $(pathToPost).find('div.header button.changetitle').on('click', function() {
+                            var newtitle = prompt("Enter new title...");
+                            if ( newtitle != null ) {
+                                //Make the call
+                                $.ajax({
+                                    url: '/cgi/in/setarticletitle?id=' + data.article.id + '&title=' + newtitle,
+                                    type: "GET",
+                                    timeout: 20000,
+                                    dataType: 'json',
+                                    success: function (data) {
+                                        if ( data.status == "false" ) {
+                                            showMessage(data.description, data.status, 5);
+                                        } else {
+                                            $(pathToPost).find('div.header h3 a').empty().html(newtitle);
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        //Change cart link at bottom to an edit article button
+                        $(pathToPost).find('div.footer div.actions a.cartlink img.icon-bookmark').removeClass('icon-bookmark').addClass('icon-editor');
+                        $(pathToPost).find('div.footer div.actions a.cartlink').removeClass('cartlink').addClass('editlink');
+                        $(pathToPost).find('div.footer div.actions a.editlink').on('click', function() {
+                            var url = '/editor?aid=' + data.article.id;
+                            window.open(url);
+                        });
                     } else {
                         //Append error message
                         $(pathToPost + ' .description .inlinecartmsg').html(data.article.body).addClass('carterrormsg');
@@ -739,7 +772,7 @@ freedomController.v1.river.methods = (function () {
             $('#' + id).hide();
 
             //Focus the next sticky article
-            if( data && (data.source === "swipe" || data.source ==="hotkey") ) {
+            if ( data && (data.source === "swipe" || data.source === "hotkey") ) {
                 var nextId = $('#' + id).next().attr('id');
                 _focusThisArticle(nextId);
             }
@@ -990,11 +1023,39 @@ freedomController.v1.river.methods = (function () {
                 //Add a swipe handler for mobile
                 if ( platform == "mobile" ) {
                     (function () {
-                        $(pathToStreamItem + '#' + item.id).on('flick', function(e) {
-                            //The following if criteria denotes left to right flick
-                            if( e.orientation === 'horizontal' && e.direction === 1 ) {
+                        $(pathToStreamItem + '#' + item.id + ' div.header h3 a').on('press', function() {
+                            $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
+                        });
+                        $(pathToStreamItem + '#' + item.id).on('flick', function (e) {
+                            //A LtoR flick triggers un-sticky call
+                            if ( e.orientation === 'horizontal' && e.direction === 1 ) {
                                 $(pathToStreamItem + '#' + item.id).hide();
-                                $(pathToStreamItem + '#' + item.id + ' .aUnSticky').trigger('click', {source:"swipe"});
+                                $(pathToStreamItem + '#' + item.id + ' .aUnSticky').trigger('click', {source: "swipe"});
+                            }
+                            //If article cart'd already, then RtoL flick prompts for title change
+                            if ( e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem).hasClass('cartulized') ) {
+                                var articleid = $(pathToStreamItem).data('articleid');
+                                var newtitle = prompt("Enter new title...");
+                                if ( newtitle != null ) {
+                                    //Make the call
+                                    $.ajax({
+                                        url: '/cgi/in/setarticletitle?id=' + articleid + '&title=' + newtitle,
+                                        type: "GET",
+                                        timeout: 20000,
+                                        dataType: 'json',
+                                        success: function (data) {
+                                            if ( data.status == "false" ) {
+                                                showMessage(data.description, data.status, 5);
+                                            } else {
+                                                $(pathToStreamItem + '#' + item.id + ' div.header h3 a').empty().append(newtitle);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                            //If article not cart'd already, then RtoL flick carts it
+                            if ( e.orientation === 'horizontal' && e.direction === -1 && !$(pathToStreamItem).hasClass('cartulized') ) {
+                                $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
                             }
                         })
                     })();
@@ -1057,6 +1118,41 @@ freedomController.v1.river.methods = (function () {
                     })();
                 }
 
+                //Add a swipe handler for mobile
+                if ( platform == "mobile" ) {
+                    (function () {
+                        $(pathToStreamItem + '#' + item.id + ' div.header h3 a').on('press', function() {
+                            $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
+                        });
+                        $(pathToStreamItem + '#' + item.id).on('flick', function (e) {
+                            //If article cart'd already, then RtoL flick prompts for title change
+                            if ( e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem).hasClass('cartulized') ) {
+                                var articleid = $(pathToStreamItem).data('articleid');
+                                var newtitle = prompt("Enter new title...");
+                                if ( newtitle != null ) {
+                                    //Make the call
+                                    $.ajax({
+                                        url: '/cgi/in/setarticletitle?id=' + articleid + '&title=' + newtitle,
+                                        type: "GET",
+                                        timeout: 20000,
+                                        dataType: 'json',
+                                        success: function (data) {
+                                            if ( data.status == "false" ) {
+                                                showMessage(data.description, data.status, 5);
+                                            } else {
+                                                $(pathToStreamItem + '#' + item.id + ' div.header h3 a').empty().append(newtitle);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                            //If article not cart'd already, then RtoL flick carts it
+                            if ( e.orientation === 'horizontal' && e.direction === -1 && !$(pathToStreamItem).hasClass('cartulized') ) {
+                                $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
+                            }
+                        })
+                    })();
+                }
             });
         });
 

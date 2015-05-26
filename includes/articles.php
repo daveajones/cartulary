@@ -1310,3 +1310,35 @@ function imap_fetch_emails_to_articles($uid = NULL, $hostname = "", $username = 
 
     return $count;
 }
+
+
+//Set the feed error count on this feed to a given value
+function set_article_title($aid = NULL, $title = NULL)
+{
+    //Check parameters
+    if (empty($aid)) {
+        loggit(2, "The article id is blank or corrupt: [$aid]");
+        return (FALSE);
+    }
+    if (empty($title)) {
+        loggit(2, "The title is blank or corrupt: [$title]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Now that we have a good id, put the article into the database
+    $stmt = "UPDATE $table_article SET title=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $title, $aid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close();
+
+    //Log and return
+    loggit(1, "Set title for article:[$aid] to: [$title].");
+    return (TRUE);
+}

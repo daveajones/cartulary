@@ -177,6 +177,7 @@ loggit(3, "DEBUG: Recent file id is [$rid].");
 //Was this an edited article content request
 if( $articleoverwrite && !empty($aid) ) {
     add_edited_content_to_article($aid, $uid, convert_opml_to_html($opml));
+    set_article_title($aid, $title);
 }
 
 //Go ahead and put in the urls we saved

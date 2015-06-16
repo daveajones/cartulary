@@ -1253,7 +1253,7 @@ $(document).ready(function () {
                     $('input.postenclosure').remove();
                 },
                 'onCancel': function (file) {
-                    $("input.postenclosure[data-filename='" + file.name + "'").remove();
+                    $("input.postenclosure[data-filename='" + file.name + "']").remove();
                 },
                 'onQueueComplete': function () {
                         hideEditorFileDropZone();

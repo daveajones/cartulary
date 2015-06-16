@@ -71,7 +71,7 @@ $(document).ready(function () {
                     $('input.postenclosure').remove();
                 },
                 'onCancel': function (file) {
-                    $("input.postenclosure[data-filename='" + file.name + "'").remove();
+                    $("input.postenclosure[data-filename='" + file.name + "']").remove();
                     enclist.splice($.inArray(file.name, enclist), 1);
                 },
                 'onUploadComplete': function (file, data) {

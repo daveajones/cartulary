@@ -95,7 +95,15 @@
     <div id="menubarEditor" class="submenuEditor navbar <?if($g_platform != "mobile"){?>navbar-fixed-top<?} else {?>navbar-static-top<?}?>">
         <div class="navbar-inner">
             <ul class="nav menubar">
-                <li><a class="menuNew" href="#" title="New">New</a></li>
+                <li class="dropdown menuNews" title="Create a new outline.">
+                    <a href="#" id="dropdownNew" class="dropdown-toggle" data-toggle="dropdown">New</a>
+                    <ul class="dropdown-menu" data-container="body">
+                        <li><a href="#" class="menuNew news" title="Save">Outline</a></li>
+                        <li><a href="#" class="menuNewRSS news" title="Save As">RSS Feed</a></li>
+                    </ul>
+                </li>
+
+
                 <li><a class="menuOpen" href="#" title="Open">Open</a></li>
                 <li class="dropdown menuSaves" title="Save your outline.">
                     <a href="#" id="dropdownSave" class="dropdown-toggle" data-toggle="dropdown">Save</a>

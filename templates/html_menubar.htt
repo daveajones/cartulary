@@ -115,11 +115,11 @@
                 </li>
                 <li><a class="menuPublish" href="#" title="Publish">Publish</a></li>
                 <li class="divider-vertical34"></li>
-                <li class="<?if($mode == "article"){echo "active";}?>"><a class="rendertoggle" href="#" title="Toggle html rendering"><i class="fa fa-file-code-o"></i></a></li>
+                <li class="<?if(isset($mode) && $mode == "article"){echo "active";}?>"><a class="rendertoggle" href="#" title="Toggle html rendering"><i class="fa fa-file-code-o"></i></a></li>
                 <?if(!empty($myprefs['disqus_shortname'])) { ?><li><a class="menuDisqusToggle" href="#" title="Include Disqus comments in rendered version?"><i class="fa fa-comments"></i></a></li><?}?>
                 <?if(imap_is_enabled($myuid) && smtp_is_enabled($myuid)) { ?><li><a class="menuWatchToggle" href="#" title="Get notified if linked-to pages in this outline change?"><i class="fa fa-eye"></i></a></li><?}?>
                 <li><a class="menuLockToggle" href="#" title="Lock this outline to prevent changes."><i class="fa fa-lock"></i></a></li>
-                <li class="dropdown menuType" title="What type of outline is this?">
+                <li class="dropdown menuType" title="What type of node is this?">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Type <b class="caret"></b></a>
                     <ul class="dropdown-menu" data-container="body">
                         <li><a href="#" class="menuTypeSelection menuTypeNone" title="No type." data-type="none">not set</a></li>
@@ -135,6 +135,7 @@
                         <li><a href="#" class="menuTypeSelection menuTypeLink" title="Link to a url." data-type="link">Link</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeInclude" title="Bring in another outline's content." data-type="include">Include</a></li>
                         <li><a href="#" class="menuTypeSelection menuTypeImage" title="Add an image node to the outline." data-type="image">Image</a></li>
+                        <li><a href="#" class="menuTypeSelection menuTypeCode" title="Add a code node to the outline." data-type="code">Code</a></li>
                     </ul>
                 </li>
 

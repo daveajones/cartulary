@@ -19,5 +19,6 @@ $utps16 = get_totp_seed_from_uid($uid);
 if( !empty($utps16) ) {
     $b32 = new Base32;
     $utps32 = $b32->encode($utps16, true);
-    $qrdata = QRcode::png("otpauth://totp/$system_name:$g_myemail?secret=".$utps32."&issuer=$system_name");
+    $sn = rawurlencode($system_name);
+    $qrdata = QRcode::png("otpauth://totp/$sn:$g_myemail?secret=".$utps32."&issuer=$sn");
 }

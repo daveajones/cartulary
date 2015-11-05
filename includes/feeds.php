@@ -5428,7 +5428,7 @@ function get_sticky_feed_items($uid = NULL)
              INNER JOIN nfitems ON nfitems.id = tsub.itemid
 			 INNER JOIN newsfeeds ON nfitems.feedid = newsfeeds.id
 			 INNER JOIN nfcatalog ON nfitems.feedid = nfcatalog.feedid AND nfcatalog.userid = ?
-             ORDER BY timeadded DESC";
+             ORDER BY timeadded ASC";
 
     //loggit(3, "[$sqltxt]");
     $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);

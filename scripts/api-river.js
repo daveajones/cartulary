@@ -97,10 +97,10 @@ freedomController.v1.river.methods = (function () {
 
 
     function _isAvatar(url) {
-        if ( url.indexOf('gravatar') != -1 ) {
+        if (url.indexOf('gravatar') != -1) {
             return true;
         }
-        if ( url.indexOf('twimg.com/profile_images') != -1 ) {
+        if (url.indexOf('twimg.com/profile_images') != -1) {
             return true;
         }
 
@@ -118,7 +118,7 @@ freedomController.v1.river.methods = (function () {
     function _countEnclosuresOfType(enclosures, typecheck) {
         var cnt = 0;
         $.each(enclosures, function () {
-            if ( this.type.indexOf(typecheck) != -1 ) {
+            if (this.type.indexOf(typecheck) != -1) {
                 cnt++;
             }
         });
@@ -128,19 +128,19 @@ freedomController.v1.river.methods = (function () {
 
 
     function _isImage(url, type) {
-        if ( type.indexOf('image') != -1 ) {
+        if (type.indexOf('image') != -1) {
             return true;
         }
-        if ( url.indexOf('.jpg') != -1 ) {
+        if (url.indexOf('.jpg') != -1) {
             return true;
         }
-        if ( url.indexOf('.jpeg') != -1 ) {
+        if (url.indexOf('.jpeg') != -1) {
             return true;
         }
-        if ( url.indexOf('.png') != -1 ) {
+        if (url.indexOf('.png') != -1) {
             return true;
         }
-        if ( url.indexOf('.gif') != -1 ) {
+        if (url.indexOf('.gif') != -1) {
             return true;
         }
 
@@ -149,22 +149,22 @@ freedomController.v1.river.methods = (function () {
 
 
     function _isAudio(url, type) {
-        if ( type.indexOf('audio') != -1 ) {
+        if (type.indexOf('audio') != -1) {
             return true;
         }
-        if ( url.indexOf('.mp3') != -1 ) {
+        if (url.indexOf('.mp3') != -1) {
             return true;
         }
-        if ( url.indexOf('.m4a') != -1 ) {
+        if (url.indexOf('.m4a') != -1) {
             return true;
         }
-        if ( url.indexOf('.wav') != -1 ) {
+        if (url.indexOf('.wav') != -1) {
             return true;
         }
-        if ( url.indexOf('.ogg') != -1 ) {
+        if (url.indexOf('.ogg') != -1) {
             return true;
         }
-        if ( url.indexOf('.wma') != -1 ) {
+        if (url.indexOf('.wma') != -1) {
             return true;
         }
 
@@ -173,22 +173,22 @@ freedomController.v1.river.methods = (function () {
 
 
     function _isVideo(url, type) {
-        if ( type.indexOf('video') != -1 ) {
+        if (type.indexOf('video') != -1) {
             return true;
         }
-        if ( url.indexOf('.mp4') != -1 ) {
+        if (url.indexOf('.mp4') != -1) {
             return true;
         }
-        if ( url.indexOf('.m4v') != -1 ) {
+        if (url.indexOf('.m4v') != -1) {
             return true;
         }
-        if ( url.indexOf('.avi') != -1 ) {
+        if (url.indexOf('.avi') != -1) {
             return true;
         }
-        if ( url.indexOf('.mov') != -1 ) {
+        if (url.indexOf('.mov') != -1) {
             return true;
         }
-        if ( url.indexOf('.wmv') != -1 ) {
+        if (url.indexOf('.wmv') != -1) {
             return true;
         }
 
@@ -197,10 +197,10 @@ freedomController.v1.river.methods = (function () {
 
 
     function _isIframe(url, type) {
-        if ( type.indexOf('text/html') != -1 ) {
+        if (type.indexOf('text/html') != -1) {
             return true;
         }
-        if ( type.indexOf('application/pdf') != -1 ) {
+        if (type.indexOf('application/pdf') != -1) {
             return true;
         }
 
@@ -232,21 +232,21 @@ freedomController.v1.river.methods = (function () {
 
 
     function _addActiveFeed(feedId, feedTitle, feedUrl, urlForIcon, type, position) {
-        if ( platform == "mobile" ) {
+        if (platform == "mobile") {
             return false;
         }
         var activeFeedsObj = $('#divActiveFeeds');
 
-        if ( activeFeedsObj.find('ul.feedlist li.' + feedId).length < 1 ) {
+        if (activeFeedsObj.find('ul.feedlist li.' + feedId).length < 1) {
             var feedImg = '/images/blank.gif';
-            if ( type == 'person' ) {
+            if (type == 'person') {
                 feedImg = urlForIcon;
                 imgClass = 'avatar48';
             } else {
                 feedImg = _getFavicon(urlForIcon);
                 imgClass = 'favicon';
             }
-            if ( position == 'top' ) {
+            if (position == 'top') {
                 activeFeedsObj.find('ul.feedlist').prepend('<li class="' + type + ' ' + feedId + '">' + feedTitle + ' <img class="' + imgClass + '" src="' + feedImg + '" /></li>');
             } else {
                 activeFeedsObj.find('ul.feedlist').append('<li class="' + type + ' ' + feedId + '">' + feedTitle + ' <img class="' + imgClass + '" src="' + feedImg + '" /></li>');
@@ -264,10 +264,10 @@ freedomController.v1.river.methods = (function () {
 
     function _getDomain(url) {
         var domain;
-        if ( ( url !== null ) && ( url !== "" ) ) {
+        if (( url !== null ) && ( url !== "" )) {
             domain = url.split('?')[0]; // cleans urls of form http://domain.com?a=1&b=2
             domain = domain.split('/')[2];
-            if ( typeof(domain) != "undefined" ) {
+            if (typeof(domain) != "undefined") {
                 domain = domain.replace("www.", "").replace("www2.", "").replace("feedproxy.", "").replace("feeds.", "");
             } else {
                 return null;
@@ -285,7 +285,7 @@ freedomController.v1.river.methods = (function () {
     function _focusFirstVisibleArticle() {
         $(pathToStreamItem).each(function () {
             console.log($(document).scrollTop() + " : " + $(this).offset().top);
-            if ( $(document).scrollTop() < $(this).offset().top ) {
+            if ($(document).scrollTop() < $(this).offset().top) {
                 $(pathToStreamItem + '.activeItem').removeClass("activeItem");
                 $(this).addClass("activeItem");
                 return false;
@@ -315,11 +315,11 @@ freedomController.v1.river.methods = (function () {
 
 
     function _focusPreviousArticle() {
-        if ( $(pathToStreamItem + ".activeItem").length > 0 ) {
+        if ($(pathToStreamItem + ".activeItem").length > 0) {
             // get top positions and references to all articles
             var pos = $(pathToStreamItem).map(function () {
                 var $this = $(this);
-                if ( $this.offset().top < $(pathToStreamItem + ".activeItem").offset().top ) {
+                if ($this.offset().top < $(pathToStreamItem + ".activeItem").offset().top) {
                     return {
                         pid: $this.attr("id"),
                         top: $this.offset().top
@@ -337,7 +337,7 @@ freedomController.v1.river.methods = (function () {
 
         //If not, we target first visible + 1
         $(pathToStreamItem).each(function (index) {
-            if ( $(document).scrollTop() < $(this).offset().top ) {
+            if ($(document).scrollTop() < $(this).offset().top) {
                 $('html, body').animate({scrollTop: ($(pathToStreamItem + ":eq(" + (index - 1) + ")").offset().top - gPlatformMenubarTopOffset)}, 300);
                 $(pathToStreamItem + ".activeItem").removeClass("activeItem");
                 $(pathToStreamItem + ":eq(" + (index - 1) + ")").addClass("activeItem");
@@ -358,11 +358,11 @@ freedomController.v1.river.methods = (function () {
     function _focusNextArticle(noscroll) {
         var _noscroll = (typeof noscroll === "undefined") ? false : noscroll;
 
-        if ( $(pathToStreamItem + ".activeItem").length > 0 ) {
+        if ($(pathToStreamItem + ".activeItem").length > 0) {
             // get top positions and references to all articles
             var pos = $(pathToStreamItem).map(function () {
                 var $this = $(this);
-                if ( $this.offset().top > $(pathToStreamItem + ".activeItem").offset().top ) {
+                if ($this.offset().top > $(pathToStreamItem + ".activeItem").offset().top) {
                     return {
                         pid: $this.attr("id"),
                         top: $this.offset().top
@@ -374,7 +374,7 @@ freedomController.v1.river.methods = (function () {
             });
             $(pathToStreamItem + ".activeItem").removeClass("activeItem");
             $(pathToStreamItem + '#' + pos[0].pid).addClass("activeItem");
-            if ( _noscroll === false ) {
+            if (_noscroll === false) {
                 $('html, body').animate({scrollTop: ($(pathToStreamItem + ".activeItem").offset().top - gPlatformMenubarTopOffset)}, 300);
             }
             return false;
@@ -382,8 +382,8 @@ freedomController.v1.river.methods = (function () {
 
         //If not, we target first visible + 1
         $(pathToStreamItem).each(function (index) {
-            if ( $(document).scrollTop() < $(this).offset().top ) {
-                if ( _noscroll === false ) {
+            if ($(document).scrollTop() < $(this).offset().top) {
+                if (_noscroll === false) {
                     $('html, body').animate({scrollTop: ($(pathToStreamItem + ":eq(" + (index + 1) + ")").offset().top - gPlatformMenubarTopOffset)}, 300);
                 }
                 $(pathToStreamItem + ".activeItem").removeClass("activeItem");
@@ -396,11 +396,11 @@ freedomController.v1.river.methods = (function () {
 
 
     function _focusPreviousFeed() {
-        if ( $(pathToStreamItem + ".activeItem").length > 0 ) {
+        if ($(pathToStreamItem + ".activeItem").length > 0) {
             // get top positions and references to all articles
             var pos = $(pathToStreamItem).map(function () {
                 var $this = $(this);
-                if ( ($this.offset().top < $(pathToStreamItem + ".activeItem").offset().top) && ($this.attr('data-feedid') != $(pathToStreamItem + ".activeItem").attr('data-feedid')) ) {
+                if (($this.offset().top < $(pathToStreamItem + ".activeItem").offset().top) && ($this.attr('data-feedid') != $(pathToStreamItem + ".activeItem").attr('data-feedid'))) {
                     return {
                         pid: $this.attr("id"),
                         top: $this.offset().top
@@ -418,7 +418,7 @@ freedomController.v1.river.methods = (function () {
 
             //If not, we target first visible + 1
             $(pathToStreamItem).each(function (index) {
-                if ( $(document).scrollTop() < $(this).offset().top ) {
+                if ($(document).scrollTop() < $(this).offset().top) {
                     $('html, body').animate({scrollTop: ($(pathToStreamItem + ":eq(" + (index + 1) + ")").offset().top - gPlatformMenubarTopOffset)}, 300);
                     $(pathToStreamItem + ".activeItem").removeClass("activeItem");
                     $(pathToStreamItem + ":eq(" + (index + 1) + ")").addClass("activeItem");
@@ -431,11 +431,11 @@ freedomController.v1.river.methods = (function () {
 
 
     function _focusNextFeed() {
-        if ( $(pathToStreamItem + ".activeItem").length > 0 ) {
+        if ($(pathToStreamItem + ".activeItem").length > 0) {
             // get top positions and references to all articles
             var pos = $(pathToStreamItem).map(function () {
                 var $this = $(this);
-                if ( ($this.offset().top > $(pathToStreamItem + ".activeItem").offset().top) && ($this.attr('data-feedid') != $(pathToStreamItem + ".activeItem").attr('data-feedid')) ) {
+                if (($this.offset().top > $(pathToStreamItem + ".activeItem").offset().top) && ($this.attr('data-feedid') != $(pathToStreamItem + ".activeItem").attr('data-feedid'))) {
                     return {
                         pid: $this.attr("id"),
                         top: $this.offset().top
@@ -453,7 +453,7 @@ freedomController.v1.river.methods = (function () {
 
             //If not, we target first visible + 1
             $(pathToStreamItem).each(function (index) {
-                if ( $(document).scrollTop() < $(this).offset().top ) {
+                if ($(document).scrollTop() < $(this).offset().top) {
                     $('html, body').animate({scrollTop: ($(pathToStreamItem + ":eq(" + (index + 1) + ")").offset().top - gPlatformMenubarTopOffset)}, 300);
                     $(pathToStreamItem + ".activeItem").removeClass("activeItem");
                     $(pathToStreamItem + ":eq(" + (index + 1) + ")").addClass("activeItem");
@@ -478,7 +478,7 @@ freedomController.v1.river.methods = (function () {
             console.log('pathToPost:' + pathToPost);
 
             //Don't allow more than one attempt at reblogging
-            if ( $(pathToBlog).length > 0 ) {
+            if ($(pathToBlog).length > 0) {
                 _focusThisArticleFooter(postId);
                 return false;
             }
@@ -519,13 +519,13 @@ freedomController.v1.river.methods = (function () {
                 $(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<a href="#" class="delete"><img class="icon-remove-small" src="/images/blank.gif" /></a>');
 
                 //Now add the enclosure thumbnail
-                if ( $(this).hasClass('enclosurepic') ) {
+                if ($(this).hasClass('enclosurepic')) {
                     $(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure" src="' + $(this).attr("src") + '" />');
-                } else if ( $(this).hasClass('encaudio') ) {
+                } else if ($(this).hasClass('encaudio')) {
                     $(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure icon-audio-enclosure" src="/images/blank.gif" alt="" />');
-                } else if ( $(this).hasClass('encvideo') ) {
+                } else if ($(this).hasClass('encvideo')) {
                     $(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure icon-video-enclosure" src="/images/blank.gif" alt="" />');
-                } else if ( $(this).hasClass('enciframe') ) {
+                } else if ($(this).hasClass('enciframe')) {
                     $(pathToForm + ' .mbextenc ul li:eq(' + encount + ')').append('<img class="imgenclosure icon-iframe-enclosure" src="/images/blank.gif" alt="" />');
                 }
 
@@ -537,7 +537,7 @@ freedomController.v1.river.methods = (function () {
                 //Attach click handler for the delete button
                 $(pathToForm + ' .mbextenc ul li:eq(' + encount + ') a.delete').click(function () {
                     $(this).parent().remove();
-                    if ( $(pathToForm + ' .mbextenc ul li').length == 0 ) {
+                    if ($(pathToForm + ' .mbextenc ul li').length == 0) {
                         $(pathToForm + ' .mbextenc').hide();
                     }
                     return false;
@@ -551,11 +551,11 @@ freedomController.v1.river.methods = (function () {
             });
 
             //Add a twitter toggle if twitter is enabled
-            if ( cuTwitterIsEnabled ) {
+            if (cuTwitterIsEnabled) {
                 $(pathToForm).append('<label class="checkbox tweetbox"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt="" /><input class="tweetcheck" name="tweet" type="checkbox" /></label>');
                 $(pathToForm + ' .tweeticon').unbind('click');
                 $(pathToForm + ' .tweeticon').bind('click', function () {
-                    if ( $(pathToForm + ' .tweetcheck').prop("checked") == false ) {
+                    if ($(pathToForm + ' .tweetcheck').prop("checked") == false) {
                         $(pathToForm + ' .tweetcheck').prop("checked", true);
                     } else {
                         $(pathToForm + ' .tweetcheck').prop("checked", false);
@@ -591,7 +591,7 @@ freedomController.v1.river.methods = (function () {
                     $(pathToPost + ' .footer .inlineblogmsg').show();
                 },
                 success: function (data) {
-                    if ( data.status == "false" ) {
+                    if (data.status == "false") {
                         showMessage(data.description, data.status, 5);
                         $(pathToPost + ' .footer .inlineblogmsg').hide();
                         $(pathToBlog + '.' + postId).show();
@@ -657,7 +657,7 @@ freedomController.v1.river.methods = (function () {
             console.log('pathToPost:' + pathToPost);
 
             //Don't allow more than one attempt at cartulizing
-            if ( $(pathToPost).hasClass('cartulized') ) {
+            if ($(pathToPost).hasClass('cartulized')) {
                 _focusThisArticle(postId);
                 return false;
             }
@@ -666,7 +666,7 @@ freedomController.v1.river.methods = (function () {
             $(pathToPost + ' .description .inlinecartmsg').remove();
 
             //Make sure a description exists
-            if ( $(pathToPost + ' .description').length === 0 ) {
+            if ($(pathToPost + ' .description').length === 0) {
                 $(pathToPost + ' .header').after('<div class="description"></div>');
             }
 
@@ -687,13 +687,13 @@ freedomController.v1.river.methods = (function () {
                 dataType: 'json',
                 timeout: 30000,
                 success: function (data) {
-                    if ( data.status == 'true' ) {
+                    if (data.status == 'true') {
                         //Kill wait message
                         $(pathToPost + ' .description .inlinecartmsg').remove();
                         //Save the article id in the post
                         $(pathToPost).attr('data-articleid', data.article.id);
                         //Replace the body text with what we got back
-                        if ( $(pathToPost + ' .description').length < 1 ) {
+                        if ($(pathToPost + ' .description').length < 1) {
                             $(pathToPost + ' .header').after('<div class="description" />');
                         }
                         $(pathToPost + ' .description').html(data.article.body);
@@ -709,9 +709,9 @@ freedomController.v1.river.methods = (function () {
                         //Add an edit button next to the title
                         $(pathToPost).find('div.header button.changetitle').remove();
                         $(pathToPost).find('div.header').prepend('<button class="changetitle"><i class="fa fa-edit"></i></button>');
-                        $(pathToPost).find('div.header button.changetitle').on('click', function() {
+                        $(pathToPost).find('div.header button.changetitle').on('click', function () {
                             var newtitle = prompt("Enter new title...");
-                            if ( newtitle != null ) {
+                            if (newtitle != null) {
                                 //Make the call
                                 $.ajax({
                                     url: '/cgi/in/setarticletitle?id=' + data.article.id + '&title=' + newtitle,
@@ -719,7 +719,7 @@ freedomController.v1.river.methods = (function () {
                                     timeout: 20000,
                                     dataType: 'json',
                                     success: function (data) {
-                                        if ( data.status == "false" ) {
+                                        if (data.status == "false") {
                                             showMessage(data.description, data.status, 5);
                                         } else {
                                             $(pathToPost).find('div.header h3 a').empty().html(newtitle);
@@ -731,7 +731,7 @@ freedomController.v1.river.methods = (function () {
                         //Change cart link at bottom to an edit article button
                         $(pathToPost).find('div.footer div.actions a.cartlink img.icon-bookmark').removeClass('icon-bookmark').addClass('icon-editor');
                         $(pathToPost).find('div.footer div.actions a.cartlink').removeClass('cartlink').addClass('editlink');
-                        $(pathToPost).find('div.footer div.actions a.editlink').on('click', function() {
+                        $(pathToPost).find('div.footer div.actions a.editlink').on('click', function () {
                             var url = '/editor?aid=' + data.article.id;
                             window.open(url);
                         });
@@ -772,7 +772,7 @@ freedomController.v1.river.methods = (function () {
             $('#' + id).hide();
 
             //Focus the next sticky article
-            if ( data && (data.source === "swipe" || data.source === "hotkey") ) {
+            if (data && (data.source === "swipe" || data.source === "hotkey")) {
                 var nextId = $('#' + id).next().attr('id');
                 _focusThisArticle(nextId);
             }
@@ -790,13 +790,13 @@ freedomController.v1.river.methods = (function () {
                     timeout: 20000,
                     dataType: 'json',
                     success: function (data) {
-                        if ( data.status == "false" ) {
+                        if (data.status == "false") {
                             showMessage(data.description, data.status, 5);
                         }
 
                         //If this is the last item from this feed/owner, remove the active feed from the sidebar
                         console.log('unsticky: ' + fid);
-                        if ( $(pathToStreamItem + '.' + fid).length < 1 ) {
+                        if ($(pathToStreamItem + '.' + fid).length < 1) {
                             $('#divActiveFeeds').find('ul.feedlist li.' + fid).remove();
                         }
 
@@ -808,7 +808,7 @@ freedomController.v1.river.methods = (function () {
                 });
 
                 //Loop through the sticky subitems and un-sticky them as well
-                for ( var i = 0; i < subitems.length; i++ ) {
+                for (var i = 0; i < subitems.length; i++) {
                     //Make the call
                     $.ajax({
                         url: '/cgi/in/unsticky?id=' + subitems[i],
@@ -816,7 +816,7 @@ freedomController.v1.river.methods = (function () {
                         timeout: 20000,
                         dataType: 'json',
                         success: function (data) {
-                            if ( data.status == "false" ) {
+                            if (data.status == "false") {
                                 showMessage(data.description, data.status, 5);
                             }
                         }
@@ -847,14 +847,14 @@ freedomController.v1.river.methods = (function () {
         var streamItemsObj = streamObj.find('#stream-items');
 
         //Build the columns
-        if ( sizeOnly == false ) {
+        if (sizeOnly == false) {
             streamItemsObj.find('.col').remove();
-            for ( c = 1; c <= colcount; c++ ) {
+            for (c = 1; c <= colcount; c++) {
                 streamItemsObj.append('<div class="col col' + c + '"><div class="stream-list"></div></div>');
             }
         }
 
-        if ( $(window).outerWidth(true) < 900 ) {
+        if ($(window).outerWidth(true) < 900) {
             $('.navbar').removeClass('navbar-fixed-top');
             $('#stream').css('max-width', '700px');
         } else {
@@ -863,7 +863,7 @@ freedomController.v1.river.methods = (function () {
         }
 
         //Adjust their sizing and layout
-        if ( platform == "mobile" || platform == "tablet" ) {
+        if (platform == "mobile" || platform == "tablet") {
             return colcount;
         }
 
@@ -876,24 +876,24 @@ freedomController.v1.river.methods = (function () {
         streamWrapObj.css('width', streamWidth + 'px');
 
         //Size the grid
-        if ( colcount == 1 ) {
+        if (colcount == 1) {
             streamObj.css('width', '800px');
             streamObj.find('.stream-list').css('width', '600px');
             streamItemsObj.find('.col').css('width', '600px');
             streamWrapObj.css('width', '');
-        } else if ( colcount == 2 ) {
+        } else if (colcount == 2) {
             streamObj.css('width', Math.min(1500, (streamWidth * .99).toFixed()) + 'px');
             streamObj.find('.stream-list').css('width', (streamWidth * .47).toFixed() + 'px');
             streamItemsObj.find('.col').css('width', (streamWidth * .47).toFixed() + 'px');
-        } else if ( colcount == 3 ) {
+        } else if (colcount == 3) {
             streamObj.css('width', Math.min(2000, (streamWidth * .99).toFixed()) + 'px');
             streamObj.find('.stream-list').css('width', (streamWidth * .30).toFixed() + 'px');
             streamItemsObj.find('.col').css('width', (streamWidth * .30).toFixed() + 'px');
-        } else if ( colcount == 4 ) {
+        } else if (colcount == 4) {
             streamObj.css('width', Math.min(2500, (streamWidth * .99).toFixed()) + 'px');
             streamObj.find('.stream-list').css('width', (streamWidth * .22).toFixed() + 'px');
             streamItemsObj.find('.col').css('width', (streamWidth * .22).toFixed() + 'px');
-        } else if ( colcount == 5 ) {
+        } else if (colcount == 5) {
             streamObj.css('width', Math.min(3000, (streamWidth * .99).toFixed()) + 'px');
             streamObj.find('.stream-list').css('width', (streamWidth * .17).toFixed() + 'px');
             streamItemsObj.find('.col').css('width', (streamWidth * .17).toFixed() + 'px');
@@ -917,7 +917,7 @@ freedomController.v1.river.methods = (function () {
         var noticeObj = $('#stream').find('p.notice');
 
         noticeObj.html(notice);
-        if ( hide == false ) {
+        if (hide == false) {
             noticeObj.show();
         } else {
             noticeObj.hide();
@@ -951,15 +951,15 @@ freedomController.v1.river.methods = (function () {
             _changeStreamNotice('', true);
 
             //Timestamp the data pull in local storage
-            if ( cached == false ) {
+            if (cached == false) {
                 sessionStorage.setItem(lsRiverDataPullTime, Math.round(new Date().getTime() / 1000));
             }
 
             //Re-trigger masonry when viewport is resized on desktop browsers
-            if ( platform != "mobile" && platform != "tablet" ) {
+            if (platform != "mobile" && platform != "tablet") {
                 $(window).off('debouncedresize');
                 $(window).on('debouncedresize', function (event) {
-                    if ( $(pathToStreamList).length != _calculateColumnCount() ) {
+                    if ($(pathToStreamList).length != _calculateColumnCount()) {
                         console.log('reflowing grid');
                         freedomController.v1.river.methods.resizeGrid();
                     } else {
@@ -980,7 +980,7 @@ freedomController.v1.river.methods = (function () {
 
         //Get data out of local storage
         var lsdata = sessionStorage.getItem(lsStickyDataKey);
-        if ( lsdata !== null ) {
+        if (lsdata !== null) {
             data = JSON.parse(lsdata);
         }
 
@@ -988,22 +988,22 @@ freedomController.v1.river.methods = (function () {
             //Add an index
             item.index = i;
 
-            if ( item.hidden != 1 ) {
+            if (item.hidden != 1) {
                 //Add each discovered feed to the active feed sidebar
-                if ( item.feed.linkedOutlineType === 'sopml' ) {
+                if (item.feed.linkedOutlineType === 'sopml') {
                     freedomController.v1.river.methods.addActiveFeed(item.feed.linkedOutlineId, item.feed.ownerName, item.feed.linkedOutlineUrl, item.feed.avatarUrl, "person", 'top');
                 } else {
                     freedomController.v1.river.methods.addActiveFeed(item.feed.feedId, item.feed.feedTitle, item.feed.feedUrl, item.feed.websiteUrl, "feed", 'bottom');
                 }
 
                 //Check if the item exists already
-                if ( $(pathToStreamItem + '#' + item.id).length > 0 ) {
+                if ($(pathToStreamItem + '#' + item.id).length > 0) {
                     $(pathToStreamItem + '#' + item.id).prependTo('#stream .col' + col + ' .stream-list');
                     _makePostSticky(pathToStreamItem + '#' + item.id, item.id, item.index, item.feed.feedId);
 
                 } else {
                     //Check if the origin exists already
-                    if ( item.origin != "" && $(pathToStreamItem + '[data-origin="' + item.origin + '"]').length > 0 ) {
+                    if (item.origin != "" && $(pathToStreamItem + '[data-origin="' + item.origin + '"]').length > 0) {
                         //Add as sub-item
                         $('#template-subitem').tmpl(item).appendTo(pathToStreamItem + '[data-origin="' + item.origin + '"]');
                         console.log('append subitem to: ' + pathToStreamItem + '#' + item.id);
@@ -1012,7 +1012,7 @@ freedomController.v1.river.methods = (function () {
                         $('#template-sticky').tmpl(item).prependTo('#stream .col' + col + ' .stream-list');
 
                         //Increment column counter
-                        if ( col == cols ) {
+                        if (col == cols) {
                             col = 1;
                         } else {
                             col++;
@@ -1021,22 +1021,22 @@ freedomController.v1.river.methods = (function () {
                 }
 
                 //Add a swipe handler for mobile
-                if ( platform == "mobile" ) {
+                if (platform == "mobile") {
                     (function () {
-                        $(pathToStreamItem + '#' + item.id + ' div.header h3 a').on('press', function() {
+                        $(pathToStreamItem + '#' + item.id + ' div.header h3 a').on('press', function () {
                             $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
                         });
                         $(pathToStreamItem + '#' + item.id).on('flick', function (e) {
                             //A LtoR flick triggers un-sticky call
-                            if ( e.orientation === 'horizontal' && e.direction === 1 ) {
+                            if (e.orientation === 'horizontal' && e.direction === 1) {
                                 $(pathToStreamItem + '#' + item.id).hide();
                                 $(pathToStreamItem + '#' + item.id + ' .aUnSticky').trigger('click', {source: "swipe"});
                             }
                             //If article cart'd already, then RtoL flick prompts for title change
-                            if ( e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem).hasClass('cartulized') ) {
+                            if (e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem).hasClass('cartulized')) {
                                 var articleid = $(pathToStreamItem).data('articleid');
                                 var newtitle = prompt("Enter new title...");
-                                if ( newtitle != null ) {
+                                if (newtitle != null) {
                                     //Make the call
                                     $.ajax({
                                         url: '/cgi/in/setarticletitle?id=' + articleid + '&title=' + newtitle,
@@ -1044,7 +1044,7 @@ freedomController.v1.river.methods = (function () {
                                         timeout: 20000,
                                         dataType: 'json',
                                         success: function (data) {
-                                            if ( data.status == "false" ) {
+                                            if (data.status == "false") {
                                                 showMessage(data.description, data.status, 5);
                                             } else {
                                                 $(pathToStreamItem + '#' + item.id + ' div.header h3 a').empty().append(newtitle);
@@ -1054,7 +1054,7 @@ freedomController.v1.river.methods = (function () {
                                 }
                             }
                             //If article not cart'd already, then RtoL flick carts it
-                            if ( e.orientation === 'horizontal' && e.direction === -1 && !$(pathToStreamItem).hasClass('cartulized') ) {
+                            if (e.orientation === 'horizontal' && e.direction === -1 && !$(pathToStreamItem).hasClass('cartulized')) {
                                 $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
                             }
                         })
@@ -1073,13 +1073,13 @@ freedomController.v1.river.methods = (function () {
 
         //Get data out of local storage
         var lsdata = sessionStorage.getItem(lsRiverDataKey);
-        if ( lsdata !== null ) {
+        if (lsdata !== null) {
             data = JSON.parse(lsdata);
         }
 
         $.each(data.updatedFeeds.updatedFeed, function (f, feed) {
             //Add each discovered feed to the active feed sidebar
-            if ( feed.linkedOutlineType === 'sopml' ) {
+            if (feed.linkedOutlineType === 'sopml') {
                 freedomController.v1.river.methods.addActiveFeed(feed.linkedOutlineId, feed.ownerName, feed.linkedOutlineUrl, feed.avatarUrl, "person", 'top');
             } else {
                 freedomController.v1.river.methods.addActiveFeed(feed.feedId, feed.feedTitle, feed.feedUrl, feed.websiteUrl, "feed", 'bottom');
@@ -1088,12 +1088,12 @@ freedomController.v1.river.methods = (function () {
             //----- Post loop -----
             $.each(feed.item, function (i, item) {
                 //Check if the item exists already
-                if ( $(pathToStreamItem + '#' + item.id).length < 1 ) {
+                if ($(pathToStreamItem + '#' + item.id).length < 1) {
                     //Make the feed info available to the item
                     item.feed = feed;
                     delete item.feed.item;
 
-                    if ( item.origin != "" && $(pathToStreamItem + '[data-origin="' + item.origin + '"]').length > 0 ) {
+                    if (item.origin != "" && $(pathToStreamItem + '[data-origin="' + item.origin + '"]').length > 0) {
                         //Add as sub-item
                         $('#template-subitem').tmpl(item).appendTo(pathToStreamItem + '[data-origin="' + item.origin + '"]');
                         console.log('append subitem to: ' + pathToStreamItem + '#' + item.id);
@@ -1102,7 +1102,7 @@ freedomController.v1.river.methods = (function () {
                         $('#template').tmpl(item).appendTo('#stream .col' + col + ' .stream-list');
 
                         //Increment column counter
-                        if ( col == cols ) {
+                        if (col == cols) {
                             col = 1;
                         } else {
                             col++;
@@ -1119,17 +1119,17 @@ freedomController.v1.river.methods = (function () {
                 }
 
                 //Add a swipe handler for mobile
-                if ( platform == "mobile" ) {
+                if (platform == "mobile") {
                     (function () {
-                        $(pathToStreamItem + '#' + item.id + ' div.header h3 a').on('press', function() {
+                        $(pathToStreamItem + '#' + item.id + ' div.header h3 a').on('press', function () {
                             $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
                         });
                         $(pathToStreamItem + '#' + item.id).on('flick', function (e) {
                             //If article cart'd already, then RtoL flick prompts for title change
-                            if ( e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem).hasClass('cartulized') ) {
+                            if (e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem).hasClass('cartulized')) {
                                 var articleid = $(pathToStreamItem).data('articleid');
                                 var newtitle = prompt("Enter new title...");
-                                if ( newtitle != null ) {
+                                if (newtitle != null) {
                                     //Make the call
                                     $.ajax({
                                         url: '/cgi/in/setarticletitle?id=' + articleid + '&title=' + newtitle,
@@ -1137,7 +1137,7 @@ freedomController.v1.river.methods = (function () {
                                         timeout: 20000,
                                         dataType: 'json',
                                         success: function (data) {
-                                            if ( data.status == "false" ) {
+                                            if (data.status == "false") {
                                                 showMessage(data.description, data.status, 5);
                                             } else {
                                                 $(pathToStreamItem + '#' + item.id + ' div.header h3 a').empty().append(newtitle);
@@ -1147,7 +1147,7 @@ freedomController.v1.river.methods = (function () {
                                 }
                             }
                             //If article not cart'd already, then RtoL flick carts it
-                            if ( e.orientation === 'horizontal' && e.direction === -1 && !$(pathToStreamItem).hasClass('cartulized') ) {
+                            if (e.orientation === 'horizontal' && e.direction === -1 && !$(pathToStreamItem).hasClass('cartulized')) {
                                 $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
                             }
                         })
@@ -1163,7 +1163,7 @@ freedomController.v1.river.methods = (function () {
     function _getRiverStickyItems(cached) {
         var timestamp = Math.round(new Date().getTime() / 1000);
 
-        if ( cached == true ) {
+        if (cached == true) {
             _populateGridSticky(_calculateColumnCount());
             return true;
         }
@@ -1185,7 +1185,7 @@ freedomController.v1.river.methods = (function () {
 
 
     function _getRiverItems(cached) {
-        if ( cached == true ) {
+        if (cached == true) {
             _populateGrid(_calculateColumnCount());
             return true;
         }
@@ -1211,7 +1211,7 @@ freedomController.v1.river.methods = (function () {
     function _removeStickyItemLS(index) {
         //Get data out of local storage
         var lsdata = sessionStorage.getItem(lsStickyDataKey);
-        if ( lsdata !== null ) {
+        if (lsdata !== null) {
             data = JSON.parse(lsdata);
             data.data.items[index].hidden = 1;
             sessionStorage.setItem(lsStickyDataKey, JSON.stringify(data));
@@ -1224,13 +1224,13 @@ freedomController.v1.river.methods = (function () {
     function _bindEnclosureLinks(elid) {
         var elid = (typeof elid === "undefined") ? "" : elid;
 
-        if ( platform == "mobile" || platform == "tablet" ) {
+        if (platform == "mobile" || platform == "tablet") {
             return true;
         }
 
         $(elid + ' .enclosureview a').unbind('click');
         $(elid + ' .enclosureview a').click(function () {
-            if ( $(this).children('img').length > 0 ) {
+            if ($(this).children('img').length > 0) {
                 openMediaShadowbox($(this).children('img'));
                 return false;
             }
@@ -1266,11 +1266,11 @@ freedomController.v1.river.methods = (function () {
 
 
     function _calculateColumnCount() {
-        if ( platform == "mobile" || platform == "tablet" ) {
+        if (platform == "mobile" || platform == "tablet") {
             return 1;
         }
 
-        if ( cuRiverColumnCount > 0 ) {
+        if (cuRiverColumnCount > 0) {
             return cuRiverColumnCount;
         }
 
@@ -1280,7 +1280,7 @@ freedomController.v1.river.methods = (function () {
 
         //Limit to a max of 5 columns for now
         var colcount = Math.min(5, Math.floor(ccsize));
-        if ( ccsize < 2 ) {
+        if (ccsize < 2) {
             colcount = 1;
         }
 

@@ -292,6 +292,16 @@ class Podcast {
         $this->xmlFeed->channel->addChild('explicit', "", $this->itunes_ns);
         $this->xmlFeed->channel->children('itunes', TRUE)->explicit = $this->itunes_explicit;
 
+        //Itunes keywords
+        if(!empty($this->itunes_keywords)) {
+            $itk = "";
+            foreach($this->itunes_keywords as $kw) {
+                $itk = $itk . " " . $kw;
+            }
+            $this->xmlFeed->channel->addChild('keywords', "", $this->itunes_ns);
+            $this->xmlFeed->channel->children('itunes', TRUE)->keywords = trim($itk);
+        }
+
         //Itunes categories
         if(empty($this->itunes_categories)) {
             //Split category value into an array and add as itunes_category values

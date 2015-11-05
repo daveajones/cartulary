@@ -8,6 +8,9 @@ header("Content-Type: application/json");
 // Globals
 $jsondata = array();
 
+//debug request
+//loggit(3, "DEBUG: ".print_r($_REQUEST, TRUE));
+
 //Check that s3 is enabled
 if( !s3_is_enabled($uid) && !sys_s3_is_enabled() ) {
     //Log it
@@ -27,6 +30,7 @@ if ( isset($_REQUEST['title']) ) {
 //Opml type
 if(isset($_REQUEST['type']) && is_numeric($_REQUEST['type'])) {
     $type = $_REQUEST['type'];
+    if( $type == 1 ) loggit(3, "DEBUG: RSS file from editor.");
 } else {
     $type = 0;
 }
@@ -151,23 +155,48 @@ if(!$s3res) {
     loggit(1, "Wrote html to S3 at url: [$s3html].");
 }
 
-//Put the myword json in S3
-$jsonfilename = str_replace('.opml', '.json', $filename);
-$s3jsonurl = get_s3_url($uid, "/json/", $jsonfilename);
-$jsdata = convert_opml_to_myword($opml);
-$s3res = putInS3($jsdata, $jsonfilename, $s3info['bucket']."/json", $s3info['key'], $s3info['secret'], "application/json");
-if(!$s3res) {
-    loggit(2, "Could not create S3 file: [$jsonfilename] for user: [$uid].");
-    loggit(3, "Could not create S3 file: [$jsonfilename] for user: [$uid].");
-    //Log it
-    $jsondata['status'] = "false";
-    $jsondata['description'] = "Error writing JSON to S3.";
-    echo json_encode($jsondata);
-    exit(1);
+
+//Is this an RSS file type?
+$s3json = "";
+if( $type == 1 ) {
+    //Put the RSS in S3
+    $rssfilename = str_replace('.opml', '.xml', $filename);
+    $s3rssurl = get_s3_url($uid, "/rss/", $rssfilename);
+    $rssdata = convert_opml_to_rss($opml);
+    $s3res = putInS3($rssdata, $rssfilename, $s3info['bucket']."/rss", $s3info['key'], $s3info['secret'], "application/rss+xml");
+    if(!$s3res) {
+        loggit(2, "Could not create S3 file: [$rssfilename] for user: [$uid].");
+        loggit(3, "Could not create S3 file: [$rssfilename] for user: [$uid].");
+        //Log it
+        $jsondata['status'] = "false";
+        $jsondata['description'] = "Error writing rss to S3.";
+        echo json_encode($jsondata);
+        exit(1);
+    } else {
+        $s3rss = get_s3_url($uid, "/rss/", $rssfilename);
+        loggit(3, "Wrote rss to S3 at url: [$s3rss].");
+        set_s3_bucket_cors($s3info['key'], $s3info['secret'], $s3info['bucket']);
+    }
+
 } else {
-    $s3json = get_s3_url($uid, "/json/", $jsonfilename);
-    loggit(1, "Wrote json to S3 at url: [$s3json].");
-    set_s3_bucket_cors($s3info['key'], $s3info['secret'], $s3info['bucket']);
+    //Put the myword json in S3
+    $jsonfilename = str_replace('.opml', '.json', $filename);
+    $s3jsonurl = get_s3_url($uid, "/json/", $jsonfilename);
+    $jsdata = convert_opml_to_myword($opml);
+    $s3res = putInS3($jsdata, $jsonfilename, $s3info['bucket']."/json", $s3info['key'], $s3info['secret'], "application/json");
+    if(!$s3res) {
+        loggit(2, "Could not create S3 file: [$jsonfilename] for user: [$uid].");
+        loggit(3, "Could not create S3 file: [$jsonfilename] for user: [$uid].");
+        //Log it
+        $jsondata['status'] = "false";
+        $jsondata['description'] = "Error writing JSON to S3.";
+        echo json_encode($jsondata);
+        exit(1);
+    } else {
+        $s3json = get_s3_url($uid, "/json/", $jsonfilename);
+        loggit(1, "Wrote json to S3 at url: [$s3json].");
+        set_s3_bucket_cors($s3info['key'], $s3info['secret'], $s3info['bucket']);
+    }
 }
 
 //Update recent file table

@@ -5,7 +5,6 @@
  * Date: 4/5/2015
  * Time: 9:31 PM
  */
-include_once "Podcast.php";
 
 class Item extends Podcast {
     public $author = "";
@@ -92,7 +91,9 @@ class Item extends Podcast {
         }
 
         //Dates
-        $this->xmlFeed->pubDate = $this->pubDate;
+        if(!empty($this->pubDate)) {
+            $this->xmlFeed->pubDate = $this->pubDate;
+        }
 
         //Itunes stuff
         if(!empty($this->itunes_subtitle)) {

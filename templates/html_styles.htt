@@ -24,4 +24,5 @@
   }
 ?>
 <link rel="stylesheet" type="text/css" href="/style/bootstrap-responsive-2.3.1.min.css" />
+<link rel="stylesheet" href="/style/font-awesome.css" />
 <link rel="stylesheet" href="/style/concord.css" />

@@ -1866,7 +1866,7 @@ function get_next_short_url($previousNumber)
 
     // Keep generating new numbers if a banned word is found until the number is no longer banned
     while (isBannedWord($newNumber, $bannedWords, $bannedWordCaseSensitive)) {
-        $newNumber = countWithCharacters($newNumber);
+        $newNumber = get_next_short_url($newNumber);
     }
 
     // Return the new number

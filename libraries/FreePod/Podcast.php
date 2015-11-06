@@ -86,7 +86,7 @@ class Podcast {
     protected function removeNodes( $val, $ns = "" ) {
         //echo "removeNodes(".$val.",".$ns.")\n";
         if(!empty($ns)) {
-            $this->xmlFeed->registerXPathNamespace("default", $this->itunes_ns);
+            $this->xmlFeed->registerXPathNamespace("default", $ns);
             $nsp = "default:";
         } else {
             $nsp = "";
@@ -100,7 +100,7 @@ class Podcast {
 
         foreach ( $nsnodes as $child )
         {
-            if($child) {
+            if(isset($child)) {
                 //echo print_r($child, TRUE);
                 unset($child[0]);
             }

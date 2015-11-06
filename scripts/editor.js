@@ -736,6 +736,18 @@ $(document).ready(function () {
         nextStep = stopTone(nextStep + 1);
         return false;
     });
+    menubar.find('.menuChangeTimestamp').click(function () {
+        var oldcreated = opGetOneAtt('created');
+        bootbox.prompt({
+            title: "Set a new timestamp.",
+            value: oldcreated,
+            callback: function (newcreated) {
+                if (newcreated !== null) {
+                    opSetOneAtt('created', newcreated);
+                }
+            }});
+        return false;
+    });
     $('.modalsrgo').click(function () {
         //Hide the form
         srmodal.find('form.srpostform').hide();
@@ -864,6 +876,7 @@ $(document).ready(function () {
             }
         });
     } else {
+        alert(type)
         if(type == 1) {
             opXmlToOutline(initialRssOpmlText);
         } else {
@@ -1266,11 +1279,17 @@ $(document).ready(function () {
     //When a new node is clicked on, this callback fires
     function opCursorMovedCallback(op) {
         var nodetype = op.attributes.getOne('type');
+        var nodecreated = op.attributes.getOne('created');
 
         if (typeof(nodetype) == "undefined") {
             nodetype = "not set";
         }
         menubar.find('.menuType > a.dropdown-toggle').html('Type (' + nodetype + ') <b class="caret"></b>');
+
+        //If a timestamp exists, show it
+        if(nodecreated) {
+            menubar.find('.menubar a.menuChangeTimestamp').attr('title', 'Change timestamp for this node. Current: ' + nodecreated);
+        }
 
         //Add a link-out option for include nodes
         menubar.find('.menubar li.extLink').remove();
@@ -1288,7 +1307,6 @@ $(document).ready(function () {
             menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('xmlUrl') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
             return true;
         }
-
 
         return true;
     }

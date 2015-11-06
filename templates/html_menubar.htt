@@ -147,6 +147,7 @@
                 <li><a class="menuInsertFiles" href="#" title="Insert files into this outline."><i class="fa fa-paperclip"></i></a></li>
                 <li><a class="menuArchiveNodes" href="#" title="Archive selected nodes."><i class="fa fa-archive"></i></a></li>
                 <li><a class="menuGenerateMorse" href="#" title="Generate morse tones for this article."><i class="fa fa-tty"></i></a></li>
+                <li><a class="menuChangeTimestamp" href="#" title="Change timestamp for this node."><i class="fa fa-clock-o"></i></a></li>
             </ul>
             <ul class="nav pull-right outlineinfo"></ul>
         </div>

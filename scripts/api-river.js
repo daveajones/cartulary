@@ -699,6 +699,7 @@ freedomController.v1.river.methods = (function () {
                         $(pathToPost + ' .description').html(data.article.body);
                         $(pathToPost + ' .description a').attr('target', '_blank');
                         $(pathToPost + ' .description a').on('press', function () {
+                            //Watch for popup blockers like mobile safari blocking this
                             var url = '/cgi/in/cartulize?url=' + $(this).attr('href');
                             window.open(url);
                         });
@@ -1033,8 +1034,8 @@ freedomController.v1.river.methods = (function () {
                                 $(pathToStreamItem + '#' + item.id + ' .aUnSticky').trigger('click', {source: "swipe"});
                             }
                             //If article cart'd already, then RtoL flick prompts for title change
-                            if (e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem).hasClass('cartulized')) {
-                                var articleid = $(pathToStreamItem).data('articleid');
+                            if (e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem + '#' + item.id).hasClass('cartulized')) {
+                                var articleid = $(pathToStreamItem + '#' + item.id).data('articleid');
                                 var newtitle = prompt("Enter new title...");
                                 if (newtitle != null) {
                                     //Make the call
@@ -1054,7 +1055,7 @@ freedomController.v1.river.methods = (function () {
                                 }
                             }
                             //If article not cart'd already, then RtoL flick carts it
-                            if (e.orientation === 'horizontal' && e.direction === -1 && !$(pathToStreamItem).hasClass('cartulized')) {
+                            if (e.orientation === 'horizontal' && e.direction === -1 && !$(pathToStreamItem + '#' + item.id).hasClass('cartulized')) {
                                 $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
                             }
                         })

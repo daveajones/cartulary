@@ -1,0 +1,35 @@
+#Release Notes - Freedom Controller v0.6.10
+
+
+Feed generation and a more swipey river.
+
+
+- Bug Fixes
+    - Feed list creation was broken on the subscribe page
+    - Bug with OTP qr code generating a bad url for scanning
+    - Fixed a bug with navigation keys in concord outliner engine (submitted pull request)
+    - Picture enclosures now go to twitter as media attachments
+    - Remove old generated qr codes from /tmp
+    - Fix offset bug on mobile river stylesheet
+    - Sometimes "cartulizing..." message wouldn't show up
+    - Fix for some utf-8 bugs in the aggregator
+    - Tweet length miscalculated sometimes when media present
+    - Jquery upload bug
+    - Fixed a url shortener bug when certain "profane" words are present
+
+- New Feature: RSS Feed Generator in the Editor
+    - You can now build RSS feeds with the editor.  When you click the "New" button, you will have the option to create a standard
+      outline or an RSS feed.  The available "type" options will be different depending on which one you choose.  This uses the
+      FreePod engine to generate the feeds, and that project will be updated along-side FreedomController.
+
+- Improvements:
+    - There are new gestures in the mobile river:
+        - Swipe left on an article will cart the article.
+        - Swipe right will unsticky an river item.
+        - Swipe left on an already cart'd article and you can change the title of the article in your archive.
+    - The editor now timestamps every new node.  You can change the timestamp of any node by placing the bar cursor on it and
+      hitting the little clock menu at the top of the editor.
+    - Sticky river items now sort oldest to newest.
+    - The editor now has a "code" node type.
+    - CORS is automatically set for buckets that share files to other web services like myword.io
+    - Switched some functions to the AWS sdk.

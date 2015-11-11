@@ -18,9 +18,10 @@ class Item extends Podcast {
 
     public function __construct( $title = "", $description = "", $link = "", $guid = "") {
         //Check default params
-        if(empty($title)) return FALSE;
-        if(empty($description)) return FALSE;
-        if(empty($link)) return FALSE;
+        if(empty($title) && empty($description)) return FALSE;
+        //if(empty($title)) return FALSE;
+        //if(empty($description)) return FALSE;
+        //if(empty($link)) return FALSE;
 
         //Create the xml
         $this->xmlFeed = new SimpleXMLElement('<item xmlns:itunes="'.$this->itunes_ns.'"></item>');
@@ -30,11 +31,13 @@ class Item extends Podcast {
         $this->link = $link;
 
         //Check the guid
-        if(empty($guid)) {
-            $this->guid['value'] = $link;
-        } else {
-            $this->guid['value'] = $guid;
-            if(stripos($guid, 'http') === 0) {
+        if(!empty($guid) || !empty($link)) {
+            if (empty($guid)) {
+                $this->guid['value'] = $link;
+            } else {
+                $this->guid['value'] = $guid;
+            }
+            if (stripos($this->guid['value'], 'http') === 0) {
                 $this->guid['isPermalink'] = TRUE;
             }
         }
@@ -54,11 +57,16 @@ class Item extends Podcast {
             curl_setopt($ch, CURLOPT_HEADER, true);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             $data = curl_exec($ch);
+            $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
             curl_close($ch);
             if (preg_match('/Content-Length: (\d+)/', $data, $matches)) {
                 // Contains file size in bytes
                 $length = (int)$matches[1];
             }
+        }
+
+        if(empty($type) && !empty($contentType)) {
+            $type = $contentType;
         }
 
         $this->enclosures[] = array(
@@ -80,20 +88,20 @@ class Item extends Podcast {
         if($this->built_once) $this->purgeFeed();
 
         //Add the required channel elements
-        $this->xmlFeed->title = $this->title;
-        $this->xmlFeed->description = $this->description;
-        $this->xmlFeed->link = $this->link;
-        $this->xmlFeed->guid = $this->guid['value'];
-        if(!$this->guid['isPermalink']) {
-            $this->xmlFeed->guid['isPermalink'] = 'false';
-        } else {
-            $this->xmlFeed->guid['isPermalink'] = 'true';
+        if(!empty($this->title)) $this->xmlFeed->title = $this->title;
+        if(!empty($this->description)) $this->xmlFeed->description = $this->description;
+        if(!empty($this->link)) $this->xmlFeed->link = $this->link;
+        if(!empty($this->guid['value'])) {
+            $this->xmlFeed->guid = $this->guid['value'];
+            if(!$this->guid['isPermalink']) {
+                $this->xmlFeed->guid['isPermalink'] = 'false';
+            } else {
+                $this->xmlFeed->guid['isPermalink'] = 'true';
+            }
         }
 
         //Dates
-        if(!empty($this->pubDate)) {
-            $this->xmlFeed->pubDate = $this->pubDate;
-        }
+        if(!empty($this->pubDate)) $this->xmlFeed->pubDate = $this->pubDate;
 
         //Itunes stuff
         if(!empty($this->itunes_subtitle)) {
@@ -101,11 +109,13 @@ class Item extends Podcast {
             $this->xmlFeed->children('itunes', TRUE)->subtitle = $this->itunes_subtitle;
         }
 
-        $this->xmlFeed->addChild('summary', "", $this->itunes_ns);
-        if(empty($this->itunes_summary)) {
-            $this->itunes_summary = $this->description;
+        if(!empty($this->itunes_summary) || !empty($this->description)) {
+            $this->xmlFeed->addChild('summary', "", $this->itunes_ns);
+            if(empty($this->itunes_summary)) {
+                $this->itunes_summary = $this->description;
+            }
+            $this->xmlFeed->children('itunes', TRUE)->summary = $this->itunes_summary;
         }
-        $this->xmlFeed->children('itunes', TRUE)->summary = $this->itunes_summary;
 
         if(!empty($this->itunes_author) || !empty($this->author)) {
             $this->xmlFeed->addChild('author', "", $this->itunes_ns);

@@ -60,7 +60,8 @@ $(document).ready(function () {
         {class: "menuTypeCategory", title: "Podcast categories.", type: "category", text: "Category"},
         {class: "menuTypeExplicit", title: "Explicit content flag.", type: "explicit", text: "Explicit"},
         {class: "menuTypeKeywords", title: "Keywords for podcast.", type: "keyword", text: "Keyword"},
-        {class: "menuTypeEnclosure", title: "An item enclosure.", type: "enclosure", text: "Enclosure"}
+        {class: "menuTypeEnclosure", title: "An item enclosure.", type: "enclosure", text: "Enclosure"},
+        {class: "menuTypeGuid", title: "A guid node for an item.", type: "guid", text: "Guid"}
     ];
 
     //New button
@@ -382,65 +383,13 @@ $(document).ready(function () {
                     sheetinclude.toggleClass('open');
                 }
             });
-        } else if (thistype == 'item') {
-            //Make the ajax call to get the recent file list
-            $.ajax({
-                type: 'POST',
-                url: '/cgi/out/get.recentfiles',
-                dataType: "json",
-                success: function (data) {
-                    //Clear the table for new data
-                    $('.templateopen').empty();
-
-                    //Iterate
-                    $.each(data.files, function (i, item) {
-                        var re = /\.$/;
-                        var newtitle = item.title.replace(re, "").toLowerCase();
-                        //Add an entry for each url returned
-                        $('.templateopen').append('<li><a href="#" data-url="' + item.url + '">' + newtitle + '</a> ' + prettyDate(item.time * 1000).toLowerCase() + '.</li>');
-                    });
-
-                    //Link apply function to each file link
-                    $('.templateopen li a').click(function () {
-                        var geturl = $(this).data('url');
-                        sheetinclude.removeClass('open');
-                        //Set the node's attributes
-                        opSetOneAtt('type', thistype);
-                        //Change this url to be a link to the html version instead of the opml
-                        gethtmlurl = geturl.replace("/opml/", "/html/");
-                        gethtmlurl = gethtmlurl.substr(0, gethtmlurl.lastIndexOf(".")) + ".html";
-                        opSetOneAtt('url', gethtmlurl);
-                        //Now call out and get the outline data
-                        $.ajax({
-                            type: 'POST',
-                            url: '/cgi/out/get.url.json?url=' + geturl,
-                            dataType: "json",
-                            beforeSend: function () {
-                                loading.show();
-                                opDeleteSubs();
-                            },
-                            success: function (data) {
-                                opSetOneAtt('icon', 'rss-square');
-                                loading.hide();
-                            },
-                            error: function () {
-                                showMessage("Error loading include url.", false, 5);
-                                loading.show();
-                            }
-                        });
-                        return false;
-                    });
-
-                    //Open the dropdown sheet
-                    sheetinclude.toggleClass('open');
-                }
-            });
         } else {
             opSetOneAtt('type', thistype);
         }
 
         //None type
         if (thistype == 'none') {
+            opSetOneAtt('icon', 'caret-right');
             outliner.concord().op.attributes.removeOne('icon');
             outliner.concord().op.attributes.removeOne('type');
             outliner.concord().op.attributes.removeOne('url');
@@ -492,8 +441,79 @@ $(document).ready(function () {
         }
 
         //Title type node
+        if (thistype == 'item') {
+            //Set the node's attributes
+            opSetOneAtt('type', 'item');
+            opSetOneAtt('icon', 'rss-square');
+
+            //Make the ajax call to get the recent file list
+            $.ajax({
+                type: 'POST',
+                url: '/cgi/out/get.recentfiles',
+                dataType: "json",
+                success: function (data) {
+                    //Clear the table for new data
+                    $('.templateopen').empty();
+
+                    //Iterate
+                    $.each(data.files, function (i, item) {
+                        var re = /\.$/;
+                        var newtitle = item.title.replace(re, "").toLowerCase();
+                        //Add an entry for each url returned
+                        $('.templateopen').append('<li><a href="#" data-url="' + item.url + '">' + newtitle + '</a> ' + prettyDate(item.time * 1000).toLowerCase() + '.</li>');
+                    });
+
+                    //Link apply function to each file link
+                    $('.templateopen li a').click(function () {
+                        var geturl = $(this).data('url');
+                        sheetimport.removeClass('open');
+                        //Now call out and get the outline data
+                        $.ajax({
+                            type: 'POST',
+                            url: '/cgi/out/get.url.json?url=' + geturl,
+                            dataType: "json",
+                            beforeSend: function () {
+                                loading.show();
+                            },
+                            success: function (data) {
+                                opInsertXml(data.data, right);
+                                loading.hide();
+                                //Prompt for a url
+                                bootbox.prompt("Set a url for this item?", function (result) {
+                                    if (result !== null) {
+                                        opSetOneAtt('url', result);
+                                    }
+                                    //Prompt for a title
+                                    bootbox.prompt("Set a title for this item?", function (result) {
+                                        if (result !== null) {
+                                            opSetLineText(result);
+                                        }
+                                    });
+                                });
+                            },
+                            error: function () {
+                                showMessage("Error loading import url.", false, 5);
+                                loading.hide();
+                            }
+                        });
+                        return false;
+                    });
+
+                    //Open the dropdown sheet
+                    sheetimport.toggleClass('open');
+
+                }
+            });
+        }
+
+        //Title type node
         if (thistype == 'title') {
             opSetOneAtt('icon', 'terminal');
+        }
+
+        //Guid type node
+        if (thistype == 'guid') {
+            opSetOneAtt('icon', 'qrcode');
         }
 
         //Category type node
@@ -586,7 +606,6 @@ $(document).ready(function () {
         srmodal.modal('show');
     });
     menubar.find('.menuImportOutline').click(function () {
-        console.log("test");
         //Make the ajax call to get the recent file list
         $.ajax({
             type: 'POST',
@@ -876,7 +895,6 @@ $(document).ready(function () {
             }
         });
     } else {
-        alert(type)
         if(type == 1) {
             opXmlToOutline(initialRssOpmlText);
         } else {
@@ -1024,9 +1042,9 @@ $(document).ready(function () {
                 //Show returned info and re-enable the save button
                 url = data.url;
                 htmlurl = data.html;
-                updateOutlineInfo(url, data, redirect);
 
                 if (data.status === "true") {
+                    updateOutlineInfo(url, data, redirect);
                     showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
                 } else {
                     showMessage(data.description, data.status, 8);
@@ -1280,6 +1298,16 @@ $(document).ready(function () {
     function opCursorMovedCallback(op) {
         var nodetype = op.attributes.getOne('type');
         var nodecreated = op.attributes.getOne('created');
+        var hasUrl = false;
+        var hasXmlUrl = false;
+
+        //Does the node have a url attribute?
+        if(op.attributes.getOne('url') != "undefined" && !isBlank(op.attributes.getOne('url'))) {
+            hasUrl = true;
+        }
+        if(op.attributes.getOne('xmlUrl') != "undefined" && !isBlank(op.attributes.getOne('xmlUrl'))) {
+            hasXmlUrl = true;
+        }
 
         if (typeof(nodetype) == "undefined") {
             nodetype = "not set";
@@ -1295,16 +1323,23 @@ $(document).ready(function () {
         menubar.find('.menubar li.extLink').remove();
         menubar.find('.menubar li.extEditLink').remove();
         if (nodetype == "include" || nodetype == "import") {
-            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
-            menubar.find('.menubar').append('<li class="extEditLink"><a target="_blank" href="/editor?url=' + op.attributes.getOne('url') + '"><i class="fa fa-edit" style="color:#090;"></i></a></li>');
+            if(hasUrl) {
+                menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
+                menubar.find('.menubar').append('<li class="extEditLink"><a target="_blank" href="/editor?url=' + op.attributes.getOne('url') + '"><i class="fa fa-edit" style="color:#090;"></i></a></li>');
+            }
             return true;
         }
         if (nodetype == "link" || nodetype == "item" || nodetype == "enclosure" || nodetype == "image") {
-            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
+            if(hasUrl) {
+                menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
+            }
+
             return true;
         }
         if (nodetype == "rss") {
-            menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('xmlUrl') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
+            if(hasXmlUrl) {
+                menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('xmlUrl') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
+            }
             return true;
         }
 

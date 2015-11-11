@@ -19,16 +19,20 @@ if( isset($_REQUEST['url']) && !empty($_REQUEST['url']) && stripos($_REQUEST['ur
     exit(0);
 }
 
+$datatype = 'opml';
 $urldata = fetchUrl(get_final_url($url));
+if(is_feed($urldata)) {
+    $datatype = 'feed';
+    $urldata = convert_feed_to_opml($urldata);
+}
 
 //--------------------------------------------------------------------------------
 //Give feedback that all went well
 $jsondata['status'] = "true";
 $jsondata['data'] = $urldata;
+$jsondata['type'] = $datatype;
 $jsondata['description'] = "Url fetch successful.";
+loggit(3, "DEBUG(json): ".print_r($jsondata, TRUE));
 echo json_encode($jsondata);
 
 return(0);
-
-?>
-

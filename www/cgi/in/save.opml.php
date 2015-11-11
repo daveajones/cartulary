@@ -163,6 +163,24 @@ if( $type == 1 ) {
     $rssfilename = str_replace('.opml', '.xml', $filename);
     $s3rssurl = get_s3_url($uid, "/rss/", $rssfilename);
     $rssdata = convert_opml_to_rss($opml);
+    if($rssdata == FALSE || $rssdata < 0) {
+        loggit(2, "RSS Error code: [$rssdata]");
+        $jsondata['status'] = "false";
+        if($rssdata == -4) {
+            $jsondata['description'] = "One of the items has both a blank title and description. At least one is required.";
+        } else
+        if($rssdata == -3) {
+            $jsondata['description'] = "A non-specific exception occured while building the rss feed.";
+        } else
+        if($rssdata == -2) {
+            $jsondata['description'] = "There were no 'item' nodes found while building the rss feed.";
+        } else {
+            $jsondata['description'] = "An unknown error occured during opml to rss conversion.";
+        }
+
+        echo json_encode($jsondata);
+        exit(1);
+    }
     $s3res = putInS3($rssdata, $rssfilename, $s3info['bucket']."/rss", $s3info['key'], $s3info['secret'], "application/rss+xml");
     if(!$s3res) {
         loggit(2, "Could not create S3 file: [$rssfilename] for user: [$uid].");

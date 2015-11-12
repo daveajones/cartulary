@@ -27,6 +27,11 @@ Feed generation and a more swipey river.
         - Swipe left on an article will cart the article.
         - Swipe right will unsticky an river item.
         - Swipe left on an already cart'd article and you can change the title of the article in your archive.
+        - Long-press a river item title will cart the article.
+        - Long-press any link within the body of a cart'd article will cart the page at that link and open it in a new browser tab. Be
+          aware that on IOS (and maybe Android), you have to disable the popup blocker in the browser settings for this to work.  On
+          IOS 9, if you disable the popup blocker it will start asking you each time: "Do you want to allow this popup".  And you just
+          say yes or no.
     - The editor now timestamps every new node.  You can change the timestamp of any node by placing the bar cursor on it and
       hitting the little clock menu at the top of the editor.
     - Sticky river items now sort oldest to newest.

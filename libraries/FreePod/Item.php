@@ -11,7 +11,7 @@ class Item extends Podcast {
     public $enclosures = array();
     public $guid = array(
         "value" => "",
-        "isPermalink" => FALSE
+        "isPermaLink" => FALSE
     );
     public $itunes_duration = "";
 
@@ -38,7 +38,7 @@ class Item extends Podcast {
                 $this->guid['value'] = $guid;
             }
             if (stripos($this->guid['value'], 'http') === 0) {
-                $this->guid['isPermalink'] = TRUE;
+                $this->guid['isPermaLink'] = TRUE;
             }
         }
 
@@ -93,10 +93,10 @@ class Item extends Podcast {
         if(!empty($this->link)) $this->xmlFeed->link = $this->link;
         if(!empty($this->guid['value'])) {
             $this->xmlFeed->guid = $this->guid['value'];
-            if(!$this->guid['isPermalink']) {
-                $this->xmlFeed->guid['isPermalink'] = 'false';
+            if(!$this->guid['isPermaLink']) {
+                $this->xmlFeed->guid['isPermaLink'] = 'false';
             } else {
-                $this->xmlFeed->guid['isPermalink'] = 'true';
+                $this->xmlFeed->guid['isPermaLink'] = 'true';
             }
         }
 

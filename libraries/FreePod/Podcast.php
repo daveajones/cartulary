@@ -257,6 +257,12 @@ class Podcast {
                 $this->image['width'] = $width;
                 $this->image['height'] = $height;
             }
+            if($this->image['width'] > 144) {
+                $this->image['width'] = 144;
+            }
+            if($this->image['height'] > 144) {
+                $this->image['height'] = 144;
+            }
             if(!empty($this->image['width']) || !empty($this->image['height'])) {
                 $this->xmlFeed->channel->image->width = $this->image['width'];
                 $this->xmlFeed->channel->image->height = $this->image['height'];

@@ -3753,6 +3753,10 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
             $podcast->webMaster = $email;
             $podcast->managingEditor = $email;
         }
+        $name = get_user_name_from_uid($uid);
+        if(!empty($name)) {
+            $podcast->itunes_author = $name;
+        }
     }
 
     //Add the channel image

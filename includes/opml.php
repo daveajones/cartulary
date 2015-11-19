@@ -3634,7 +3634,7 @@ function convert_feed_to_opml($content = NULL, $max = NULL)
 
 
 //Convert opml to rss format
-function convert_opml_to_rss($content = NULL, $max = NULL, $uid = NULL)
+function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
 {
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
@@ -3745,6 +3745,15 @@ function convert_opml_to_rss($content = NULL, $max = NULL, $uid = NULL)
     $podcast = new Podcast($converted['title'], $converted['description'], $converted['link']);
     $podcast->xml(TRUE);
     loggit(3, "RSS Conversion ------- " . $converted['title'] . " ------- ");
+
+    //Add a webmaster and managingeditor if we have a uid
+    if(!empty($uid)) {
+        $email = get_email_from_uid($uid);
+        if(!empty($email)) {
+            $podcast->webMaster = $email;
+            $podcast->managingEditor = $email;
+        }
+    }
 
     //Add the channel image
     if(!empty($converted['img'])) {

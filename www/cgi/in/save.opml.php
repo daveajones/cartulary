@@ -162,8 +162,8 @@ if( $type == 1 ) {
     //Put the RSS in S3
     $rssfilename = str_replace('.opml', '.xml', $filename);
     $s3rssurl = get_s3_url($uid, "/rss/", $rssfilename);
-    $rssdata = convert_opml_to_rss($opml);
-    if($rssdata == FALSE || $rssdata < 0) {
+    $rssdata = convert_opml_to_rss($opml, $uid);
+    if($rssdata == FALSE || (is_numeric($rssdata) && $rssdata < 0)) {
         loggit(2, "RSS Error code: [$rssdata]");
         $jsondata['status'] = "false";
         if($rssdata == -4) {
@@ -247,6 +247,7 @@ if($watched) {
 }
 
 //Update the redirector table
+
 if( !empty($rhost) ) {
     //Let's not clobber existing redirects
     $erurl = get_redirection_url_by_host_name($rhost);

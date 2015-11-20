@@ -1,4 +1,4 @@
-/* --------------------------------------------------- */
+
 /* ----- Menus --------------------------------------- */
 li.menubar-search-container { display:none; }
 .navbar-inner {
@@ -1141,6 +1141,7 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
 
 /* --------------------------------------------------- */
 /* ----- Microblog ----- */
+#divEnclosures > input.datestamp { display:none; }
 .pageContentWrapper.Microblog #divBlogPost {
   position: relative;
   padding:40px;

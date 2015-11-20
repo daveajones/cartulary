@@ -61,7 +61,9 @@ $(document).ready(function () {
         {class: "menuTypeExplicit", title: "Explicit content flag.", type: "explicit", text: "Explicit"},
         {class: "menuTypeKeywords", title: "Keywords for podcast.", type: "keyword", text: "Keyword"},
         {class: "menuTypeEnclosure", title: "An item enclosure.", type: "enclosure", text: "Enclosure"},
-        {class: "menuTypeGuid", title: "A guid node for an item.", type: "guid", text: "Guid"}
+        {class: "menuTypeGuid", title: "A guid node for an item.", type: "guid", text: "Guid"},
+        {class: "menuTypeAuthor", title: "The author of the feed.", type: "author", text: "Author"},
+        {class: "menuTypePubDate", title: "The pubDate of the feed or item.", type: "pubdate", text: "PubDate"}
     ];
 
     //New button
@@ -164,7 +166,7 @@ $(document).ready(function () {
         if (isEmpty(redirect)) {
             pburl = htmlurl;
         } else {
-            pburl = redirect;
+            pburl = 'http://' + redirect;
         }
 
         $('#divEditOutline .ouitem').remove();

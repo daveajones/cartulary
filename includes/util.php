@@ -2186,9 +2186,9 @@ function stripText($text, $nl = TRUE, $leave = "", $dashes = TRUE)
 
     // strip all non alphanum or -
     if( $dashes ) {
-        $clean = ereg_replace("[^A-Za-z0-9".$leave."\-]", "", $text);
+        $clean = preg_replace('/[^A-Za-z0-9".$leave."\-]/', "", $text);
     } else {
-        $clean = ereg_replace("[^A-Za-z0-9".$leave."]", "", $text);
+        $clean = preg_replace('/[^A-Za-z0-9".$leave."]/', "", $text);
     }
 
 
@@ -2202,7 +2202,7 @@ function cleanFilename($text)
     $text = strtolower(trim($text));
 
     // strip all except these characters
-    $clean = ereg_replace("[^A-Za-z0-9\-\.]", "", $text);
+    $clean = preg_replace('/[^A-Za-z0-9\-\.]/', "", $text);
 
     return $clean;
 }

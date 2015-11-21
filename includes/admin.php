@@ -41,13 +41,12 @@ function create_user($email = NULL, $silent = NULL, $inside = NULL, $active = NU
     }
     $sql->close() or loggit(2, "8_" . $dbh->error);
 
-
     //Generate a temporary first time password
     $newuid = random_gen(60);
     $password = random_gen(8);
 
     //Generate a unique username on this system
-    $emparts = split("@", $email);
+    $emparts = explode("@", $email);
     $username = $emparts[0] . random_gen(4);
     $tuid = get_user_id_from_username($username);
     $tc = 0;

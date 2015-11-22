@@ -141,12 +141,17 @@ class Item extends Podcast {
 
         //Itunes keywords
         if(!empty($this->itunes_keywords)) {
+            $itksize = 0;
             $itk = "";
             foreach($this->itunes_keywords as $kw) {
-                $itk = $itk . " " . $kw;
+                $itksize += strlen($kw.",");
+                if($itksize > 255) {
+                    break;
+                }
+                $itk = $itk . "," . $kw;
             }
             $this->xmlFeed->addChild('keywords', "", $this->itunes_ns);
-            $this->xmlFeed->children('itunes', TRUE)->keywords = trim($itk);
+            $this->xmlFeed->children('itunes', TRUE)->keywords = trim($itk, " ,");
         }
 
         //Enclosures

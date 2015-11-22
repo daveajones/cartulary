@@ -3653,6 +3653,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
     $converted['link'] = "";
     $converted['authorname'] = "";
     $converted['when'] = "";
+    $converted['pubdate'] = "";
     $converted['img'] = "";
     $converted['items'] = "";
     $converted['explicit'] = FALSE;
@@ -3675,10 +3676,8 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
         $converted['when'] = (string)$x->head->dateModified;
     }
 
-    //loggit(3, "RSS Head Meta ------- ");
-
     //Grab the first description node as the feed description
-    $nodes = $x->xpath('//outline[@type="description"]');
+    $nodes = $x->xpath('//outline[@type="description" and not(ancestor::outline[@type="item"])]');
     if (!empty($nodes)) {
         foreach ($nodes as $entry) {
             $converted['description'] = (string)$entry->attributes()->text;
@@ -3706,6 +3705,24 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
         }
     }
 
+    //Grab the channel author node if there is one
+    $nodes = $x->xpath('//outline[@type="author" and not(ancestor::outline[@type="item"])]');
+    if (!empty($nodes)) {
+        foreach ($nodes as $entry) {
+            $converted['author'] = (string)$entry->attributes()->text;
+            break;
+        }
+    }
+
+    //Grab the channel pubdate node if there is one
+    $nodes = $x->xpath('//outline[@type="pubdate" and not(ancestor::outline[@type="item"])]');
+    if (!empty($nodes)) {
+        foreach ($nodes as $entry) {
+            $converted['pubdate'] = (string)$entry->attributes()->text;
+            break;
+        }
+    }
+
     //Grab the explicit tag if there is one
     $nodes = $x->xpath('//outline[@type="explicit"]');
     if (!empty($nodes)) {
@@ -3719,7 +3736,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
     }
 
     //Grab the keywords
-    $nodes = $x->xpath('//outline[@type="keyword"]');
+    $nodes = $x->xpath('//outline[@type="keyword" and not(ancestor::outline[@type="item"])]');
     if (!empty($nodes)) {
         foreach ($nodes as $entry) {
             $converted['keywords'][] = (string)$entry->attributes()->text;
@@ -3727,7 +3744,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
     }
 
     //Grab the categories
-    $nodes = $x->xpath('//outline[@type="category"]');
+    $nodes = $x->xpath('//outline[@type="category" and not(ancestor::outline[@type="item"])]');
     if (!empty($nodes)) {
         foreach ($nodes as $entry) {
             $converted['categories'][] = (string)$entry->attributes()->text;
@@ -3744,7 +3761,6 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
     //Start the rss feed structure with what we have
     $podcast = new Podcast($converted['title'], $converted['description'], $converted['link']);
     $podcast->xml(TRUE);
-    loggit(3, "RSS Conversion ------- " . $converted['title'] . " ------- ");
 
     //Add a webmaster and managingeditor if we have a uid
     if(!empty($uid)) {
@@ -3752,11 +3768,29 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
         if(!empty($email)) {
             $podcast->webMaster = $email;
             $podcast->managingEditor = $email;
+            $podcast->itunes_owner['email'] = $email;
         }
         $name = get_user_name_from_uid($uid);
         if(!empty($name)) {
             $podcast->itunes_author = $name;
+            $podcast->itunes_owner['name'] = $name;
         }
+        if(!empty($name) && !empty($email)) {
+            $podcast->webMaster = $email. " ($name)";
+            $podcast->managingEditor = $email. " ($name)";
+        }
+    }
+
+    //Author
+    if(!empty($converted['author'])) {
+        loggit(3, "Adding channel author: [".$converted['author']."]");
+        $podcast->itunes_author = $converted['author'];
+    }
+
+    //pubDate
+    if(!empty($converted['pubdate'])) {
+        loggit(3, "Adding channel pubDate: [".$converted['pubdate']."]");
+        $podcast->pubDate = $converted['pubdate'];
     }
 
     //Add the channel image
@@ -3790,13 +3824,14 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
     $count = 0;
     $pcount = 0;
     foreach ($nodes as $item) {
-        //loggit(3, "------- RSS Item: OPMLnode[type]:" . (string)$item->attributes()->type);
         $pcount++;
 
         $converted_urls = array();
         $converted_texts = array();
         $converted_nontypes = array();
         $converted_images = array();
+        $converted_author = "";
+        $converted_pubdate = "";
         $converted_enclosures = array();
         $converted_explicits = FALSE;
         $converted_keywords = array();
@@ -3817,8 +3852,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
             $converted_explicit = FALSE;
             $converted_keyword = "";
 
-            //loggit(3, "OPMLpart[type]: " . (string)$part->attributes()->type);
-
+            //Handle each link type
             if ((string)$part->attributes()->type == "link") {
                 if (empty($part->attributes()->text)) {
                     $converted_text = (string)$part->attributes()->url;
@@ -3826,18 +3860,24 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
                     $converted_text = (string)$part->attributes()->text;
                 }
                 $converted_url = (string)$part->attributes()->url;
-                //loggit(3, "RSS: Add new link item: " . $converted_text . " " . $converted_url);
+                if(stripos($converted_text, "http") === 0) {
+                    $converted_url = $converted_text;
+                }
 
             } else if ((string)$part->attributes()->type == "description") {
                 $desc_parts = $part->xpath('.//outline');
                 foreach ($desc_parts as $dpart) {
-                    $converted_desc = $converted_desc . " " . (string)$dpart->attributes()->text."\n";
-                    //loggit(3, "RSS: Add new description item: ");
+                    $converted_desc = $converted_desc . "<p>" . (string)$dpart->attributes()->text."</p>\n";
                 }
 
             } else if ((string)$part->attributes()->type == "title") {
                 $converted_title = (string)$part->attributes()->text;
-                //loggit(3, "RSS: Add new text item: " . $converted_title);
+
+            } else if ((string)$part->attributes()->type == "author") {
+                $converted_author = (string)$part->attributes()->text;
+
+            } else if ((string)$part->attributes()->type == "pubdate") {
+                $converted_pubdate = (string)$part->attributes()->text;
 
             } else if ((string)$part->attributes()->type == "guid") {
                 $converted_guid = trim((string)$part->attributes()->text);
@@ -3848,7 +3888,6 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
 
             } else if ((string)$part->attributes()->type == "keyword") {
                 $converted_keyword = (string)$part->attributes()->text;
-                //loggit(3, "RSS Item: Keyword: [$converted_keyword].");
 
             } else if ((string)$part->attributes()->type == "explicit") {
                 //Grab the explicit tag if there is one
@@ -3856,17 +3895,25 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
                 if(!empty($exp) && stripos($exp, "yes") !== FALSE) {
                     $converted_explicit = TRUE;
                 }
-                //loggit(3, "RSS Item: Explicit tag: [" . print_r($converted_explicit, TRUE) ." | $exp].");
 
             } else if ((string)$part->attributes()->type == "enclosure") {
+                $converted_enclosure['txturl'] = (string)$part->attributes()->text;
                 $converted_enclosure['url'] = (string)$part->attributes()->url;
                 $converted_enclosure['type'] = (string)$part->attributes()->mimetype;
                 $converted_enclosure['length'] = (string)$part->attributes()->length;
-                //loggit(3, "RSS: Add new enclosure item: " . print_r($converted_enclosure, TRUE));
+                if(stripos($converted_enclosure['txturl'], "http") === 0) {
+                    $converted_enclosure['url'] = $converted_enclosure['txturl'];
+                    $converted_enclosure['type'] = "";
+                    $converted_enclosure['length'] = "";
+                }
 
             } else if ((string)$part->attributes()->type == "image") {
                 $converted_image = (string)$part->attributes()->url;
-                //loggit(3, "RSS: Add new image item: " . $converted_image);
+                $converted_imgtxt = (string)$part->attributes()->text;
+                if(stripos($converted_imgtxt, "http") === 0) {
+                    $converted_image = $converted_imgtxt;
+                }
+
             } else {
                 //Save non-typed nodes for use as description text if no description is found
                 $converted_nontype = (string)$part->attributes()->text;
@@ -3884,11 +3931,13 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
         //Trim strings
         $converted_desc = trim($converted_desc);
         $converted_title = trim($converted_title);
+        $converted_author = trim($converted_author);
+        $converted_pubdate = trim($converted_pubdate);
 
         //Determine if a description was explicitely assigned as a "description" node. If
         //not, use any non-typed nodes found as the description body.  If those are blank
         //too, use a single blank space.
-        loggit(3, "RSS DESCRIPTION: ".print_r($converted_desc, TRUE));
+        //loggit(3, "RSS DESCRIPTION: ".print_r($converted_desc, TRUE));
         if(empty($converted_desc)) {
             loggit(3, "RSS: No description nodes found.");
             if(empty($converted_nontypes)) {
@@ -3900,17 +3949,30 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
                 }
             } else {
                 loggit(3, "RSS: Using non-types as description.");
-                $converted_desc = implode("\n", $converted_nontypes);
+                $converted_desc = "<p>".implode("</p><p>\n", $converted_nontypes)."</p>";
             }
         }
 
         //Now insert the item and it's attributes into the feed
-        loggit(3, "RSS: Adding the item [$converted_title | $converted_desc].");
+        //loggit(3, "RSS: Adding the item [$converted_title | $converted_desc].");
         $pitem = $podcast->newItem($converted_title, $converted_desc, $converted_urls[0], $converted_guid);
+
+        //Itunes subtitle
+        $pitem->itunes_subtitle = $converted_title;
+
+        //Author
+        if(!empty($converted_author)) {
+            $pitem->author = $converted_author;
+        } else {
+            $pitem->author = $converted['author'];
+        }
 
         //Pubdate check
         if(!empty($converted_created)) {
             $pitem->setValue("pubDate", $converted_created);
+        }
+        if(!empty($converted_pubdate)) {
+            $pitem->setValue("pubDate", $converted_pubdate);
         }
 
         //If this item's pubDate is newer use it for the channel pubDate

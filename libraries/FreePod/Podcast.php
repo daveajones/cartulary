@@ -189,13 +189,11 @@ class Podcast {
         $this->xmlFeed->channel->description = $this->description;
         $this->xmlFeed->channel->link = $this->link;
         //Add categories
-        $ctg = "";
-        foreach( $this->categories as $cat ) {
-            $ctg = $ctg . " " . $cat;
-        }
-        if(!empty($ctg)) {
-            $this->xmlFeed->channel->category = trim($ctg);
-        }
+//        $ctg = "";
+//        foreach( $this->categories as $cat ) {
+//            $category_node = $this->xmlFeed->channel->addChild("category", "", $this->itunes_ns);
+//            $category_node->addAttribute("text", trim($cat));
+//        }
         //Copyright
         if(!empty($this->copyright)) {
             $this->xmlFeed->channel->copyright = $this->copyright;
@@ -302,12 +300,17 @@ class Podcast {
 
         //Itunes keywords
         if(!empty($this->itunes_keywords)) {
+            $itksize = 0;
             $itk = "";
             foreach($this->itunes_keywords as $kw) {
-                $itk = $itk . " " . $kw;
+                $itksize += strlen($kw.",");
+                if($itksize > 255) {
+                    break;
+                }
+                $itk = $itk . "," . $kw;
             }
             $this->xmlFeed->channel->addChild('keywords', "", $this->itunes_ns);
-            $this->xmlFeed->channel->children('itunes', TRUE)->keywords = trim($itk);
+            $this->xmlFeed->channel->children('itunes', TRUE)->keywords = trim($itk, " ,");
         }
 
         //Itunes categories
@@ -318,7 +321,7 @@ class Podcast {
         $count = 0;
         foreach($this->itunes_categories as $cat) {
             $this->xmlFeed->channel->addChild('category', "", $this->itunes_ns);
-            $this->xmlFeed->channel->children('itunes', TRUE)->category[$count] = $cat;
+            $this->xmlFeed->channel->children('itunes', TRUE)->category[$count]->addAttribute("text", $cat);
             $count++;
         }
 

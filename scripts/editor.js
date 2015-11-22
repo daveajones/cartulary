@@ -518,6 +518,18 @@ $(document).ready(function () {
             opSetOneAtt('icon', 'qrcode');
         }
 
+        //Author type node
+        if (thistype == 'author') {
+            opSetOneAtt('icon', 'user');
+        }
+
+        //Pubdate type node
+        if (thistype == 'pubdate') {
+            opSetOneAtt('icon', 'clock-o');
+            if(isBlank(opGetLineText())) opSetLineText(new Date().toUTCString());
+        }
+
+
         //Category type node
         if (thistype == 'category') {
             opSetOneAtt('icon', 'tags');
@@ -1428,6 +1440,11 @@ $(document).ready(function () {
             outliner.op.deleteLine();
             return false;
         }
+        //Enter key
+        //if (event.which == 13) {
+        //    opSetOneAtt("created", new Date().toUTCString());
+        //    return false;
+        //}
         //Stop concord from responding to these key combos
         if (event.ctrlKey || event.metaKey) {
             switch (String.fromCharCode(event.which).toLowerCase()) {

@@ -9,15 +9,15 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     //Sidegrade file name for this release if any
     $sgscript = "$confroot/releases/v" . $cg_sys_version . "-apt.sh";
 
-    echo "Looking for [$sgscript]...";
+    echo "Looking for [$sgscript]... ";
     if (file_exists($sgscript)) {
-        echo "  found. Execute..."
+        echo "found. Executing... ";
         $exoutput = shell_exec($sgscript . " 2>&1 > /tmp/v" . $cg_sys_version . "-sidegrade.log");
         echo $exoutput . "\n";
-        echo "  finished."
+        echo "finished.\n";
     }
 
-    echo "Done.\n";
+    echo "\n\n";
 
     //Release the lock
     cronHelper::unlock();

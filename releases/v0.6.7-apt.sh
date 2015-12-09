@@ -23,8 +23,8 @@ apt-get install -y php5-xsl
 php5enmod xsl
 
 apt-get install -y nodejs npm
+sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
 cd $CARTROOT/aggrivate
 npm install
-
 
 ##: This file should be EXEcutable!

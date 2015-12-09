@@ -1,7 +1,7 @@
 #Release Notes - Freedom Controller v0.6.10
 
 
-Feed generation and a more swipey river.
+Feed generation and a more "touchy" river.
 
 
 - Bug Fixes
@@ -21,6 +21,10 @@ Feed generation and a more swipey river.
     - You can now build RSS feeds with the editor.  When you click the "New" button, you will have the option to create a standard
       outline or an RSS feed.  The available "type" options will be different depending on which one you choose.  This uses the
       FreePod engine to generate the feeds, and that project will be updated along-side FreedomController.
+
+- New Feature: New node-based feed puller in the aggregator
+    - The feed fetcher that runs every 10 minutes is now using node.js.  This is waaaaay more efficient than pulling them one at a
+      time using the old php fetcher.  It can blow threw a few hundred feeds in seconds.
 
 - Improvements:
     - There are new gestures in the mobile river:

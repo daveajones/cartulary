@@ -10,6 +10,8 @@ if [ "$UID" -ne "$ROOT_UID" ] ; then
 fi
 export CARTROOT=`echo "<?echo rtrim(get_cfg_var('cartulary_conf'), '/');?>" | php`
 
+echo Side-loading packages up through version 0.6.7...
+
 ##: Refresh apt
 apt-get update
 

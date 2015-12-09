@@ -10,16 +10,22 @@ if [ "$UID" -ne "$ROOT_UID" ] ; then
 fi
 export CARTROOT=`echo "<?echo rtrim(get_cfg_var('cartulary_conf'), '/');?>" | php`
 
+echo Side-loading packages up through version 0.6.10...
+
 ##: Refresh apt
+echo Updating apt-get repos...
 apt-get update
 
 ##: Install any new modules needed for this release
+echo Installing php5 imap library...
 apt-get install -y php5-imap
 php5enmod imap
 
+echo Installing php5 xsl library...
 apt-get install -y php5-xsl
 php5enmod xsl
 
+echo Installing node.js...
 apt-get install -y nodejs npm
 cd $CARTROOT/aggrivate
 npm install

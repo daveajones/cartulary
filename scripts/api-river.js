@@ -16,7 +16,7 @@ freedomController.v1.river.methods = (function () {
 //-----------------------------------------------------------------------------------
 
 
-//----- River globals -----
+    //----- River globals -----
     var riverJsonUrl = freedomController.v1.river.statics.riverJsonUrl;
     var pathToStreamItem = freedomController.v1.river.statics.pathToStreamItem;
     var pathToActiveItem = freedomController.v1.river.statics.pathToActiveItem;
@@ -27,7 +27,7 @@ freedomController.v1.river.methods = (function () {
     var lsSessionIdKey = freedomController.v1.river.statics.lsSessionIdKey;
 
 
-//----- River functions -----
+    //----- River functions -----
     function _searchPostLoad() {
         return _rebindEverything();
     }
@@ -711,7 +711,7 @@ freedomController.v1.river.methods = (function () {
                         $(pathToPost).find('div.header button.changetitle').remove();
                         $(pathToPost).find('div.header').prepend('<button class="changetitle"><i class="fa fa-edit"></i></button>');
                         $(pathToPost).find('div.header button.changetitle').on('click', function () {
-                            var newtitle = prompt("Enter new title...");
+                            var newtitle = prompt("Enter new title...", data.article.title);
                             if (newtitle != null) {
                                 //Make the call
                                 $.ajax({
@@ -1036,7 +1036,7 @@ freedomController.v1.river.methods = (function () {
                             //If article cart'd already, then RtoL flick prompts for title change
                             if (e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem + '#' + item.id).hasClass('cartulized')) {
                                 var articleid = $(pathToStreamItem + '#' + item.id).data('articleid');
-                                var newtitle = prompt("Enter new title...");
+                                var newtitle = prompt("Enter new title...", item.title);
                                 if (newtitle != null) {
                                     //Make the call
                                     $.ajax({
@@ -1129,7 +1129,7 @@ freedomController.v1.river.methods = (function () {
                             //If article cart'd already, then RtoL flick prompts for title change
                             if (e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem).hasClass('cartulized')) {
                                 var articleid = $(pathToStreamItem).data('articleid');
-                                var newtitle = prompt("Enter new title...");
+                                var newtitle = prompt("Enter new title...", item.title);
                                 if (newtitle != null) {
                                     //Make the call
                                     $.ajax({
@@ -1289,7 +1289,7 @@ freedomController.v1.river.methods = (function () {
     }
 
 
-//-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
 
     return {
         searchPostLoad: _searchPostLoad,

@@ -1127,7 +1127,7 @@ freedomController.v1.river.methods = (function () {
                         });
                         $(pathToStreamItem + '#' + item.id).on('flick', function (e) {
                             //If article cart'd already, then RtoL flick prompts for title change
-                            if (e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem).hasClass('cartulized')) {
+                            if (e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem + '#' + item.id).hasClass('cartulized')) {
                                 var articleid = $(pathToStreamItem).data('articleid');
                                 var newtitle = prompt("Enter new title...", item.title);
                                 if (newtitle != null) {
@@ -1148,7 +1148,7 @@ freedomController.v1.river.methods = (function () {
                                 }
                             }
                             //If article not cart'd already, then RtoL flick carts it
-                            if (e.orientation === 'horizontal' && e.direction === -1 && !$(pathToStreamItem).hasClass('cartulized')) {
+                            if (e.orientation === 'horizontal' && e.direction === -1 && !$(pathToStreamItem + '#' + item.id).hasClass('cartulized')) {
                                 $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
                             }
                         })

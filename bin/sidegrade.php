@@ -7,11 +7,14 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     echo "Installing any extra modules needed for this release. Please wait...\n";
 
     //Sidegrade file name for this release if any
-    $sgscript = "$confroot/releases/v".$cg_sys_version."-apt.sh";
+    $sgscript = "$confroot/releases/v" . $cg_sys_version . "-apt.sh";
 
-    if(file_exists($sgscript)) {
-        $exoutput = shell_exec($sgscript." 2>&1 > /tmp/v".$cg_sys_version."-sidegrade.log");
-        echo $exoutput."\n";
+    echo "Looking for [$sgscript]...";
+    if (file_exists($sgscript)) {
+        echo "  found. Execute..."
+        $exoutput = shell_exec($sgscript . " 2>&1 > /tmp/v" . $cg_sys_version . "-sidegrade.log");
+        echo $exoutput . "\n";
+        echo "  finished."
     }
 
     echo "Done.\n";

@@ -19,10 +19,15 @@ if [ "$UID" -ne "$ROOT_UID" ] ; then
         exit 1
 fi
 
+#Check that we're on Ubuntu
+if ! lsb_release -r | grep -i "1[2-9]\.[0-9][0-9]"; then
+        echo "This script only works on Ubuntu LTS 12 and up."
+        exit 1
+fi
 
 ##: 0. Warning.
 clear
-echo 'This install script assumes it is being run on a virgin install of Ubuntu server 12.04 LTS.'
+echo 'This install script assumes it is being run on a virgin install of Ubuntu server LTS.'
 echo 'Running this file as-is on a production system is going to most likely wreck a lot of stuff.'
 echo 'If that is the case, you should  **STOP NOW**  and do the installation by hand.'
 echo
@@ -37,9 +42,12 @@ read -p "This is your last chance to back out.  Are you really, really sure this
 clear
 echo 'Installing Apache, PHP and some modules.'
 apt-get update
-apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-imap php5-tidy php5-gd ccze cstream ntp
+apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-imap php5-tidy php5-gd ccze cstream ntp php5-xsl nodejs
 php5enmod imap
-
+sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
+cd $CARTROOT/aggrivate
+npm install
+cd -
 
 ##: 2. Install MySql
 clear
@@ -110,7 +118,11 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-cp $INSTALLDIR/templates/apache.conf /etc/apache2/sites-available/cartulary.conf >>/tmp/cartinstall.log 2>&1
+if lsb_release -r | grep -i "12\.[0-9][0-9]"; then
+  cp $INSTALLDIR/templates/apache12.conf /etc/apache2/sites-available/cartulary.conf >>/tmp/cartinstall.log 2>&1
+else
+  cp $INSTALLDIR/templates/apache.conf /etc/apache2/sites-available/cartulary.conf >>/tmp/cartinstall.log 2>&1
+fi
 ln -s /etc/apache2/sites-available/cartulary.conf /etc/apache2/sites-enabled/000-cartulary.conf >>/tmp/cartinstall.log 2>&1
 sed -i "s,\[CONFROOT\],$INSTALLDIR,g" /etc/apache2/sites-available/cartulary.conf
 a2enmod headers

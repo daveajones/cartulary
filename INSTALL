@@ -41,10 +41,11 @@ read -p "This is your last chance to back out.  Are you really, really sure this
 ##: 1. Install Apache and PHP5
 clear
 echo 'Installing Apache, PHP and some modules.'
+curl -sL https://deb.nodesource.com/setup | sudo bash -
 apt-get update
 apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-imap php5-tidy php5-gd ccze cstream ntp php5-xsl nodejs
 php5enmod imap
-sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
+#sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
 cd $CARTROOT/aggrivate
 npm install
 cd -

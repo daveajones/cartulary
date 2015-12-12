@@ -224,7 +224,9 @@ echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
 php $INSTALLDIR/bin/outlinescan.php
-php $INSTALLDIR/bin/feedpull.php
+cd $INSTALLDIR/aggrivate
+node aggrivate
+cd -
 php $INSTALLDIR/bin/feedscan.php
 php $INSTALLDIR/bin/buildrivers.php
 

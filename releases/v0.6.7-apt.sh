@@ -26,6 +26,8 @@ echo Installing node.js...
 curl -sL https://deb.nodesource.com/setup | sudo bash -
 apt-get install -y nodejs
 cd $CARTROOT/aggrivate
+sudo npm -g install npm@latest
+sudo npm -g install npm@latest
 npm install
 
 ##: This file should be EXEcutable!

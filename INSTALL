@@ -47,6 +47,8 @@ apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-cu
 php5enmod imap
 #sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
 cd $CARTROOT/aggrivate
+sudo npm -g install npm@latest
+sudo npm -g install npm@latest
 npm install
 cd -
 

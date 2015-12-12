@@ -22,8 +22,9 @@ php5enmod imap
 apt-get install -y php5-xsl
 php5enmod xsl
 
-apt-get install -y nodejs npm
-sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
+echo Installing node.js...
+curl -sL https://deb.nodesource.com/setup | sudo bash -
+apt-get install -y nodejs
 cd $CARTROOT/aggrivate
 npm install
 

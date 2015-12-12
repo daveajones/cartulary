@@ -26,8 +26,8 @@ apt-get install -y php5-xsl
 php5enmod xsl
 
 echo Installing node.js...
-apt-get install -y nodejs npm
-sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
+curl -sL https://deb.nodesource.com/setup | sudo bash -
+apt-get install -y nodejs
 cd $CARTROOT/aggrivate
 npm install
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-##: Server Setup on Ubuntu 12.04
+##: Server Setup on Ubuntu LTS 12.x, 14.x, etc.
 ##:
 ##:   This install script can be run as-is on a virgin system. If you're installing on an existing box
 ##:   it'd be better to walk through it first and adjust things

@@ -2217,7 +2217,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         $enclosures = array();
         for ($lcount = 0; $lcount < $mcount; $lcount++) {
             //Alternate is the main link
-            if ($item->link[$lcount]['rel'] == "alternate") {
+            if ($item->link[$lcount]['rel'] == "alternate" || !isset($item->link->attributes()->rel)) {
                 $linkurl = $item->link[$lcount]['href'];
             }
 

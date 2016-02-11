@@ -856,9 +856,15 @@ $(document).ready(function () {
 
     //Load the outline content
     if (!isBlank(url) && type != 2) {
+        if(url.indexOf("ipfs://") == 0) {
+            actionurl = '/cgi/out/get.ipfs.json';
+        } else {
+            actionurl = '/cgi/out/get.url.json';
+        }
+
         $.ajax({
             type: 'POST',
-            url: '/cgi/out/get.url.json',
+            url: actionurl,
             data: {
                 "url": url
             },
@@ -883,7 +889,6 @@ $(document).ready(function () {
                 }
                 //Set the title of the html document
                 document.title = title + " - FC";
-
 
                 //Set up the root node type correctly
                 getRootNodeType();

@@ -3121,7 +3121,7 @@ class Str
     {
         if (ini_get('magic_quotes_sybase'))
             $pure = str_replace("''", "'", $gpc);
-        else $pure = get_magic_quotes_gpc() ? stripslashes($gpc) : $gpc;
+        else $pure = $gpc;
         return $pure;
     }
 
@@ -3651,6 +3651,7 @@ function utf8ize($d) {
     return $d;
 }
 
+
 function to_utf8( $string ) {
 // From http://w3.org/International/questions/qa-forms-utf-8.html
     if ( preg_match('%^(?:
@@ -3667,4 +3668,83 @@ function to_utf8( $string ) {
     } else {
         return iconv( 'CP1252', 'UTF-8', $string);
     }
+}
+
+
+//Add a file to the ipfs DHT space
+function add_file_to_ipfs($filepath = NULL)
+{
+    //Check parameters
+    if (empty($filepath)) {
+        loggit(2, "Location missing from S3 redirect call: [$location].");
+        return (FALSE);
+    }
+
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/ipfs/ipfs.class.php";
+
+    //Create an IPFS object
+    $ipfs = new IPFS("localhost", "8080", "5001");
+
+    $imageContent = file_get_contents($filepath);
+    $hash = $ipfs->add($imageContent);
+
+    loggit(3, "Added file: [$filepath] to IPFS with hash: [$hash].");
+    return ($hash);
+}
+
+
+//Add a file to the ipfs DHT space
+function add_content_to_ipfs($content = NULL)
+{
+    //Check parameters
+    if (empty($content)) {
+        loggit(2, "Content for adding to ipfs was blank: [$content].");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/ipfs/ipfs.class.php";
+
+    //Create an IPFS object
+    $ipfs = new IPFS("localhost", "8080", "5001");
+
+    $hash = $ipfs->add($content);
+
+    loggit(3, "Added content to IPFS with hash: [$hash].");
+    return ($hash);
+}
+
+
+//Get content from the ipfs DHT space
+function get_content_from_ipfs($hash = NULL)
+{
+    //Check parameters
+    if (empty($hash)) {
+        loggit(2, "Hash to get from ipfs is blank: [$hash].");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/ipfs/ipfs.class.php";
+
+    //Create an IPFS object
+    $ipfs = new IPFS("localhost", "8080", "5001");
+
+    $size = $ipfs->size($hash);
+
+    if ($size > 7866189) {
+        loggit(3, "Content from IPFS is too big: [$size] for hash: [$hash].");
+        $content = "";
+    } else {
+        $content = $ipfs->cat($hash);
+    }
+
+
+    loggit(3, "Got content from IPFS with hash: [$hash].");
+    return ($content);
 }

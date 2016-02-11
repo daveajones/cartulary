@@ -11,6 +11,7 @@ $url = "";
 $redirect = "";
 $aid = "";
 $rhost = "";
+$ipfs = FALSE;
 if (isset($_REQUEST['aid'])) {
     $aid = trim($_REQUEST['aid']);
 }
@@ -29,7 +30,12 @@ if (!empty($aid)) {
         //Get opml data and clean it
         $protpos = stripos($url, 'http');
         if ($protpos <> 0 || $protpos === FALSE) {
-            $badurl = true;
+            $protpos = stripos($url, 'ipfs');
+            if ($protpos <> 0 || $protpos === FALSE) {
+                $badurl = true;
+            } else {
+                $ipfs = FALSE;
+            }
         } else {
             /*
             $opmldata = fetchUrl(get_final_url($url));
@@ -42,18 +48,20 @@ if (!empty($aid)) {
         }
 
         //Get side info
-        $seenfile = get_recent_file_by_url($g_uid, $url);
+        if($ipfs == FALSE) {
+            $seenfile = get_recent_file_by_url($g_uid, $url);
 
-        //Set the redirect host for this document
-        loggit(3, "DEBUG: Url to open - [" . $url . "]");
-        $lookurl = str_replace('/opml/', '/html/', $url);
-        $lookurl = str_replace('.opml', '.html', $lookurl);
-        loggit(3, "DEBUG: Redirect url to look for - [" . $lookurl . "]");
-        $rhost = get_redirection_host_name_by_url($lookurl);
-        if (empty($rhost) && preg_match('/http.*\.opml/i', $url)) {
-            $nurl = preg_replace('/\.(opml)$/i', '.html', $url);
-            $rhost = get_redirection_host_name_by_url($nurl);
-            loggit(3, "DEBUG: $nurl");
+            //Set the redirect host for this document
+            loggit(3, "DEBUG: Url to open - [" . $url . "]");
+            $lookurl = str_replace('/opml/', '/html/', $url);
+            $lookurl = str_replace('.opml', '.html', $lookurl);
+            loggit(3, "DEBUG: Redirect url to look for - [" . $lookurl . "]");
+            $rhost = get_redirection_host_name_by_url($lookurl);
+            if (empty($rhost) && preg_match('/http.*\.opml/i', $url)) {
+                $nurl = preg_replace('/\.(opml)$/i', '.html', $url);
+                $rhost = get_redirection_host_name_by_url($nurl);
+                loggit(3, "DEBUG: $nurl");
+            }
         }
     }
 }
@@ -81,14 +89,13 @@ $tree_location = "Edit Outline";
     <script src="/script/webaudio_tools.js"></script>
     <script>
         //Globals
-        var mode = '';
         <?loggit(3, "DEBUG: seenfile = ".print_r(isset($seenfile), TRUE));?>
         var type = <?if     (isset($seenfile[0]['type'])) { echo $seenfile[0]['type']; }
                  else if (isset($_REQUEST['type']) && is_numeric($_REQUEST['type'])) { echo $_REQUEST['type']; }
                  else { echo "0"; }
                ?>;
         var url = '<?echo $url?>';
-            <?if(!empty($aid)) { ?>var aid = '<?echo $aid?>'; var mode = 'article';
+            <?if(!empty($aid)) { ?>var aid = '<?echo $aid?>';
             <?; } else { ?>var aid = false;
         <?}?>
         var htmlurl = "";

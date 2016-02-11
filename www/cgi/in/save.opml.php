@@ -131,6 +131,9 @@ if(!$s3res) {
     loggit(1, "Wrote opml to S3 at url: [$s3url].");
 }
 
+//Put the opml content in IPFS
+$opmlhash = add_content_to_ipfs($opml);
+
 //Assemble an old url if we had an old filename
 $s3oldurl = "";
 if ( !empty($oldfilename) ) {
@@ -326,6 +329,7 @@ loggit(3,"Saved: [$filename] to S3 for user: [$uid]. ");
 
 //Give feedback that all went well
 $jsondata['status'] = "true";
+$jsondata['ipfs']['opml'] = $opmlhash;
 $jsondata['description'] = "File saved to S3.";
 echo json_encode($jsondata);
 

@@ -2177,6 +2177,10 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
     //Contains media?
     $media = 0;
 
+    //Get feed url
+    $fd = get_feed_info($fid);
+    $fdurl = $fd['url'];
+
     //Each item needs a unique id
     //$id = random_gen(128);
     $old = FALSE;
@@ -2217,9 +2221,17 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         $enclosures = array();
         for ($lcount = 0; $lcount < $mcount; $lcount++) {
             //Alternate is the main link
-            if ($item->link[$lcount]['rel'] == "alternate") {
-                $linkurl = $item->link[$lcount]['href'];
+            if ($item->link[$lcount]['rel'] == "alternate" || !isset($item->link->attributes()->rel)) {
+                if(isset($item->link[$lcount]) && !isset($item->link[$lcount]['href'])) {
+                    $linkurl = (string)$item->link[$lcount][0];
+                    if(stripos($linkurl, 'http') !== 0) {
+                        $linkurl = "#";
+                    }
+                } else {
+                    $linkurl = $item->link[$lcount]['href'];
+                }
             }
+            loggit(3, "ATOM LINK: $linkurl");
 
             //Some feeds only use id for the link
             if ( isset($item->id) && ( stripos($item->id, 'http:') !== FALSE || stripos($item->id, 'https:') !== FALSE) ) {
@@ -2328,7 +2340,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         $sql->bind_param("sssssddsssssd", $fid, $title, $linkurl, $description, $item->id, $pubdate, $timeadded, $enclosure, $sourceurl, $sourcetitle, $author, $origin, $media) or loggit(2, "MySql error: " . $dbh->error);
     } else {
         //-----RSS----------------------------------------------------------------------------------------------------------------------------------------------------
-        $linkurl = $item->link;
+        $linkurl = trim((string)$item->link[0]);
         $title = clean_feed_item_content((string)$item->title, 0, FALSE, FALSE);
         $description = $item->description;
 
@@ -2343,6 +2355,10 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                 );
                 $media = 1;
             }
+        }
+
+        if(stripos($fdurl, "dailymail") !== FALSE) {
+            loggit(3, "DAILYMAIL: link is [$linkurl]");
         }
 
         //Does this item have a media namespace?

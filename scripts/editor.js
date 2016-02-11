@@ -63,7 +63,7 @@ $(document).ready(function () {
         {class: "menuTypeEnclosure", title: "An item enclosure.", type: "enclosure", text: "Enclosure"},
         {class: "menuTypeGuid", title: "A guid node for an item.", type: "guid", text: "Guid"},
         {class: "menuTypeAuthor", title: "The author of the feed.", type: "author", text: "Author"},
-        {class: "menuTypePubDate", title: "The pubDate of the feed or item.", type: "pubdate", text: "PubDate"}
+        {class: "menuTypePubDate", title: "The pubDate of the feed or item.", type: "pubdate", text: "pubDate"}
     ];
 
     //New button
@@ -950,6 +950,9 @@ $(document).ready(function () {
                     event.preventDefault();
                     break;
                 case 'g':
+                    event.preventDefault();
+                    break;
+                case ',':
                     event.preventDefault();
                     break;
             }

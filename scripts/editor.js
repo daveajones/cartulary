@@ -1286,7 +1286,7 @@ $(document).ready(function () {
             if (type === 1) {
                 elOutlineinfo.append('<li><a target="_blank" title="Link to the RSS feed xml of this outline." href="' + rssurl + '">RSS</a></li>');
             }
-            if (data.ipfs.opml !== "" && data.ipfs.opml !== undefined) {
+            if (typeof(data.ipfs) !== "undefined") {
                 elOutlineinfo.append('<li><a title="Show the ipfs hash of this outline." href="#" onclick="javascript:alert(\''+data.ipfs.opml+'\');return false;">IPFS</a></li>')
             }
         }

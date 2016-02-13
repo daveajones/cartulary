@@ -1276,12 +1276,6 @@ $(document).ready(function () {
             } else {
                 htmlurl = data.html;
             }
-            if (data.json == "" || data.json === undefined) {
-                jsurl = url.replace("/opml/", "/json/");
-                jsurl = jsurl.substr(0, jsurl.lastIndexOf(".")) + ".json";
-            } else {
-                jsurl = data.json;
-            }
             if (data.rss == "" || data.rss === undefined) {
                 rssurl = url.replace("/opml/", "/rss/");
                 rssurl = rssurl.substr(0, rssurl.lastIndexOf(".")) + ".xml";
@@ -1291,8 +1285,9 @@ $(document).ready(function () {
             elOutlineinfo.append('<li><a target="_blank" title="Link to rendered html version of this outline." href="' + htmlurl + '">HTML</a></li>');
             if (type === 1) {
                 elOutlineinfo.append('<li><a target="_blank" title="Link to the RSS feed xml of this outline." href="' + rssurl + '">RSS</a></li>');
-            } else {
-                elOutlineinfo.append('<li><a target="_blank" title="Link to myword.io rendering of this outline." href="http://myword.io/?url=' + jsurl + '">MW</a></li>');
+            }
+            if (data.ipfs.opml !== "" && data.ipfs.opml !== undefined) {
+                elOutlineinfo.append('<li><a title="Show the ipfs hash of this outline." href="#" onclick="javascript:alert(\''+data.ipfs.opml+'\');return false;">IPFS</a></li>')
             }
         }
 

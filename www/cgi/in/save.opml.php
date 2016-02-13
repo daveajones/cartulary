@@ -199,25 +199,6 @@ if( $type == 1 ) {
         set_s3_bucket_cors($s3info['key'], $s3info['secret'], $s3info['bucket']);
     }
 
-} else {
-    //Put the myword json in S3
-    $jsonfilename = str_replace('.opml', '.json', $filename);
-    $s3jsonurl = get_s3_url($uid, "/json/", $jsonfilename);
-    $jsdata = convert_opml_to_myword($opml);
-    $s3res = putInS3($jsdata, $jsonfilename, $s3info['bucket']."/json", $s3info['key'], $s3info['secret'], "application/json");
-    if(!$s3res) {
-        loggit(2, "Could not create S3 file: [$jsonfilename] for user: [$uid].");
-        loggit(3, "Could not create S3 file: [$jsonfilename] for user: [$uid].");
-        //Log it
-        $jsondata['status'] = "false";
-        $jsondata['description'] = "Error writing JSON to S3.";
-        echo json_encode($jsondata);
-        exit(1);
-    } else {
-        $s3json = get_s3_url($uid, "/json/", $jsonfilename);
-        loggit(1, "Wrote json to S3 at url: [$s3json].");
-        set_s3_bucket_cors($s3info['key'], $s3info['secret'], $s3info['bucket']);
-    }
 }
 
 //Update recent file table
@@ -233,7 +214,7 @@ if( $articleoverwrite && !empty($aid) ) {
 //Go ahead and put in the urls we saved
 $jsondata['url'] = $s3url;
 $jsondata['html'] = $s3html;
-$jsondata['json'] = $s3json;
+$jsondata['ipfs']['opml'] = $opmlhash;
 
 //Extract and add watched urls if this is a watched outline
 remove_watched_urls_by_file_id($rid);
@@ -329,7 +310,6 @@ loggit(3,"Saved: [$filename] to S3 for user: [$uid]. ");
 
 //Give feedback that all went well
 $jsondata['status'] = "true";
-$jsondata['ipfs']['opml'] = $opmlhash;
 $jsondata['description'] = "File saved to S3.";
 echo json_encode($jsondata);
 

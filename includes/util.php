@@ -2301,6 +2301,18 @@ function absolutizeUrl($url = NULL, $rurl = NULL)
     }
 
     //Check if url has a preceding slash
+    $pos = strpos($url, '//');
+    if ($pos !== FALSE && $pos == 0) {
+        loggit(3, "Url: [$url] is scheme-relative.");
+        $rp = parse_url($rurl);
+        if ($rp != FALSE) {
+            return ($rp['scheme'] . ":" . $url);
+        } else {
+            return ($url);
+        }
+    }
+
+    //Check if url has a preceding slash
     $pos = strpos($url, '/');
     if ($pos !== FALSE && $pos == 0) {
         //loggit(3, "Url: [$url] is root-relative.");

@@ -133,6 +133,7 @@ if(!$s3res) {
 
 //Put the opml content in IPFS
 $opmlhash = add_content_to_ipfs($opml);
+//loggit(3, "DEBUG: [".print_r($opmlhash, TRUE)."]");
 
 //Assemble an old url if we had an old filename
 $s3oldurl = "";
@@ -202,7 +203,7 @@ if( $type == 1 ) {
 }
 
 //Update recent file table
-$rid = update_recent_file($uid, $s3url, $title, $opml, $type, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked);
+$rid = update_recent_file($uid, $s3url, $title, $opml, $type, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked, $opmlhash);
 loggit(3, "DEBUG: Recent file id is [$rid].");
 
 //Was this an edited article content request
@@ -214,7 +215,9 @@ if( $articleoverwrite && !empty($aid) ) {
 //Go ahead and put in the urls we saved
 $jsondata['url'] = $s3url;
 $jsondata['html'] = $s3html;
-$jsondata['ipfs']['opml'] = $opmlhash;
+if(!empty($opmlhash)) {
+    $jsondata['ipfs']['opml'] = $opmlhash;
+}
 
 //Extract and add watched urls if this is a watched outline
 remove_watched_urls_by_file_id($rid);

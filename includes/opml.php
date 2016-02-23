@@ -2978,7 +2978,7 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 
 
 //Update a file into the recent files table
-function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $type = 0, $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE, $articleid = NULL, $locked = FALSE)
+function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $type = 0, $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE, $articleid = NULL, $locked = FALSE, $ipfshash = "")
 {
     //Check parameters
     if (empty($uid)) {
@@ -3013,6 +3013,10 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     } else {
         $locked = 1;
     }
+    if(empty($ipfshash)) {
+        $ipfshash = "";
+    }
+
 
     //Timestamp
     $time = time();
@@ -3025,17 +3029,17 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
 
     //Insert recent file entry
     if (empty($oldurl)) {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type)
-                                         VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?)
-                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type, ipfshash)
+                                         VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?,        ?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?, ipfshash=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssddddsddsdsdddsd", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $title, $time, $outline, $disqus, $wysiwyg, $watched, $articleid, $locked) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsddssdsdddsds", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $ipfshash, $title, $time, $outline, $disqus, $wysiwyg, $watched, $articleid, $locked, $ipfshash) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type)
-                                         VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?)
-                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type, ipfshash)
+                                         VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?,        ?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?, ipfshash=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssddddsddsdssdddsd", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched, $articleid, $locked) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsddssdssdddsds", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $ipfshash, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched, $articleid, $locked, $ipfshash) or loggit(2, "MySql error: " . $dbh->error);
         loggit(3, "User: [$uid] changed old url: [$oldurl] to new url: [$url].");
     }
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);

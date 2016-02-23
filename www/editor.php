@@ -120,6 +120,7 @@ $tree_location = "Edit Outline";
         var watchedOutline = <?if(!isset($seenfile) || $seenfile[0]['watched'] == 0) { echo "false"; } else { echo "true"; }?>;
         var lockedOutline = <?if(!isset($seenfile) || $seenfile[0]['locked'] == 0) { echo "false"; } else { echo "true"; }?>;
         var wasLocked = <?if(!isset($seenfile) || $seenfile[0]['locked'] == 0) { echo "false"; } else { echo "true"; }?>;
+        var ipfsHash = '<?if(!isset($seenfile) || $seenfile[0]['ipfshash'] == "") { echo ""; } else { echo $seenfile[0]['ipfshash']; }?>';
         var redirectHits = <?if(empty($rhost)) { echo 0; } else { echo get_redirection_hit_count_by_host($rhost); }?>;
         <?if( isset($badurl) ) {?>
         badurl = true;

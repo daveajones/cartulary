@@ -1288,6 +1288,8 @@ $(document).ready(function () {
             }
             if (typeof(data.ipfs) !== "undefined") {
                 elOutlineinfo.append('<li><a title="Show the ipfs hash of this outline." href="#" onclick="javascript:alert(\''+data.ipfs.opml+'\');return false;">IPFS</a></li>')
+            } else if (typeof(ipfsHash) !== "undefined" && ipfsHash !== "") {
+                elOutlineinfo.append('<li><a title="Show the ipfs hash of this outline." href="#" onclick="javascript:alert(\''+ipfsHash+'\');return false;">IPFS</a></li>')
             }
         }
 

@@ -2924,9 +2924,9 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 
     //Do the query
     if ($blob) {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, outline FROM $table_recentfiles WHERE userid=? AND url=?";
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash, outline FROM $table_recentfiles WHERE userid=? AND url=?";
     } else {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked FROM $table_recentfiles WHERE userid=? AND url=?";
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash FROM $table_recentfiles WHERE userid=? AND url=?";
     }
 
 
@@ -2945,9 +2945,9 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
     }
 
     if ($blob) {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash, $foutline) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash) or loggit(2, "MySql error: " . $dbh->error);
     }
 
 
@@ -2962,7 +2962,8 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
             'wysiwyg' => $fwysiwyg,
             'watched' => $fwatched,
             'type' => $ftype,
-            'locked' => $flocked
+            'locked' => $flocked,
+            'ipfshash' => $ipfshash
         );
         if ($blob) {
             $files[$count]['content'] = $foutline;

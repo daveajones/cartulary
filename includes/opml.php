@@ -2624,6 +2624,10 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
 			margin: 10px 0;
 		}
 
+        body > div.container > ul.outline {
+            margin: 30px 0;
+        }
+
 		ul.outline li {
 			font-size: 16px;
 			line-height: 24px;

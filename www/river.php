@@ -43,24 +43,29 @@ $tree_location = "River";
         </div>
 
         <? if ($platform != "mobile") { ?>
+            <div id="stream-sidebar-right-wrapper">
             <div id="stream-sidebar-right">
                 <div id="divActiveFeeds">
                     <ul class="feedlist">
                     </ul>
                 </div>
             </div>
+            </div>
         <? } ?>
 
         <script id="template" type="text/x-jquery-tmpl">
             <? include "$confroot/$scripts/river-temp-item.js" ?>
+
         </script>
 
         <script id="template-sticky" type="text/x-jquery-tmpl">
             <? include "$confroot/$scripts/river-temp-sticky.js" ?>
+
         </script>
 
         <script id="template-subitem" type="text/x-jquery-tmpl">
             <? include "$confroot/$scripts/river-temp-subitem.js" ?>
+
         </script>
 
         <? //--- Include the footer bar html fragments -----------?>

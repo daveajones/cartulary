@@ -297,15 +297,20 @@ li.menubar-search-container { display:none; }
 
 /* ----- Sidebar ---------------------------------- */
 .pageContentWrapper.River #stream-sidebar-right {
-	display:none;
-	position:absolute;
-	z-index:6;
+    display:none;
+    position:absolute;
+    z-index:6;
     top:48px;
     right:0px;
     width:240px;
-    min-height:100%;
-	background:#fafafa;
+    min-height:95%;
+    background:#fafafa;
     border-left:solid #ddd 1px;
+    height:90%;
+    padding-bottom:4px;
+    overflow-y: scroll;
+}
+.pageContentWrapper.River #stream-sidebar-right #divActiveFeeds{
 }
 .pageContentWrapper.River #stream-sidebar-right #divActiveFeeds ul.feedlist {
 	list-style:none;

@@ -96,7 +96,6 @@
         </div>
         {{else freedomController.v1.river.methods.isIframe(enc.url, enc.type) && Hidepics == false}}
         <!-- Embed -->
-        {{if console.log("DEBUG: " + enc.url)}}{{/if}}
             {{if freedomController.v1.river.methods.convertYoutube(enc.url)}}
             <div class="encobj enciframe inactive hide" data-src="${freedomController.v1.river.methods.convertYoutube(enc.url)}" data-type="text\/html; charset=utf-8"
                  data-length="0" data-frameborder="0" allowfullscreen>

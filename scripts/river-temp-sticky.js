@@ -100,13 +100,13 @@
             <div class="encobj enciframe inactive hide" data-src="${freedomController.v1.river.methods.convertYoutube(enc.url)}" data-type="text\/html; charset=utf-8"
                  data-length="0" data-frameborder="0" allowfullscreen>
                 <div class="play"><img class="icon-play" src="/images/blank.gif" alt=""/> Click to load...</div>
-                <p>1${freedomController.v1.river.methods.convertYoutube(enc.url)}</p>
+                <p>${freedomController.v1.river.methods.convertYoutube(enc.url)}</p>
             </div>
             {{else}}
             <div class="encobj enciframe inactive hide" data-src="${enc.url}" data-type="${enc.type}"
                  data-length="${enc.length}" data-frameborder="0" allowfullscreen>
                 <div class="play"><img class="icon-play" src="/images/blank.gif" alt=""/> Click to load...</div>
-                <p>2${enc.url}</p>
+                <p>${enc.url}</p>
             </div>
         {{/if}}
         {{/if}}
@@ -116,7 +116,7 @@
         <div class="encobj enciframe inactive hide" data-src="${freedomController.v1.river.methods.convertYoutube(link)}" data-type="text\/html; charset=utf-8"
              data-length="0" data-frameborder="0" allowfullscreen>
             <div class="play"><img class="icon-play" src="/images/blank.gif" alt=""/> Click to load...</div>
-            <p>3${freedomController.v1.river.methods.convertYoutube(link)}</p>
+            <p>${freedomController.v1.river.methods.convertYoutube(link)}</p>
         </div>
         {{/if}}
     </div>

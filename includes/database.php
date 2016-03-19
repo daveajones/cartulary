@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 62;
+$cg_database_version = 63;
 $cg_database_updates = array();
 
 
@@ -867,6 +867,15 @@ CGDB0188;
 $cg_database_updates[61][] = <<<CGDB0189
  INSERT INTO `dbversion` ( `version` ) VALUES ( '62' )
 CGDB0189;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 62 to 63 -----------------------------------------------------------------------------------------------
+$cg_database_updates[62][] = <<<CGDB0190
+ ALTER TABLE `nfitems` ADD `cbscore` INT NOT NULL COMMENT 'Click-bait score'
+CGDB0190;
+$cg_database_updates[62][] = <<<CGDB0191
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '63' )
+CGDB0191;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

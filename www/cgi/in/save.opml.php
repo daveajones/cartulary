@@ -46,6 +46,14 @@ loggit(3, "DEBUG: [".$_REQUEST['rendertitle']."]");
 $rhost = "";
 if ( isset($_REQUEST['redirect']) && !empty($_REQUEST['redirect']) ) {
     $rhost = $_REQUEST['redirect'];
+    if($rhost == $system_fqdn) {
+        //Log it
+        loggit(2,"User tried to set a document redirect to the system FQDN: [$uid|$rhost].");
+        $jsondata['status'] = "false";
+        $jsondata['description'] = "You can't use that host name as a redirect.";
+        echo json_encode($jsondata);
+        exit(1);
+    }
 }
 
 //Get disqus bool

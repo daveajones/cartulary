@@ -20,6 +20,7 @@ $(document).ready(function () {
     var dit = 60;
     var audioOut = false;
     var audioAnimate;
+    var uploaddatestamp = new Date().valueOf() / 1000;
 
     //Node type menu sets
     var nodeTypeMenuStandard = [
@@ -526,14 +527,14 @@ $(document).ready(function () {
         //Pubdate type node
         if (thistype == 'pubdate') {
             opSetOneAtt('icon', 'clock-o');
-            if(isBlank(opGetLineText())) opSetLineText(new Date().toUTCString());
+            if (isBlank(opGetLineText())) opSetLineText(new Date().toUTCString());
         }
 
 
         //Category type node
         if (thistype == 'category') {
             opSetOneAtt('icon', 'tags');
-            if(isBlank(opGetLineText())) opSetLineText("Category");
+            if (isBlank(opGetLineText())) opSetLineText("Category");
         }
 
         //Explicit type node
@@ -545,7 +546,7 @@ $(document).ready(function () {
         //Keyword type node
         if (thistype == 'keyword') {
             opSetOneAtt('icon', 'info-circle');
-            if(isBlank(opGetLineText())) opSetLineText("Keyword");
+            if (isBlank(opGetLineText())) opSetLineText("Keyword");
         }
 
         //Collaboration node
@@ -778,7 +779,8 @@ $(document).ready(function () {
                 if (newcreated !== null) {
                     opSetOneAtt('created', newcreated);
                 }
-            }});
+            }
+        });
         return false;
     });
     $('.modalsrgo').click(function () {
@@ -856,7 +858,7 @@ $(document).ready(function () {
 
     //Load the outline content
     if (!isBlank(url) && type != 2) {
-        if(url.indexOf("ipfs://") == 0) {
+        if (url.indexOf("ipfs://") == 0) {
             actionurl = '/cgi/out/get.ipfs.json';
         } else {
             actionurl = '/cgi/out/get.url.json';
@@ -914,7 +916,7 @@ $(document).ready(function () {
             }
         });
     } else {
-        if(type == 1) {
+        if (type == 1) {
             opXmlToOutline(initialRssOpmlText);
         } else {
             opXmlToOutline(initialOpmlText);
@@ -1141,15 +1143,16 @@ $(document).ready(function () {
                     title: "Type the target link.",
                     value: urltolink,
                     callback: function (result) {
-                    if (result !== null) {
-                        console.log(result);
-                        urltolink = result;
-                        if (urltolink != "" && /^http[s]?\:\/\//.test(urltolink)) {
-                            opSetOneAtt('type', 'link');
-                            opSetOneAtt('url', urltolink);
+                        if (result !== null) {
+                            console.log(result);
+                            urltolink = result;
+                            if (urltolink != "" && /^http[s]?\:\/\//.test(urltolink)) {
+                                opSetOneAtt('type', 'link');
+                                opSetOneAtt('url', urltolink);
+                            }
                         }
                     }
-                }});
+                });
             }
             if (urltolink != "" && /^http[s]?\:\/\//.test(urltolink)) {
                 opSetOneAtt('type', 'link');
@@ -1287,9 +1290,9 @@ $(document).ready(function () {
                 elOutlineinfo.append('<li><a target="_blank" title="Link to the RSS feed xml of this outline." href="' + rssurl + '">RSS</a></li>');
             }
             if (typeof(data.ipfs) !== "undefined") {
-                elOutlineinfo.append('<li><a title="Show the ipfs hash of this outline." href="#" onclick="javascript:alert(\''+data.ipfs.opml+'\');return false;">IPFS</a></li>')
+                elOutlineinfo.append('<li><a title="Show the ipfs hash of this outline." href="#" onclick="javascript:alert(\'' + data.ipfs.opml + '\');return false;">IPFS</a></li>')
             } else if (typeof(ipfsHash) !== "undefined" && ipfsHash !== "") {
-                elOutlineinfo.append('<li><a title="Show the ipfs hash of this outline." href="#" onclick="javascript:alert(\''+ipfsHash+'\');return false;">IPFS</a></li>')
+                elOutlineinfo.append('<li><a title="Show the ipfs hash of this outline." href="#" onclick="javascript:alert(\'' + ipfsHash + '\');return false;">IPFS</a></li>')
             }
         }
 
@@ -1321,10 +1324,10 @@ $(document).ready(function () {
         var hasXmlUrl = false;
 
         //Does the node have a url attribute?
-        if(op.attributes.getOne('url') != "undefined" && !isBlank(op.attributes.getOne('url'))) {
+        if (op.attributes.getOne('url') != "undefined" && !isBlank(op.attributes.getOne('url'))) {
             hasUrl = true;
         }
-        if(op.attributes.getOne('xmlUrl') != "undefined" && !isBlank(op.attributes.getOne('xmlUrl'))) {
+        if (op.attributes.getOne('xmlUrl') != "undefined" && !isBlank(op.attributes.getOne('xmlUrl'))) {
             hasXmlUrl = true;
         }
 
@@ -1334,7 +1337,7 @@ $(document).ready(function () {
         menubar.find('.menuType > a.dropdown-toggle').html('Type (' + nodetype + ') <b class="caret"></b>');
 
         //If a timestamp exists, show it
-        if(nodecreated) {
+        if (nodecreated) {
             menubar.find('.menubar a.menuChangeTimestamp').attr('title', 'Change timestamp for this node. Current: ' + nodecreated);
         }
 
@@ -1342,21 +1345,21 @@ $(document).ready(function () {
         menubar.find('.menubar li.extLink').remove();
         menubar.find('.menubar li.extEditLink').remove();
         if (nodetype == "include" || nodetype == "import") {
-            if(hasUrl) {
+            if (hasUrl) {
                 menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
                 menubar.find('.menubar').append('<li class="extEditLink"><a target="_blank" href="/editor?url=' + op.attributes.getOne('url') + '"><i class="fa fa-edit" style="color:#090;"></i></a></li>');
             }
             return true;
         }
         if (nodetype == "link" || nodetype == "item" || nodetype == "enclosure" || nodetype == "image") {
-            if(hasUrl) {
+            if (hasUrl) {
                 menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('url') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
             }
 
             return true;
         }
         if (nodetype == "rss") {
-            if(hasXmlUrl) {
+            if (hasXmlUrl) {
                 menubar.find('.menubar').append('<li class="extLink"><a target="_blank" href="' + op.attributes.getOne('xmlUrl') + '"><i class="fa fa-external-link" style="color:#090;"></i></a></li>');
             }
             return true;
@@ -1514,7 +1517,10 @@ $(document).ready(function () {
                 'simUploadLimit': 1,
                 'removeCompleted': true,
                 'formData': {
-                    'datestamp': gDatestamp
+                    'datestamp': uploaddatestamp
+                },
+                'onAddQueueItem': function (file) {
+                    this.data('uploadifive').settings.formData = {'datestamp': (new Date().valueOf() / 1000)};
                 },
                 'onSelect': function (queue) {
                     $('#divEditorEnclosures').show();
@@ -1533,14 +1539,24 @@ $(document).ready(function () {
                     var jdata = $.parseJSON(data);
                     $('.complete .filename:contains("' + file.name + '")').each(function (index) {
                         if (isImage(jdata.url)) {
-                            opInsertImage(jdata.url);
+                            opInsert('<img src="' + jdata.url + '" style="width:600px;">', down);
                             opSetOneAtt('type', 'image');
                             opSetOneAtt('icon', 'image');
                             opSetOneAtt('url', jdata.url);
+                        } else if (isVideo(jdata.url)) {
+                            opInsert('<video style="width:95%;margin:0 auto;display:block;" controls="true"><source src="'+jdata.url+'" type="'+jdata.type+'"></video>', down);
+                            opSetOneAtt('type', 'video');
+                            opSetOneAtt('icon', 'video-camera');
+                            opSetOneAtt('url', jdata.url);
+                        } else if (isAudio(jdata.url)) {
+                            opInsert('<audio style="width:400px" controls="true"><source src="'+jdata.url+'" type="'+jdata.type+'"></audio>', down);
+                            opSetOneAtt('type', 'audio');
+                            opSetOneAtt('icon', 'volume-up');
+                            opSetOneAtt('url', jdata.url);
                         } else {
-                            if(type === 1) {
+                            if (type === 1) {
                                 opInsert(jdata.url, down);
-                                if(isAudio(jdata.url)) {
+                                if (isAudio(jdata.url)) {
                                     opSetOneAtt('type', 'enclosure');
                                     opSetOneAtt('icon', 'file-audio-o');
                                 } else {
@@ -1563,6 +1579,7 @@ $(document).ready(function () {
 
     //Show file drop zone
     function showEditorFileDropZone() {
+        uploaddatestamp = new Date().valueOf() / 1000;
         $('#divEditorEnclosures').width($('#divEditOutline').width() - 8);
         $('#divEditorEnclosures').height($('#divEditOutline').height() + 8);
         $('input[type=file]').hide();

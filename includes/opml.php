@@ -2147,6 +2147,87 @@ function convert_opml_to_html($content = NULL, $max = NULL)
 
 
 //Convert an opml document to html
+function convert_opml_to_ia($content = NULL, $link = NULL, $max = NULL)
+{
+    //Check params
+    if ($content == NULL) {
+        loggit(2, "The opml content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Parse it
+    libxml_use_internal_errors(true);
+    $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
+    libxml_clear_errors();
+
+    //Roll through all of the outline nodes
+    $nodes = $x->xpath('//outline[not(@type="collaborate") and not(@type="menu") and not(ancestor::outline[@type="menu"])]');
+    if (empty($nodes)) {
+        loggit(3, "This opml document is blank.");
+        return (-2);
+    }
+
+    //Run through each node and convert it to an html element
+    $count = 0;
+    $html = "";
+    $html .= "              <!doctype html>\n";
+    $html .= "              <html lang=\"en\" prefix=\"op: http://media.facebook.com/op#\">\n";
+    $html .= "              <head>\n";
+    $html .= "                  <meta charset=\"utf-8\">\n";
+    $html .= "                  <meta property=\"op:markup_version\" content=\"v1.0\">\n";
+    $html .= "                  <meta property=\"fb:article_style\" content=\"default\">\n";
+    $html .= "                  <link rel=\"canonical\" href=\"$link\">\n";
+    $html .= "              </head>\n";
+    $html .= "              <body>\n";
+    $html .= "              <article>\n";
+    $html .= "                  <header>\n";
+    $html .= "                      <h1>" . (string)$x->head->title . "</h1>\n";
+    $html .= "                      <time class=\"op-published\" datetime=\"" . (string)$x->head->dateModified . "\"></time>\n";
+    $html .= "                      <time class=\"op-modified\" dateTime=\"" . (string)$x->head->dateModified . "\"></time>\n";
+    foreach ($nodes as $entry) {
+        $line = "";
+        //loggit(3, "DEBUG: ".print_r($entry, TRUE));
+
+        $text = (string)$entry->attributes()->text;
+        $name = (string)$entry->attributes()->name;
+        $link = (string)$entry->attributes()->url;
+        $type = (string)$entry->attributes()->type;
+
+        $text = trim(html_entity_decode($text));
+
+        if (!empty($link)) {
+            $line .= "                      <p><a href=\"$link\">$text</a></p>\n";
+        } else {
+            $line .= "                      <p>$text</p>\n";
+        }
+
+        if (empty($text)) {
+            $line = "                      <br>\n";
+        }
+
+        //$html .= $line . "\n";
+
+        $count++;
+    }
+
+    $html .= "                  </header>\n";
+    $html .= "              </article>\n";
+    $html .= "              </body>\n";
+    $html .= "        ";
+
+    //Collapse muliple br tags
+    $output = preg_replace("/(<br\s*\/?>\s*)+/", "<br/>", $html);
+
+    //Log and leave
+    loggit(3, "Got [$count] items from the opml document.");
+    return ($output);
+}
+
+
+//Convert an opml document to html
 function convert_opml_to_text($content = NULL, $max = NULL)
 {
     //Check params
@@ -2282,7 +2363,7 @@ XSLTSTRING;
 
 
 //Recursive function for parsing an entire outline structure into html format
-function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $expansionState = array(), $expand = 1, $expanded = FALSE, &$parents, &$extrahtml, $menuexists = 0, &$extrahead)
+function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $expansionState = array(), $expand = 1, $expanded = FALSE, &$parents, &$extrahtml, $menuexists = 0, &$extrahead, $cindent = 0)
 {
 
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
@@ -2301,8 +2382,9 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
         }
 
         //Push the current type onto the stack
-        if (($type == "tabs" || $type == "html" || $type == "document" || $type == "menu" || $type == "presentation") && end(array_values($parents)) != "tabs") {
+        if (($type == "tabs" || $type == "html" || $type == "document" || $type == "menu" || $type == "presentation" || $type == "code") && end(array_values($parents)) != "tabs") {
             array_push($parents, $type);
+            $cindent=0;
         }
 
         //If no expansionState value matches the current visible node count then add a collapsed class
@@ -2318,10 +2400,10 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             } else {
                 $nodetext = (string)$child->attributes()->text;
             }
-            if ($type == "code") {
-                $nodetext = "<pre><code>" . (string)$child->attributes()->text . "</code></pre>";
+            if ($type == "code" && !isset($child->outline) ) {
+                $nodetext = "<ul class=\"outline\"><li class=\"ou outline\"><pre><code>    " . (string)$child->attributes()->text . "</code></pre></li></ul>";
             }
-            if (empty($nodetext)) {
+            if (empty($nodetext) && $type != "code") {
                 $nodetext = "&nbsp;";
             }
 
@@ -2345,74 +2427,69 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             if ($type == "menu" && $menuexists == 0) {
                 $htmlcontent .= "<div class=\"navbar navbar-fixed-top navbar-inverse\" role=\"navigation\">\n<div class=\"container\">\n<div class=\"navbar-header\">\n<button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\"#navbar-collapse-1\">\n<span class=\"sr-only\">Toggle navigation</span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n</button>\n<a class=\"navbar-brand\" href='#'>$nodetext</a>\n</div>\n<div class=\"collapse navbar-collapse\" id=\"navbar-collapse-1\"><ul class=\"nav navbar-nav\">\n";
                 $menuexists++;
-            } else
-                if ($type == "collaborate") {
-                    $colltime = time();
-                    $extrahead .= "<script>var TogetherJSConfig_findRoom = \"$colltime\";var TogetherJSConfig_inviteFromRoom = true; var TogetherJSConfig_suppressJoinConfirmation = true;</script><script id='togetherJS' src=\"//togetherjs.com/togetherjs-min.js\"></script>";
-                } else
-                    if ($type == "presentation") {
-                        //Bring in the reveal.js style
-                        $fh = fopen("$confroot/$templates/$cg_editor_presentation_style_filename", "r");
-                        $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_editor_presentation_style_filename"));
-                        fclose($fh);
-                        $extrahead .= "\n      <style>" . $rftemplate . "</style>";
-                        //Now the script
-                        $fh = fopen("$confroot/$templates/$cg_editor_presentation_js_filename", "r");
-                        $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_editor_presentation_js_filename"));
-                        fclose($fh);
-                        $extrahead .= "\n      <script id='revealJS'>" . $rftemplate . "</script>";
+            } else if ($type == "code" && isset($child->outline)) {
+                $htmlcontent .= "<ul class=\"outline\"><li class=\"ou outline\"><pre><code>" . $nodetext;
+            } else if (in_array('code', $parents)) {
+                $htmlcontent .= "\n" . str_repeat('    ', $cindent) . "$nodetext\n";
+            } else if ($type == "collaborate") {
+                $colltime = time();
+                $extrahead .= "<script>var TogetherJSConfig_findRoom = \"$colltime\";var TogetherJSConfig_inviteFromRoom = true; var TogetherJSConfig_suppressJoinConfirmation = true;</script><script id='togetherJS' src=\"//togetherjs.com/togetherjs-min.js\"></script>";
+            } else if ($type == "presentation") {
+                //Bring in the reveal.js style
+                $fh = fopen("$confroot/$templates/$cg_editor_presentation_style_filename", "r");
+                $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_editor_presentation_style_filename"));
+                fclose($fh);
+                $extrahead .= "\n      <style>" . $rftemplate . "</style>";
+                //Now the script
+                $fh = fopen("$confroot/$templates/$cg_editor_presentation_js_filename", "r");
+                $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_editor_presentation_js_filename"));
+                fclose($fh);
+                $extrahead .= "\n      <script id='revealJS'>" . $rftemplate . "</script>";
 
-                        //Make collaboration track clicks
-                        $extrahead .= "<script>var TogetherJSConfig_cloneClicks = true;</script>";
+                //Make collaboration track clicks
+                $extrahead .= "<script>var TogetherJSConfig_cloneClicks = true;</script>";
 
-                        //Begin the slide sections
-                        $htmlcontent .= "<section>$nodetext</section>";
-                    } else
-                        if ($type == "tabs") {
-                            $html .= "\n" . str_repeat('    ', $indent + 1) . "<ul class=\"nav nav-tabs\" id=\"myTab\">";
-                            $extrahtml .= "<div class=\"tab-content\">\n";
-                        } else
-                            if ($parent == "slide" || $type == "slide" || in_array('slide', $parents)) {
-                                if (isset($child->outline)) {
-                                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<section>$nodetext</section><section>\n";
-                                } else {
-                                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<section>$nodetext</section>\n";
-                                }
-                            } else
-                                if ($parent == "presentation") {
-                                    array_push($parents, 'slide');
-                                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<section>$nodetext</section>\n";
-                                } else
-                                    if ($parent == "tabs") {
-                                        array_push($parents, 'tab');
-                                        $tabid = 'tab' . stripText((string)$child->attributes()->text);
-                                        $html .= "\n" . str_repeat('    ', $indent + 1) . "<li><a href=\"#$tabid\" data-toggle=\"tab\">" . strip_tags($nodetext) . "</a></li>";
-                                        $extrahtml .= "<div class=\"tab-pane\" id=\"$tabid\">\n";
-                                    } else
-                                        if (in_array('menu', $parents)) {
-                                            if (stripos($nodetext, "navatar") !== FALSE) {
-                                                $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "</ul><ul class=\"nav navbar-nav pull-right\"><li>$nodetext</li></ul><ul class=\"nav navbar-nav\">";
-                                            } else {
-                                                $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<li>$nodetext</li>";
-                                            }
-                                        } else
-                                            if (in_array('html', $parents)) {
-                                                $htmlcontent .= str_repeat('    ', $indent) . "$nodetext\n";
-                                            } else
-                                                if ($type == 'html') {
-                                                    $oldindent = $indent;
-                                                    $indent = 0;
-                                                    $htmlcontent .= str_repeat('    ', $indent) . "$nodetext\n";
-                                                } else {
-                                                    if (isset($child->outline)) {
-                                                        $expandible = "<li class=\"owedge$exco\"><span>$nodetext</span>";
-                                                    } else {
-                                                        $expandible = "";
-                                                        $expandible = "<li class=\"ou $classes\">$nodetext";
-                                                        $exco = "";
-                                                    }
-                                                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<ul class=\"$classes\">$expandible";
-                                                }
+                //Begin the slide sections
+                $htmlcontent .= "<section>$nodetext</section>";
+            } else if ($type == "tabs") {
+                $html .= "\n" . str_repeat('    ', $indent + 1) . "<ul class=\"nav nav-tabs\" id=\"myTab\">";
+                $extrahtml .= "<div class=\"tab-content\">\n";
+            } else if ($parent == "slide" || $type == "slide" || in_array('slide', $parents)) {
+                if (isset($child->outline)) {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<section>$nodetext</section><section>\n";
+                } else {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<section>$nodetext</section>\n";
+                }
+            } else if ($parent == "presentation") {
+                array_push($parents, 'slide');
+                $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<section>$nodetext</section>\n";
+            } else if ($parent == "tabs") {
+                array_push($parents, 'tab');
+                $tabid = 'tab' . stripText((string)$child->attributes()->text);
+                $html .= "\n" . str_repeat('    ', $indent + 1) . "<li><a href=\"#$tabid\" data-toggle=\"tab\">" . strip_tags($nodetext) . "</a></li>";
+                $extrahtml .= "<div class=\"tab-pane\" id=\"$tabid\">\n";
+            } else if (in_array('menu', $parents)) {
+                if (stripos($nodetext, "navatar") !== FALSE) {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "</ul><ul class=\"nav navbar-nav pull-right\"><li>$nodetext</li></ul><ul class=\"nav navbar-nav\">";
+                } else {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<li>$nodetext</li>";
+                }
+            } else if (in_array('html', $parents)) {
+                $htmlcontent .= str_repeat('    ', $indent) . "$nodetext\n";
+            } else if ($type == 'html') {
+                $oldindent = $indent;
+                $indent = 0;
+                $htmlcontent .= str_repeat('    ', $indent) . "$nodetext\n";
+            } else {
+                if (isset($child->outline)) {
+                    $expandible = "<li class=\"owedge$exco\"><span>$nodetext</span>";
+                } else {
+                    $expandible = "";
+                    $expandible = "<li class=\"ou $classes\">$nodetext";
+                    $exco = "";
+                }
+                $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<ul class=\"$classes\">$expandible";
+            }
         }
 
         //Adjust the expansion state tracking
@@ -2427,7 +2504,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
         }
 
         //Make the recursion call for the next set of nodes
-        list($line, $expand) = buildHtmlFromOpmlRecursive($child, $html, $indent + 1, $line + 1, $expansionState, $ne, $ex, $parents, $extrahtml, $menuexists, $extrahead);
+        list($line, $expand) = buildHtmlFromOpmlRecursive($child, $html, $indent + 1, $line + 1, $expansionState, $ne, $ex, $parents, $extrahtml, $menuexists, $extrahead, $cindent + 1);
 
 
         //If this is an outline node, close the open tag.  We take care to keep the html looking good, so don't add spaces
@@ -2440,53 +2517,49 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             if ($type == "menu" && $menuexists < 2) {
                 $htmlcontent .= str_repeat('    ', $indention) . "</ul>\n</div>\n</div>\n</div>";
                 $menuexists++;
-            } else
-                if ($type == "collaborate") {
-                    $htmlcontent .= "\n";
-                } else
-                    if ($type == "presentation") {
-                        $htmlcontent .= "";
-                    } else
-                        if ($type == "tabs") {
-                            $html .= str_repeat('    ', $indention) . "</ul>\n";
-                            $extrahtml .= str_repeat('    ', $indention) . "</div>\n";
-                        } else
-                            if ($parent == "slide" || $type == "slide" || in_array('slide', $parents)) {
-                                if (isset($child->outline)) {
-                                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "</section>\n";
-                                } else {
-                                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "\n";
-                                }
-                            } else
-                                if ($parent == "presentation") {
-                                    array_pop($parents);
-                                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "\n";
-                                } else
-                                    if ($parent == "tabs") {
-                                        array_pop($parents);
-                                        $html .= str_repeat('    ', $indention) . "\n";
-                                        $extrahtml .= str_repeat('    ', $indention) . "</div>\n";
-                                    } else
-                                        if (in_array('menu', $parents) && $type != "html") {
-                                            $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "\n";
-                                        } else
-                                            if (in_array('html', $parents)) {
-                                                $htmlcontent .= str_repeat('    ', $indent) . "";
-                                            } else
-                                                if ($type == 'html') {
-                                                    $htmlcontent .= str_repeat('    ', $indent) . "";
-                                                    $indent = $oldindent;
-                                                } else {
-                                                    $htmlcontent .= str_repeat('    ', $indention) . "</li></ul>\n";
-                                                }
+            } else if ($type == "code" && isset($child->outline)) {
+                $htmlcontent .= "</pre></code></li></ul>";
+            } else if ($type == "collaborate") {
+                $htmlcontent .= "\n";
+            } else if ($type == "presentation") {
+                $htmlcontent .= "";
+            } else if ($type == "tabs") {
+                $html .= str_repeat('    ', $indention) . "</ul>\n";
+                $extrahtml .= str_repeat('    ', $indention) . "</div>\n";
+            } else if ($parent == "slide" || $type == "slide" || in_array('slide', $parents)) {
+                if (isset($child->outline)) {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "</section>\n";
+                } else {
+                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "\n";
+                }
+            } else if ($parent == "presentation") {
+                array_pop($parents);
+                $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "\n";
+            } else if ($parent == "tabs") {
+                array_pop($parents);
+                $html .= str_repeat('    ', $indention) . "\n";
+                $extrahtml .= str_repeat('    ', $indention) . "</div>\n";
+            } else if (in_array('menu', $parents) && $type != "html") {
+                $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "\n";
+            } else if (in_array('html', $parents)) {
+                $htmlcontent .= str_repeat('    ', $indent) . "";
+            } else if (in_array('code', $parents)) {
+                $htmlcontent .= str_repeat('    ', $indent) . "";
+            } else if ($type == 'html') {
+                $htmlcontent .= str_repeat('    ', $indent) . "";
+                $indent = $oldindent;
+            } else {
+                $htmlcontent .= str_repeat('    ', $indention) . "</li></ul>\n";
+            }
 
         }
 
         if ($indent == 0 && $ex == FALSE) {
             $expand++;
         }
-        if (($type == "tabs" || $type == "html" || $type == "document" || $type == "menu" || $type == "presentation") && end(array_values($parents)) != "tabs") {
+        if (($type == "tabs" || $type == "html" || $type == "document" || $type == "menu" || $type == "presentation" || $type == "code") && end(array_values($parents)) != "tabs") {
             array_pop($parents);
+            $cindent = 0;
         }
     }
 
@@ -2624,8 +2697,18 @@ function process_opml_to_html($content = NULL, $title = "", $uid = NULL, $dodisq
 			margin: 10px 0;
 		}
 
+        ul.outline.code ul.outline.code li {
+            margin: -30px 0;
+        }
+
         body > div.container > ul.outline {
             margin: 30px 0;
+        }
+
+        ul.outline li pre code {
+          overflow: auto;
+          word-wrap: normal;
+          white-space: pre;
         }
 
 		ul.outline li {
@@ -3018,7 +3101,7 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     } else {
         $locked = 1;
     }
-    if(empty($ipfshash)) {
+    if (empty($ipfshash)) {
         $ipfshash = "";
     }
 
@@ -3737,7 +3820,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
     if (!empty($nodes)) {
         foreach ($nodes as $entry) {
             $explicit = (string)$entry->attributes()->text;
-            if(!empty($explicit) && stripos($explicit, "yes") !== FALSE) {
+            if (!empty($explicit) && stripos($explicit, "yes") !== FALSE) {
                 $converted['explicit'] = TRUE;
             }
             break;
@@ -3772,59 +3855,59 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
     $podcast->xml(TRUE);
 
     //Add a webmaster and managingeditor if we have a uid
-    if(!empty($uid)) {
+    if (!empty($uid)) {
         $email = get_email_from_uid($uid);
-        if(!empty($email)) {
+        if (!empty($email)) {
             $podcast->webMaster = $email;
             $podcast->managingEditor = $email;
             $podcast->itunes_owner['email'] = $email;
         }
         $name = get_user_name_from_uid($uid);
-        if(!empty($name)) {
+        if (!empty($name)) {
             $podcast->itunes_author = $name;
             $podcast->itunes_owner['name'] = $name;
         }
-        if(!empty($name) && !empty($email)) {
-            $podcast->webMaster = $email. " ($name)";
-            $podcast->managingEditor = $email. " ($name)";
+        if (!empty($name) && !empty($email)) {
+            $podcast->webMaster = $email . " ($name)";
+            $podcast->managingEditor = $email . " ($name)";
         }
     }
 
     //Author
-    if(!empty($converted['author'])) {
-        loggit(3, "Adding channel author: [".$converted['author']."]");
+    if (!empty($converted['author'])) {
+        loggit(3, "Adding channel author: [" . $converted['author'] . "]");
         $podcast->itunes_author = $converted['author'];
     }
 
     //pubDate
-    if(!empty($converted['pubdate'])) {
-        loggit(3, "Adding channel pubDate: [".$converted['pubdate']."]");
+    if (!empty($converted['pubdate'])) {
+        loggit(3, "Adding channel pubDate: [" . $converted['pubdate'] . "]");
         $podcast->pubDate = $converted['pubdate'];
     }
 
     //Add the channel image
-    if(!empty($converted['img'])) {
-        loggit(3, "Adding channel image: [".$converted['img']."]");
+    if (!empty($converted['img'])) {
+        loggit(3, "Adding channel image: [" . $converted['img'] . "]");
         $podcast->itunes_image = $converted['img'];
     }
 
     //Add the explicit tag if it's true
-    if($converted['explicit']) {
+    if ($converted['explicit']) {
         loggit(3, "Channel explicit tag: [Yes]");
         $podcast->itunes_explicit = "Yes";
     }
 
     //Add the keywords
     $keywords = "";
-    if(!empty($converted['keywords'])) {
-        loggit(3, "Adding keywords: [".print_r($converted['keywords'], TRUE)."]");
+    if (!empty($converted['keywords'])) {
+        loggit(3, "Adding keywords: [" . print_r($converted['keywords'], TRUE) . "]");
         $podcast->itunes_keywords = $converted['keywords'];
     }
 
     //Add the categories
-    if(!empty($converted['categories'])) {
-        loggit(3, "Adding categories: [".print_r($converted['categories'], TRUE)."]");
-        foreach( $converted['categories'] as $cat) {
+    if (!empty($converted['categories'])) {
+        loggit(3, "Adding categories: [" . print_r($converted['categories'], TRUE) . "]");
+        foreach ($converted['categories'] as $cat) {
             $podcast->addCategory($cat);
         }
     }
@@ -3869,14 +3952,14 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
                     $converted_text = (string)$part->attributes()->text;
                 }
                 $converted_url = (string)$part->attributes()->url;
-                if(stripos($converted_text, "http") === 0) {
+                if (stripos($converted_text, "http") === 0) {
                     $converted_url = $converted_text;
                 }
 
             } else if ((string)$part->attributes()->type == "description") {
                 $desc_parts = $part->xpath('.//outline');
                 foreach ($desc_parts as $dpart) {
-                    $converted_desc = $converted_desc . "<p>" . (string)$dpart->attributes()->text."</p>\n";
+                    $converted_desc = $converted_desc . "<p>" . (string)$dpart->attributes()->text . "</p>\n";
                 }
 
             } else if ((string)$part->attributes()->type == "title") {
@@ -3890,7 +3973,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
 
             } else if ((string)$part->attributes()->type == "guid") {
                 $converted_guid = trim((string)$part->attributes()->text);
-                if(empty($converted_guid)) {
+                if (empty($converted_guid)) {
                     $converted_guid = random_gen(64);
                 }
                 loggit(3, "RSS: Guid value: " . $converted_guid);
@@ -3901,7 +3984,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
             } else if ((string)$part->attributes()->type == "explicit") {
                 //Grab the explicit tag if there is one
                 $exp = (string)$part->attributes()->text;
-                if(!empty($exp) && stripos($exp, "yes") !== FALSE) {
+                if (!empty($exp) && stripos($exp, "yes") !== FALSE) {
                     $converted_explicit = TRUE;
                 }
 
@@ -3910,7 +3993,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
                 $converted_enclosure['url'] = (string)$part->attributes()->url;
                 $converted_enclosure['type'] = (string)$part->attributes()->mimetype;
                 $converted_enclosure['length'] = (string)$part->attributes()->length;
-                if(stripos($converted_enclosure['txturl'], "http") === 0) {
+                if (stripos($converted_enclosure['txturl'], "http") === 0) {
                     $converted_enclosure['url'] = $converted_enclosure['txturl'];
                     $converted_enclosure['type'] = "";
                     $converted_enclosure['length'] = "";
@@ -3919,7 +4002,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
             } else if ((string)$part->attributes()->type == "image") {
                 $converted_image = (string)$part->attributes()->url;
                 $converted_imgtxt = (string)$part->attributes()->text;
-                if(stripos($converted_imgtxt, "http") === 0) {
+                if (stripos($converted_imgtxt, "http") === 0) {
                     $converted_image = $converted_imgtxt;
                 }
 
@@ -3947,18 +4030,18 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
         //not, use any non-typed nodes found as the description body.  If those are blank
         //too, use a single blank space.
         //loggit(3, "RSS DESCRIPTION: ".print_r($converted_desc, TRUE));
-        if(empty($converted_desc)) {
+        if (empty($converted_desc)) {
             loggit(3, "RSS: No description nodes found.");
-            if(empty($converted_nontypes)) {
-                if(empty($converted_title)) {
+            if (empty($converted_nontypes)) {
+                if (empty($converted_title)) {
                     loggit(3, "RSS: Error. Both title and description are blank.");
-                    return(-4);
+                    return (-4);
                 } else {
                     loggit(3, "RSS: No non-types found to use as description.");
                 }
             } else {
                 loggit(3, "RSS: Using non-types as description.");
-                $converted_desc = "<p>".implode("</p><p>\n", $converted_nontypes)."</p>";
+                $converted_desc = "<p>" . implode("</p><p>\n", $converted_nontypes) . "</p>";
             }
         }
 
@@ -3970,17 +4053,17 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
         $pitem->itunes_subtitle = $converted_title;
 
         //Author
-        if(!empty($converted_author)) {
+        if (!empty($converted_author)) {
             $pitem->author = $converted_author;
         } else {
             $pitem->author = $converted['author'];
         }
 
         //Pubdate check
-        if(!empty($converted_created)) {
+        if (!empty($converted_created)) {
             $pitem->setValue("pubDate", $converted_created);
         }
-        if(!empty($converted_pubdate)) {
+        if (!empty($converted_pubdate)) {
             $pitem->setValue("pubDate", $converted_pubdate);
         }
 
@@ -3993,18 +4076,18 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
         }
 
         //Image check
-        if(!empty($converted_images[0])) {
+        if (!empty($converted_images[0])) {
             $pitem->itunes_image = $converted_images[0];
         }
 
         //Enclosure check
-        if(!empty($converted_enclosures[0])) {
+        if (!empty($converted_enclosures[0])) {
             $pitem->addEnclosure($converted_enclosures[0]['url'], $converted_enclosures[0]['length'], $converted_enclosures[0]['type']);
         }
 
         //Explicit episode check
-        if($converted_explicits != $converted['explicit']) {
-            if($converted_explicits) {
+        if ($converted_explicits != $converted['explicit']) {
+            if ($converted_explicits) {
                 $pitem->itunes_explicit = "Yes";
             } else {
                 $pitem->itunes_explicit = "No";
@@ -4012,7 +4095,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
         }
 
         //Keyword check
-        if(!empty($converted_keywords)) {
+        if (!empty($converted_keywords)) {
             $pitem->itunes_keywords = $converted_keywords;
         }
 
@@ -4030,11 +4113,11 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
     try {
         $xxp = $podcast->xml(TRUE);
     } catch (Exception $e) {
-        loggit(3, 'Caught exception: '.$e->getMessage());
-        return(-3);
+        loggit(3, 'Caught exception: ' . $e->getMessage());
+        return (-3);
     }
 
-    loggit(3,"DEBUG! RSS XML generated successfully.");
+    loggit(3, "DEBUG! RSS XML generated successfully.");
     return ($xxp);
 }
 

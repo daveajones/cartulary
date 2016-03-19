@@ -2610,7 +2610,7 @@ function make_mime_type($url = NULL, $type = NULL)
 
     // ----- Audio
     if (strposa($url, array('.mp3')) !== FALSE) {
-        return ('audio/mpeg3');
+        return ('audio/mpeg');
     }
     if (strposa($url, array('.wav')) !== FALSE) {
         return ('audio/wav');
@@ -3759,4 +3759,29 @@ function get_content_from_ipfs($hash = NULL)
 
     loggit(3, "Got content from IPFS with hash: [$hash].");
     return ($content);
+}
+
+
+//Encode just the ampersands from a url to make them xml safe
+function clean_url_for_xml($url = NULL)
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "URL is blank: [$hash].");
+        return (FALSE);
+    }
+
+
+    $newurl = htmlspecialchars(str_replace('&', '%26', $url));
+
+    loggit(1, "Returned url: [$newurl] for url: [$url].");
+    return ($newurl);
+}
+
+
+//Remove whitespace between markup tags
+function remove_non_tag_space($string){
+    $pattern = '/>\s+</';
+    $replacement = '><';
+    return preg_replace($pattern, $replacement, $string);
 }

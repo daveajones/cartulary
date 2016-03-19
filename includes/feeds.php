@@ -398,7 +398,7 @@ function get_river($uid = NULL, $mobile = FALSE)
 
 
 //Get the river formatted in JSONP
-function get_river_as_json($uid = NULL, $mobile = FALSE)
+function get_river_as_json($uid = NULL, $mobile = FALSE, $pretty = FALSE)
 {
     //Check parameters
     if (empty($uid)) {
@@ -406,6 +406,9 @@ function get_river_as_json($uid = NULL, $mobile = FALSE)
         return (FALSE);
     }
 
+    if($pretty) {
+        return(format_json(json_encode(utf8ize(get_river($uid, $mobile)))));
+    }
     return(json_encode(utf8ize(get_river($uid, $mobile))));
 }
 
@@ -5732,4 +5735,37 @@ function get_map_word_today_counts($max = 100) {
     //Log and leave
     loggit(3, "Returning: [$count] words in the last 23 hours.");
     return(TRUE);
+}
+
+
+//Determine if a headline is click-bait and assign a score
+function calculate_click_bait_score($headline = "") {
+    //Check parameters
+    if (empty($headline)) {
+        loggit(2, "The headline to test is blank or corrupt: [$headline]");
+        return (FALSE);
+    }
+
+    $cbscore = 0;
+
+    //Check linguistics
+    if (preg_match("/\bthis\b/i", $headline)) {
+        $cbscore += 5;
+    }
+    if (preg_match("/\bthese\b/i", $headline)) {
+        $cbscore += 5;
+    }
+    if (preg_match("/\byou\b/i", $headline)) {
+        $cbscore += 5;
+    }
+    if (preg_match("/\byour\b/i", $headline)) {
+        $cbscore += 5;
+    }
+    if (preg_match("/([^-]\b[1-9][0-9]*\b)/i", $headline)) {
+        $cbscore += 5;
+    }
+
+    //Log and leave
+    loggit(3, "Click-bait score for [$headline] is: [$cbscore].");
+    return($cbscore);
 }

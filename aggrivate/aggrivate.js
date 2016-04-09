@@ -31,7 +31,7 @@ var monthago = (Date.now() / 1000) - (28 * 86400);
 
 //Pull the feed list
 dbcalls++;
-connection.query('SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE errors < 10 AND (lastupdate > '+monthago+' OR lastcheck = 0 OR lastmod = 0) ORDER by lastcheck ASC', function(err,rows,fields) {
+connection.query('SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE errors < 10 OR (lastupdate > '+monthago+' OR lastcheck = 0 OR lastmod = 0) ORDER by lastcheck ASC', function(err,rows,fields) {
     //Bail on error
     if(err) throw err;
 

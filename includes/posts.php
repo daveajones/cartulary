@@ -277,7 +277,7 @@ function user_owns_post($uid = NULL, $pid = NULL)
 
 
 //Retrieve a post from the repository
-function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE)
+function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE, $fromeditor = FALSE)
 {
     //Check parameters
     if ($uid == NULL) {
@@ -319,6 +319,10 @@ function get_blog_posts($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE
 
     if ($pub == TRUE) {
         $sqltxt .= " AND ($table_mbcatalog.postid=$table_post.id OR $table_mbcatalog.public=1)";
+    }
+
+    if ($fromeditor == TRUE) {
+        $sqltxt .= " AND $table_post.opmlsource != ''";
     }
 
     if ($archive != FALSE) {
@@ -549,7 +553,7 @@ function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
 
 
 //Build an rss feed for the given user
-function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts = NULL, $nos3 = FALSE)
+function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts = NULL, $nos3 = FALSE, $fromeditor = FALSE)
 {
     //Check parameters
     if ($uid == NULL) {
@@ -570,7 +574,6 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
         return (FALSE);
     }
 
-
     //Get a proper max value
     if ($max == NULL) {
         if (!empty($prefs['maxlist'])) {
@@ -585,10 +588,11 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
 
     //If the array of posts is being passed in as an argument we don't make this call
     if ($posts == NULL || !is_array($posts)) {
-        $posts = get_blog_posts($uid, $max, NULL, $archive);
+        $posts = get_blog_posts($uid, $max, NULL, $archive, $fromeditor);
     }
 
     //Get a correct title
+    //TODO: Separate title for the full editor blog feed
     $title = get_microblog_title($uid);
 
     //Get the correct link
@@ -613,14 +617,23 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
         $lastpostDate = date('Y-m-d', $posts[0]['createdon']);
     }
 
+    //Determine feed file name based on which type of feed requested
+    if($fromeditor) {
+        $mbfeedfile = get_blog_feed_filename($uid);
+    } else {
+        $mbfeedfile = get_microblog_feed_filename($uid);
+    }
+
     //Get the url of the social outline owner of this feed
     $sopmlurl = "";
+    $mbfeedurl = "";
     if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
         $sopmlurl = get_s3_url($uid, NULL, $default_social_outline_file_name);
+        $mbfeedurl = get_s3_url($uid, NULL, $mbfeedfile);
     }
 
     //The feed string
-    $rss = '<?xml version="1.0"?>' . "\n  <rss version=\"2.0\" xmlns:source=\"http://source.smallpict.com/2014/07/12/theSourceNamespace.html\" xmlns:sopml=\"$sopmlnamespaceurlv1\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\">\n    <channel>";
+    $rss = '<?xml version="1.0"?>' . "\n  <rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:source=\"http://source.smallpict.com/2014/07/12/theSourceNamespace.html\" xmlns:sopml=\"$sopmlnamespaceurlv1\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\">\n    <channel>";
 
     $rss .= "\n
       <title>" . htmlspecialchars($title) . "</title>
@@ -636,10 +649,11 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
       <sopml:url>$sopmlurl</sopml:url>
       <source:archive>
           <source:url>" . htmlspecialchars(get_s3_url($uid, "arc")) . "/</source:url>
-          <source:filename>" . get_microblog_feed_filename($uid) . "</source:filename>
+          <source:filename>" .  $mbfeedfile . "</source:filename>
           <source:startDay>$firstpostDate</source:startDay>
           <source:endDay>$lastpostDate</source:endDay>
-      </source:archive>\n";
+      </source:archive>
+      <atom:link href=\"$mbfeedurl\" rel=\"self\" type=\"application/rss+xml\" />\n";
     }
     $rss .= "      <source:localTime>" . date('n/j/Y; g:i:s A') . "</source:localTime>\n";
 
@@ -693,7 +707,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
                         $rss_enclosures .= '        <enclosure url="' . clean_url_for_xml(trim($enclosure['url'])) . '" ' . $elen . ' ' . $etyp . ' />' . "\n";
                     }
                     if(url_is_a_picture($enclosure['url'])) {
-                        $html_enclosures .= "<p><image src=\"".clean_url_for_xml($enclosure['url'])."\">"."</p>";
+                        $html_enclosures .= "<p><img src=\"".clean_url_for_xml($enclosure['url'])."\">"."</p>";
                     }
                     if(url_is_audio($enclosure['url'])) {
                         $html_enclosures .= "<p><audio controls=\"true\"><source src=\"".clean_url_for_xml($enclosure['url'])."\" type='".$enclosure['type']."'></audio>"."</p>";
@@ -758,7 +772,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
         $s3info = get_s3_info($uid);
 
         //Get the microblog feed file name
-        $filename = get_microblog_feed_filename($uid);
+        $filename = $mbfeedfile;
         $arcpath = '';
 
         //Was this a request for a monthly archive?
@@ -785,7 +799,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
     }
 
 
-    loggit(1, "Built blog rss feed for user: [$username | $uid].");
+    loggit(3, "Built blog rss feed for user: [$username | $uid] with filename: [$mbfeedfile] from editor posts: [$fromeditor].");
     return ($rss);
 }
 
@@ -1011,6 +1025,24 @@ function get_microblog_feed_filename($uid = NULL)
 
     //loggit(1,"Returning user name: [$username] for uid: [$uid]");
     return ($prefs['mbfilename']);
+}
+
+
+//Get the file name of the microblog feed
+function get_blog_feed_filename($uid = NULL)
+{
+    //If uid is zero then balk
+    if (empty($uid)) {
+        loggit(2, "Can't get the username from this uid: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //TODO: Pref for getting a custom file name here
+
+    return ($default_editor_blog_feed_file_name);
 }
 
 

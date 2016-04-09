@@ -111,7 +111,8 @@ if (!empty($enclosure)) {
     foreach ($enclosure as $encfile) {
         $encarray = json_decode($encfile, TRUE);
         //loggit(3, "DEBUG: ".print_r($encarray, TRUE));
-        $enclosures[] = array('url' => (string)$encarray['url'],
+        $enclosures[] = array(
+            'url' => (string)$encarray['url'],
             'length' => (string)$encarray['length'],
             'type' => (string)$encarray['type']
         );
@@ -123,7 +124,8 @@ if (!empty($_REQUEST['extenclosure'])) {
         $enclosures = array();
     }
     foreach ($extenclosures as $extenclosure) {
-        $enclosures[] = array('url' => $extenclosure['url'],
+        $enclosures[] = array(
+            'url' => $extenclosure['url'],
             'length' => $extenclosure['length'],
             'type' => $extenclosure['type']
         );
@@ -146,7 +148,8 @@ if (isset($_FILES['file_mobile']) && $_FILES['file_mobile']['size'] > 0 && ($s3i
     loggit(3, "Enclosures incoming: " . print_r($enclosures, TRUE));
     $encfile = date('YmdHis') . "_" . strtolower($files['name']);
     putFileInS3($files['tmp_name'], $encfile, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret']);
-    $enclosures[] = array('url' => get_s3_url($uid, '/enc/', $encfile),
+    $enclosures[] = array(
+        'url' => get_s3_url($uid, '/enc/', $encfile),
         'length' => $files['size'],
         'type' => $files['type']
     );
@@ -184,7 +187,7 @@ if (isset($_REQUEST['tweet']) && twitter_is_enabled($uid)) {
 
     //What about enclosure pictures
     $mid = "";
-    if( count($enclosures) > 0 && stripos($enclosures[0]['type'], 'image/') !== FALSE && (0 + $enclosures[0]['length']) < 3000000 ) {
+    if (count($enclosures) > 0 && stripos($enclosures[0]['type'], 'image/') !== FALSE && (0 + $enclosures[0]['length']) < 3000000) {
         $img = fetchUrl($enclosures[0]['url']);
         $b64 = base64_encode($img);
         $mid = tweet_upload_picture($uid, $b64);
@@ -194,7 +197,7 @@ if (isset($_REQUEST['tweet']) && twitter_is_enabled($uid)) {
     if (!empty($title)) {
         $twtext = $title;
     } else {
-        $twtext = $content;
+        $twtext = strip_tags($content);
     }
 
     //Get the appropriate url
@@ -222,6 +225,9 @@ if (isset($_REQUEST['tweet']) && twitter_is_enabled($uid)) {
 //Rebuild static files
 //$aposts = get_blog_posts($uid);
 build_blog_rss_feed($uid, NULL, FALSE);
+if(!empty($opmlsource)) {
+    build_blog_rss_feed($uid, NULL, FALSE, NULL, FALSE, TRUE);
+}
 build_blog_opml_feed($uid, NULL, FALSE);
 build_blog_html_archive($uid, NULL, FALSE);
 build_blog_html_archive($uid, NULL, TRUE);
@@ -229,7 +235,7 @@ build_blog_script_widget($uid, 20, FALSE);
 loggit(1, "User: [$uid]'s static files were rebuilt.");
 
 //Log it
-loggit(1, "User: [$uid] posted a new blog: [$pid].");
+loggit(1, "User: [$uid] posted a new microblog: [$pid].");
 $jsondata['pid'] = $pid;
 $jsondata['post'] = array(
     'id' => $pid,

@@ -551,7 +551,7 @@ function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL, $type = 0
 
     //Does this feed exist already?
     $fid = feed_exists($url);
-    if ($fid == FALSE) {
+    if (!$fid) {
         $existed = FALSE;
         //Now that we have a good id, put the article into the database
         $stmt = "INSERT INTO $table_newsfeed (id,url,createdon, type) VALUES (?,?,?,?)";
@@ -1595,7 +1595,7 @@ function fetch_feed_content($fid = NULL, $force = TRUE)
         update_feed_lastmod($fid, $lastmodtime);
     }
     $goodurl = get_final_url($url);
-    if ($goodurl != $url) {
+    if ($goodurl != $url && stripos($goodurl, 'http') === 0) {
         loggit(3, "Changing feed url: [$url] to: [$goodurl].");
         update_feed_url($fid, $goodurl);
     }

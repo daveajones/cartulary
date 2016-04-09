@@ -283,7 +283,11 @@ function feed_exists($url = NULL)
     $sql->close();
 
     loggit(1, "The feed: [$feedid] at url: [$url] is already in the repository.");
-    return ($feedid);
+    if(!empty($feedid)) {
+        return ($feedid);
+    } else {
+        return FALSE;
+    }
 }
 
 

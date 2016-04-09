@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 63;
+$cg_database_version = 64;
 $cg_database_updates = array();
 
 
@@ -877,6 +877,16 @@ $cg_database_updates[62][] = <<<CGDB0191
  INSERT INTO `dbversion` ( `version` ) VALUES ( '63' )
 CGDB0191;
 //----------------------------------------------------------------------------------------------------------------
+
+//Version 63 to 64 -----------------------------------------------------------------------------------------------
+$cg_database_updates[63][] = <<<CGDB0192
+ ALTER TABLE `newsfeeds` ADD UNIQUE (`url`)
+CGDB0192;
+$cg_database_updates[63][] = <<<CGDB0193
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '64' )
+CGDB0193;
+//----------------------------------------------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------------------------------------------
 
 

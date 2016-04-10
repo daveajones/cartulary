@@ -10,6 +10,15 @@ var netcalls = 0;
 var dbcalls = 0;
 var dbcheck = 0;
 var query = 0;
+var checkall = false;
+
+//Get command line args
+process.argv.forEach((val, index, array) => {
+    if( index >= 2 && val === "checkall") {
+        console.log("Checking all feeds.");
+        checkall = true;
+    }
+});
 
 //Get the database and table info
 var config = ini.parse(fs.readFileSync('/opt/cartulary/conf/cartulary.conf', 'utf-8'));
@@ -29,17 +38,31 @@ connection.connect();
 //Timestamp for one month ago
 var monthago = (Date.now() / 1000) - (28 * 86400);
 
+//Assemble query
+var query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE errors < 10 OR (lastupdate > '+monthago+' OR lastcheck = 0 OR lastmod = 0) ORDER by lastmod ASC';
+if(checkall) {
+    query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' ORDER by title ASC';
+}
+
 //Pull the feed list
 dbcalls++;
-connection.query('SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE errors < 10 OR (lastupdate > '+monthago+' OR lastcheck = 0 OR lastmod = 0) ORDER by lastcheck ASC', function(err,rows,fields) {
+connection.query(query, function(err,rows,fields) {
     //Bail on error
     if(err) throw err;
 
     for (var row in rows) {
         var feed = rows[row];
 
+        //Ignore feeds that dont start with http scheme
+
         //Give the console what we're checking
         //console.log(rows[row].id + ' : ', rows[row].url);
+
+        //Don't attempt to fetch feeds with non-fqdn urls
+        if( feed.url.indexOf('http') !== 0 ) {
+            console.log("Skipping non-fqdn feed url: ["+feed.url+"]");
+            continue;
+        }
 
         //Make the get request
         (function(f) {
@@ -114,6 +137,9 @@ connection.query('SELECT id,title,url,lastmod,createdon FROM ' + config.tables.t
                 netcalls--;
             });
         })(feed);
+
+        //DEBUG: Break here when testing
+        //break;
     }
 });
 dbcalls--;
@@ -125,7 +151,6 @@ dbcheck = setInterval(function() {
         process.exit(0);
     }
 }, 5000);
-
 
 function loggit(lognum, message) {
     //Timestamp for this log

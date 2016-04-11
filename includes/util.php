@@ -582,8 +582,8 @@ function tweet($uid = NULL, $content = NULL, $link = "", $media_id = "")
 
     //Truncate text if too long to fit in remaining space
     if (strlen($content) > $charcount) {
-        loggit(1, "Had to truncate tweet: [$content] to: [$twcontent] for user: [$uid].");
         $twcontent = truncate_text($content, ($charcount - 3)) . "...";
+        loggit(1, "Had to truncate tweet: [$content] to: [$twcontent] for user: [$uid].");
     } else {
         $twcontent = $content;
     }

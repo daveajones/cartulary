@@ -3620,8 +3620,8 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
     //Prefs
     $prefs = get_user_prefs($uid);
 
-    $start = time() - (6 * 3600);
-    $dmax = 100;
+    $start = time() - (48 * 3600);
+    $dmax = 75;
     $mmax = 50;
 
     //The river array
@@ -3891,7 +3891,7 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
 
             //Put the html index
             $filename = $prefs['pubriverfile'];
-            $s3res = putInS3($rftemplate, $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], "text/html");
+            $s3res = putInS3(gzencode($rftemplate), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "text/html", "Content-Encoding" => "gzip"));
             if (!$s3res) {
                 loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
                 //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -3931,8 +3931,8 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
         }
     }
 
-    loggit(1, "Returning: [$drcount] items in public river.");
-    loggit(1, "Returning: [$mrcount] items in public river.");
+    loggit(3, "Returning: [$drcount] items in public river.");
+    loggit(3, "Returning: [$mrcount] items in public river.");
     return ($jsonriver);
 }
 

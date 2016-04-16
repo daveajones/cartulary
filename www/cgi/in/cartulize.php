@@ -59,13 +59,6 @@ function __autoload($class_name)
         return false;
     }
 }
-
-
-//////////////////////////////////////////////
-// Convert $html to UTF8
-// (uses HTTP headers and HTML to find encoding)
-// adapted from http://stackoverflow.com/questions/910793/php-detect-encoding-and-make-everything-utf-8
-//////////////////////////////////////////////
 function convert_to_utf8($html, $header = null)
 {
     $encoding = null;
@@ -132,7 +125,6 @@ function convert_to_utf8($html, $header = null)
     }
     return $html;
 }
-
 function makeAbsolute($base, $elem)
 {
     $base = new IRI($base);
@@ -146,7 +138,6 @@ function makeAbsolute($base, $elem)
         if (strtolower($elem->tagName) == $tag) makeAbsoluteAttr($base, $elem, $attr);
     }
 }
-
 function makeAbsoluteAttr($base, $e, $attr)
 {
     if ($e->hasAttribute($attr)) {
@@ -194,13 +185,22 @@ $newurl = $url;
 //Remove feedburner garbage
 $url = trim(rtrim(preg_replace("/&?utm_(.*?)\=[^&]+/", "", $newurl), '?'));
 
-
 //////////////////////////////////
 // Set up HTTP agent
 //////////////////////////////////
 $http = new HumbleHttpAgent();
 
 //See if the response returned was actually a meta-refresh forwarding document
+
+//##: -------  PRE-PROCESS the URL here to make sure we dodge any weirdness like proxies or non-HTML content-types
+//Feed proxy?
+if (preg_match('/feedproxy\.google\.com/i', $url)) {
+    $oldurl = $url;
+    $url = get_final_url($oldurl);
+    loggit(3, "Converting feedproxy url: [$oldurl] to [$url].");
+}
+//##: ------- END PRE-PROCESS of URL -----------------------------------------------------------------------------
+
 
 $response = fetchUrlExtra($url);
 //loggit(3, "DEBUG: ".print_r($response, TRUE));
@@ -239,9 +239,7 @@ if (preg_match('/^https?\:\/\/(www\.)?reddit\.com/i', $url)) {
 if( substr($response['body'], 0, 4) == "%PDF" ) {
     $ispdf = TRUE;
     $pdfbody = $response['body'];
-    loggit(3, "IS PDF");
-} else {
-    loggit(3, "NOT PDF");
+    loggit(3, "The url: [$url] is a PDF document.");
 }
 
 // ---------- BEGIN ARTICLE EXISTENCE CHECK ----------
@@ -355,6 +353,9 @@ if ($linkonly == FALSE) {
             $html = preg_replace("/<article[^>]+\>/i", "<div>", $html);
             $html = preg_replace("/<\/article[^>]+\>/i", "</div>", $html);
 
+            $html = preg_replace("/<ul class=\"outline\"><li class=\"ou outline\">(.*)<\/li><\/ul>/i", "<div>$1</div>", $html);
+
+
             // Convert encoding
             $html = convert_to_utf8($html, $response['headers']);
         }
@@ -387,6 +388,19 @@ if ($linkonly == FALSE) {
             preg_match("/\<meta.*property\=\"og\:title\".*content\=\"(.*)\".*\>/i", $html, $matches) || die("Couldn't extract the YouTube video title.");
             $title = $matches[1];
             loggit(3, "Youtube video title: [$title].");
+            $analysis = "";
+            $slimcontent = $content;
+
+        } else
+        if (preg_match('/imgur\.com/i', $url)) {
+            loggit(3, "Getting an imgur image.");
+            if( preg_match("/\<link.*rel=\"image_src.*href=\"(.*)\"/iU", $html, $matches) ) {
+                $url = $matches[1];
+                loggit(3, "Imgur image source: [".$url."]");
+                $content = '<br/><img class="bodyvid" src="' . $matches[1] . '"></img>';
+            } else {
+                loggit(2, "Couldn't extract Imgur image: [".$matches[1]."]");
+            }
             $analysis = "";
             $slimcontent = $content;
 

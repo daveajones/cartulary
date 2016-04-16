@@ -41,7 +41,7 @@ echo "Update script md5 hash:  $UPDOLDHASH"
 
 echo "Downloading new package..."
 rm $BRANCH.zip
-wget https://github.com/daveajones/cartulary/archive/$BRANCH.zip
+wget -nv https://github.com/daveajones/cartulary/archive/$BRANCH.zip
 
 echo "Extracting..."
 unzip -q $BRANCH.zip

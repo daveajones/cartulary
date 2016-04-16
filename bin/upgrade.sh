@@ -113,14 +113,14 @@ php $CARTROOT/bin/sidegrade.php
 echo "Bounce Apache..."
 service apache2 restart
 
+export UPDNEWHASH=`md5sum $CARTROOT/bin/upgrade.sh | awk '{ print $1 }'`
+echo "New update md5:  $UPDNEWHASH"
+
 echo
 echo 'Upgrade is finished.'
 
 ##: Check hash again for the upgrade script
-export UPDNEWHASH=`md5sum $CARTROOT/bin/upgrade.sh | awk '{ print $1 }'`
 if [ "$UPDOLDHASH" != "$UPDNEWHASH" ] ; then
-    echo "Old update md5:  $UPDOLDHASH"
-    echo "New update md5:  $UPDNEWHASH"
     echo
     echo "A new version of this upgrade script was just installed.  You should run the upgrade again right now."
 fi

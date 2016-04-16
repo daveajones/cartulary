@@ -15,10 +15,6 @@ if [ $# -gt 0 ] ; then
 	BRANCH="$1"
 fi
 
-##: Check the timestamp on this upgrade script so we can detect changes
-export UPDSTARTDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
-echo "Update script time stamp:  $UPDSTARTDATE"
-
 ##: Get a datestamp
 BAKDATE=`date +'%Y%m%d%s'`
 
@@ -27,6 +23,10 @@ cd /tmp
 
 ##: Find cart install
 export CARTROOT=`echo "<?echo rtrim(get_cfg_var('cartulary_conf'), '/');?>" | php`
+
+##: Check the timestamp on this upgrade script so we can detect changes
+export UPDSTARTDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
+echo "Update script time stamp:  $UPDSTARTDATE"
 
 ##: Grab the current repo and extract it
 clear
@@ -128,6 +128,6 @@ export UPDENDDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
 if [ "$UPDENDDATE" != "$UPDSTARTDATE" ] ; then
     echo "Old update script time stamp:  $UPDSTARTDATE"
     echo "New update script time stamp:  $UPDENDDATE"
-    echo.
+    echo
     echo "A new version of this upgrade script was just installed.  You should run the upgrade again right now."
 fi

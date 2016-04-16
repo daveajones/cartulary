@@ -1,0 +1,35 @@
+#Release Notes - Freedom Controller v0.6.11
+
+
+Feed generation and a more "touchy" river.
+
+
+- Bug Fixes
+    - Don't allow system fqdn to be an rhost
+    - Multiple uploads in the editor with same filename were getting clobbered
+    - Youtube iframes in the river are now correctly https
+    - Multiple aggregator bugs fixed
+    - Newsfeed table url field not properly indexed
+    - Fix followthrough when using 2-factor auth
+    - Relative feed urls now get fixed in the feed subscriber
+    - Fix CTRL+, triggering safari prefs
+    - Fixed ATOM links with no rel attribute
+    - Fix issue with un-stickying not removing all the html of the post
+
+- New Feature: Editor Blog Feed
+    - There is now a separate feed that gets built each time you publish an item to your microblog from the
+      editor.  This feed only contains items that have originated from the editor.
+
+- New Feature: Facebook Instant Article support in microblog feed
+    - The proper extra content:encoded material is now in the microblog rss feed.
+
+- New Feature: IPFS now supported in the editor
+    - If you have the IPFS client installed on the server, the editor will add outlines you save to IPFS
+      and return a hash for it.  The hash will be tracked with the outline and change each time it does.
+
+- Improvements
+    - Multi-line "code" node types in the editor now supported
+    - Better spacing in html output of editor
+    - There is now a side scrollbar in the feed pane on the river page
+    - Cartulizing proxied feed urls
+    - Periodic attempt to fix bad and relative feed urls

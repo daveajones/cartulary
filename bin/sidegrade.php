@@ -12,7 +12,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     echo "Looking for [$sgscript]... ";
     if (file_exists($sgscript)) {
         echo "found. Executing... \n";
-        echo "This may take a while, so please be patient..."
+        echo "This may take a while, so please be patient...";
         $exoutput = shell_exec($sgscript . " 2>&1 > /tmp/v" . $cg_sys_version . "-sidegrade.log");
         echo $exoutput . "\n";
         echo "finished.\n";

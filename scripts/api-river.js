@@ -803,8 +803,8 @@ freedomController.v1.river.methods = (function () {
 
                         //Remove the item
                         $('#' + id).removeClass('sticky').addClass('unsticky');
-                        //$('#' + id).remove();
-                        //_removeStickyItemLS(idx);
+                        $('#' + id).remove();
+                        _removeStickyItemLS(idx);
                     }
                 });
 

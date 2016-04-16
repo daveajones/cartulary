@@ -24,9 +24,9 @@ cd /tmp
 ##: Find cart install
 export CARTROOT=`echo "<?echo rtrim(get_cfg_var('cartulary_conf'), '/');?>" | php`
 
-##: Check the timestamp on this upgrade script so we can detect changes
-export UPDSTARTDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
-echo "Update script time stamp:  $UPDSTARTDATE"
+##: Check the hash on this upgrade script so we can detect changes
+export UPDOLDHASH=`md5sum $CARTROOT/bin/upgrade.sh | awk '{ print $1 }'`
+echo "Update script md5 hash:  $UPDOLDHASH"
 
 ##: Grab the current repo and extract it
 clear
@@ -123,11 +123,11 @@ service apache2 restart
 echo
 echo 'Upgrade is finished.'
 
-##: Check timestamp again for the upgrade script
-export UPDENDDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
-if [ "$UPDENDDATE" != "$UPDSTARTDATE" ] ; then
-    echo "Old update script time stamp:  $UPDSTARTDATE"
-    echo "New update script time stamp:  $UPDENDDATE"
+##: Check hash again for the upgrade script
+export UPDNEWHASH=`md5sum $CARTROOT/bin/upgrade.sh | awk '{ print $1 }'`
+if [ "$UPDOLDHASH" != "$UPDNEWHASH" ] ; then
+    echo "Old update md5:  $UPDOLDHASH"
+    echo "New update md5:  $UPDNEWHASH"
     echo
     echo "A new version of this upgrade script was just installed.  You should run the upgrade again right now."
 fi

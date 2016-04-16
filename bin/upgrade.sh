@@ -97,9 +97,6 @@ echo "Clean up..."
 rm -rf cartulary-$BRANCH/
 rm $BRANCH.zip
 
-##: Run supplemental version scripts
-$CARTROOT/releases/
-
 ##: Run confcheck
 php $CARTROOT/bin/confcheck.php upgrade silent
 

@@ -72,6 +72,7 @@ touch $CARTROOT/logs/access.log
 chown www-data $CARTROOT/logs >>/tmp/cartinstall.log 2>&1
 chown www-data $CARTROOT/logs/* >>/tmp/cartinstall.log 2>&1
 chown www-data $CARTROOT/spool >>/tmp/cartinstall.log 2>&1
+chmod +x $CARTROOT/releases/v*-apt.sh
 
 ##: Restore newuser sub list
 cp /tmp/newuser.opml $CARTROOT/www

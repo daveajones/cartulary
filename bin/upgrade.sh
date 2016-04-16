@@ -124,6 +124,6 @@ echo 'Upgrade is finished.'
 
 ##: Check timestamp again for the upgrade script
 UPDENDDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
-if [ "$UPDENDDATE" == "$UPDSTARTDATE" ] ; then
+if [ "$UPDENDDATE" != "$UPDSTARTDATE" ] ; then
     echo "A new version of this upgrade script was just installed.  You should run the upgrade again right now."
 fi

@@ -56,7 +56,7 @@ killall php
 
 ##: Back up the existing install
 echo "Backing up the existing install..."
-tar -zcvf ~/cartulary-bak-$BAKDATE.tar.gz $CARTROOT >/dev/null
+tar -zcf ~/cartulary-bak-$BAKDATE.tar.gz $CARTROOT >/dev/null
 
 ##: Get into the repo folder
 cd cartulary-$BRANCH

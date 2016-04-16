@@ -44,7 +44,7 @@ rm $BRANCH.zip
 wget https://github.com/daveajones/cartulary/archive/$BRANCH.zip
 
 echo "Extracting..."
-unzip $BRANCH.zip
+unzip -q $BRANCH.zip
 
 ##: Stop cron
 echo "Stop cron daemon."
@@ -56,7 +56,7 @@ killall php
 
 ##: Back up the existing install
 echo "Backing up the existing install..."
-tar -zcf ~/cartulary-bak-$BAKDATE.tar.gz $CARTROOT >/dev/null
+tar -zcf ~/cartulary-bak-$BAKDATE.tar.gz $CARTROOT
 
 ##: Get into the repo folder
 cd cartulary-$BRANCH

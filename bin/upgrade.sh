@@ -16,7 +16,8 @@ if [ $# -gt 0 ] ; then
 fi
 
 ##: Check the timestamp on this upgrade script so we can detect changes
-UPDSTARTDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
+export UPDSTARTDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
+echo "Update script time stamp:  $UPDSTARTDATE"
 
 ##: Get a datestamp
 BAKDATE=`date +'%Y%m%d%s'`
@@ -123,7 +124,10 @@ echo
 echo 'Upgrade is finished.'
 
 ##: Check timestamp again for the upgrade script
-UPDENDDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
+export UPDENDDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
 if [ "$UPDENDDATE" != "$UPDSTARTDATE" ] ; then
+    echo "Old update script time stamp:  $UPDSTARTDATE"
+    echo "New update script time stamp:  $UPDENDDATE"
+    echo.
     echo "A new version of this upgrade script was just installed.  You should run the upgrade again right now."
 fi

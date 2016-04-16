@@ -4,8 +4,12 @@
 // Get the current cookie value
 $sid = $_COOKIE[$sidcookie];
 
+unset($_COOKIE[$sidcookie]);
+unset($_COOKIE[$postfollowcookie]);
+
 // Expire the cookie
-setcookie($sidcookie, "", time() - 3600);
+setcookie($sidcookie, "", time() - 3600, '/');
+setcookie($postfollowcookie, "", time() - 3600, '/');
 
 // Remove the sid from the database
 expire_session($sid);

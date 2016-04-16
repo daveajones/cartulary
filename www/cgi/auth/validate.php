@@ -63,8 +63,11 @@ if( !empty($_COOKIE[$postfollowcookie]) ) {
     loggit(3, "FOLLOW: $pfc");
     $goloc = $pfc;
 } else {
-    $golog = "/";
+    $goloc = "/";
 }
+
+//Clear the followup cookie now that we've handled it
+setcookie($postfollowcookie, "", time() - 3600, "/");
 
 $jsondata['status'] = "true";
 $jsondata['goloc'] = $goloc;

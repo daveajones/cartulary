@@ -15,6 +15,9 @@ if [ $# -gt 0 ] ; then
 	BRANCH="$1"
 fi
 
+##: Check the timestamp on this upgrade script so we can detect changes
+UPDSTARTDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
+
 ##: Get a datestamp
 BAKDATE=`date +'%Y%m%d%s'`
 
@@ -118,3 +121,9 @@ service apache2 restart
 
 echo
 echo 'Upgrade is finished.'
+
+##: Check timestamp again for the upgrade script
+UPDENDDATE=`stat -c %Y $CARTROOT/bin/upgrade.sh | sed 's/upgrade.sh//'`
+if [ "$UPDENDDATE" -ne "$UPDSTARTDATE" ] ; then
+    echo "A new version of this upgrade script was just installed.  You should run the upgrade again right now."
+fi

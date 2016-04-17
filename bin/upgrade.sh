@@ -124,5 +124,10 @@ echo 'Upgrade is finished.'
 ##: Check hash again for the upgrade script
 if [ "$UPDOLDHASH" != "$UPDNEWHASH" ] ; then
     echo
-    echo "A new version of this upgrade script was just installed.  You should run the upgrade again right now."
+    echo
+    echo
+    echo "!!!!!! -- A new version of this upgrade script was just installed.  You should run the upgrade again right now. -- !!!!!!"
+    echo
+    echo
+    echo
 fi

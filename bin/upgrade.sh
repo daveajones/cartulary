@@ -40,7 +40,9 @@ export UPDOLDHASH=`md5sum $CARTROOT/bin/upgrade.sh | awk '{ print $1 }'`
 echo "Update script md5 hash:  $UPDOLDHASH"
 
 echo "Downloading new package..."
-rm $BRANCH.zip
+if [ -e "$BRANCH.zip" ] ; then
+    rm $BRANCH.zip
+if
 wget -nv https://github.com/daveajones/cartulary/archive/$BRANCH.zip
 
 echo "Extracting..."

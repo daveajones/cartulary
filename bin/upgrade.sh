@@ -42,7 +42,7 @@ echo "Update script md5 hash:  $UPDOLDHASH"
 echo "Downloading new package..."
 if [ -e "$BRANCH.zip" ] ; then
     rm $BRANCH.zip
-if
+fi
 wget -nv https://github.com/daveajones/cartulary/archive/$BRANCH.zip
 
 echo "Extracting..."
@@ -126,7 +126,7 @@ if [ "$UPDOLDHASH" != "$UPDNEWHASH" ] ; then
     echo
     echo
     echo
-    echo "!!!!!! -- A new version of this upgrade script was just installed.  You should run the upgrade again right now. -- !!!!!!"
+    echo '!!!!!! -- A new version of this upgrade script was just installed.  You should run the upgrade again right now. -- !!!!!!'
     echo
     echo
     echo

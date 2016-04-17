@@ -40,7 +40,7 @@ unzip -q $BRANCH.zip
 stop cron
 
 ##: Kill running jobs
-killall php
+killall php >/dev/null 2>/dev/null
 
 ##: Back up the existing install
 tar -zcf ~/cartulary-bak-$BAKDATE.tar.gz $CARTROOT
@@ -111,4 +111,4 @@ if [ "$UPDOLDHASH" != "$UPDNEWHASH" ] ; then
     echo
     echo
 fi
-cp $CARTROOT/bin/new-upgrade.sh $CARTROOT/bin/upgrade.sh
+mv $CARTROOT/bin/new-upgrade.sh $CARTROOT/bin/upgrade.sh

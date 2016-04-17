@@ -56,6 +56,11 @@ stop cron
 echo "Kill any running php jobs."
 killall php
 
+
+
+
+
+
 ##: Back up the existing install
 echo "Backing up the existing install..."
 tar -zcf ~/cartulary-bak-$BAKDATE.tar.gz $CARTROOT
@@ -70,7 +75,9 @@ cp $CARTROOT/www/newuser.opml /tmp
 echo "Put the new files in place..."
 cp -R aggrivate $CARTROOT/aggrivate
 cp -R aggrivate/* $CARTROOT/aggrivate
-cp -R bin/* $CARTROOT/bin
+cp -R bin/*.php $CARTROOT/bin
+cp bin/cartlog $CARTLOG/bin
+cp bin/upgrade.sh $CARTROOT/bin/new-upgrade.sh
 cp -R includes/* $CARTROOT/includes
 cp -R libraries/* $CARTROOT/libraries
 cp -R scripts/* $CARTROOT/scripts
@@ -115,7 +122,9 @@ php $CARTROOT/bin/sidegrade.php
 echo "Bounce Apache..."
 service apache2 restart
 
-export UPDNEWHASH=`md5sum $CARTROOT/bin/upgrade.sh | awk '{ print $1 }'`
+
+##: ----- Update this script -----
+export UPDNEWHASH=`md5sum $CARTROOT/bin/new-upgrade.sh | awk '{ print $1 }'`
 echo "New update md5:  $UPDNEWHASH"
 
 echo
@@ -131,3 +140,16 @@ if [ "$UPDOLDHASH" != "$UPDNEWHASH" ] ; then
     echo
     echo
 fi
+
+
+
+
+
+
+
+
+
+
+
+
+cp $CARTROOT/bin/new-upgrade.sh $CARTROOT/bin/upgrade.sh

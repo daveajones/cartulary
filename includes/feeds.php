@@ -283,7 +283,11 @@ function feed_exists($url = NULL)
     $sql->close();
 
     loggit(1, "The feed: [$feedid] at url: [$url] is already in the repository.");
-    return ($feedid);
+    if(!empty($feedid)) {
+        return ($feedid);
+    } else {
+        return FALSE;
+    }
 }
 
 
@@ -398,7 +402,7 @@ function get_river($uid = NULL, $mobile = FALSE)
 
 
 //Get the river formatted in JSONP
-function get_river_as_json($uid = NULL, $mobile = FALSE)
+function get_river_as_json($uid = NULL, $mobile = FALSE, $pretty = FALSE)
 {
     //Check parameters
     if (empty($uid)) {
@@ -406,6 +410,9 @@ function get_river_as_json($uid = NULL, $mobile = FALSE)
         return (FALSE);
     }
 
+    if($pretty) {
+        return(format_json(json_encode(utf8ize(get_river($uid, $mobile)))));
+    }
     return(json_encode(utf8ize(get_river($uid, $mobile))));
 }
 
@@ -544,7 +551,7 @@ function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL, $type = 0
 
     //Does this feed exist already?
     $fid = feed_exists($url);
-    if ($fid == FALSE) {
+    if (!$fid) {
         $existed = FALSE;
         //Now that we have a good id, put the article into the database
         $stmt = "INSERT INTO $table_newsfeed (id,url,createdon, type) VALUES (?,?,?,?)";
@@ -1588,7 +1595,7 @@ function fetch_feed_content($fid = NULL, $force = TRUE)
         update_feed_lastmod($fid, $lastmodtime);
     }
     $goodurl = get_final_url($url);
-    if ($goodurl != $url) {
+    if ($goodurl != $url && stripos($goodurl, 'http') === 0) {
         loggit(3, "Changing feed url: [$url] to: [$goodurl].");
         update_feed_url($fid, $goodurl);
     }
@@ -3613,8 +3620,8 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
     //Prefs
     $prefs = get_user_prefs($uid);
 
-    $start = time() - (6 * 3600);
-    $dmax = 100;
+    $start = time() - (48 * 3600);
+    $dmax = 75;
     $mmax = 50;
 
     //The river array
@@ -3884,7 +3891,7 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
 
             //Put the html index
             $filename = $prefs['pubriverfile'];
-            $s3res = putInS3($rftemplate, $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], "text/html");
+            $s3res = putInS3(gzencode($rftemplate), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "text/html", "Content-Encoding" => "gzip"));
             if (!$s3res) {
                 loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
                 //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -3924,8 +3931,8 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
         }
     }
 
-    loggit(1, "Returning: [$drcount] items in public river.");
-    loggit(1, "Returning: [$mrcount] items in public river.");
+    loggit(3, "Returning: [$drcount] items in public river.");
+    loggit(3, "Returning: [$mrcount] items in public river.");
     return ($jsonriver);
 }
 
@@ -5732,4 +5739,37 @@ function get_map_word_today_counts($max = 100) {
     //Log and leave
     loggit(3, "Returning: [$count] words in the last 23 hours.");
     return(TRUE);
+}
+
+
+//Determine if a headline is click-bait and assign a score
+function calculate_click_bait_score($headline = "") {
+    //Check parameters
+    if (empty($headline)) {
+        loggit(2, "The headline to test is blank or corrupt: [$headline]");
+        return (FALSE);
+    }
+
+    $cbscore = 0;
+
+    //Check linguistics
+    if (preg_match("/\bthis\b/i", $headline)) {
+        $cbscore += 5;
+    }
+    if (preg_match("/\bthese\b/i", $headline)) {
+        $cbscore += 5;
+    }
+    if (preg_match("/\byou\b/i", $headline)) {
+        $cbscore += 5;
+    }
+    if (preg_match("/\byour\b/i", $headline)) {
+        $cbscore += 5;
+    }
+    if (preg_match("/([^-]\b[1-9][0-9]*\b)/i", $headline)) {
+        $cbscore += 5;
+    }
+
+    //Log and leave
+    loggit(3, "Click-bait score for [$headline] is: [$cbscore].");
+    return($cbscore);
 }

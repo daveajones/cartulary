@@ -803,8 +803,8 @@ freedomController.v1.river.methods = (function () {
 
                         //Remove the item
                         $('#' + id).removeClass('sticky').addClass('unsticky');
-                        //$('#' + id).remove();
-                        //_removeStickyItemLS(idx);
+                        $('#' + id).remove();
+                        _removeStickyItemLS(idx);
                     }
                 });
 
@@ -1289,6 +1289,35 @@ freedomController.v1.river.methods = (function () {
     }
 
 
+    function _convertYoutube(url) {
+        var ytcode;
+
+        if( url === null || url === "" ) {
+            return false;
+        }
+
+        if ( url.indexOf('youtube.com/embed/') > -1 ) {
+            return url.split("?")[0].replace('http://','https://');
+        }
+
+        if ( url.indexOf('youtube.com') > -1 || url.indexOf('youtu.be') > -1 ) {
+            ytcode = url.split('v=')[1];
+            if(typeof ytcode === 'undefined') {
+                return false;
+            }
+            var ampersandPosition = ytcode.indexOf('&');
+            if(ampersandPosition != -1) {
+                ytcode = ytcode.substring(0, ampersandPosition);
+            }
+
+            ytcode = 'https://www.youtube.com/embed/' + ytcode;
+            return ytcode;
+        }
+
+        return false;
+    };
+
+
     //-----------------------------------------------------------------------------------
 
     return {
@@ -1326,7 +1355,8 @@ freedomController.v1.river.methods = (function () {
         buildRiver: _buildRiver,
         bindEnclosureLinks: _bindEnclosureLinks,
         bindEmbedActivations: _bindEmbedActivations,
-        calculateColumnCount: _calculateColumnCount
+        calculateColumnCount: _calculateColumnCount,
+        convertYoutube: _convertYoutube
     };
 
 //-----------------------------------------------------------------------------------

@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 61;
+$cg_database_version = 64;
 $cg_database_updates = array();
 
 
@@ -858,6 +858,35 @@ $cg_database_updates[60][] = <<<CGDB0187
  INSERT INTO `dbversion` ( `version` ) VALUES ( '61' )
 CGDB0187;
 //----------------------------------------------------------------------------------------------------------------
+
+//Version 61 to 62 -----------------------------------------------------------------------------------------------
+$cg_database_updates[61][] = <<<CGDB0188
+ ALTER TABLE `recentfiles` ADD `ipfshash` VARCHAR( 48 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL ,
+ ADD INDEX ( `ipfshash` )
+CGDB0188;
+$cg_database_updates[61][] = <<<CGDB0189
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '62' )
+CGDB0189;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 62 to 63 -----------------------------------------------------------------------------------------------
+$cg_database_updates[62][] = <<<CGDB0190
+ ALTER TABLE `nfitems` ADD `cbscore` INT NOT NULL COMMENT 'Click-bait score'
+CGDB0190;
+$cg_database_updates[62][] = <<<CGDB0191
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '63' )
+CGDB0191;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 63 to 64 -----------------------------------------------------------------------------------------------
+$cg_database_updates[63][] = <<<CGDB0192
+ ALTER TABLE `newsfeeds` ADD UNIQUE (`url`)
+CGDB0192;
+$cg_database_updates[63][] = <<<CGDB0193
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '64' )
+CGDB0193;
+//----------------------------------------------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------------------------------------------
 
 

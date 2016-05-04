@@ -14,8 +14,8 @@ $(document).ready(function () {
                 $('.searchbar .search-more').empty();
                 $('.searchbar .search-extra').remove();
                 //Don't try to process empty queries
-                if ( $('#navsearchq').val() === '' ) {
-                    return(false);
+                if ($('#navsearchq').val() === '') {
+                    return (false);
                 } else {
                     lastQuery = $('#navsearchq').val();
                 }
@@ -26,7 +26,7 @@ $(document).ready(function () {
             },
             success: function (data) {
                 //If an error occured on the backend, give a warning message
-                if ( data.status == "false" ) {
+                if (data.status == "false") {
                     showMessage(data.description, data.status, 5);
                     data.query = '';
                     $('.searchbar .body').append('<center><p>Error during search: ' + data.description + '</p></center>');
@@ -35,7 +35,7 @@ $(document).ready(function () {
                     $('#search-' + data.section).tmpl(data).appendTo('.searchbar .body');
 
                     //Print 'no results' if there was no data returned
-                    if ( data.data.length < 1 ) {
+                    if (data.data.length < 1) {
                         $('.searchbar .body').append('<p>No Results</p>');
                     }
 
@@ -74,16 +74,16 @@ $(document).ready(function () {
     freedomController.v1.people.methods.bindSocialOutlineLinks("body");
 
     //Attach payment handler
-    $('#btnPaypalSubmit').on('click', function() {
+    $('#btnPaypalSubmit').on('click', function () {
         $.ajax({
             type: 'POST',
-            url:  '/cgi/auth/setsinglepref',
+            url: '/cgi/auth/setsinglepref',
             data: {
                 prefs: {
                     payment_made: 1
                 }
             },
-            success: function() {
+            success: function () {
                 $('#frmPaypalButton').hide();
                 $('#divPayments').hide();
             }

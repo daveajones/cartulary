@@ -24,7 +24,7 @@
     header("Location: $loginpage");
     exit(0);
   }
-  setcookie($postfollowcookie, "", time() - 3600);
+  setcookie($postfollowcookie, "", time() - 3600, '/');
 
   //Discover what kind of device this is
   $g_device = get_device_type();

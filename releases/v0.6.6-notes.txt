@@ -1,7 +1,7 @@
 #Release Notes - Freedom Controller v0.6.6
 
 
-This is a big one.
+Lots of stuff!
 
 
 - Bug Fixes

@@ -582,8 +582,8 @@ function tweet($uid = NULL, $content = NULL, $link = "", $media_id = "")
 
     //Truncate text if too long to fit in remaining space
     if (strlen($content) > $charcount) {
-        loggit(1, "Had to truncate tweet: [$content] to: [$twcontent] for user: [$uid].");
         $twcontent = truncate_text($content, ($charcount - 3)) . "...";
+        loggit(1, "Had to truncate tweet: [$content] to: [$twcontent] for user: [$uid].");
     } else {
         $twcontent = $content;
     }
@@ -2301,6 +2301,18 @@ function absolutizeUrl($url = NULL, $rurl = NULL)
     }
 
     //Check if url has a preceding slash
+    $pos = strpos($url, '//');
+    if ($pos !== FALSE && $pos == 0) {
+        loggit(3, "Url: [$url] is scheme-relative.");
+        $rp = parse_url($rurl);
+        if ($rp != FALSE) {
+            return ($rp['scheme'] . ":" . $url);
+        } else {
+            return ($url);
+        }
+    }
+
+    //Check if url has a preceding slash
     $pos = strpos($url, '/');
     if ($pos !== FALSE && $pos == 0) {
         //loggit(3, "Url: [$url] is root-relative.");
@@ -2598,7 +2610,7 @@ function make_mime_type($url = NULL, $type = NULL)
 
     // ----- Audio
     if (strposa($url, array('.mp3')) !== FALSE) {
-        return ('audio/mpeg3');
+        return ('audio/mpeg');
     }
     if (strposa($url, array('.wav')) !== FALSE) {
         return ('audio/wav');
@@ -3121,7 +3133,7 @@ class Str
     {
         if (ini_get('magic_quotes_sybase'))
             $pure = str_replace("''", "'", $gpc);
-        else $pure = get_magic_quotes_gpc() ? stripslashes($gpc) : $gpc;
+        else $pure = $gpc;
         return $pure;
     }
 
@@ -3651,6 +3663,7 @@ function utf8ize($d) {
     return $d;
 }
 
+
 function to_utf8( $string ) {
 // From http://w3.org/International/questions/qa-forms-utf-8.html
     if ( preg_match('%^(?:
@@ -3667,4 +3680,108 @@ function to_utf8( $string ) {
     } else {
         return iconv( 'CP1252', 'UTF-8', $string);
     }
+}
+
+
+//Add a file to the ipfs DHT space
+function add_file_to_ipfs($filepath = NULL)
+{
+    //Check parameters
+    if (empty($filepath)) {
+        loggit(2, "Location missing from S3 redirect call: [$location].");
+        return (FALSE);
+    }
+
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/ipfs/ipfs.class.php";
+
+    //Create an IPFS object
+    $ipfs = new IPFS("localhost", "8080", "5001");
+
+    $imageContent = file_get_contents($filepath);
+    $hash = $ipfs->add($imageContent);
+
+    loggit(3, "Added file: [$filepath] to IPFS with hash: [$hash].");
+    return ($hash);
+}
+
+
+//Add a file to the ipfs DHT space
+function add_content_to_ipfs($content = NULL)
+{
+    //Check parameters
+    if (empty($content)) {
+        loggit(2, "Content for adding to ipfs was blank: [$content].");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/ipfs/ipfs.class.php";
+
+    //Create an IPFS object
+    $ipfs = new IPFS("localhost", "8080", "5001");
+
+    $hash = $ipfs->add($content);
+
+    loggit(3, "Added content to IPFS with hash: [$hash].");
+    return ($hash);
+}
+
+
+//Get content from the ipfs DHT space
+function get_content_from_ipfs($hash = NULL)
+{
+    //Check parameters
+    if (empty($hash)) {
+        loggit(2, "Hash to get from ipfs is blank: [$hash].");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/ipfs/ipfs.class.php";
+
+    //Create an IPFS object
+    $ipfs = new IPFS("localhost", "8080", "5001");
+
+    $size = $ipfs->size($hash);
+
+    if ($size > 7866189) {
+        loggit(3, "Content from IPFS is too big: [$size] for hash: [$hash].");
+        $content = "";
+    } else {
+        $content = $ipfs->cat($hash);
+    }
+
+
+    loggit(3, "Got content from IPFS with hash: [$hash].");
+    return ($content);
+}
+
+
+//Encode just the ampersands from a url to make them xml safe
+function clean_url_for_xml($url = NULL)
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "URL is blank: [$hash].");
+        return (FALSE);
+    }
+
+
+    $newurl = htmlspecialchars(str_replace('&', '%26', $url));
+
+    loggit(1, "Returned url: [$newurl] for url: [$url].");
+    return ($newurl);
+}
+
+
+//Remove whitespace between markup tags
+function remove_non_tag_space($string){
+    $pattern = '/>\s+</';
+    $replacement = '><';
+    return preg_replace($pattern, $replacement, $string);
 }

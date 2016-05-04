@@ -25,6 +25,8 @@ MAILTO=""
 
 ##: Server maint
 */15 * * * * root php [$CONF_ROOT]/bin/clean.php
+50   3 * * * root php [$CONF_ROOT]/bin/clean_nonfqdn_feeds.php
+53   3 * * * root php [$CONF_ROOT]/bin/clean_duplicate_feeds.php
 
 ##: Build main user rivers
 */5  * * * * root php [$CONF_ROOT]/bin/buildrivers.php

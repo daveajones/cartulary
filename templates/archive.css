@@ -1,3 +1,4 @@
+
 /*----- Bootstrap -----*/
 article,aside,details,figcaption,figure,footer,header,hgroup,nav,section{display:block;}
 audio,canvas,video{display:inline-block;*display:inline;*zoom:1;}
@@ -571,130 +572,136 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
 /* ---------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------- */
 @media all { /* ----------- Start Media: All ---------------------------- */
-/* ---------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------- */
 
 
-/* --------------------------------------------------- */
-/* ----- Fonts --------------------------------------- */
-@font-face {
-    font-family: 'CreteRoundItalic';
-    src: url('[SYSTEM_URL]/style/CreteRound-Italic-webfont.eot');
-    src: url('[SYSTEM_URL]/style/CreteRound-Italic-webfont.eot?#iefix') format('embedded-opentype'),
-         url('[SYSTEM_URL]/style/CreteRound-Italic-webfont.woff') format('woff'),
-         url('[SYSTEM_URL]/style/CreteRound-Italic-webfont.ttf') format('truetype'),
-         url('[SYSTEM_URL]/style/CreteRound-Italic-webfont.svg#CreteRoundItalic') format('svg');
-    font-weight: normal;
-    font-style: normal;
+    /* --------------------------------------------------- */
+    /* ----- Fonts --------------------------------------- */
+    @font-face {
+        font-family: 'CreteRoundItalic';
+        src: url('http://cart.sobr.org/style/CreteRound-Italic-webfont.eot');
+        src: url('http://cart.sobr.org/style/CreteRound-Italic-webfont.eot?#iefix') format('embedded-opentype'),
+        url('http://cart.sobr.org/style/CreteRound-Italic-webfont.woff') format('woff'),
+        url('http://cart.sobr.org/style/CreteRound-Italic-webfont.ttf') format('truetype'),
+        url('http://cart.sobr.org/style/CreteRound-Italic-webfont.svg#CreteRoundItalic') format('svg');
+        font-weight: normal;
+        font-style: normal;
 
-}
-@font-face {
-    font-family: 'CreteRoundRegular';
-    src: url('[SYSTEM_URL]/style/CreteRound-Regular-webfont.eot');
-    src: url('[SYSTEM_URL]/style/CreteRound-Regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('[SYSTEM_URL]/style/CreteRound-Regular-webfont.woff') format('woff'),
-         url('[SYSTEM_URL]/style/CreteRound-Regular-webfont.ttf') format('truetype'),
-         url('[SYSTEM_URL]/style/CreteRound-Regular-webfont.svg#CreteRoundRegular') format('svg');
-    font-weight: normal;
-    font-style: normal;
+    }
+    @font-face {
+        font-family: 'CreteRoundRegular';
+        src: url('http://cart.sobr.org/style/CreteRound-Regular-webfont.eot');
+        src: url('http://cart.sobr.org/style/CreteRound-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+        url('http://cart.sobr.org/style/CreteRound-Regular-webfont.woff') format('woff'),
+        url('http://cart.sobr.org/style/CreteRound-Regular-webfont.ttf') format('truetype'),
+        url('http://cart.sobr.org/style/CreteRound-Regular-webfont.svg#CreteRoundRegular') format('svg');
+        font-weight: normal;
+        font-style: normal;
 
-}
-/* --------------------------------------------------- */
-
-
-/* --------------------------------------------------- */
-/* ----- Body and other major elements ----- */
-body {  background:#ddd;  }
-.container {
-  width: 90%;
-  max-width:960px;
-}
-a {  color:#059;  }
+    }
+    /* --------------------------------------------------- */
 
 
+    /* --------------------------------------------------- */
+    /* ----- Body and other major elements ----- */
+    body {  background:white;  }
+    .container {
+        width: 90%;
+        max-width:960px;
 
-/* --------------------------------------------------- */
-/* ----- Header ----- */
-img.avatarheader {  float:right; max-height: 64px;  }
-
-#divPageTitle {
-  color: #222;
-  font-size: 130%;
-  text-shadow:0 1px 0 #777;
-  border:none;
-}
-#divPageTitle h1 {
-  width:70%;
-}
-/* --------------------------------------------------- */
+    }
+    a {  color:#059;  }
 
 
-/* --------------------------------------------------- */
-/* ----- Microblog HTML Archive ----- */
-.pageContentWrapper.Archive #divArchive {
-  font-family:"CreteRoundRegular", serif;
-  position: relative;
-  margin-left:auto;
-  margin-right:auto;
-  margin-top:10px;
-  padding:20px;
-  *padding-top: 19px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  -webkit-border-radius: 4px;
-     -moz-border-radius: 4px;
-          border-radius: 4px;
-}
 
-.pageContentWrapper.Archive .item {
-  margin-bottom:40px;
-}
-.pageContentWrapper.Archive .byline {
-  color:#777;
-}
-.pageContentWrapper.Archive .item .guid {
-  display:none;
-}
-.pageContentWrapper.Archive .item .pubdate {
-  margin-top:20px;
-  font-size:80%;
-}
-.pageContentWrapper.Archive .item .content {
-  margin-left: 15px;
-}
-.pageContentWrapper.Archive .item .content h3 {
-  font-size:170%;
-  margin-bottom: 10px;
-}
-.pageContentWrapper.Archive .item .description {
-  font-family:"CreteRoundRegular", serif;
-  font-size:150%;
-  line-height:150%;
-}
-.pageContentWrapper.Archive .item h3 + p.description {
-  font-size:150%;
-  margin-left:10px;
-}
-.pageContentWrapper.Archive .item .shortlink {
-  border-right: solid #111 1px;
-  padding-right: 3px;
-}
-.pageContentWrapper.Archive .item .enclosureimg {
-  display:block;
-  margin:10px auto 10px;
-  max-width:50%;
-}
-.pageContentWrapper.Archive .item .link {
-  border-right: solid #111 1px;
-  padding-right: 3px;
-}
-.pageContentWrapper.Archive .item .enclosure {
-  border-left: solid #111 1px;
-  padding-left: 3px;
-}
-/* --------------------------------------------------- */
+    /* --------------------------------------------------- */
+    /* ----- Header ----- */
+    img.avatarheader {  float:right; max-height: 64px;  }
+
+    #divPageTitle {
+        color: #222;
+        font-size: 130%;
+        text-shadow:0 1px 0 #777;
+        border:none;
+    }
+    #divPageTitle h1 {
+        width:70%;
+    }
+    /* --------------------------------------------------- */
 
 
-/* --------------------------------------------------------- */
+    /* --------------------------------------------------- */
+    /* ----- Microblog HTML Archive ----- */
+    .pageContentWrapper.Archive #divArchive {
+        position: relative;
+        margin-left:auto;
+        margin-right:auto;
+        margin-top:10px;
+        padding:20px;
+        *padding-top: 19px;
+    }
+    p.pubdate{
+        padding-top:20px;
+    }
+    .pageContentWrapper.Archive .item {
+        margin-bottom:40px;
+    }
+    .pageContentWrapper.Archive .byline {
+        color:#777;
+    }
+    .pageContentWrapper.Archive .item .guid {
+        display:none;
+    }
+    .pageContentWrapper.Archive .item .pubdate {
+        font-size:80%;
+        text-decoration: underline;
+        color:#955;
+    }
+    .pageContentWrapper.Archive .item .linkage {
+        display:none;
+    }
+    .pageContentWrapper.Archive .item .content {
+        margin-left: 20px;
+        padding-left:10px;
+        border-left:4px solid #ddd;
+
+    }
+    .pageContentWrapper.Archive .item .content h3 {
+        font-size:170%;
+        margin-bottom: 10px;
+
+    }
+    .pageContentWrapper.Archive .item .description {
+
+        font-size:150%;
+        line-height:150%;
+
+    }
+    .pageContentWrapper.Archive .item h3 + p.description {
+        font-size:150%;
+        margin-left:10px;
+    }
+    .pageContentWrapper.Archive .item .shortlink {
+        border-right: solid #111 1px;
+        padding-right: 3px;
+    }
+    .pageContentWrapper.Archive .item .enclosureimg {
+        display:block;
+        margin:10px;
+        max-width:50%;
+    }
+    .pageContentWrapper.Archive .item .link {
+        border-right: solid #111 1px;
+        padding-right: 3px;
+    }
+    .pageContentWrapper.Archive .item .enclosure {
+        border-left: solid #111 1px;
+        padding-left: 3px;
+    }
+    /* --------------------------------------------------- */
+
+
+    /* --------------------------------------------------------- */
 } /* ---------------- End Media: All ----------------------- */
 /* --------------------------------------------------------- */

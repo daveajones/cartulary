@@ -1,4 +1,4 @@
-<div class="article ${feed.feedId} {{if feed.linkedOutlineType == " sopml"}}${feed.linkedOutlineId}{{/if}}"
+<div class="article ${feed.feedId} {{if feed.linkedOutlineType == "sopml"}}${feed.linkedOutlineId}{{/if}}"
      id="${id}"
      data-url="{{if permaLink}}${permaLink}{{else link}}${link}{{/if}}"
      data-sourceurl="{{if sourceurl}}${sourceurl}{{else feed.feedUrl}}${feed.feedUrl}{{/if}}"

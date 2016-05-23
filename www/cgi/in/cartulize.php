@@ -352,7 +352,7 @@ if ($linkonly == FALSE) {
 
             $html = preg_replace("/<article[^>]+\>/i", "<div>", $html);
             $html = preg_replace("/<\/article[^>]+\>/i", "</div>", $html);
-
+            $html = preg_replace("/<br[^>]*\>/i", "<br><br>", $html);
             $html = preg_replace("/<ul class=\"outline\"><li class=\"ou outline\">(.*)<\/li><\/ul>/i", "<div>$1</div>", $html);
 
 
@@ -392,8 +392,39 @@ if ($linkonly == FALSE) {
             $slimcontent = $content;
 
         } else
+
+        //Is this an image
+        if (url_is_a_picture($url)) {
+            loggit(3, "Getting an image.");
+            loggit(3, "Image source: [" . $url . "]");
+            $content = '<br/><img style="width:600px;" src="' . $url . '"></img>';
+            $analysis = "";
+            $slimcontent = $content;
+        } else
+
+        //Is this audio
+        if (url_is_audio($url)) {
+            loggit(3, "Getting an audio url.");
+            loggit(3, "Audio source: [" . $url . "]");
+            $mt = make_mime_type($url);
+            $content = '<br/><audio style="width:400px" controls="true"><source src="' . $url . '" type="' . $mt . '"></audio>';
+            $analysis = "";
+            $slimcontent = $content;
+        } else
+
+        //Is this audio
+        if (url_is_video($url)) {
+            loggit(3, "Getting a video url.");
+            loggit(3, "Video source: [" . $url . "]");
+            $mt = make_mime_type($url);
+            $content = '<br/><video style="width:95%;margin:0 auto;display:block;" controls="true"><source src="' . $url . '" type="' . $mt . '"></video>';
+            $analysis = "";
+            $slimcontent = $content;
+        } else
+
+                //Is this an imgur link?
         if (preg_match('/imgur\.com/i', $url)) {
-            loggit(3, "Getting an imgur image.");
+            loggit(3, "Getting an image file as a full article.");
             if( preg_match("/\<link.*rel=\"image_src.*href=\"(.*)\"/iU", $html, $matches) ) {
                 $url = $matches[1];
                 loggit(3, "Imgur image source: [".$url."]");

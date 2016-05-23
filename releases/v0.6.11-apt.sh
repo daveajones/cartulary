@@ -26,7 +26,7 @@ apt-get install -y php5-xsl
 php5enmod xsl
 
 echo Installing node.js...
-curl -sL https://deb.nodesource.com/setup | sudo bash -
+curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 apt-get install -y nodejs
 cd $CARTROOT/aggrivate
 sudo npm -g install npm@latest

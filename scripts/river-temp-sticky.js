@@ -1,5 +1,4 @@
-<div class="article ${feed.feedId} {{if feed.linkedOutlineType == "
-     sopml"}}${feed.linkedOutlineId}{{/if}} sticky appeared"
+<div class="article ${feed.feedId} {{if feed.linkedOutlineType == "sopml"}}${feed.linkedOutlineId}{{/if}} sticky appeared"
      id="${id}"
      data-index="${index}"
      data-url="{{if permaLink}}${permaLink}{{else link}}${link}{{/if}}"

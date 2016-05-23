@@ -27,7 +27,7 @@ fi
 
 ##: 0. Warning.
 clear
-echo 'This install script assumes it is being run on a virgin install of Ubuntu server LTS.'
+echo 'This install script assumes it is being run on a virgin install of Ubuntu server LTS v12 and up.'
 echo 'Running this file as-is on a production system is going to most likely wreck a lot of stuff.'
 echo 'If that is the case, you should  **STOP NOW**  and do the installation by hand.'
 echo

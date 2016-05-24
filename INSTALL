@@ -43,8 +43,14 @@ clear
 echo 'Installing Apache, PHP and some modules.'
 curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 apt-get update
-apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-imap php5-tidy php5-gd ccze cstream ntp php5-xsl nodejs
-php5enmod imap
+if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
+  apt-get install -y apache2 php7.0 php7.0-cli libapache2-mod-php7.0 php7.0-mcrypt php7.0-curl php7.0-imap php7.0-tidy php7.0-gd ccze cstream ntp php7.0-xsl nodejs
+  phpenmod imap
+else
+  apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-imap php5-tidy php5-gd ccze cstream ntp php5-xsl nodejs
+  php5enmod imap
+fi
+
 #sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
 cd $CARTROOT/aggrivate
 sudo npm -g install npm@latest
@@ -55,7 +61,11 @@ cd -
 ##: 2. Install MySql
 clear
 echo 'Give MySQL a root password and write it down.'
-apt-get install -y mysql-server php5-mysql
+if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
+  apt-get install -y mysql-server php7.0-mysql
+else
+  apt-get install -y mysql-server php5-mysql
+fi
 #[you should set a root password during this step and write it down]
 #mysql_secure_installation
 #[No, Yes, Yes, Yes, Yes]
@@ -85,18 +95,31 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-echo  >> /etc/php5/apache2/php.ini
-echo '[cartulary]' >> /etc/php5/apache2/php.ini
-echo "cartulary_conf=$INSTALLDIR" >> /etc/php5/apache2/php.ini
-echo 'post_max_size=300M' >> /etc/php5/apache2/php.ini
-echo 'upload_max_filesize=300M' >> /etc/php5/apache2/php.ini
-echo 'max_execution_time=90' >> /etc/php5/apache2/php.ini
-echo 'short_open_tag=On' >> /etc/php5/apache2/php.ini
-echo  >> /etc/php5/cli/php.ini
-echo '[cartulary]' >> /etc/php5/cli/php.ini
-echo "cartulary_conf=$INSTALLDIR" >> /etc/php5/cli/php.ini
-echo "short_open_tag=On" >> /etc/php5/cli/php.ini
-
+if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
+    echo  >> /etc/php/7.0/apache2/php.ini
+    echo '[cartulary]' >> /etc/php/7.0/apache2/php.ini
+    echo "cartulary_conf=$INSTALLDIR" >> /etc/php/7.0/apache2/php.ini
+    echo 'post_max_size=300M' >> /etc/php/7.0/apache2/php.ini
+    echo 'upload_max_filesize=300M' >> /etc/php/7.0/apache2/php.ini
+    echo 'max_execution_time=90' >> /etc/php/7.0/apache2/php.ini
+    echo 'short_open_tag=On' >> /etc/php/7.0/apache2/php.ini
+    echo  >> /etc/php/7.0/cli/php.ini
+    echo '[cartulary]' >> /etc/php/7.0/cli/php.ini
+    echo "cartulary_conf=$INSTALLDIR" >> /etc/php/7.0/cli/php.ini
+    echo "short_open_tag=On" >> /etc/php/7.0/cli/php.ini
+else
+    echo  >> /etc/php5/apache2/php.ini
+    echo '[cartulary]' >> /etc/php5/apache2/php.ini
+    echo "cartulary_conf=$INSTALLDIR" >> /etc/php5/apache2/php.ini
+    echo 'post_max_size=300M' >> /etc/php5/apache2/php.ini
+    echo 'upload_max_filesize=300M' >> /etc/php5/apache2/php.ini
+    echo 'max_execution_time=90' >> /etc/php5/apache2/php.ini
+    echo 'short_open_tag=On' >> /etc/php5/apache2/php.ini
+    echo  >> /etc/php5/cli/php.ini
+    echo '[cartulary]' >> /etc/php5/cli/php.ini
+    echo "cartulary_conf=$INSTALLDIR" >> /etc/php5/cli/php.ini
+    echo "short_open_tag=On" >> /etc/php5/cli/php.ini
+fi
 
 ##: 5. Install Cartulary Files
 echo

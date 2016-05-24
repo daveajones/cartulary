@@ -81,9 +81,18 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
+echo "Configuring MySQL. Please wait..."
+if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
+    echo  >> /etc/mysql/conf.d/mysql.cnf
+    echo '[mysqld]' >> /etc/mysql/conf.d/mysql.cnf
+    echo "sql_mode='NO_ENGINE_SUBSTITUTION'" >> /etc/mysql/conf.d/mysql.cnf
+    echo  >> /etc/mysql/conf.d/mysql.cnf
+    echo '[mysqld_safe]' >> /etc/mysql/conf.d/mysql.cnf
+    echo "sql_mode='NO_ENGINE_SUBSTITUTION'" >> /etc/mysql/conf.d/mysql.cnf
+fi
+/etc/init.d/mysql restart
 mysql -u root -p < cartulary-master/templates/newdb.sql >>/tmp/cartinstall.log 2>&1
 mysql -ucartulary -pcartulary cartulary < cartulary-master/templates/cartulary.sql >>/tmp/cartinstall.log 2>&1
-
 
 ##: 4. Configure PHP
 echo

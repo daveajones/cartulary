@@ -1,4 +1,6 @@
 
+
+
 /*----- Bootstrap -----*/
 article,aside,details,figcaption,figure,footer,header,hgroup,nav,section{display:block;}
 audio,canvas,video{display:inline-block;*display:inline;*zoom:1;}
@@ -611,7 +613,7 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
         max-width:960px;
 
     }
-    a {  color:#059;  }
+    a {  color:#123;  }
 
 
 
@@ -690,6 +692,31 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
         display:block;
         margin:10px;
         max-width:50%;
+    }
+    .pageContentWrapper.Archive .item .enclosureview img {
+        display:block;
+        margin:20px;
+        max-width:50%;
+    }
+    .pageContentWrapper.Archive .item .enclosureview video {
+        display:block;
+        margin:20px;
+        width:70%;
+        height:350px;
+        max-width:640px;
+    }
+    .pageContentWrapper.Archive .item .enclosureview audio {
+        display:block;
+        margin:20px;
+        width:640px;
+    }
+    .pageContentWrapper.Archive .item .enclosureview.youtube {
+        display:block;
+        margin:20px;
+        margin-top:0px;
+        width:70%;
+        height:350px;
+        max-width:640px;
     }
     .pageContentWrapper.Archive .item .link {
         border-right: solid #111 1px;

@@ -1332,13 +1332,33 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
         if (!empty($post['title'])) {
             $html .= "        <h3>" . xmlentities(trim($post['title'])) . "</h3>\n";
         }
-        //$html .= "        <p class=\"description\">".xmlentities(trim( str_replace("\n", '', $post['content'] ) ))."</p>\n";
-        $html .= "        <p class=\"description\">" . safe_html(trim($post['content'])) . "</p>\n";
+        if(!empty($rsslink)) {
+            $html .= "        <p class=\"description\"><a href='$rssurl'>" . safe_html(trim($post['content'])) . "</a></p>\n";
+        } else {
+            $html .= "        <p class=\"description\">" . safe_html(trim($post['content'])) . "</p>\n";
+        }
+
+        if (preg_match('/youtube\.com/i', $linkfull)) {
+            preg_match("/v[\/\=]([A-Za-z0-9\_\-]*)/i", $linkfull, $matches) || loggit(2, "Couldn't extract YouTube ID string.");
+            $html .= '<br/><iframe class="enclosureview youtube" src="https://www.youtube.com/embed/' . $matches[1] . '" frameborder="0" allowfullscreen></iframe>';
+        }
+
         if (isset($enclosures)) {
             if (is_array($enclosures) && count($enclosures) > 0) {
                 foreach ($enclosures as $enclosure) {
-                    if (strripos($enclosure['url'], ".jpg") !== FALSE || strripos($enclosure['url'], ".gif") !== FALSE || strripos($enclosure['url'], ".png") !== FALSE) {
-                        $html .= '        <p class="enclosureview"><img class="enclosureimg" alt="" src="' . htmlspecialchars($enclosure['url']) . '" /></p>' . "\n";
+                    //Is this a youtube link?
+                    if (preg_match('/youtube\.com/i', $enclosure['url'])) {
+                        preg_match("/v[\/\=]([A-Za-z0-9\_\-]*)/i", $enclosure['url'], $matches) || loggit(2, "Couldn't extract YouTube ID string.");
+                        $html .= '<br/><iframe class="enclosureview youtube" src="https://www.youtube.com/embed/' . $matches[1] . '" frameborder="0" allowfullscreen></iframe>';
+                    } else
+                    if(url_is_a_picture($enclosure['url'])) {
+                        $html .= "<p class=\"enclosureview picture\"><img class=\"enclosureimg\" alt=\"\" src=\"".clean_url_for_xml($enclosure['url'])."\">"."</p>";
+                    } else
+                    if(url_is_audio($enclosure['url'])) {
+                        $html .= "<p class=\"enclosureview audio\"><audio controls=\"true\"><source src=\"".clean_url_for_xml($enclosure['url'])."\" type='".$enclosure['type']."'></audio>"."</p>";
+                    } else
+                    if(url_is_video($enclosure['url'])) {
+                        $html .= "<p class=\"enclosureview video\"><video controls=\"true\"><source src=\"".clean_url_for_xml($enclosure['url'])."\" type='".$enclosure['type']."'></video>"."</p>";
                     }
                 }
             }

@@ -1,6 +1,8 @@
 
 
 
+
+
 /*----- Bootstrap -----*/
 article,aside,details,figcaption,figure,footer,header,hgroup,nav,section{display:block;}
 audio,canvas,video{display:inline-block;*display:inline;*zoom:1;}
@@ -577,34 +579,6 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
     /* ---------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------- */
 
-
-    /* --------------------------------------------------- */
-    /* ----- Fonts --------------------------------------- */
-    @font-face {
-        font-family: 'CreteRoundItalic';
-        src: url('http://cart.sobr.org/style/CreteRound-Italic-webfont.eot');
-        src: url('http://cart.sobr.org/style/CreteRound-Italic-webfont.eot?#iefix') format('embedded-opentype'),
-        url('http://cart.sobr.org/style/CreteRound-Italic-webfont.woff') format('woff'),
-        url('http://cart.sobr.org/style/CreteRound-Italic-webfont.ttf') format('truetype'),
-        url('http://cart.sobr.org/style/CreteRound-Italic-webfont.svg#CreteRoundItalic') format('svg');
-        font-weight: normal;
-        font-style: normal;
-
-    }
-    @font-face {
-        font-family: 'CreteRoundRegular';
-        src: url('http://cart.sobr.org/style/CreteRound-Regular-webfont.eot');
-        src: url('http://cart.sobr.org/style/CreteRound-Regular-webfont.eot?#iefix') format('embedded-opentype'),
-        url('http://cart.sobr.org/style/CreteRound-Regular-webfont.woff') format('woff'),
-        url('http://cart.sobr.org/style/CreteRound-Regular-webfont.ttf') format('truetype'),
-        url('http://cart.sobr.org/style/CreteRound-Regular-webfont.svg#CreteRoundRegular') format('svg');
-        font-weight: normal;
-        font-style: normal;
-
-    }
-    /* --------------------------------------------------- */
-
-
     /* --------------------------------------------------- */
     /* ----- Body and other major elements ----- */
     body {  background:white;  }
@@ -640,14 +614,14 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
         margin-left:auto;
         margin-right:auto;
         margin-top:10px;
-        padding:20px;
+        padding:1px;
         *padding-top: 19px;
     }
     p.pubdate{
         padding-top:20px;
     }
     .pageContentWrapper.Archive .item {
-        margin-bottom:40px;
+        margin-bottom:60px;
     }
     .pageContentWrapper.Archive .byline {
         color:#777;
@@ -659,6 +633,7 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
         font-size:80%;
         text-decoration: underline;
         color:#955;
+        margin-bottom: 15px;
     }
     .pageContentWrapper.Archive .item .linkage {
         display:none;
@@ -666,7 +641,7 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
     .pageContentWrapper.Archive .item .content {
         margin-left: 20px;
         padding-left:10px;
-        border-left:4px solid #ddd;
+        border-left:3px solid #efefef;
 
     }
     .pageContentWrapper.Archive .item .content h3 {
@@ -708,7 +683,8 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
     .pageContentWrapper.Archive .item .enclosureview audio {
         display:block;
         margin:20px;
-        width:640px;
+        width:70%;
+        max-width:640px;
     }
     .pageContentWrapper.Archive .item .enclosureview.youtube {
         display:block;
@@ -732,3 +708,62 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
     /* --------------------------------------------------------- */
 } /* ---------------- End Media: All ----------------------- */
 /* --------------------------------------------------------- */
+
+
+/* Portrait */
+@media all
+and (min-device-width: 320px)
+and (max-device-width: 480px)
+and (orientation: portrait) {
+
+    .pageContentWrapper.Archive #divArchive {
+        position: relative;
+        margin-left:auto;
+        margin-right:auto;
+        margin-top:10px;
+        padding:0px;
+        *padding-top: 19px;
+    }
+    .pageContentWrapper.Archive .item .content {
+        margin-left:0;
+        padding-left:10px;
+    }
+    .pageContentWrapper.Archive .item .enclosureimg {
+        display:block;
+        margin:20px;
+        margin-left:10px;
+        width:80%;
+        max-width:640px;
+    }
+    .pageContentWrapper.Archive .item .enclosureview img {
+        display:block;
+        margin:20px;
+        margin-left:10px;
+        width:90%;
+        max-width:400px;
+    }
+    .pageContentWrapper.Archive .item .enclosureview video {
+        display:block;
+        margin:20px;
+        margin-left:10px;
+        width:90%;
+        max-height:142px;
+        max-width:400px;
+    }
+    .pageContentWrapper.Archive .item .enclosureview audio {
+        display:block;
+        margin:20px;
+        margin-left:10px;
+        width:90%;
+        max-width:400px;
+    }
+    .pageContentWrapper.Archive .item .enclosureview.youtube {
+        display:block;
+        margin:20px;
+        margin-left:10px;
+        margin-top:0px;
+        width:90%;
+        max-height:142px;
+        max-width:400px;
+    }
+}

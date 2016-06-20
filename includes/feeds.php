@@ -3827,10 +3827,7 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
     $mjsonriver = "onGetRiverStream(" . json_encode($moutput) . ")";
 
     //Let's return the river asked for
-    $jsonriver = $djsonriver;
-    if ($mobile == TRUE) {
-        $jsonriver = $mjsonriver;
-    }
+    $jsonriver = $mjsonriver;
 
     //If we can get some sane S3 credentials then let's go
     if ((s3_is_enabled($uid) || sys_s3_is_enabled()) && $prefs['publicriver'] == 1) {
@@ -3842,7 +3839,7 @@ function build_public_river($uid = NULL, $max = NULL, $force = FALSE, $mobile = 
 
         //Put the json river file
         $filename = $default_public_river_json_file_name;
-        $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
+        $s3res = putInS3(gzencode($jsonriver), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/javascript", "Content-Encoding" => "gzip"));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename].");
             //loggit(3, "Could not create S3 file: [$filename].");

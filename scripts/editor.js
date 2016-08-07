@@ -1540,22 +1540,26 @@ $(document).ready(function () {
                     fileMultiDrop = false;
                 },
                 'onDrop': function (file, fileDropCount) {
-                    fileMultiDrop = true;
+                    if(fileDropCount > 1) {
+                        fileMultiDrop = true;
+                    } else {
+                        fileMultiDrop = false;
+                    }
                 },
                 'onUploadComplete': function (file, data) {
                     var jdata = $.parseJSON(data);
                     $('.complete .filename:contains("' + file.name + '")').each(function (index) {
-                        if (isImage(jdata.url) && !fileMultiDrop) {
+                        if (isImage(jdata.url)) {
                             opInsert('<img src="' + jdata.url + '" style="width:600px;">', down);
                             opSetOneAtt('type', 'image');
                             opSetOneAtt('icon', 'image');
                             opSetOneAtt('url', jdata.url);
-                        } else if (isVideo(jdata.url)  && !fileMultiDrop) {
+                        } else if (isVideo(jdata.url) && !fileMultiDrop) {
                             opInsert('<video style="width:95%;margin:0 auto;display:block;" controls="true"><source src="'+jdata.url+'" type="'+jdata.type+'"></video>', down);
                             opSetOneAtt('type', 'video');
                             opSetOneAtt('icon', 'video-camera');
                             opSetOneAtt('url', jdata.url);
-                        } else if (isAudio(jdata.url)  && !fileMultiDrop) {
+                        } else if (isAudio(jdata.url) && !fileMultiDrop) {
                             opInsert('<audio style="width:400px" controls="true"><source src="'+jdata.url+'" type="'+jdata.type+'"></audio>', down);
                             opSetOneAtt('type', 'audio');
                             opSetOneAtt('icon', 'volume-up');

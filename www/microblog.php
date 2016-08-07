@@ -165,6 +165,7 @@ $tree_location = "Microblog";
                         <!-- Uploadify controls. -->
                         <div id="divUpload">
                             <? if ($g_platform == "mobile") { ?>
+                                <h1>DEBUG</h1>
                                 <input type="file" name="file_mobile" id="fileMobile"/>
                             <? } else { ?>
 			You can drag and drop files into this page to attach them.<br/>
@@ -231,8 +232,6 @@ $tree_location = "Microblog";
 
 <script id="microblog-template" type="text/x-jquery-tmpl">
 <? include "$confroot/$scripts/microblog-temp.js" ?>
-
-
 </script>
 
 <div class="row" id="divPostList"></div>

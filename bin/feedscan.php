@@ -2,16 +2,16 @@
 <? include "$confroot/$templates/php_bin_init.php" ?>
 <?
 //Let's not run twice
-if ( ( $pid = cronHelper::lock() ) !== FALSE ) {
+if (($pid = cronHelper::lock()) !== FALSE) {
 
     //Track the river scan time
     $tstart = time();
 
     //Get the feed list
     //Checking a single feed?
-    if ( isset($argv[1]) && !empty($argv[1]) ) {
+    if (isset($argv[1]) && !empty($argv[1])) {
         $feed = get_feed_info(feed_exists($argv[1]));
-        $feeds = array( $feed );
+        $feeds = array($feed);
     } else {
         $feeds = get_updated_feeds();
     }
@@ -27,7 +27,7 @@ if ( ( $pid = cronHelper::lock() ) !== FALSE ) {
     $ccount = 0;
     $ncount = 0;
     $newitems = 0;
-    foreach ( $feeds as $feed ) {
+    foreach ($feeds as $feed) {
         loggit(1, "Checking feed: [" . $feed['title'] . " | " . $feed['url'] . "]...");
         echo "Checking feed: [" . $feed['title'] . " | " . $feed['url'] . "]...\n";
 
@@ -37,17 +37,17 @@ if ( ( $pid = cronHelper::lock() ) !== FALSE ) {
         //Parse the feed and add new items to the database
         loggit(1, "Checking feed: [ $ccount | " . $feed['title'] . " | " . $feed['url'] . "].");
         $result = get_feed_items($feed['id']);
-        if ( $result == -1 ) {
+        if ($result == -1) {
             loggit(1, "Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]");
             echo "    Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]\n";
-        } else if ( $result == -2 ) {
+        } else if ($result == -2) {
             loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] has no items.");
             echo "    Feed is empty.\n";
-        } else if ( $result == -3 ) {
+        } else if ($result == -3) {
             loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] is current.");
             echo "    Feed is current.\n";
         } else {
-            loggit(3, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] updated.");
+            loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] updated.");
             echo "    Feed updated.\n";
             $ncount++;
             $newitems += $result;
@@ -55,27 +55,34 @@ if ( ( $pid = cronHelper::lock() ) !== FALSE ) {
 
         $ccount++;
 
-        echo "      It took " . ( time() - $fstart ) . " seconds to scan this feed.\n";
-        loggit(1, "It took [" . ( time() - $fstart ) . "] seconds to scan this feed.");
+        echo "      It took " . (time() - $fstart) . " seconds to scan this feed.\n";
+        loggit(1, "It took [" . (time() - $fstart) . "] seconds to scan this feed.");
         echo "\n";
 
         //We stop scanning if this scan has taken longer than expected
-        if ( ( time() - $tstart ) > $totaltime ) {
+        if ((time() - $tstart) > $totaltime) {
             loggit(3, "Stop scan because it took longer than the expected: [$totaltime] seconds.");
             break;
         }
 
         //We stop scanning once we hit our feed count limit for this pass
-        if ( $ccount >= $scancount ) {
+        if ($ccount >= $scancount) {
             break;
         }
     }
     echo "\n";
 
+    //Rebuild the v2 search map counts if v2 enabled
+    if ($cg_search_v2_enable) {
+        loggit(3, "Rebuilding search word counts.");
+        calculate_map_word_counts();
+        calculate_map_word_today_counts();
+    }
+
     //Calculate time took to scan the river
-    loggit(3, "It took " . ( time() - $tstart ) . " seconds to scan [$ccount] of [$totalfeeds] feeds.");
+    loggit(3, "It took " . (time() - $tstart) . " seconds to scan [$ccount] of [$totalfeeds] feeds.");
     loggit(3, "Total checked: [$ccount]. Updated: [$ncount]. New items: [$newitems].");
-    echo "      It took " . ( time() - $tstart ) . " seconds to scan [$ccount] of [$totalfeeds] feeds.\n";
+    echo "      It took " . (time() - $tstart) . " seconds to scan [$ccount] of [$totalfeeds] feeds.\n";
     echo "Total checked: [$ccount]. Updated: [$ncount]. New items: [$newitems].\n";
 
 
@@ -85,4 +92,4 @@ if ( ( $pid = cronHelper::lock() ) !== FALSE ) {
     //Remove the lock file
     cronHelper::unlock();
 }
-exit( 0 );
+exit(0);

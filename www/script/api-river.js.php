@@ -1,6 +1,12 @@
 <? include get_cfg_var("cartulary_conf") . '/includes/env.php'; ?>
 <? include "$confroot/$templates/php_script_init.php" ?>
 
+if (!Array.prototype.last){
+    Array.prototype.last = function(){
+        return this[this.length - 1];
+    };
+};
+
 //-----------------------------------------------------------------------------------
 // ----- River API -----
 freedomController.v1.river = {};
@@ -41,6 +47,27 @@ freedomController.v1.river.methods = (function () {
         sessionStorage.removeItem(lsRiverDataKey);
         sessionStorage.removeItem(lsRiverDataPullTime);
         sessionStorage.removeItem(lsSessionIdKey);
+
+        return true;
+    }
+
+
+    function _unstickyAllItems() {
+        //Loop through the sticky items and un-sticky them as well
+        $.ajax({
+            url: '/cgi/in/unstickyall',
+            type: "GET",
+            timeout: 20000,
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == "true") {
+                    showMessage(data.description, data.status, 5);
+                    $('div.article.sticky').remove();
+                } else {
+                    showMessage(data.description, data.status, 5);
+                }
+            }
+        });
 
         return true;
     }
@@ -737,6 +764,20 @@ freedomController.v1.river.methods = (function () {
                                 });
                             }
                         });
+                        //Scrape the retrieved article body for links to stuff we can render like videos and pictures and embed them
+                        $(pathToPost + ' .description').find('a').each(function() {
+                            // Match elements containg youtube urls
+                            var match = this.href.match(/(http:|https:)?\/\/(www\.)?(youtube.com|youtu.be)\/(watch)?(\?v=)?(\S+)?/);
+                            if(match != null) {
+                                console.log(match);
+                                if(match[4] == 'watch') {
+                                    $(pathToPost + ' .enclosureview').prepend('<iframe class="encobj enciframe" src="https://youtube.com/embed/'+match.last()+'"></iframe>');
+                                } else {
+                                    $(pathToPost + ' .enclosureview').prepend('<iframe class="encobj enciframe" src="'+match[0]+'"></iframe>');
+                                }
+
+                            }
+                        });
                         //Change cart link at bottom to an edit article button
                         $(pathToPost).find('div.footer div.actions a.cartlink img.icon-bookmark').removeClass('icon-bookmark').addClass('icon-editor');
                         $(pathToPost).find('div.footer div.actions a.cartlink').removeClass('cartlink').addClass('editlink');
@@ -1330,6 +1371,7 @@ freedomController.v1.river.methods = (function () {
 
     return {
         searchPostLoad: _searchPostLoad,
+        unstickyAllItems: _unstickyAllItems,
         removeSessionData: _removeSessionData,
         rebindEverything: _rebindEverything,
         showOnlyItems: _showOnlyItems,

@@ -703,7 +703,7 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
                     if (!empty($enclosure['type'])) {
                         $etyp = 'type="' . $enclosure['type'] . '"';
                     }
-                    if (!empty($enclosure['url'])) {
+                    if (!empty($enclosure['url']) && $enclosure['url'] != "undefined") {
                         $rss_enclosures .= '        <enclosure url="' . clean_url_for_xml(trim($enclosure['url'])) . '" ' . $elen . ' ' . $etyp . ' />' . "\n";
                     }
                     if(url_is_a_picture($enclosure['url'])) {
@@ -1363,6 +1363,7 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
                 }
             }
         }
+
         $html .= $guid . "\n";
         $html .= '<div class="linkage">' . "\n";
         if (!empty($rsslink)) {

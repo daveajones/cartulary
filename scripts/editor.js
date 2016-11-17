@@ -99,7 +99,20 @@ $(document).ready(function () {
                 filename = result.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
 
                 //Save the file
-                saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, opOutlineToXml(ownerName, ownerEmail));
+                saveFile(
+                    title,
+                    filename,
+                    type,
+                    redirect,
+                    includeDisqus,
+                    wysiwygOn,
+                    watchedOutline,
+                    lockedOutline,
+                    opOutlineToXml(ownerName, ownerEmail),
+                    undefined,
+                    undefined,
+                    true
+                );
             }
         });
         $('#dropdownSave').dropdown('toggle');
@@ -127,7 +140,7 @@ $(document).ready(function () {
         if (lockedOutline && wasLocked) {
             menubar.find('.menuSaveAs').trigger('click');
         } else {
-            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, opOutlineToXml(ownerName, ownerEmail));
+            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false);
         }
         $('#dropdownSave').dropdown('hide');
         return false;
@@ -211,7 +224,6 @@ $(document).ready(function () {
                     }
                     var rfType = "";
                     if (item.type === 1) {
-                        type = 1;
                         rfType = ' <i class="fa fa-rss"></i> ';
                     }
                     $('.recentfilesopen').append('<li><a style="text-transform: capitalize;" href="/editor?url=' + item.url + '">' + newtitle + '</a> ' + prettyDate(item.time * 1000).toLowerCase() + '. ' + rfType + rfLocked + rfEye + '</li>');
@@ -760,7 +772,7 @@ $(document).ready(function () {
 
 
         morsestring.forEach(function (letter) {
-            console.log("STarting letter: [" + letter + "]");
+            //console.log("STarting letter: [" + letter + "]");
             if (letter !== " ") nextStep += clGap;
             if (letter === " ") {
                 nextStep += cwGap;
@@ -1029,9 +1041,10 @@ $(document).ready(function () {
     $('#divEditorEnclosures').offset({top: 0, left: 0}).offset($('#divEditOutline').offset());
 
     //Save a file
-    function saveFile(ftitle, fname, ftype, fredirect, fdisqus, fwysiwyg, fwatched, flocked, fopml, foldname, asarticle) {
+    function saveFile(ftitle, fname, ftype, fredirect, fdisqus, fwysiwyg, fwatched, flocked, fopml, foldname, asarticle, jumptourl) {
         var _foldname = (typeof foldname === "undefined") ? "" : foldname;
         var _asarticle = (typeof asarticle === "undefined") ? false : asarticle;
+        var _jumptourl = (typeof jumptourl === "undefined") ? false : jumptourl;
         var menubar = $('#menubarEditor');
 
         //Render the title and byline?
@@ -1057,7 +1070,7 @@ $(document).ready(function () {
                 "title": ftitle,
                 "rendertitle": rendertitle,
                 "aid": aid,
-                "articleoverwrite": asarticle
+                "articleoverwrite": _asarticle
             },
             dataType: "json",
             beforeSend: function () {
@@ -1082,6 +1095,11 @@ $(document).ready(function () {
 
                 //Set the title of the html document
                 document.title = ftitle + " - FC";
+
+                if(_jumptourl) {
+                    //alert(_jumptourl + " | " + url);
+                    window.location = '/editor?url=' + url;
+                }
             }
         });
 
@@ -1139,7 +1157,7 @@ $(document).ready(function () {
         if (!opInTextMode()) {
             seltxt = opGetLineText();
             if (/^http[s]?\:\/\//.test(seltxt)) {
-                console.log(seltxt);
+                //console.log(seltxt);
                 urltolink = seltxt;
             } else {
                 bootbox.prompt({
@@ -1147,7 +1165,7 @@ $(document).ready(function () {
                     value: urltolink,
                     callback: function (result) {
                         if (result !== null) {
-                            console.log(result);
+                            //console.log(result);
                             urltolink = result;
                             if (urltolink != "" && /^http[s]?\:\/\//.test(urltolink)) {
                                 opSetOneAtt('type', 'link');
@@ -1165,12 +1183,12 @@ $(document).ready(function () {
             seltxt = getSelected();
             seltxt = new String(seltxt);
             if (/^http[s]?\:\/\//.test(seltxt)) {
-                console.log(seltxt);
+                //console.log(seltxt);
                 urltolink = seltxt;
             } else {
                 bootbox.prompt("Type the target link.", function (result) {
                     if (result !== null) {
-                        console.log(result);
+                        //console.log(result);
                         urltolink = result;
                         if (urltolink != "" && /^http[s]?\:\/\//.test(urltolink)) {
                             outliner.concord().op.link(urltolink);
@@ -1422,7 +1440,7 @@ $(document).ready(function () {
 
     //Handle some special key stroke stuff
     function opKeystrokeCallback(event) {
-        console.log(event)
+        //console.log(event)
 
         //CTRL+SHIFT+Enter should duplicate this line above the current line
         if (event.which == 13 && event.shiftKey && (event.ctrlKey || event.metaKey)) {
@@ -1810,7 +1828,7 @@ $(document).ready(function () {
                 return [dot, dot, dash, dash, dot, dot];
             }
         };
-        console.log("Letter: [" + letter + "] values: " + letters[letter]());
+        //console.log("Letter: [" + letter + "] values: " + letters[letter]());
         return letters[letter]();
     }
 

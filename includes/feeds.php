@@ -1525,6 +1525,37 @@ function delete_feed_items($fid = NULL)
 }
 
 
+//Delete all the items for a particular feed
+function unmark_all_feed_items_as_sticky($uid = NULL)
+{
+    //Check params
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the id in the transaction table
+    $stmt = "DELETE FROM nfitemprops WHERE userid=? AND sticky=1";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $delcount = $sql->affected_rows;
+    $sql->close();
+
+    //Log and leave
+    if ($delcount > 0) {
+        loggit(1, "Unmarked: [$delcount] items as sticky for user: [$uid].");
+    }
+    return ($delcount);
+}
+
+
 //Delete a feed
 function delete_feed($fid = NULL)
 {
@@ -1744,9 +1775,10 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     $newcount = 0;
     if (strtolower($x->getName()) == "rdf") {
         //Probably an RDF feed
+        loggit(3, "RDF Feed: ".$ftitle);
         foreach ($x->item as $entry) {
             $items[$count] = $entry;
-            if (!feed_item_exists($fid, get_unique_id_for_feed_item($entry))) { //testing
+            if (!feed_item_exists($fid, get_unique_id_for_rdf_feed_item($entry, $namespaces))) {
                 update_feed_lastupdate($fid, time());
                 add_feed_item($fid, $entry, "rss", $namespaces);
                 $newcount++;
@@ -1779,7 +1811,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         //This is an rss feed
         foreach ($x->channel->item as $entry) {
             $items[$count] = $entry;
-            if (!feed_item_exists($fid, get_unique_id_for_feed_item($entry))) { //testing
+            if (!feed_item_exists($fid, get_unique_id_for_feed_item($entry))) {
                 update_feed_lastupdate($fid, time());
                 add_feed_item($fid, $entry, "rss", $namespaces);
                 $newcount++;
@@ -1887,7 +1919,104 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
 }
 
 
-//Retrieve a list of all the feeds in the database
+//Retrieve a list of all the feed items in the database
+function get_all_feed_item_ids($max = NULL)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Get all feed items up to max
+    $sqltxt = "SELECT id FROM $table_nfitem";
+
+    //Work newest to oldest
+    $sqltxt .= " ORDER BY id";
+
+    //Max given?
+    if ( !empty($max) && is_numeric($max) ) {
+        $sqltxt .= " LIMIT $max";
+    }
+
+    //Run the query
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any feed items returned
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "There are no feed items in the system.");
+        return (array());
+    }
+
+    $sql->bind_result($iid) or loggit(2, "MySql error: " . $dbh->error);
+
+    $items = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $items[] = $iid;
+        $count++;
+    }
+
+    $sql->close();
+
+    loggit(1, "Returning: [$count] feed items in the system.");
+    return ($items);
+}
+
+
+//Retrieve details of a certain feed item
+function get_feed_item($id = NULL)
+{
+    //Check parameters
+    if (empty($id)) {
+        loggit(2, "The id is blank or corrupt: [$id]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Get all feed items up to max
+    $sqltxt = "SELECT id,title,url,description FROM $table_nfitem WHERE id=?";
+
+    //Run the query
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $id) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any feed items returned
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "No feed item found.");
+        return (array());
+    }
+
+    $sql->bind_result($iid, $ititle, $iurl, $idescription) or loggit(2, "MySql error: " . $dbh->error);
+
+    $items = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $items[$count] = array('id' => $iid, 'title' => $ititle, 'url' => $iurl, 'description' => $idescription);
+        $count++;
+    }
+
+    $sql->close();
+
+    loggit(1, "Returning feed item: [$id].");
+    return ($items[0]);
+}
+
+
+//Retrieve a list of all the feed items in the database
 function get_all_feed_items($max = NULL, $collapsebyurl = TRUE)
 {
     //Includes
@@ -2434,7 +2563,12 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         }
 
         //We need a guid, so if the item doesn't have a guid, then build a uniqe id by hashing the whole item
-        $uniq = get_unique_id_for_feed_item($item);
+        if(isset($namespaces['rdf'])) {
+            $uniq = get_unique_id_for_rdf_feed_item($item, $namespaces);
+        } else {
+            $uniq = get_unique_id_for_feed_item($item);
+        }
+
 
         //De-relativize links
         $httploc = strpos($linkurl, 'http');
@@ -3169,6 +3303,41 @@ function get_unique_id_for_feed_item($item = NULL)
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //If a guid exists then get that instead
+    if (!empty($item->guid)) {
+        //loggit(3, "Returning guid: [".$item->guid."] as unique id for feed item."]");
+        return ($item->guid);
+    }
+
+    //Hash it
+    $hashed = sha1($item->asXML());
+
+    //Return
+    //loggit(3, "Returning hash: [$hashed] as unique id for feed item: [".print_r($item, TRUE)."]");
+    return ($hashed);
+}
+
+
+//Hash a feed item to construct a unique id for this item
+function get_unique_id_for_rdf_feed_item($item = NULL, $namespaces = array())
+{
+    //Check parameters
+    if (empty($item)) {
+        loggit(2, "The feed item is blank or corrupt: [" . print_r($item, TRUE) . "]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //loggit(3, "DEBUG: RDF namespaces: ".print_r($namespaces, TRUE));
+
+    //Get rdf about string
+    if( isset($namespaces['rdf']) && !empty($item->attributes($namespaces['rdf'])->about) ) {
+        loggit(3, "RDF item->about attribute: ".$item->attributes($namespaces['rdf'])->about);
+        return ($item->attributes($namespaces['rdf'])->about);
+    }
 
     //If a guid exists then get that instead
     if (!empty($item->guid)) {
@@ -5445,9 +5614,9 @@ function get_sticky_feed_items($uid = NULL)
 					'nfcatalog.hidden',
 					'nfcatalog.fulltext'
              FROM (SELECT itemid FROM nfitemprops WHERE userid = ? AND sticky = 1) AS tsub
-             INNER JOIN nfitems ON nfitems.id = tsub.itemid
-			 INNER JOIN newsfeeds ON nfitems.feedid = newsfeeds.id
-			 INNER JOIN nfcatalog ON nfitems.feedid = nfcatalog.feedid AND nfcatalog.userid = ?
+             LEFT JOIN nfitems ON nfitems.id = tsub.itemid
+			 LEFT JOIN newsfeeds ON nfitems.feedid = newsfeeds.id
+			 LEFT JOIN nfcatalog ON nfitems.feedid = nfcatalog.feedid AND nfcatalog.userid = ?
              ORDER BY timeadded ASC";
 
     //loggit(3, "[$sqltxt]");

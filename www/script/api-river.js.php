@@ -150,8 +150,11 @@ freedomController.v1.river.methods = (function () {
     function _countEnclosuresOfType(enclosures, typecheck) {
         var cnt = 0;
         $.each(enclosures, function () {
-            if (this.type.indexOf(typecheck) != -1) {
-                cnt++;
+            var thisenc = this;
+            if (typeof thisenc.type.indexOf === "function") {
+                if (thisenc.type.indexOf(typecheck) != -1) {
+                    cnt++;
+                }
             }
         });
 
@@ -160,6 +163,7 @@ freedomController.v1.river.methods = (function () {
 
 
     function _isImage(url, type) {
+        if (typeof type.indexOf !== "function") return false;
         if (type.indexOf('image') != -1) {
             return true;
         }
@@ -181,6 +185,7 @@ freedomController.v1.river.methods = (function () {
 
 
     function _isAudio(url, type) {
+        if (typeof type.indexOf !== "function") return false;
         if (type.indexOf('audio') != -1) {
             return true;
         }
@@ -205,6 +210,7 @@ freedomController.v1.river.methods = (function () {
 
 
     function _isVideo(url, type) {
+        if (typeof type.indexOf !== "function") return false;
         if (type.indexOf('video') != -1) {
             return true;
         }
@@ -229,6 +235,7 @@ freedomController.v1.river.methods = (function () {
 
 
     function _isIframe(url, type) {
+        if (typeof type.indexOf !== "function") return false;
         if (type.indexOf('text/html') != -1) {
             return true;
         }

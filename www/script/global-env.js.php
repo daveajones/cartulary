@@ -13,7 +13,7 @@ var msgtimer;
 
 //User globals
 var cuTwitterIsEnabled = <?if( twitter_is_enabled($g_uid) ) {?>true<?}else{?>false<?}?>;
-var cuRiverColumnCount = <?echo $g_prefs['rivercolumns']?>;
+var cuRiverColumnCount = <?if( isset($g_prefs['rivercolumns'])) { echo $g_prefs['rivercolumns']; } else { echo "1"; }?>;
 
 //Library prefs
 $.Finger = {

@@ -30,7 +30,7 @@ header("Content-Security-Policy-Report: script-src 'self' https://apis.google.co
 
         <div id="stream-wrap" class="stream-wrap">
             <div id="stream" class="stream">
-                <button id="unstickyAllItems" title="Unsticky All"><i class="fa fa-star-half-o"></i></button>
+                <button id="unstickyAllItems" class="hide" title="Unsticky All"><i class="fa fa-star-half-o"></i></button>
                 <p class="notice"><img id="imgLoadRiverSpinner" class="imgSpinner" src="/images/spinner.gif" alt=""/>
                     Loading river...</p>
 

@@ -53,6 +53,8 @@ freedomController.v1.river.methods = (function () {
 
 
     function _unstickyAllItems() {
+        console.log("_unstickyAllItems() called");
+        showMessage("Un-stickying all items...", "warning", 30);
         //Loop through the sticky items and un-sticky them as well
         $.ajax({
             url: '/cgi/in/unstickyall',
@@ -63,6 +65,7 @@ freedomController.v1.river.methods = (function () {
                 if (data.status == "true") {
                     showMessage(data.description, data.status, 5);
                     $('div.article.sticky').remove();
+                    $('button#unstickyAllItems').hide();
                 } else {
                     showMessage(data.description, data.status, 5);
                 }
@@ -879,6 +882,9 @@ freedomController.v1.river.methods = (function () {
                         }
                     });
                 }
+
+                //If this is the last sticky item, remove un-stickyall button
+                if ($('.article.sticky').length < 1) $('button#unstickyAllItems').hide();
             })();
 
             return false;
@@ -984,7 +990,7 @@ freedomController.v1.river.methods = (function () {
     }
 
 
-    function _buildRiver(cached) {
+    function _buildRiver(cached, callback) {
         var cached = (typeof cached === "undefined") ? false : cached;
         var cols = 1;
 
@@ -1024,6 +1030,11 @@ freedomController.v1.river.methods = (function () {
                         _sortGrid(true);
                     }
                 });
+            }
+
+            if(typeof callback === "function") {
+                console.log("ua callback");
+                callback();
             }
 
         });

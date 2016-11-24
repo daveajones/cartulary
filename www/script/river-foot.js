@@ -64,22 +64,30 @@ $(document).ready(function () {
     });
 
     //Bind unsticky all items button
-    // if( $('.article.sticky').length < 1 ) {
-    //     $('button#unstickyAllItems').hide();
-    //} else {
-        $('button#unstickyAllItems').click(function() {
-            freedomController.v1.river.methods.unstickyAllItems();
-        });
-    //}
-
+    var showHideUnstickyAllButton = function() {
+        console.log("stickies: "+$('.article.sticky').length);
+        if ($('.article.sticky').length > 0) {
+            $('button#unstickyAllItems').show();
+            console.log("there are sticky articles");
+            $('button#unstickyAllItems').click(function () {
+                freedomController.v1.river.methods.unstickyAllItems();
+            });
+        }
+    };
 
     //Initial river build
     var nowt = Math.round(new Date().getTime() / 1000);
     var rdpt = sessionStorage.getItem(freedomController.v1.river.statics.lsRiverDataPullTime);
     if (rdpt == "undefined" || (nowt - rdpt) > 300) {
-        freedomController.v1.river.methods.buildRiver(false);
+        freedomController.v1.river.methods.buildRiver(false, function () {
+            console.log("post-riverbuild callback called");
+            showHideUnstickyAllButton();
+        });
     } else {
-        freedomController.v1.river.methods.buildRiver(false);
+        freedomController.v1.river.methods.buildRiver(false, function () {
+            console.log("post-riverbuild callback called");
+            showHideUnstickyAllButton();
+        });
     }
     console.log("time since last river pull [" + (nowt - rdpt) + "]");
 

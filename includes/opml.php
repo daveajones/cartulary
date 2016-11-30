@@ -2423,7 +2423,12 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             }
 
             //Set an expanded class on outline nodes that match the expansionState counter
-            $parent = end(array_values($parents));
+            if(isset($parents)) {
+                $parent = end(array_values($parents));
+            } else {
+                $parent = "";
+            }
+
             if ($type == "menu" && $menuexists == 0) {
                 $htmlcontent .= "<div class=\"navbar navbar-fixed-top navbar-inverse\" role=\"navigation\">\n<div class=\"container\">\n<div class=\"navbar-header\">\n<button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\"#navbar-collapse-1\">\n<span class=\"sr-only\">Toggle navigation</span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n</button>\n<a class=\"navbar-brand\" href='#'>$nodetext</a>\n</div>\n<div class=\"collapse navbar-collapse\" id=\"navbar-collapse-1\"><ul class=\"nav navbar-nav\">\n";
                 $menuexists++;
@@ -3734,7 +3739,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
 
     //Check params
     if (empty($content) || !is_outline($content)) {
-        loggit(3, "The outline content is blank or corrupt: [$content]");
+        loggit(3, "The outline content is blank or corrupt: Size[".strlen($content)."]");
         return (FALSE);
     }
 

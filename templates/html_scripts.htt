@@ -1,36 +1,34 @@
+<!-- Global scripts -->
 <!-- Core -->
-<script type="text/javascript" src="/script/pace.min.js"></script>
-<script type="text/javascript" src="/script/jquery-1.11.2.min.js"></script>
-<script type="text/javascript" src="/script/jquery.form.js"></script>
-<script type="text/javascript" src="/script/bootstrap-2.3.1.min.js"></script>
-<script type="text/javascript" src="/script/jquery.finger.min.js"></script>
-<script type="text/javascript" src="/script/jquery.tmpl.min.js"></script>
-<script><?include "$confroot/$scripts/freedomcontroller.utils.js"?></script>
-<?if( isset($g_uid) ) {?>
-<script type="text/javascript" src="/script/jquery.cookie.js"></script>
-<script type="text/javascript" src="/script/jquery.appear.js"></script>
-<script type="text/javascript" src="/script/jquery.uploadifive-v1.1.2.min.js"></script>
-<script type="text/javascript" src="/script/jquery-ui-1.10.2.js"></script>
-<script type="text/javascript" src="/script/jquery.masonry.min.js"></script>
-<script type="text/javascript" src="/script/jquery.debouncedresize.js"></script>
-<script type="text/javascript" src="/script/jquery.touchSwipe.min.js"></script>
-<script type="text/javascript" src="/script/hmac-sha1.js"></script>
-<!-- Other -->
-<script type="text/javascript" src="/script/keymaster.min.js"></script>
-<!-- Global custom -->
-<script>
-<?include "$confroot/$scripts/global-env.js"?>
-<?include "$confroot/$scripts/global-custom.js"?>
-</script>
-<!-- Freedom Controller API -->
-<script>
-<?include "$confroot/$scripts/freedomcontroller.v1.js"?>
-<?include "$confroot/$scripts/api-subscribe.js"?>
-<?include "$confroot/$scripts/api-river.js"?>
-<?include "$confroot/$scripts/api-search.js"?>
-<?include "$confroot/$scripts/api-people.js"?>
-</script>
-<?}?>
+<script src="/script/pace.min.js"></script>
+<script src="/script/jquery-1.11.2.min.js"></script>
+<script src="/script/jquery.form.js"></script>
+<script src="/script/bootstrap-2.3.1.min.js"></script>
+<script src="/script/jquery.finger.min.js"></script>
+<script src="/script/jquery.tmpl.min.js"></script>
+<script src="/script/freedomcontroller.utils.js"></script>
+<? if (isset($g_uid)) { ?>
+    <script src="/script/jquery.cookie.js"></script>
+    <script src="/script/jquery.appear.js"></script>
+    <script src="/script/jquery.uploadifive-v1.1.2.min.js"></script>
+    <script src="/script/jquery-ui-1.10.2.js"></script>
+    <script src="/script/jquery.masonry.min.js"></script>
+    <script src="/script/jquery.debouncedresize.js"></script>
+    <script src="/script/jquery.touchSwipe.min.js"></script>
+    <script src="/script/hmac-sha1.js"></script>
+    <!-- Other -->
+    <script src="/script/keymaster.min.js"></script>
+    <!-- Global custom -->
+    <script src="/script/global-env.js"></script>
+    <script src="/script/global-custom.js"></script>
+    <!-- Freedom Controller API -->
+    <script src="/script/freedomcontroller.v1.js"></script>
+    <script src="/script/api-subscribe.js"></script>
+    <script src="/script/api-river.js"></script>
+    <script src="/script/api-search.js"></script>
+    <script src="/script/api-people.js"></script>
+    <script src="/script/upload.js"></script>
+<? } ?>
 <script src="/script/concord.js"></script>
 <script src="/script/concordUtils.js"></script>
 <script src="/script/bootbox.min.js"></script>

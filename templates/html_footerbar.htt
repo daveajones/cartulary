@@ -249,10 +249,6 @@
     <!-- Global Modals -->
 
     <!-- End-of-body content -->
-    <script>
-        <?include "$confroot/$scripts/upload.js"?>
-    </script>
-    <script>
-        <?include "$confroot/$scripts/global-postload.js"?>
-    </script>
+    <script src="/script/upload.js"></script>
+    <script src="/script/global-postload.js"></script>
 <? } ?>

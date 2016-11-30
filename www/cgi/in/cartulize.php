@@ -412,7 +412,7 @@ if ($linkonly == FALSE) {
             $slimcontent = $content;
         } else
 
-        //Is this audio
+        //Is this video
         if (url_is_video($url)) {
             loggit(3, "Getting a video url.");
             loggit(3, "Video source: [" . $url . "]");
@@ -422,16 +422,36 @@ if ($linkonly == FALSE) {
             $slimcontent = $content;
         } else
 
-                //Is this an imgur link?
+        //Is this an imgur link?
         if (preg_match('/imgur\.com/i', $url)) {
             loggit(3, "Getting an image file as a full article.");
-            if( preg_match("/\<link.*rel=\"image_src.*href=\"(.*)\"/iU", $html, $matches) ) {
+            if (preg_match("/\<link.*rel=\"image_src.*href=\"(.*)\"/iU", $html, $matches)) {
                 $url = $matches[1];
-                loggit(3, "Imgur image source: [".$url."]");
+                loggit(3, "Imgur image source: [" . $url . "]");
                 $content = '<br/><img class="bodyvid" src="' . $matches[1] . '"></img>';
             } else {
-                loggit(2, "Couldn't extract Imgur image: [".$matches[1]."]");
+                loggit(2, "Couldn't extract Imgur image: [" . $matches[1] . "]");
             }
+            $analysis = "";
+            $slimcontent = $content;
+        } else
+
+        //Is this a wordpress post?
+        if (preg_match('/\<div.*class.*post-content\>/i', $html)) {
+            loggit(2, "DEBUG: ----------------------> Getting a wordpress post.");
+
+            $dom = new DomDocument();
+            $dom->loadHTML($html);
+            $classname = 'post-content';
+            $finder = new DomXPath($dom);
+            $nodes = $finder->query("//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+            $tmp_dom = new DOMDocument();
+            foreach ($nodes as $node)
+            {
+                $tmp_dom->appendChild($tmp_dom->importNode($node,true));
+            }
+            $content.=trim($tmp_dom->saveHTML());
+
             $analysis = "";
             $slimcontent = $content;
 

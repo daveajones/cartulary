@@ -209,6 +209,13 @@ li.menubar-search-container { display:none; }
   width:500px;
   height:300px;
 }
+.pageContentWrapper.River .stream .stream-items .stream-list > .article iframe.bodyvid {
+    display:block;
+    clear:both;
+    margin:10px auto 0;
+    width:500px;
+    height:300px;
+}
 
 /* ----- Interactive------------------------------- */
 .pageContentWrapper.River .stream .filternotice {

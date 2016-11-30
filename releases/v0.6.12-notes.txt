@@ -1,0 +1,26 @@
+#Release Notes - Freedom Controller v0.6.12
+
+
+Catching up on old times.
+
+This is a big time catchup release.  The biggest improvements here are structural.  But there are some
+visible things as well.
+
+
+- Bug Fixes
+    - Improved updater script
+    - Lots of fixes in the river template scripts
+    - Fixed imgur.com parsing in cartulize script
+    - Re-enabled search v2 word map building
+    - OPML expansion state bug in rendered html
+    - Better defense on some RSS enclosure edge cases
+    - Fixed multiple bugs with RDF handling in the aggregator
+
+- New Feature: Unsticky All Button in River
+    - Does what it says.  Unsticky all posts at once.
+
+- Improvements
+    - Save as... button in the editor now operates like a normal save as button by saving the outline
+      and then opening the new version, leaving the old one un-touched.
+    - Lots of structure changes to the app directory layout.
+    - Better handling and rendering of media uploads in the editor.

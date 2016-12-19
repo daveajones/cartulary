@@ -52,7 +52,7 @@ else
 fi
 
 #sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
-cd $CARTROOT/aggrivate
+cd $INSTALLDIR/aggrivate
 sudo npm -g install npm@latest
 sudo npm -g install npm@latest
 npm install

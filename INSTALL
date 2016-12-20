@@ -10,6 +10,7 @@
 
 
 ##: This script needs to be run with sudo
+SOURCEROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 INSTALLDIR="/opt/cartulary"
 ROOT_UID="0"
 
@@ -52,7 +53,7 @@ else
 fi
 
 #sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
-cd $INSTALLDIR/aggrivate
+cd $SOURCEROOT/aggrivate
 sudo npm -g install npm@latest
 sudo npm -g install npm@latest
 npm install

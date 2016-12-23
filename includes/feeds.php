@@ -1525,7 +1525,7 @@ function delete_feed_items($fid = NULL)
 }
 
 
-//Delete all the items for a particular feed
+//Remove the sticky flags for all of a user's feed items
 function unmark_all_feed_items_as_sticky($uid = NULL)
 {
     //Check params
@@ -5371,7 +5371,7 @@ function collapse_river($river)
 
 
 //Retrieve the feed items that have media in them
-function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL, $start = NULL)
+function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL, $start = NULL, $typefilter = NULL)
 {
     //Check parameters
     if (empty($uid)) {
@@ -5444,20 +5444,25 @@ function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL
     $items = array();
     $count = 0;
     while ($sql->fetch()) {
-        $items[$count] = array(
-            'id' => $aid,
-            'url' => $aurl,
-            'title' => $atitle,
-            'description' => $adescription,
-            'timestamp' => $atimestamp,
-            'timeadded' => $atimeadded,
-            'enclosure' => unserialize($aenclosure),
-            'sourceurl' => $asourceurl,
-            'sourcetitle' => $asourcetitle,
-            'origin' => $aorigin,
-            'author' => $aauthor
-        );
-        $count++;
+        $enc = unserialize($aenclosure);
+        foreach( $enc as $enclosure ) {
+            if($typefilter == NULL || stripos($enclosure['url'], $typefilter) !== FALSE) {
+                $items[$count] = array(
+                    'id' => $aid,
+                    'url' => $aurl,
+                    'title' => $atitle,
+                    'description' => $adescription,
+                    'timestamp' => $atimestamp,
+                    'timeadded' => $atimeadded,
+                    'enclosure' => $enclosure,
+                    'sourceurl' => $asourceurl,
+                    'sourcetitle' => $asourcetitle,
+                    'origin' => $aorigin,
+                    'author' => $aauthor
+                );
+                $count++;
+            }
+        }
     }
 
     $sql->close();
@@ -5470,7 +5475,7 @@ function get_feed_items_with_enclosures($uid = NULL, $tstart = NULL, $max = NULL
 
 
 //Retrieve the feed items that have media in them
-function get_feed_items_with_enclosures2($uid = NULL, $tstart = NULL, $max = NULL, $start = NULL)
+function get_feed_items_with_enclosures2($uid = NULL, $tstart = NULL, $max = NULL, $start = NULL, $type = NULL, $noduplicates = FALSE)
 {
     //Check parameters
     if (empty($uid)) {
@@ -5511,12 +5516,26 @@ function get_feed_items_with_enclosures2($uid = NULL, $tstart = NULL, $max = NUL
              FROM $table_nfenclosures AS enc
              LEFT JOIN $table_nfitem AS nfi ON nfi.id = enc.iid
              INNER JOIN $table_nfcatalog AS nfc ON nfi.feedid = nfc.feedid AND nfc.userid = ?
-             ORDER BY enc.time DESC
-	     LIMIT ?,?";
+    ";
 
-    //loggit(3, "[$sqltxt]");
+    //Was a type requested
+    if (!empty($type)) {
+        $sqltxt .= "WHERE enc.type = ?
+        ";
+    }
+
+    $sqltxt .= "ORDER BY enc.time DESC LIMIT ?,?";
+
+
+
+    loggit(3, "DEBUG_SQL:[$sqltxt]");
     $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("sdd", $uid, $start, $max) or loggit(2, $sql->error);
+    //Was a type requested
+    if (!empty($type)) {
+        $sql->bind_param("sddd", $uid, $type, $start, $max) or loggit(2, $sql->error);
+    } else {
+        $sql->bind_param("sdd", $uid, $start, $max) or loggit(2, $sql->error);
+    }
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
 
@@ -5544,12 +5563,17 @@ function get_feed_items_with_enclosures2($uid = NULL, $tstart = NULL, $max = NUL
         $aauthor
     ) or loggit(2, "MySql error: " . $dbh->error);
 
+    $urls = array();
     $items = array();
     $count = 0;
     while ($sql->fetch()) {
+        if($noduplicates && in_array($aurl, $urls)) continue;
+
         $items[$count] = array(
             'id' => $aiid,
             'url' => $aurl,
+            'mimetype' => $amimetype,
+            'length' => $alength,
             'title' => $atitle,
             'type' => $atype,
             'timestamp' => $atime,
@@ -5560,6 +5584,8 @@ function get_feed_items_with_enclosures2($uid = NULL, $tstart = NULL, $max = NUL
             'author' => $aauthor
         );
         $count++;
+
+        if($noduplicates) $urls[] = $aurl;
     }
 
     $sql->close();
@@ -5938,4 +5964,45 @@ function calculate_click_bait_score($headline = "") {
     //Log and leave
     loggit(3, "Click-bait score for [$headline] is: [$cbscore].");
     return($cbscore);
+}
+
+
+//Create an m3u file based on all of the audio enclosures in this user's river
+function create_m3u_from_river_enclosures($uid = NULL, $max = 50) {
+
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+
+    //The m3u file content
+    $m3utxt = "#EXTM3U\n\n";
+
+    //Get all of the audio enclosures
+    $encitems = get_feed_items_with_enclosures2($uid, NULL, $max, NULL, 2, TRUE);
+
+    //Build out the m3u items
+    foreach($encitems as $encitem) {
+
+        //The header for each line
+        $m3utxt .= "#EXTINF:";
+
+        //Next is the length.  If it's less than 3 bytes (randomly chosen) assume the length isn't valid
+        //and use -1 instead, per the spec
+        if($encitem['length'] > 3 && is_numeric($encitem['length'])) {
+            $m3utxt .= $encitem['length'].", ";
+        } else {
+            $m3utxt .= "-1, ";
+        }
+
+        //Need a title next.  Use the title of the article for now until a better way comes to mind
+        $m3utxt .= $encitem['title']."\n";
+
+        //Finally the url of the enclosure followed by a blank line
+        $m3utxt .= $encitem['url']."\n\n";
+
+    }
+
+    return($m3utxt);
 }

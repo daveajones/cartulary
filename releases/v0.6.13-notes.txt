@@ -1,0 +1,17 @@
+#Release Notes - Freedom Controller v0.6.13
+
+
+Tuning in.
+
+
+
+- Bug Fixes
+    -
+
+- New Feature: Radio
+    - The new radio page lists all enclosures and extracted media from your newsfeed items
+      and builds a playlist of them.
+    - All the normal audio controls are here.
+
+- Improvements
+    -

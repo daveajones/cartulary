@@ -2367,7 +2367,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                     $linkurl = $item->link[$lcount]['href'];
                 }
             }
-            loggit(3, "ATOM LINK: $linkurl");
+            //loggit(3, "ATOM LINK: $linkurl");
 
             //Some feeds only use id for the link
             if ( isset($item->id) && ( stripos($item->id, 'http:') !== FALSE || stripos($item->id, 'https:') !== FALSE) ) {
@@ -2434,7 +2434,11 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                     $esize = check_head_size($mediatag['src']);
                 }
                 if ((empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures)) {
-                    $enclosures[] = array('url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => make_mime_type($mediatag['src'], $mediatag['type']));
+                    $enclosures[] = array('url' => $mediatag['src'],
+                                          'length' => 0 + $esize,
+                                          'type' => make_mime_type($mediatag['src'], $mediatag['type']),
+                                          'extracted' => TRUE
+                    );
                     $media = 1;
                 }
             }
@@ -2588,7 +2592,11 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                     $esize = check_head_size($mediatag['src']);
                 }
                 if ((empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures)) {
-                    $enclosures[] = array('url' => $mediatag['src'], 'length' => 0 + $esize, 'type' => make_mime_type($mediatag['src'], $mediatag['type']));
+                    $enclosures[] = array('url' => $mediatag['src'],
+                                          'length' => 0 + $esize,
+                                          'type' => make_mime_type($mediatag['src'], $mediatag['type']),
+                                          'extracted' => TRUE
+                    );
                     $media = 1;
                 }
             }
@@ -3335,7 +3343,7 @@ function get_unique_id_for_rdf_feed_item($item = NULL, $namespaces = array())
 
     //Get rdf about string
     if( isset($namespaces['rdf']) && !empty($item->attributes($namespaces['rdf'])->about) ) {
-        loggit(3, "RDF item->about attribute: ".$item->attributes($namespaces['rdf'])->about);
+        //loggit(3, "RDF item->about attribute: ".$item->attributes($namespaces['rdf'])->about);
         return ($item->attributes($namespaces['rdf'])->about);
     }
 
@@ -5796,6 +5804,14 @@ function add_feed_item_enclosure($iid = NULL, $enclosure = array()) {
             break;
     }
 
+    //See if this enclosure was an extraction from scraping the html or if it was a
+    //native enclosure
+    $source = 0;
+    if(isset($enclosure['source']) && $enclosure['source']) {
+        loggit(3, "DEBUG: Enclosure: [".$enclosure['url']."] was found by scraping.");
+        $source = 1;
+    }
+
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
@@ -5808,10 +5824,11 @@ function add_feed_item_enclosure($iid = NULL, $enclosure = array()) {
                          mimetype,
                          length,
                          time,
-                         type)
-             VALUES     (?,?,?,?,NOW(),?)";
+                         type,
+                         source)
+             VALUES     (?,?,?,?,NOW(),?,?)";
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dssdd", $iid, $enclosure['url'], $enclosure['type'], $enclosure['length'], $type) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("dssddd", $iid, $enclosure['url'], $enclosure['type'], $enclosure['length'], $type, $source) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(3, $dbh->error);
     $sql->close();
 

@@ -37,7 +37,7 @@ wget -nv https://github.com/daveajones/cartulary/archive/$BRANCH.zip
 unzip -q $BRANCH.zip
 
 ##: Stop cron
-stop cron
+service cron stop 
 
 ##: Kill running jobs
 killall php >/dev/null 2>/dev/null
@@ -61,7 +61,7 @@ cp -R includes/* $CARTROOT/includes
 cp -R libraries/* $CARTROOT/libraries
 cp -R scripts/* $CARTROOT/scripts
 cp -R templates/* $CARTROOT/templates
-cp -R releases/* $CARTROOT/releases
+cp -R releases $CARTROOT
 cp -R www/* $CARTROOT/www
 
 ##: Set permissions
@@ -86,14 +86,14 @@ rm $BRANCH.zip
 ##: Run confcheck
 php $CARTROOT/bin/confcheck.php upgrade silent
 
-##: Run any side-scripts that were shipped with this version
-php $CARTROOT/bin/sidegrade.php
-
 ##: Check the database version
 php $CARTROOT/bin/dbcheck.php
 
 ##: Restart cron daemon
-start cron
+service cron start
+
+##: Run any side-scripts that were shipped with this version
+php $CARTROOT/bin/sidegrade.php
 
 service apache2 restart
 

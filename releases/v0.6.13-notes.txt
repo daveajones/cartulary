@@ -6,12 +6,17 @@ Tuning in.
 
 
 - Bug Fixes
-    -
+    - fixed an INSTALL script bug
+    - fixed an upgrade script bug
+    - fixed a javascript bug on the photo river page
 
 - New Feature: Radio
     - The new radio page lists all enclosures and extracted media from your newsfeed items
       and builds a playlist of them.
     - All the normal audio controls are here.
+    - For now the page is simple with improvements planned like playlists and progress
+      tracking
+    - Feedback welcome and needed
 
 - Improvements
-    -
+    - nfenclosures table now tags media extracted from the body of a feed item

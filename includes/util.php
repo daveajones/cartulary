@@ -302,8 +302,9 @@ function extract_urls_from_text($text) {
         loggit(2, "The text to analyze for urls was blank or corrupt: [$text]");
     }
 
-    return(array());
+    
 
+    return(array());
 }
 
 
@@ -513,7 +514,7 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
     $content = str_replace(array('&lt;', '&gt;', '&nbsp;'), array('<', '>', ' '), $content);
 
     //Strip out all the html tags except for the ones that control textual layout
-    $content = strip_tags($content, '<p><h1><h2><h3><h4><ul><ol><li><table><thead><tbody><tr><td><a><img>');
+    $content = strip_tags($content, '<p><h1><h2><h3><h4><ul><ol><li><table><thead><tbody><tr><td><a><img><blockquote>');
 
     //Strip the attributes from remaining tags
     $content = stripAttributes($content, array('href', 'src'));

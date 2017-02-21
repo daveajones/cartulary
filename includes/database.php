@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 64;
+$cg_database_version = 65;
 $cg_database_updates = array();
 
 
@@ -885,6 +885,15 @@ CGDB0192;
 $cg_database_updates[63][] = <<<CGDB0193
  INSERT INTO `dbversion` ( `version` ) VALUES ( '64' )
 CGDB0193;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 64 to 65 -----------------------------------------------------------------------------------------------
+$cg_database_updates[64][] = <<<CGDB0194
+  ALTER TABLE `nfenclosures` ADD `source` INT NOT NULL COMMENT 'Is this an html scrape or an enclosure?'
+CGDB0194;
+$cg_database_updates[64][] = <<<CGDB0195
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '65' )
+CGDB0195;
 //----------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------

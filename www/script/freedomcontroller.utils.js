@@ -293,7 +293,7 @@ function isImage(url, type) {
     var type = (typeof type === "undefined") ? false : type;
     if(typeof url === "undefined") {
         console.log("DEBUG: isImage() url is undefined.");
-        //return false;
+        return false;
     }
 
     if (type) {

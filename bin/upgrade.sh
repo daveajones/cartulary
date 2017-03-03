@@ -37,7 +37,7 @@ wget -nv https://github.com/daveajones/cartulary/archive/$BRANCH.zip
 unzip -q $BRANCH.zip
 
 ##: Stop cron
-service cron stop 
+service cron stop
 
 ##: Kill running jobs
 killall php >/dev/null 2>/dev/null

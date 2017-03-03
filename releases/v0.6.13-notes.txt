@@ -9,6 +9,7 @@ Tuning in.
     - fixed an INSTALL script bug
     - fixed an upgrade script bug
     - fixed a javascript bug on the photo river page
+    - fixed an issue where the cron jobs could get stuck if a run file was still present
 
 - New Feature: Radio
     - The new radio page lists all enclosures and extracted media from your newsfeed items

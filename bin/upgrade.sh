@@ -32,7 +32,7 @@ export UPDOLDHASH=`md5sum $CARTROOT/bin/upgrade.sh | awk '{ print $1 }'`
 if [ -e "$BRANCH.zip" ] ; then
     rm $BRANCH.zip
 fi
-wget -nv https://github.com/daveajones/cartulary/archive/$BRANCH.zip
+wget --progress=bar:force https://github.com/daveajones/cartulary/archive/$BRANCH.zip 2>&1 | progressfilt
 
 unzip -q $BRANCH.zip
 
@@ -106,9 +106,36 @@ if [ "$UPDOLDHASH" != "$UPDNEWHASH" ] ; then
     echo
     echo
     echo
-    echo " **** A new version of this upgrade script was just installed.  You should run the upgrade again right now. **** "
+    echo " **** A new version of this upgrade script was just installed. ****"
+    echo " ****  You should run the upgrade again right now. Sorry :-(   **** "
     echo
     echo
     echo
 fi
 mv $CARTROOT/bin/new-upgrade.sh $CARTROOT/bin/upgrade.sh
+
+
+##: Wget progress filter
+##: http://stackoverflow.com/questions/4686464/how-to-show-wget-progress-bar-only
+progressfilt ()
+{
+    local flag=false c count cr=$'\r' nl=$'\n'
+    while IFS='' read -d '' -rn 1 c
+    do
+        if $flag
+        then
+            printf '%c' "$c"
+        else
+            if [[ $c != $cr && $c != $nl ]]
+            then
+                count=0
+            else
+                ((count++))
+                if ((count > 1))
+                then
+                    flag=true
+                fi
+            fi
+        fi
+    done
+}

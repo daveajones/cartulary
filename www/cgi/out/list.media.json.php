@@ -20,8 +20,15 @@ if( isset($_REQUEST['start']) ) {
   $start = 0;
 }
 
+//Was a range start specified?
+if( isset($_REQUEST['type']) && is_numeric($_REQUEST['type']) ) {
+    $type = $_REQUEST['type'];
+} else {
+    $type = NULL;
+}
+
 //Get all the users in the system
-$items = get_feed_items_with_enclosures($g_uid, NULL, $max, $start);
+$items = get_feed_items_with_enclosures2($g_uid, NULL, $max, $start, $type, TRUE);
 
 
 //--------------------------------------------------------------------------------
@@ -29,8 +36,11 @@ $items = get_feed_items_with_enclosures($g_uid, NULL, $max, $start);
 $jsondata['data']['items'] = $items;
 $jsondata['status'] = "true";
 $jsondata['description'] = "List of river items containing media.";
-echo json_encode($jsondata);
+
+if( isset($_REQUEST['pretty']) ) {
+    echo format_json(json_encode($jsondata));
+} else {
+    echo json_encode($jsondata);
+}
 
 return(0);
-?>
-

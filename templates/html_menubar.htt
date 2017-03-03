@@ -23,6 +23,7 @@
             <li <?if($section == "Microblog"){echo "class='active'";}?>>  <a href="<?echo $microblogpage?>" title="Microblog">    <i class="icn-nav-microblog"></i></a></li>
             <li <?if($section == "Articles"){echo "class='active'";}?>>   <a href="<?echo $articlespage?>"  title="Articles">     <i class="icn-nav-articles"></i></a></li>
             <li <?if($section == "Media"){echo "class='active'";}?>>      <a href="<?echo $mediapage?>"     title="Media">        <i class="icn-nav-media"></i></a></li>
+            <li <?if($section == "Radio"){echo "class='active'";}?>>      <a href="<?echo $radiopage?>"     title="Radio">      <i class="icn-nav-radio"></i></a></li>
             <li <?if($section == "Subscribe"){echo "class='active'";}?>>  <a href="<?echo $subscribepage?>" title="Subscribe">    <i class="icn-nav-subscribe"></i></a></li>
         </ul>
     </div>
@@ -37,6 +38,7 @@
             <li <?if($section == "Microblog"){echo "class='active'";}?>>  <a href="<?echo $microblogpage?>" title="Microblog">  <i class="icn-nav-microblog"></i></a></li>
             <li <?if($section == "Articles"){echo "class='active'";}?>>   <a href="<?echo $articlespage?>"  title="Articles">   <i class="icn-nav-articles"></i></a></li>
             <li <?if($section == "Media"){echo "class='active'";}?>>      <a href="<?echo $mediapage?>"     title="Media">      <i class="icn-nav-media"></i></a></li>
+            <li <?if($section == "Radio"){echo "class='active'";}?>>      <a href="<?echo $radiopage?>"     title="Radio">      <i class="icn-nav-radio"></i></a></li>
             <li <?if($section == "Subscribe"){echo "class='active'";}?>>  <a href="<?echo $subscribepage?>" title="Subscribe">  <i class="icn-nav-subscribe"></i></a></li>
             <li <?if($section == "Editor"){echo "class='active'";}?>>     <a href="<?echo $editorpage?>"    title="Editor">     <i class="icn-nav-editor"></i></a></li>
 

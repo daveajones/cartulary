@@ -291,6 +291,10 @@ function isBlank(str) {
 //Is this object an image?
 function isImage(url, type) {
     var type = (typeof type === "undefined") ? false : type;
+    if(typeof url === "undefined") {
+        console.log("DEBUG: isImage() url is undefined.");
+        return false;
+    }
 
     if (type) {
         if (type.indexOf(systemUrl) == -1 && type.indexOf('image') != -1 && url.indexOf('http') == 0) {
@@ -317,6 +321,7 @@ function isImage(url, type) {
 //Is it video?
 function isVideo(url, type) {
     var type = (typeof type === "undefined") ? false : type;
+    if(typeof url === "undefined") return false;
 
     if (type) {
         if (type.indexOf(systemUrl) == -1 && type.indexOf('video') != -1 && url.indexOf('http') == 0) {
@@ -343,6 +348,7 @@ function isVideo(url, type) {
 //Is it audio?
 function isAudio(url, type) {
     var type = (typeof type === "undefined") ? false : type;
+    if(typeof url === "undefined") return false;
 
     if (type) {
         if (type.indexOf(systemUrl) == -1 && type.indexOf('audio') != -1 && url.indexOf('http') == 0) {
@@ -372,6 +378,7 @@ function isAudio(url, type) {
 //Is it html content?
 function isHtml(url, type) {
     var type = (typeof type === "undefined") ? false : type;
+    if(typeof url === "undefined") return false;
 
     if (type) {
         if (type.indexOf(systemUrl) == -1 && type.indexOf('html') != -1 && url.indexOf('http') == 0) {

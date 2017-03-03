@@ -48,11 +48,12 @@ function loggit($lognum, $message)
 
 //Calculate a TOTP value
 //via: http://www.opendoorinternet.co.uk/news/2013/05/09/simple-totp-rfc-6238-in-php
-function calculate_totp($seed = NULL, $time_window = 30 ) {
+function calculate_totp($seed = NULL, $time_window = 30)
+{
     // Define your secret seed in hexadecimal format
-    if( empty($seed) ) {
+    if (empty($seed)) {
         loggit(3, "Bad seed given for TOTP calculation.");
-        return(FALSE);
+        return (FALSE);
     }
 
     //Convert to hex
@@ -62,34 +63,34 @@ function calculate_totp($seed = NULL, $time_window = 30 ) {
     $exact_time = microtime(true);
 
     // Round the time down to the time window
-    $rounded_time = floor($exact_time/$time_window);
+    $rounded_time = floor($exact_time / $time_window);
 
     // Pack the counter into binary
     $packed_time = pack("N", $rounded_time);
 
     // Make sure the packed time is 8 characters long
-    $padded_packed_time = str_pad($packed_time,8, chr(0), STR_PAD_LEFT);
+    $padded_packed_time = str_pad($packed_time, 8, chr(0), STR_PAD_LEFT);
 
     // Pack the secret seed into a binary string
     $packed_secret_seed = pack("H*", $secret_seed);
 
     // Generate the hash using the SHA1 algorithm
-    $hash = hash_hmac ('sha1', $padded_packed_time, $packed_secret_seed, true);
+    $hash = hash_hmac('sha1', $padded_packed_time, $packed_secret_seed, true);
 
     // Extract the 6 digit number fromt the hash as per RFC 6238
     $offset = ord($hash[19]) & 0xf;
     $otp = (
-            ((ord($hash[$offset+0]) & 0x7f) << 24 ) |
-            ((ord($hash[$offset+1]) & 0xff) << 16 ) |
-            ((ord($hash[$offset+2]) & 0xff) << 8 ) |
-            (ord($hash[$offset+3]) & 0xff)
+            ((ord($hash[$offset + 0]) & 0x7f) << 24) |
+            ((ord($hash[$offset + 1]) & 0xff) << 16) |
+            ((ord($hash[$offset + 2]) & 0xff) << 8) |
+            (ord($hash[$offset + 3]) & 0xff)
         ) % pow(10, 6);
 
     // Add any missing zeros to the left of the numerical output
     $otp = str_pad($otp, 6, "0", STR_PAD_LEFT);
 
     // Display it
-    return($otp);
+    return ($otp);
 }
 
 
@@ -97,14 +98,13 @@ function calculate_totp($seed = NULL, $time_window = 30 ) {
 function convert_string_to_hex($string = NULL)
 {
     //Check params
-    if( empty($string) ) {
+    if (empty($string)) {
         loggit(3, "Bad string value given for hex conversion.");
-        return(FALSE);
+        return (FALSE);
     }
 
-    $hex='';
-    for ($i=0; $i < strlen($string); $i++)
-    {
+    $hex = '';
+    for ($i = 0; $i < strlen($string); $i++) {
         $hex .= dechex(ord($string[$i]));
     }
     return $hex;
@@ -115,15 +115,14 @@ function convert_string_to_hex($string = NULL)
 function convert_hex_to_string($hex = NULL)
 {
     //Check params
-    if( empty($hex) ) {
+    if (empty($hex)) {
         loggit(3, "Bad hexidecimal input value.");
-        return(FALSE);
+        return (FALSE);
     }
 
-    $string='';
-    for ($i=0; $i < strlen($hex)-1; $i+=2)
-    {
-        $string .= chr(hexdec($hex[$i].$hex[$i+1]));
+    $string = '';
+    for ($i = 0; $i < strlen($hex) - 1; $i += 2) {
+        $string .= chr(hexdec($hex[$i] . $hex[$i + 1]));
     }
     return $string;
 }
@@ -297,6 +296,18 @@ function truncate_html($html, $max_words)
 }
 
 
+function extract_urls_from_text($text) {
+
+    if(empty($text)) {
+        loggit(2, "The text to analyze for urls was blank or corrupt: [$text]");
+    }
+
+    
+
+    return(array());
+}
+
+
 //Extract img, video, audio and iframe tags from a piece of html
 function extract_media($html)
 {
@@ -319,7 +330,8 @@ function extract_media($html)
 
             //Check for an href first
             $src = (string)$tag->getAttribute('href');
-            if (strlen($src) < 8) {
+            $src = trim($src);
+            if (strlen($src) < 8 || empty($src)) {
                 //If href value looks bogus, try for a src value
                 $src = (string)$tag->getAttribute('src');
                 if (strlen($src) < 8) {
@@ -351,36 +363,37 @@ function extract_media($html)
                     $media_tags[$idx] = array('tag' => 'img',
                         'stag' => $tagname,
                         'type' => 'image',
-                        'src' => trim($src),
+                        'src' => $src,
                         'raw' => "<img src=\"$src\" />");
                     $idx++;
                 } else
-                    if ($thistype == 'audio' || $tagname == 'audio') {
-                        $media_tags[$idx] = array('tag' => 'audio',
-                            'stag' => $tagname,
-                            'type' => 'audio',
-                            'src' => trim($src),
-                            'raw' => "<audio src=\"$src\"></audio>");
-                        $idx++;
-                    } else
-                        if ($thistype == 'video' || $tagname == 'video') {
-                            $media_tags[$idx] = array('tag' => 'video',
-                                'stag' => $tagname,
-                                'type' => 'video',
-                                'src' => trim($src),
-                                'raw' => "<video src=\"$src\"></video>");
-                            $idx++;
-                        } else
-                            if ($tagname == 'iframe') {
-                                $media_tags[$idx] = array('tag' => 'iframe',
-                                    'stag' => $tagname,
-                                    'type' => 'text/html',
-                                    'src' => trim($src),
-                                    'raw' => "<iframe src=\"$src\"></iframe>");
-                                $idx++;
-                            } else {
-                                continue;
-                            }
+                if ($thistype == 'audio' || $tagname == 'audio') {
+                    $media_tags[$idx] = array('tag' => 'audio',
+                        'stag' => $tagname,
+                        'type' => 'audio',
+                        'src' => $src,
+                        'raw' => "<audio src=\"$src\"></audio>");
+                    loggit(3, "AUDIOSCRAPE: [$src]");
+                    $idx++;
+                } else
+                if ($thistype == 'video' || $tagname == 'video') {
+                    $media_tags[$idx] = array('tag' => 'video',
+                        'stag' => $tagname,
+                        'type' => 'video',
+                        'src' => $src,
+                        'raw' => "<video src=\"$src\"></video>");
+                    $idx++;
+                } else
+                if ($tagname == 'iframe') {
+                    $media_tags[$idx] = array('tag' => 'iframe',
+                        'stag' => $tagname,
+                        'type' => 'text/html',
+                        'src' => $src,
+                        'raw' => "<iframe src=\"$src\"></iframe>");
+                    $idx++;
+                } else {
+                    continue;
+                }
                 //loggit(3, "DEBUG: $src");
             }
         }
@@ -501,7 +514,7 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
     $content = str_replace(array('&lt;', '&gt;', '&nbsp;'), array('<', '>', ' '), $content);
 
     //Strip out all the html tags except for the ones that control textual layout
-    $content = strip_tags($content, '<p><h1><h2><h3><h4><ul><ol><li><table><thead><tbody><tr><td><a><img>');
+    $content = strip_tags($content, '<p><h1><h2><h3><h4><ul><ol><li><table><thead><tbody><tr><td><a><img><blockquote>');
 
     //Strip the attributes from remaining tags
     $content = stripAttributes($content, array('href', 'src'));
@@ -592,7 +605,7 @@ function tweet($uid = NULL, $content = NULL, $link = "", $media_id = "")
     $tweet = $twcontent . " " . $link;
 
     $twstatus = array('status' => $tweet);
-    if(!empty($media_id)) {
+    if (!empty($media_id)) {
         $twstatus['media_ids'] = array($media_id);
     }
 
@@ -641,11 +654,11 @@ function tweet_upload_picture($uid = NULL, $content = NULL)
 
     //Connect to twitter using oAuth
     $connection = new tmhOAuth(array(
-        'host'              => 'upload.twitter.com',
-        'consumer_key'      => $prefs['twitterkey'],
-        'consumer_secret'   => $prefs['twittersecret'],
-        'user_token'        => $prefs['twittertoken'],
-        'user_secret'       => $prefs['twittertokensecret'],
+        'host' => 'upload.twitter.com',
+        'consumer_key' => $prefs['twitterkey'],
+        'consumer_secret' => $prefs['twittersecret'],
+        'user_token' => $prefs['twittertoken'],
+        'user_secret' => $prefs['twittertokensecret'],
         'curl_ssl_verifypeer' => false
     ));
 
@@ -655,7 +668,7 @@ function tweet_upload_picture($uid = NULL, $content = NULL)
     //Log and return
     if ($code == 200) {
         loggit(1, "Uploaded a picture to twitter for user: [$uid].");
-        loggit(3, "DEBUG: ".print_r($connection->response['response'], TRUE));
+        loggit(3, "DEBUG: " . print_r($connection->response['response'], TRUE));
         //loggit(3,"Tweeted a new post: [$tweet] for user: [$uid].");
 
         //Decode the json
@@ -1014,9 +1027,9 @@ function check_head_content_type($url, $timeout = 5)
     curl_exec($curl);
 
     $ct = curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
-    loggit(3, "DEBUG: CURL: Content-type check on: [$url] returned: [$ct]");
+    //loggit(3, "DEBUG: CURL: Content-type check on: [$url] returned: [$ct]");
 
-    return($ct);
+    return ($ct);
 }
 
 
@@ -1051,6 +1064,11 @@ function get_final_url($url, $timeout = 5, $count = 0)
     $url = clean_url($url);
     $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
 
+    if($count > 5) {
+        loggit(2, "Error: Too many redirects for url: [$url]. Abandoning...");
+        return($url);
+    }
+
     $cookie = tempnam("/tmp", "CURLCOOKIE");
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
@@ -1082,9 +1100,17 @@ function get_final_url($url, $timeout = 5, $count = 0)
             //loggit(3, "HEADER: [[".trim(substr($value, 9, strlen($value)))."]]");
             if (substr(strtolower($value), 0, 9) == "location:") {
                 //loggit(3, "DEBUG: This was a normal http redirect.");
-                loggit(3, "HEADER: [[".trim(substr($value, 9, strlen($value)))."]]");
+                loggit(3, "HEADER: [[" . trim(substr($value, 9, strlen($value))) . "]]");
                 return get_final_url(trim(substr($value, 9, strlen($value))), 8, $count);
             }
+        }
+    }
+
+    //Meta-refresh redirect
+    if (preg_match("/meta.*refresh.*URL=.*(http[^'\"]*)/i", $content, $value)) {
+        loggit(3, "DEBUG: This was a meta-refresh redirect.");
+        if (strpos($value[1], "http") !== FALSE) {
+            return get_final_url($value[1], NULL, $count);
         }
     }
 
@@ -1092,7 +1118,7 @@ function get_final_url($url, $timeout = 5, $count = 0)
     if (preg_match("/window\.location\.replace\('(.*)'\)/i", $content, $value) || preg_match("/window\.location\=\"(.*)\"/i", $content, $value)) {
         //loggit(3, "DEBUG: This was a javascript redirect.");
         if (strpos($value[1], "http") !== FALSE) {
-            return get_final_url($value[1]);
+            return get_final_url($value[1], NULL, $count);
         } else {
             return $response['url'];
         }
@@ -1109,9 +1135,9 @@ function get_final_url_with_cookie($url, $timeout = 5, $count = 0, $cookie = "")
     echo "get_final_url_with_cookie($url, $timeout, $count, $cookie)\n";
 
     $count++;
-    if($count == 10) {
+    if ($count == 10) {
         loggit(3, "Too many redirects for url: [$url]");
-        return("");
+        return ("");
     }
     $url = clean_url($url);
     $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
@@ -1119,7 +1145,7 @@ function get_final_url_with_cookie($url, $timeout = 5, $count = 0, $cookie = "")
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
-    if(empty($cookie)) {
+    if (empty($cookie)) {
         $cookie = tempnam("/tmp", "CURLCOOKIE");
         curl_setopt($curl, CURLOPT_COOKIEJAR, $cookie);
     } else {
@@ -1183,7 +1209,7 @@ function fetchUrl($url, $timeout = 30)
     $data = curl_exec($curl);
     $response = curl_getinfo($curl);
     curl_close($curl);
-    if(!empty($cookie)) {
+    if (!empty($cookie)) {
         //unlink($cookie);
     }
 
@@ -1589,14 +1615,14 @@ function set_s3_bucket_cors($key, $secret, $bucket)
                     'AllowedHeaders' => array('*'),
                     'AllowedMethods' => array('GET'),
                     'AllowedOrigins' => array('*'),
-                    'ExposeHeaders' =>  array('Content-Type', 'Content-Length', 'Date'),
-                    'MaxAgeSeconds' =>  3000
+                    'ExposeHeaders' => array('Content-Type', 'Content-Length', 'Date'),
+                    'MaxAgeSeconds' => 3000
                 )
             )
         ));
     } catch (\Aws\S3\Exception\S3Exception $e) {
-        loggit(3, "Error setting s3 cors config: ".$e->getAwsErrorCode()." : ".$e->getMessage());
-        return(FALSE);
+        loggit(3, "Error setting s3 cors config: " . $e->getAwsErrorCode() . " : " . $e->getMessage());
+        return (FALSE);
     }
 
     //Give back the buckets array
@@ -1668,7 +1694,7 @@ function get_s3_regional_dns($location)
             break;
     }
 
-    return("s3.amazonaws.com");
+    return ("s3.amazonaws.com");
 }
 
 
@@ -2176,16 +2202,16 @@ function get_server_river_s3_url($path = NULL, $filename = NULL)
 //Remove all characters except alphanum and dashes
 function stripText($text, $nl = TRUE, $leave = "", $dashes = TRUE)
 {
-    if($nl) {
+    if ($nl) {
         $text = strtolower(trim($text));
     }
     // replace all white space sections with a dash
-    if( $dashes ) {
+    if ($dashes) {
         $text = str_replace(' ', '-', $text);
     }
 
     // strip all non alphanum or -
-    if( $dashes ) {
+    if ($dashes) {
         $clean = preg_replace('/[^A-Za-z0-9".$leave."\-]/', "", $text);
     } else {
         $clean = preg_replace('/[^A-Za-z0-9".$leave."]/', "", $text);
@@ -2742,8 +2768,9 @@ function url_is_video($url = NULL)
 }
 
 
-function get_mimetype_parent($mt = NULL) {
-    if(empty($mt)) {
+function get_mimetype_parent($mt = NULL)
+{
+    if (empty($mt)) {
         loggit(2, "Mimetype parameter is either blank or corrupt: [$mt].");
         return ("");
     }
@@ -3109,7 +3136,7 @@ function makeValuesReferenced(&$arr)
 {
     $refs = array();
     foreach ($arr as $key => $value)
-        $refs[$key] = & $arr[$key];
+        $refs[$key] = &$arr[$key];
     return $refs;
 
 }
@@ -3117,6 +3144,7 @@ function makeValuesReferenced(&$arr)
 
 // Nice string conversion utility class picked up from the comments on php.net
 define('STR_SYBASE', false);
+
 class Str
 {
     function gpc2sql($gpc, $maxLength = false)
@@ -3217,7 +3245,7 @@ class stmt_Extended extends mysqli_stmt
                 // this is to stop a syntax error if a column name has a space in
                 // e.g. "This Column". 'Typer85 at gmail dot com' pointed this out
                 $columnName = str_replace(' ', '_', $column->name);
-                $bindVarArray[] = & $this->results[$columnName];
+                $bindVarArray[] = &$this->results[$columnName];
             }
             call_user_func_array(array($this, 'bind_result'), $bindVarArray);
             $this->varsBound = true;
@@ -3431,7 +3459,8 @@ class Bcrypt
 }
 
 
-class Base32 {
+class Base32
+{
 
     private static $map = array(
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', //  7
@@ -3442,10 +3471,10 @@ class Base32 {
     );
 
     private static $flippedMap = array(
-        'A'=>'0', 'B'=>'1', 'C'=>'2', 'D'=>'3', 'E'=>'4', 'F'=>'5', 'G'=>'6', 'H'=>'7',
-        'I'=>'8', 'J'=>'9', 'K'=>'10', 'L'=>'11', 'M'=>'12', 'N'=>'13', 'O'=>'14', 'P'=>'15',
-        'Q'=>'16', 'R'=>'17', 'S'=>'18', 'T'=>'19', 'U'=>'20', 'V'=>'21', 'W'=>'22', 'X'=>'23',
-        'Y'=>'24', 'Z'=>'25', '2'=>'26', '3'=>'27', '4'=>'28', '5'=>'29', '6'=>'30', '7'=>'31'
+        'A' => '0', 'B' => '1', 'C' => '2', 'D' => '3', 'E' => '4', 'F' => '5', 'G' => '6', 'H' => '7',
+        'I' => '8', 'J' => '9', 'K' => '10', 'L' => '11', 'M' => '12', 'N' => '13', 'O' => '14', 'P' => '15',
+        'Q' => '16', 'R' => '17', 'S' => '18', 'T' => '19', 'U' => '20', 'V' => '21', 'W' => '22', 'X' => '23',
+        'Y' => '24', 'Z' => '25', '2' => '26', '3' => '27', '4' => '28', '5' => '29', '6' => '30', '7' => '31'
     );
 
     /**
@@ -3454,50 +3483,53 @@ class Base32 {
      * @return base32 encoded string
      * @author Bryan Ruiz
      **/
-    public static function encode($input, $padding = true) {
-        if(empty($input)) return "";
+    public static function encode($input, $padding = true)
+    {
+        if (empty($input)) return "";
         $input = str_split($input);
         $binaryString = "";
-        for($i = 0; $i < count($input); $i++) {
+        for ($i = 0; $i < count($input); $i++) {
             $binaryString .= str_pad(base_convert(ord($input[$i]), 10, 2), 8, '0', STR_PAD_LEFT);
         }
         $fiveBitBinaryArray = str_split($binaryString, 5);
         $base32 = "";
-        $i=0;
-        while($i < count($fiveBitBinaryArray)) {
-            $base32 .= self::$map[base_convert(str_pad($fiveBitBinaryArray[$i], 5,'0'), 2, 10)];
+        $i = 0;
+        while ($i < count($fiveBitBinaryArray)) {
+            $base32 .= self::$map[base_convert(str_pad($fiveBitBinaryArray[$i], 5, '0'), 2, 10)];
             $i++;
         }
-        if($padding && ($x = strlen($binaryString) % 40) != 0) {
-            if($x == 8) $base32 .= str_repeat(self::$map[32], 6);
-            else if($x == 16) $base32 .= str_repeat(self::$map[32], 4);
-            else if($x == 24) $base32 .= str_repeat(self::$map[32], 3);
-            else if($x == 32) $base32 .= self::$map[32];
+        if ($padding && ($x = strlen($binaryString) % 40) != 0) {
+            if ($x == 8) $base32 .= str_repeat(self::$map[32], 6);
+            else if ($x == 16) $base32 .= str_repeat(self::$map[32], 4);
+            else if ($x == 24) $base32 .= str_repeat(self::$map[32], 3);
+            else if ($x == 32) $base32 .= self::$map[32];
         }
         return $base32;
     }
 
-    public static function decode($input) {
-        if(empty($input)) return;
+    public static function decode($input)
+    {
+        if (empty($input)) return;
         $paddingCharCount = substr_count($input, self::$map[32]);
-        $allowedValues = array(6,4,3,1,0);
-        if(!in_array($paddingCharCount, $allowedValues)) return false;
-        for($i=0; $i<4; $i++){
-            if($paddingCharCount == $allowedValues[$i] &&
-                substr($input, -($allowedValues[$i])) != str_repeat(self::$map[32], $allowedValues[$i])) return false;
+        $allowedValues = array(6, 4, 3, 1, 0);
+        if (!in_array($paddingCharCount, $allowedValues)) return false;
+        for ($i = 0; $i < 4; $i++) {
+            if ($paddingCharCount == $allowedValues[$i] &&
+                substr($input, -($allowedValues[$i])) != str_repeat(self::$map[32], $allowedValues[$i])
+            ) return false;
         }
-        $input = str_replace('=','', $input);
+        $input = str_replace('=', '', $input);
         $input = str_split($input);
         $binaryString = "";
-        for($i=0; $i < count($input); $i = $i+8) {
+        for ($i = 0; $i < count($input); $i = $i + 8) {
             $x = "";
-            if(!in_array($input[$i], self::$map)) return false;
-            for($j=0; $j < 8; $j++) {
+            if (!in_array($input[$i], self::$map)) return false;
+            for ($j = 0; $j < 8; $j++) {
                 $x .= str_pad(base_convert(@self::$flippedMap[@$input[$i + $j]], 10, 2), 5, '0', STR_PAD_LEFT);
             }
             $eightBits = str_split($x, 8);
-            for($z = 0; $z < count($eightBits); $z++) {
-                $binaryString .= ( ($y = chr(base_convert($eightBits[$z], 2, 10))) || ord($y) == 48 ) ? $y:"";
+            for ($z = 0; $z < count($eightBits); $z++) {
+                $binaryString .= (($y = chr(base_convert($eightBits[$z], 2, 10))) || ord($y) == 48) ? $y : "";
             }
         }
         return $binaryString;
@@ -3510,26 +3542,22 @@ function stripInvalidXml($value)
 {
     $ret = "";
     $current;
-    if (empty($value))
-    {
+    if (empty($value)) {
         return $ret;
     }
 
     $length = strlen($value);
-    for ($i=0; $i < $length; $i++)
-    {
+    for ($i = 0; $i < $length; $i++) {
         $current = ord($value{$i});
         if (($current == 0x9) ||
             ($current == 0xA) ||
             ($current == 0xD) ||
             (($current >= 0x20) && ($current <= 0xD7FF)) ||
             (($current >= 0xE000) && ($current <= 0xFFFD)) ||
-            (($current >= 0x10000) && ($current <= 0x10FFFF)))
-        {
+            (($current >= 0x10000) && ($current <= 0x10FFFF))
+        ) {
             $ret .= chr($current);
-        }
-        else
-        {
+        } else {
             $ret .= " ";
         }
     }
@@ -3539,11 +3567,12 @@ function stripInvalidXml($value)
 
 //Escape strings for passing into javascript
 //_____via https://sixohthree.com/241/escaping
-function javascript_escape($str) {
+function javascript_escape($str)
+{
     $new_str = '';
 
     $str_len = strlen($str);
-    for($i = 0; $i < $str_len; $i++) {
+    for ($i = 0; $i < $str_len; $i++) {
         $new_str .= '\\x' . dechex(ord(substr($str, $i, 1)));
     }
 
@@ -3551,7 +3580,8 @@ function javascript_escape($str) {
 }
 
 
-function create_s3_qrcode_from_url($uid = NULL, $value = "", $qrfilename = "") {
+function create_s3_qrcode_from_url($uid = NULL, $value = "", $qrfilename = "")
+{
     //Check parameters
     if (empty($uid)) {
         loggit(2, "The uid is blank: [$uid]");
@@ -3563,18 +3593,18 @@ function create_s3_qrcode_from_url($uid = NULL, $value = "", $qrfilename = "") {
     }
     if (empty($qrfilename)) {
         loggit(1, "The qrfilename is blank: [$qrfilename]");
-        $qrfilename = time()."-".random_gen(16).".png";
+        $qrfilename = time() . "-" . random_gen(16) . ".png";
     }
 
     //Bring in qr code library
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
-    set_include_path("$confroot/$libraries".PATH_SEPARATOR.get_include_path());
+    set_include_path("$confroot/$libraries" . PATH_SEPARATOR . get_include_path());
     include "phpqrcode/qrlib.php";
-    $qrtmpfile = sys_get_temp_dir()."/".$uid.time()."_qr.png";
+    $qrtmpfile = sys_get_temp_dir() . "/" . $uid . time() . "_qr.png";
     QRcode::png($value, $qrtmpfile);
 
     //Put the qrcode in s3
-    if(s3_is_enabled($uid) || sys_s3_is_enabled()) {
+    if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
         //First we get all the key info
         $s3info = get_s3_info($uid);
 
@@ -3602,10 +3632,12 @@ function create_s3_qrcode_from_url($uid = NULL, $value = "", $qrfilename = "") {
 }
 
 
-class Rest {
-    public function __construct($req = NULL) {
+class Rest
+{
+    public function __construct($req = NULL)
+    {
         //Try to grab the global REQUEST if none passed in
-        if( empty($req) ) {
+        if (empty($req)) {
             $req = $_REQUEST;
         }
     }
@@ -3613,22 +3645,23 @@ class Rest {
 
 //Diff engine for text
 //__via: https://github.com/paulgb/simplediff/blob/master/php/simplediff.php
-function diff($old, $new){
+function diff($old, $new)
+{
     $matrix = array();
     $maxlen = 0;
-    foreach($old as $oindex => $ovalue){
+    foreach ($old as $oindex => $ovalue) {
         $nkeys = array_keys($new, $ovalue);
-        foreach($nkeys as $nindex){
+        foreach ($nkeys as $nindex) {
             $matrix[$oindex][$nindex] = isset($matrix[$oindex - 1][$nindex - 1]) ?
                 $matrix[$oindex - 1][$nindex - 1] + 1 : 1;
-            if($matrix[$oindex][$nindex] > $maxlen){
+            if ($matrix[$oindex][$nindex] > $maxlen) {
                 $maxlen = $matrix[$oindex][$nindex];
                 $omax = $oindex + 1 - $maxlen;
                 $nmax = $nindex + 1 - $maxlen;
             }
         }
     }
-    if($maxlen == 0) return array(array('d'=>$old, 'i'=>$new));
+    if ($maxlen == 0) return array(array('d' => $old, 'i' => $new));
     return array_merge(
         diff(array_slice($old, 0, $omax), array_slice($new, 0, $nmax)),
         array_slice($new, $nmax, $maxlen),
@@ -3638,13 +3671,14 @@ function diff($old, $new){
 
 //Diff engine for html
 //__via: https://github.com/paulgb/simplediff/blob/master/php/simplediff.php
-function htmlDiff($old, $new){
+function htmlDiff($old, $new)
+{
     $ret = '';
     $diff = diff(preg_split("/[\s]+/", $old), preg_split("/[\s]+/", $new));
-    foreach($diff as $k){
-        if(is_array($k))
-            $ret .= (!empty($k['d'])?"<del>".implode(' ',$k['d'])."</del> ":'').
-                (!empty($k['i'])?"<ins>".implode(' ',$k['i'])."</ins> ":'');
+    foreach ($diff as $k) {
+        if (is_array($k))
+            $ret .= (!empty($k['d']) ? "<del>" . implode(' ', $k['d']) . "</del> " : '') .
+                (!empty($k['i']) ? "<ins>" . implode(' ', $k['i']) . "</ins> " : '');
         else $ret .= $k . ' ';
     }
     return $ret;
@@ -3652,21 +3686,23 @@ function htmlDiff($old, $new){
 
 
 //Make sure all strings are utf-8 valid for json
-function utf8ize($d) {
+function utf8ize($d)
+{
     if (is_array($d)) {
         foreach ($d as $k => $v) {
             $d[$k] = utf8ize($v);
         }
-    } else if (is_string ($d)) {
+    } else if (is_string($d)) {
         return iconv(mb_detect_encoding($d, mb_detect_order(), true), "UTF-8", $d);
     }
     return $d;
 }
 
 
-function to_utf8( $string ) {
+function to_utf8($string)
+{
 // From http://w3.org/International/questions/qa-forms-utf-8.html
-    if ( preg_match('%^(?:
+    if (preg_match('%^(?:
       [\x09\x0A\x0D\x20-\x7E]            # ASCII
     | [\xC2-\xDF][\x80-\xBF]             # non-overlong 2-byte
     | \xE0[\xA0-\xBF][\x80-\xBF]         # excluding overlongs
@@ -3675,10 +3711,10 @@ function to_utf8( $string ) {
     | \xF0[\x90-\xBF][\x80-\xBF]{2}      # planes 1-3
     | [\xF1-\xF3][\x80-\xBF]{3}          # planes 4-15
     | \xF4[\x80-\x8F][\x80-\xBF]{2}      # plane 16
-    )*$%xs', $string) ) {
+    )*$%xs', $string)) {
         return $string;
     } else {
-        return iconv( 'CP1252', 'UTF-8', $string);
+        return iconv('CP1252', 'UTF-8', $string);
     }
 }
 
@@ -3780,7 +3816,8 @@ function clean_url_for_xml($url = NULL)
 
 
 //Remove whitespace between markup tags
-function remove_non_tag_space($string){
+function remove_non_tag_space($string)
+{
     $pattern = '/>\s+</';
     $replacement = '><';
     return preg_replace($pattern, $replacement, $string);

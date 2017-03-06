@@ -525,6 +525,7 @@ if ($linkonly == FALSE) {
                 }
             }
             $readability->clean($content_block, 'select');
+
             makeAbsolute($effective_url, $content_block);
             //footnotes
             if ($extract_pattern) {

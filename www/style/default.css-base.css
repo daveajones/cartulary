@@ -2,7 +2,7 @@
 /* ----- Body and other major elements --------------- */
 body {
 	padding-bottom: 40px;
-    background: #eee url(/images/bg_lightgrey.png) repeat;
+    background: #eee url(/images/bg_darkgrey.png) repeat;
 }
 body > .container {  margin-top:80px;  }
 .navbar-inner a.brand {  display:none;  }

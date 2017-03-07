@@ -59,17 +59,28 @@
 
 /* Navbar icons */
 .icn-nav-home { display:inline-block; background:url('/images/glyph/glyphicons_020_home.png') 0px 0px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-home.white { display:inline-block; background:url('/images/glyph/glyphicons_020_home_white.png') 0px 0px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-home-lights { display:inline-block; background:url('/images/glyph/glyphicons_020_home_lights.png') 0px 0px no-repeat; width:28px; height:30px; border:0; }
 .icn-nav-microblog { display:inline-block; background:url('/images/glyph/glyphicons_309_comments.png') 3px 3px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-microblog.white { display:inline-block; background:url('/images/glyph/glyphicons_309_comments_white.png') 3px 3px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-articles { display:inline-block; background:url('/images/glyph/glyphicons_072_bookmark.png') 8px 1px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-articles.white { display:inline-block; background:url('/images/glyph/glyphicons_072_bookmark_white.png') 8px 1px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-media { display:inline-block; background:url('/images/glyph/glyphicons_138_picture.png') 4px 2px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-media.white { display:inline-block; background:url('/images/glyph/glyphicons_138_picture_white.png') 4px 2px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-radio { display:inline-block; background:url('/images/glyph/glyphicons_017_music.png') 4px 1px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-radio.white { display:inline-block; background:url('/images/glyph/glyphicons_017_music_white.png') 4px 1px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-subscribe { display:inline-block; background:url('/images/glyph/glyphicons_397_rss.png') 3px 1px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-subscribe.white { display:inline-block; background:url('/images/glyph/glyphicons_397_rss_white.png') 3px 1px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-editor { display:inline-block; background:url('/images/glyph/glyphicons_039_notes.png') 5px 0px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-editor.white { display:inline-block; background:url('/images/glyph/glyphicons_039_notes_white.png') 5px 0px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-feeditor { display:inline-block; background:url('/images/glyph/glyphicons_118_embed_close.png') 0px 0px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-feeditor.white { display:inline-block; background:url('/images/glyph/glyphicons_118_embed_close_white.png') 0px 0px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-admin-user { display:inline-block; background:url('/images/glyph/glyphicons_024_parents.png') 0px 1px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-admin-user.white { display:inline-block; background:url('/images/glyph/glyphicons_024_parents_white.png') 0px 1px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-admin-feed { display:inline-block; background:url('/images/glyph/glyphicons_114_list.png') 0px 1px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-admin-feed.white { display:inline-block; background:url('/images/glyph/glyphicons_114_list_white.png') 0px 1px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-search { display:inline-block; background:url('/images/glyph/glyphicons_027_search.png') 4px 2px no-repeat; width:30px; height:28px; border:0; }
+.icn-nav-search.white { display:inline-block; background:url('/images/glyph/glyphicons_027_search_white.png') 4px 2px no-repeat; width:30px; height:28px; border:0; }
 
 /* Animated rotating icon */
 .icon-spinning {

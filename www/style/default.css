@@ -166,7 +166,7 @@ li.menubar-search-container { display:none; }
 	background:#666;
 }
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .enciframe.inactive div.play {
-	padding-top:130px;
+	padding-top:146px;
     color:#ddd;
 }
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .encpicture {
@@ -199,8 +199,8 @@ li.menubar-search-container { display:none; }
   display:block;
   clear:both;
   margin:10px auto 0;
-  width:500px;
-  height:300px;
+  width:600px;
+  height:337px;
 }
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .encvideo {
   display:block;
@@ -366,12 +366,6 @@ li.menubar-search-container { display:none; }
 	padding:15px;
 }
 /* --------------------------------------------------- */
-
-
-div.row#divMedia {
-    margin-left:auto;
-    margin-right:auto;
-}
 
 
 /* ***************************************************************************************** */

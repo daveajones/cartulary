@@ -1316,7 +1316,7 @@ freedomController.v1.river.methods = (function () {
             $(this).children('div.play').unbind('click');
             $(this).children('div.play').bind('click', function () {
                 var dsrc = $(_this).attr("data-src");
-                var $iframe = $('<iframe>', {class: 'encobj enciframe', src: dsrc, frameborder: 0});
+                var $iframe = $('<iframe>', {class: 'encobj enciframe', src: dsrc, frameborder: 0, allowfullscreen: true});
                 $(_this).replaceWith($iframe)
             });
         });

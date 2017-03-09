@@ -32,7 +32,7 @@ $jsondata['status'] = "true";
 $jsondata['data'] = $urldata;
 $jsondata['type'] = $datatype;
 $jsondata['description'] = "Url fetch successful.";
-loggit(3, "DEBUG(json): ".print_r($jsondata, TRUE));
+//loggit(3, "DEBUG(json): ".print_r($jsondata, TRUE));
 echo json_encode($jsondata);
 
 return(0);

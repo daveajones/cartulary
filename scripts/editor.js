@@ -115,7 +115,7 @@ $(document).ready(function () {
                 );
             }
         });
-        $('#dropdownSave').dropdown('toggle');
+        $('#dropdownSave').dropdown('hide');
         return false;
     });
     menubar.find('.menuSave').click(function () {
@@ -722,23 +722,18 @@ $(document).ready(function () {
         opPaste();
         opGo(up, 32767);
         outliner.concord().op.deleteLine();
-        //opGo(left, 1);
+
         var xmlArchive = outliner.concord().op.cursorToXmlSubsOnly();
         if (!multiarc && hadsubs) {
             opGo(right, 1);
             var xmlArchive = outliner.concord().op.cursorToXmlSubsOnly();
             opGo(left, 1);
         }
-        //alert(xmlArchive);
         opDeleteSubs();
         opCollapse();
-//        if( multiarc ) {
-//            opReorg(right, 1);
-//        }
-        opSetAtts({
-            "type": "include",
-            "url": arcplaceholder
-        });
+
+        opSetOneAtt("type", "include");
+        opSetOneAtt("url", arcplaceholder);
 
         //Save the file
         saveArchive(atitle, afilename, type, '', false, false, xmlArchive, arcplaceholder);

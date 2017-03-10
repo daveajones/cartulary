@@ -1,5 +1,5 @@
 #### What is Cartulary?
-  It's part of the new Freedom Controller project:  http://freedomcontroller.com
+  It's part of the Freedom Controller project:  http://freedomcontroller.com
 
   The larger goal of the project is an attempt at building a distributed social network
   through the use of standard RSS and OPML feeds.  This is the first product.
@@ -43,7 +43,7 @@
 
   Example: Ubuntu 12,14,16 LTS [on Amazon Ec2]:
 
-    1. [Launch an "small" Ubuntu 12 LTS ec2 instance.]
+    1. [Launch a "small" Ubuntu LTS ec2 instance.]
     2. [Create an Elastic IP and assign it to your instance.]
     3. Create a DNS A or CNAME record for the server and point it to your elastic ip.
     4. Create two S3 buckets: 1 for holding user data and 1 for holding server backups.

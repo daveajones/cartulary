@@ -1012,7 +1012,7 @@ class Readability
 				$contentLength = strlen($this->getInnerText($tagsList->item($i)));
 				$toRemove      = false;
 
-				if ( $img > $p ) {
+				if ( $img > $p && $p > 0 ) {  //DJ: added && p > 0 test
 					$toRemove = true;
 				} else if ($li > $p && $tag != 'ul' && $tag != 'ol') {
 					$toRemove = true;

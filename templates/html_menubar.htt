@@ -31,22 +31,22 @@
 
 <div id="divMainMenu" class="row">
     <div id="divSearchResultsHook"></div>
-    <div class="navbar <?if($g_platform != "mobile"){?>navbar-fixed-top<?} else {?>navbar-static-top<?}?>">
+    <div class="navbar <?if($cg_theme_darkmode) echo "navbar-inverse"?> <?if($g_platform != "mobile"){?>navbar-fixed-top<?} else {?>navbar-static-top<?}?>">
     <div class="navbar-inner msganchor" style="z-index:2">
         <ul class="nav">
-            <li <?if($section == "River"){echo "class='active'";}?>>      <a href="<?echo $newsriverpage?>" title="River">      <i class="icn-nav-home"></i></a></li>
-            <li <?if($section == "Microblog"){echo "class='active'";}?>>  <a href="<?echo $microblogpage?>" title="Microblog">  <i class="icn-nav-microblog"></i></a></li>
-            <li <?if($section == "Articles"){echo "class='active'";}?>>   <a href="<?echo $articlespage?>"  title="Articles">   <i class="icn-nav-articles"></i></a></li>
-            <li <?if($section == "Media"){echo "class='active'";}?>>      <a href="<?echo $mediapage?>"     title="Media">      <i class="icn-nav-media"></i></a></li>
-            <li <?if($section == "Radio"){echo "class='active'";}?>>      <a href="<?echo $radiopage?>"     title="Radio">      <i class="icn-nav-radio"></i></a></li>
-            <li <?if($section == "Subscribe"){echo "class='active'";}?>>  <a href="<?echo $subscribepage?>" title="Subscribe">  <i class="icn-nav-subscribe"></i></a></li>
-            <li <?if($section == "Editor"){echo "class='active'";}?>>     <a href="<?echo $editorpage?>"    title="Editor">     <i class="icn-nav-editor"></i></a></li>
+            <li <?if($section == "River"){echo "class='active'";}?>>      <a href="<?echo $newsriverpage?>" title="River">      <i class="icn-nav-home <?if($cg_theme_darkmode) echo "white"?>"></i></a></li>
+            <li <?if($section == "Microblog"){echo "class='active'";}?>>  <a href="<?echo $microblogpage?>" title="Microblog">  <i class="icn-nav-microblog <?if($cg_theme_darkmode) echo "white"?>"></i></a></li>
+            <li <?if($section == "Articles"){echo "class='active'";}?>>   <a href="<?echo $articlespage?>"  title="Articles">   <i class="icn-nav-articles <?if($cg_theme_darkmode) echo "white"?>"></i></a></li>
+            <li <?if($section == "Media"){echo "class='active'";}?>>      <a href="<?echo $mediapage?>"     title="Media">      <i class="icn-nav-media <?if($cg_theme_darkmode) echo "white"?>"></i></a></li>
+            <li <?if($section == "Radio"){echo "class='active'";}?>>      <a href="<?echo $radiopage?>"     title="Radio">      <i class="icn-nav-radio <?if($cg_theme_darkmode) echo "white"?>"></i></a></li>
+            <li <?if($section == "Subscribe"){echo "class='active'";}?>>  <a href="<?echo $subscribepage?>" title="Subscribe">  <i class="icn-nav-subscribe <?if($cg_theme_darkmode) echo "white"?>"></i></a></li>
+            <li <?if($section == "Editor"){echo "class='active'";}?>>     <a href="<?echo $editorpage?>"    title="Editor">     <i class="icn-nav-editor <?if($cg_theme_darkmode) echo "white"?>"></i></a></li>
 
             <?if(is_admin($myuid)){?>
                 <!-- Only show this part of the menu if the user is an admin -->
-                <li class="divider-vertical"></li>
-                <li <?if($section == "Admin-user"){echo "class='active'";}?>><a href="<?echo $adminpage?>.user" title="User Admin"><i class="icn-nav-admin-user"></i></a></li>
-                <li <?if($section == "Admin-feed"){echo "class='active'";}?>><a href="<?echo $adminpage?>.feed" title="Feed Admin"><i class="icn-nav-admin-feed"></i></a></li>
+                <li class="<?if(!$cg_theme_darkmode) echo "divider-vertical"?>"></li>
+                <li <?if($section == "Admin-user"){echo "class='active'";}?>><a href="<?echo $adminpage?>.user" title="User Admin"><i class="icn-nav-admin-user <?if($cg_theme_darkmode) echo "white"?>"></i></a></li>
+                <li <?if($section == "Admin-feed"){echo "class='active'";}?>><a href="<?echo $adminpage?>.feed" title="Feed Admin"><i class="icn-nav-admin-feed <?if($cg_theme_darkmode) echo "white"?>"></i></a></li>
             <?}?>
 
             <?if( $g_platform == "mobile no" ) {?>
@@ -77,7 +77,7 @@
                     </form>
                     <div id="divNavSearchResults"></div>
                 </li>
-                <li class="divider-vertical"></li>
+                <li class="<?if(!$cg_theme_darkmode) echo "divider-vertical"?>"></li>
 
                 <li class="dropdown <?if($section == "Prefs"){echo " active";}?>">
                 <a style="padding:0;padding-left:8px;" href="#" id="drop5" role="button" class="edgecase dropdown-toggle" data-toggle="dropdown"><?echo $myuname?> <img class="avatar48" src="<?echo $avatarurl?>" alt=""/></a>
@@ -108,11 +108,11 @@
 
                 <li><a class="menuOpen" href="#" title="Open">Open</a></li>
                 <li class="dropdown menuSaves" title="Save your outline.">
-                    <a href="#" id="dropdownSave" class="dropdown-toggle" data-toggle="dropdown">Save</a>
+                    <a id="dropdownSave" class="dropdown-toggle" data-toggle="dropdown">Save</a>
                     <ul class="dropdown-menu" data-container="body">
-                        <li><a href="#" class="menuSave saves" title="Save">Save</a></li>
-                        <li><a href="#" class="menuSaveAs saves" title="Save As">Save as...</a></li>
-                        <li><a href="#" class="menuSaveArticle saves hide" title="Save Edited Article">Save Edited Article</a></li>
+                        <li><a class="menuSave saves" title="Save">Save</a></li>
+                        <li><a class="menuSaveAs saves" title="Save As">Save as...</a></li>
+                        <li><a class="menuSaveArticle saves hide" title="Save Edited Article">Save Edited Article</a></li>
                     </ul>
                 </li>
                 <li><a class="menuPublish" href="#" title="Publish">Publish</a></li>

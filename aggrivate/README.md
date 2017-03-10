@@ -1,3 +1,3 @@
-#### Aggrivate: Feed aggrigator.
+#### Aggrivate: Feed aggregator.
 
-Aggrivate is the feed aggrigator for the Freedom Controller.
+Aggrivate is the feed aggregator for the Freedom Controller.

@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 65;
+$cg_database_version = 66;
 $cg_database_updates = array();
 
 
@@ -894,6 +894,28 @@ CGDB0194;
 $cg_database_updates[64][] = <<<CGDB0195
  INSERT INTO `dbversion` ( `version` ) VALUES ( '65' )
 CGDB0195;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 65 to 66 -----------------------------------------------------------------------------------------------
+$cg_database_updates[65][] = <<<CGDB0196
+  CREATE TABLE IF NOT EXISTS `tokens` ( 
+      `id` BIGINT NOT NULL AUTO_INCREMENT , 
+      `userid` VARCHAR(64) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL , 
+      `token` VARCHAR(48) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL , 
+      `lastusedon` DATETIME NOT NULL , 
+      `useragent` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL , 
+      `createdon` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP , 
+    PRIMARY KEY (`id`), 
+    INDEX `userid` (`userid`), 
+    UNIQUE `token` (`token`)
+  ) ENGINE = InnoDB COMMENT = 'Application tokens'
+CGDB0196;
+$cg_database_updates[65][] = <<<CGDB0197
+  ALTER TABLE `tokens` ADD CONSTRAINT `userid` FOREIGN KEY (`userid`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0197;
+$cg_database_updates[65][] = <<<CGDB0198
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '66' )
+CGDB0198;
 //----------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------

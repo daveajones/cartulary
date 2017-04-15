@@ -20,7 +20,9 @@ $tree_location = "Preferences";
 </head>
 <? include "$confroot/$templates/$template_html_posthead" ?>
 
+<? //--- The body tag and anything else needed ---?>
 <? include "$confroot/$templates/$template_html_bodystart" ?>
+
 <? //--- Include the logo and menu bar html fragments --?>
 <? include "$confroot/$templates/$template_html_logotop" ?>
 <? include "$confroot/$templates/$template_html_menubar" ?>

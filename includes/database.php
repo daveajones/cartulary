@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 66;
+$cg_database_version = 67;
 $cg_database_updates = array();
 
 
@@ -916,6 +916,15 @@ CGDB0197;
 $cg_database_updates[65][] = <<<CGDB0198
  INSERT INTO `dbversion` ( `version` ) VALUES ( '66' )
 CGDB0198;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 66 to 67 -------------------------------------------------------------------------------------------------
+$cg_database_updates[66][] = <<<CGDB0199
+ ALTER TABLE `prefs` ADD `darkmode` TINYINT NOT NULL DEFAULT '0' COMMENT 'Used dark theme for the UI?'
+CGDB0199;
+$cg_database_updates[66][] = <<<CGDB0200
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '67' )
+CGDB0200;
 //----------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------

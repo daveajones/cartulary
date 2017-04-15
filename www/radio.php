@@ -94,8 +94,8 @@ $tree_location = "Radio";
                         onload: function(bSuccess) {
                             if(bSuccess) {
                                 $('div#nowPlaying').html(playlist[i].title + '<div class="progContainer"><hr class="progBar"><img class="progDot" src="/images/progDot.png" /></div>' + playlist[i].url);
-                                $('div#upNext > ul li').css('font-weight', '').css('color', '');
-                                $('div#upNext > ul li[data-index="'+i+'"]').css('font-weight', 'bold').css('color', '#0FF');
+                                $('div#upNext > ul li').css('font-weight', '');
+                                $('div#upNext > ul li[data-index="'+i+'"]').css('font-weight', 'bold');
                             } else {
                                 $('div#nowPlaying').html('Error! Skipping... ' + playlist[i].title);
 
@@ -220,7 +220,8 @@ $tree_location = "Radio";
     </script>
 </head>
 <? include "$confroot/$templates/$template_html_posthead" ?>
-<body>
+<? //--- The body tag and anything else needed ---?>
+<? include "$confroot/$templates/$template_html_bodystart" ?>
 <? //--- Include the logo and menu bar html fragments --?>
 <? include "$confroot/$templates/$template_html_logotop" ?>
 <? include "$confroot/$templates/$template_html_menubar" ?>

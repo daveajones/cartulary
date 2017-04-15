@@ -77,7 +77,8 @@ $tree_location = "Microblog";
     <? include "$confroot/$templates/$template_html_scripts" ?>
 </head>
 <? include "$confroot/$templates/$template_html_posthead" ?>
-<body ondragenter="javascript:showEnclosures();">
+<? //--- The body tag and anything else needed ---?>
+<? include "$confroot/$templates/$template_html_bodystart" ?>
 <? //--- Include the logo and menu bar html fragments --?>
 <? include "$confroot/$templates/$template_html_logotop" ?>
 <? include "$confroot/$templates/$template_html_menubar" ?>
@@ -85,7 +86,7 @@ $tree_location = "Microblog";
 <? //--- Stuff between the title and content --?>
 <? include "$confroot/$templates/$template_html_precontent" ?>
 
-<div class="row" id="divBlogPost">
+<div class="row" id="divBlogPost" ondragenter="javascript:showEnclosures()">
     <div class="blogPostWrapper">
         <form id="frmBlogPost" name="blogpost" action="/cgi/in/blogpost"
               method="POST"<? if ($g_platform == "mobile") { ?> enctype="multipart/form-data"<? } ?>>
@@ -165,7 +166,6 @@ $tree_location = "Microblog";
                         <!-- Uploadify controls. -->
                         <div id="divUpload">
                             <? if ($g_platform == "mobile") { ?>
-                                <h1>DEBUG</h1>
                                 <input type="file" name="file_mobile" id="fileMobile"/>
                             <? } else { ?>
 			You can drag and drop files into this page to attach them.<br/>

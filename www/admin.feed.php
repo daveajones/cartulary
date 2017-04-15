@@ -1,45 +1,48 @@
-<?include get_cfg_var("cartulary_conf").'/includes/env.php';?>
-<?include "$confroot/$templates/php_page_init.php"?>
-<?include "$confroot/$templates/php_page_admin.php"?>
+<? include get_cfg_var("cartulary_conf") . '/includes/env.php'; ?>
+<? include "$confroot/$templates/php_page_init.php" ?>
+<? include "$confroot/$templates/php_page_admin.php" ?>
 <?
-  $section = "Admin-feed";
-  $tree_location = "Feed Administration";
+$section = "Admin-feed";
+$tree_location = "Feed Administration";
 ?>
 
-<?include "$confroot/$templates/$template_html_prehead"?>
+<? include "$confroot/$templates/$template_html_prehead" ?>
 <head>
-<?include "$confroot/$templates/$template_html_meta"?>
-<title><?echo $tree_location?></title>
-<?include "$confroot/$templates/$template_html_styles"?>
-<?include "$confroot/$templates/$template_html_scripts"?>
-<script>
-<?include "$confroot/$scripts/admin.js"?>
-</script>
+    <? include "$confroot/$templates/$template_html_meta" ?>
+    <title><? echo $tree_location ?></title>
+    <? include "$confroot/$templates/$template_html_styles" ?>
+    <? include "$confroot/$templates/$template_html_scripts" ?>
+    <script>
+        <?include "$confroot/$scripts/admin.js"?>
+    </script>
 </head>
-<?include "$confroot/$templates/$template_html_posthead"?>
+<? include "$confroot/$templates/$template_html_posthead" ?>
 
-<body>
-<?//--- Include the logo and menu bar html fragments --?>
-<?include "$confroot/$templates/$template_html_logotop"?>
-<?include "$confroot/$templates/$template_html_menubar"?>
+<? //--- The body tag and anything else needed ---?>
+<? include "$confroot/$templates/$template_html_bodystart" ?>
 
-<?//--- Stuff between the title and content --?>
-<?include "$confroot/$templates/$template_html_precontent"?>
+<? //--- Include the logo and menu bar html fragments --?>
+<? include "$confroot/$templates/$template_html_logotop" ?>
+<? include "$confroot/$templates/$template_html_menubar" ?>
+
+<? //--- Stuff between the title and content --?>
+<? include "$confroot/$templates/$template_html_precontent" ?>
 
 <div class="row" id="divAdmin">
 
-  <script id="managefeeds-template" type="text/x-jquery-tmpl">
-  <?include "$confroot/$scripts/admin-feed-temp.js"?>
-  </script>
+    <script id="managefeeds-template" type="text/x-jquery-tmpl">
+  <? include "$confroot/$scripts/admin-feed-temp.js" ?>
 
-  <div id="divFeedManage"></div>
+    </script>
+
+    <div id="divFeedManage"></div>
 
 </div>
 
-<?//--- Include the footer bar html fragments -----------?>
-<?include "$confroot/$templates/$template_html_footerbar"?>
+<? //--- Include the footer bar html fragments -----------?>
+<? include "$confroot/$templates/$template_html_footerbar" ?>
 </body>
 
-<?include "$confroot/$templates/$template_html_postbody"?>
+<? include "$confroot/$templates/$template_html_postbody" ?>
 </html>
 

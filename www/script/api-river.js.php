@@ -34,6 +34,7 @@ freedomController.v1.river.methods = (function () {
     var lsRiverDataPullTime = freedomController.v1.river.statics.lsRiverDataPullTime;
     var lsStickyDataKey = freedomController.v1.river.statics.lsStickyDataKey;
     var lsSessionIdKey = freedomController.v1.river.statics.lsSessionIdKey;
+    var videoShowPopout = true;
 
 
     //----- River functions -----
@@ -1316,8 +1317,47 @@ freedomController.v1.river.methods = (function () {
             $(this).children('div.play').unbind('click');
             $(this).children('div.play').bind('click', function () {
                 var dsrc = $(_this).attr("data-src");
+                $('div#videoBox').addClass('oldVideoBox').removeAttr('id');
+                $('#videoBox').removeClass('out').removeClass('in');
+                $('#videoBox').css('bottom','');
+                $('div.enclosureview').removeClass('keepVidHeight');
+                videoShowPopout = true;
+                var $closebtn = $('<button>', {id:'videoBoxClose', class:'btn-link fa fa-close'});
                 var $iframe = $('<iframe>', {class: 'encobj enciframe', src: dsrc, frameborder: 0, allowfullscreen: true});
-                $(_this).replaceWith($iframe)
+                var $vidBox = $('<div>', {id: 'videoBox', class: 'box'});
+                $vidBox.append($closebtn);
+                $vidBox.append($iframe);
+                $(_this).parent().addClass('keepVidHeight');
+                $(_this).replaceWith($vidBox);
+
+                //Pop out playing videos to the bottom of the viewport when scrolling down past them
+                var boxtop = Math.floor( $('#videoBox').offset().top );
+                var boxbottom = Math.floor( $('#videoBox').offset().top + $('#videoBox').height() );
+
+                $(window).unbind('scroll');
+                $(window).scroll(function(){
+                    var viewporttop = $(window).scrollTop();
+                    var viewportbottom = viewporttop + $(window).height();
+                    //Only show the video popout if the popout hasn't been closed manually before
+                    if(videoShowPopout) {
+                        //This means the video has scrolled entirely outside of the viewing area
+                        if ( (viewporttop > boxbottom + 200) || (viewportbottom < boxtop - 200) ) {
+                            $('#videoBox').removeClass('in').addClass('out');
+                            $('#videoBox').css('bottom','0');
+
+                        //This means the video is entirely within the viewing area
+                        } else if ( (viewporttop - 200 < boxtop) && ( viewportbottom + 200 > boxbottom) ) {
+                            $('#videoBox').css('bottom','-500px');
+                            $('#videoBox').removeClass('out').addClass('in');
+                        };
+                    }
+                });
+
+                $(document).on('click', 'button#videoBoxClose', function() {
+                    videoShowPopout = false;
+                    $('#videoBox').removeClass('out').removeClass('in');
+                    $('#videoBox').css('bottom','');
+                });
             });
         });
 

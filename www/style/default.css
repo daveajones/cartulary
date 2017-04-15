@@ -85,8 +85,6 @@ li.menubar-search-container { display:none; }
 	max-width:640px;
     margin-bottom:30px;
     background:#fff;
-    word-wrap:break-word;
-    word-break:hyphenate;
     -webkit-column-break-inside:avoid;
        -moz-column-break-inside:avoid;
             column-break-inside:avoid;
@@ -118,6 +116,10 @@ li.menubar-search-container { display:none; }
 	margin:17px;
 	margin-bottom:24px;
     white-space:pre-line;
+    -webkit-hyphens: auto;
+       -moz-hyphens: auto;
+        -ms-hyphens: auto;
+            hyphens: auto;
 }
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .aUnSticky {
 	position:absolute;
@@ -352,6 +354,57 @@ li.menubar-search-container { display:none; }
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .subitem .rivermicrotar {
 	margin:0 0 8px 8px;
 }
+
+
+/* --box testing-- */
+div.keepVidHeight {
+    min-height:300px;
+}
+#videoBox {
+    border: none;
+    transition: 0.5s;
+}
+
+#videoBox video,
+#videoBox iframe {
+    height:300px;
+    width: 100%;
+    vertical-align: bottom;
+}
+
+#videoBox.in  {
+    animation: ac 1s;
+}
+
+#videoBox button#videoBoxClose,
+.oldVideoBox button#videoBoxClose,
+#videoBox.in button#videoBoxClose {
+    display:none;
+}
+
+#videoBox.out  {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width:300px;
+    margin:10px;
+    padding:5px;
+    z-index: 999;
+    animation: an 0.5s;
+    background-color:#222;
+    text-align:left;
+}
+
+#videoBox.out #videoBoxClose {
+    display:block;
+}
+
+#videoBox.out video,
+#videoBox.out iframe {
+    height:169px;
+}
+
+
 /* --------------------------------------------------- */
 
 
@@ -1343,7 +1396,6 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
 /* ----------------------------------------------------------------------- testing ----------------------------------------------------------------------------- */
 .pageContentWrapper.Microblog #divBlogPost input, textarea {
   font-family: "CreteRoundRegular", Georgia, serif;
-  line-height
 }
 .pageContentWrapper.Microblog #divBlogPost #divPostIt input {  font-size:120%;  }
 #divPostList {  margin-top:20px;  }
@@ -1367,7 +1419,7 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
   font-size: 130%;
   line-height: 130%;
   word-wrap:break-word;
-  word-break:hyphenate;
+  word-break:break-all;
 }
 .postList .toolPanel {
   padding-top:0;
@@ -1602,7 +1654,7 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
   overflow:hidden;
   white-space:nowrap;
   text-overflow:ellipsis;
-  word-wrap:nowrap;
+  white-space:nowrap;
 }
 
 /* --------------------------------------------------- */
@@ -1788,10 +1840,12 @@ body#bodyEditOutline input.bootbox-input.bootbox-input-text.form-control {
 }
 .pageContentWrapper.Prefs #divPrefs #divPref input.urlinput {  width:95%;  }
 .pageContentWrapper.Prefs #divPrefs .divPrefPane ul li {  margin-bottom:3px;  }
-.pageContentWrapper.Prefs #divPrefs .divPrefPane ul li.privacy:before {
-  content: " ! ";
-  font-weight:bold;
-  color: red;
+.pageContentWrapper.Prefs #divPrefs .divPrefPane ul li.privacy {
+    font-weight:bold;
+    color: red;
+}
+.pageContentWrapper.Prefs #divPrefs .divPrefPane li {
+    list-style: none;
 }
 /* --------------------------------------------------- */
 

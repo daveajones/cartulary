@@ -78,6 +78,7 @@ if ( isset($_POST['imap_port']) ) { $imap_port = $_POST['imap_port']; } else { $
 if ( isset($_POST['smtp_server']) ) { $smtp_server = $_POST['smtp_server']; } else { $smtp_server = ""; };
 if ( isset($_POST['smtp_secure']) ) { $smtp_secure = 1; } else { $smtp_secure = 0; };
 if ( isset($_POST['smtp_port']) ) { $smtp_port = $_POST['smtp_port']; } else { $smtp_port = ""; };
+if ( isset($_POST['darkmode']) ) { $darkmode = 1; } else { $darkmode = 0; };
 $jsondata = array();
 $jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
@@ -842,6 +843,17 @@ if( ($smtp_port < 1) || ($smtp_port > 65535) || !is_numeric($smtp_port) ) {
     exit(1);
 }
 $prefs['smtp_port'] = $smtp_port;
+
+$jsondata['prefname'] = "darkmode";
+if( ($darkmode < 0) || ($darkmode > 1) ) {
+    //Log it
+    loggit(2,"The value for darkmode pref was not within acceptable range: [$darkmode]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Value of pref is out of range.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['darkmode'] = $darkmode;
 //--------------------------------------------------------
 //--------------------------------------------------------
 
@@ -907,6 +919,11 @@ if( $publicriver == 1 && (
 $utps16 = get_totp_seed_from_uid($uid);
 if( empty($utps16) || ($oldprefs['usetotp'] != $prefs['usetotp']) ) {
     set_user_totp_seed($uid);
+    $jsondata['goloc'] = "/prefs?ts=".time();
+}
+
+//If darkmode preference changed
+if( ($oldprefs['darkmode'] != $prefs['darkmode']) ) {
     $jsondata['goloc'] = "/prefs?ts=".time();
 }
 

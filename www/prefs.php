@@ -20,7 +20,7 @@ $tree_location = "Preferences";
 </head>
 <? include "$confroot/$templates/$template_html_posthead" ?>
 
-<body>
+<? include "$confroot/$templates/$template_html_bodystart" ?>
 <? //--- Include the logo and menu bar html fragments --?>
 <? include "$confroot/$templates/$template_html_logotop" ?>
 <? include "$confroot/$templates/$template_html_menubar" ?>
@@ -401,7 +401,7 @@ $tree_location = "Preferences";
                     <h3>Links</h3>
                     <ul>
                         <li>I want analytics code on my pages and links:<br/><textarea name="analyticscode"
-                                                                                       style="width:600px;height:200px;"></textarea>
+                                                                                       style="width:600px;height:200px;font-family:monospace;" wrap="off"><?echo $prefs['analyticscode']?></textarea>
                         </li>
                         <li><label class="checkbox inline"><input name="sourceurlrt"
                                                                   type="checkbox" <? if ($prefs['sourceurlrt'] == 1) echo "checked "; ?>/>
@@ -429,6 +429,11 @@ $tree_location = "Preferences";
                                                            value="<? echo $prefs['maxlist'] ?>"/> items to be listed in
                                 feeds and on pages by default.
                             </li>
+                        </div>
+                        <div class="control-group">
+                            <li><label class="checkbox inline"><input name="darkmode"
+                                                                      type="checkbox" <? if ($prefs['darkmode'] == 1) echo "checked "; ?>/>
+                                    I want to use the dark mode theme.</label></li>
                         </div>
                     </ul>
                 </div>

@@ -1,1 +1,1 @@
-<div class="container">
+<div class="container<?if($g_prefs['darkmode']) echo " darkmode";?>">

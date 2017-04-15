@@ -1,0 +1,1 @@
+<body class="<?if($g_prefs['darkmode']) echo "darkmode";?>">

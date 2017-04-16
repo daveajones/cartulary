@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 67;
+$cg_database_version = 68;
 $cg_database_updates = array();
 
 
@@ -925,6 +925,27 @@ CGDB0199;
 $cg_database_updates[66][] = <<<CGDB0200
  INSERT INTO `dbversion` ( `version` ) VALUES ( '67' )
 CGDB0200;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 67 to 68 -----------------------------------------------------------------------------------------------
+$cg_database_updates[67][] = <<<CGDB0201
+ ALTER TABLE `prefs` ADD `mastodon_url` VARCHAR( 160 ) NOT NULL COMMENT 'url to mastodon instance'
+CGDB0201;
+$cg_database_updates[67][] = <<<CGDB0202
+ ALTER TABLE `prefs` ADD `mastodon_app_token` VARCHAR( 80 ) NOT NULL COMMENT 'mastodon app token'
+CGDB0202;
+$cg_database_updates[67][] = <<<CGDB0203
+ ALTER TABLE `prefs` ADD `mastodon_client_id` VARCHAR( 80 ) NOT NULL COMMENT 'mastodon app client_id'
+CGDB0203;
+$cg_database_updates[67][] = <<<CGDB0204
+ ALTER TABLE `prefs` ADD `mastodon_client_secret` VARCHAR( 80 ) NOT NULL COMMENT 'mastodon app client_secret'
+CGDB0204;
+$cg_database_updates[67][] = <<<CGDB0205
+ ALTER TABLE `prefs` ADD `mastodon_access_token` VARCHAR( 80 ) NOT NULL COMMENT 'mastodon app access token'
+CGDB0205;
+$cg_database_updates[67][] = <<<CGDB0206
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '68' )
+CGDB0206;
 //----------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------

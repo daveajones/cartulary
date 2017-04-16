@@ -453,22 +453,29 @@ $tree_location = "Preferences";
                     </h3>
                     <ul>
                         <div class="control-group">
-                            <li>My Twitter oAuth consumer key is <input name="twitterkey" type="text"
+                            <li>My Twitter oAuth consumer key is: <input name="twitterkey" type="text"
                                                                         value="<? echo $prefs['twitterkey'] ?>"/></li>
                         </div>
                         <div class="control-group">
-                            <li>My Twitter oAuth consumer secret is <input name="twittersecret" type="text"
+                            <li>My Twitter oAuth consumer secret is: <input name="twittersecret" type="text"
                                                                            value="<? echo $prefs['twittersecret'] ?>"/>
                             </li>
                         </div>
                         <div class="control-group">
-                            <li>My Twitter oAuth access token is <input name="twittertoken" type="text"
+                            <li>My Twitter oAuth access token is: <input name="twittertoken" type="text"
                                                                         value="<? echo $prefs['twittertoken'] ?>"/></li>
                         </div>
                         <div class="control-group">
-                            <li>My Twitter oAuth access secret is <input name="twittertokensecret" type="text"
+                            <li>My Twitter oAuth access secret is: <input name="twittertokensecret" type="text"
                                                                          value="<? echo $prefs['twittertokensecret'] ?>"/>
                             </li>
+                        </div>
+                    </ul>
+
+                    <h3>Mastodon</h3>
+                    <ul>
+                        <div class="control-group">
+                            <li>Instance url: <input name="mastodon_url" placeholder="<?echo $cg_mastodon_placeholder_url?>" type="text" value="<? echo $prefs['mastodon_url'] ?>"/></li>
                         </div>
                     </ul>
                 </div>

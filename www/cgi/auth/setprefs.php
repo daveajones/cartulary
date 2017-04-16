@@ -79,6 +79,7 @@ if ( isset($_POST['smtp_server']) ) { $smtp_server = $_POST['smtp_server']; } el
 if ( isset($_POST['smtp_secure']) ) { $smtp_secure = 1; } else { $smtp_secure = 0; };
 if ( isset($_POST['smtp_port']) ) { $smtp_port = $_POST['smtp_port']; } else { $smtp_port = ""; };
 if ( isset($_POST['darkmode']) ) { $darkmode = 1; } else { $darkmode = 0; };
+if ( isset($_POST['mastodon_url']) ) { $mastodon_url = $_POST['mastodon_url']; } else { $mastodon_url = ""; };
 $jsondata = array();
 $jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
@@ -854,6 +855,17 @@ if( ($darkmode < 0) || ($darkmode > 1) ) {
     exit(1);
 }
 $prefs['darkmode'] = $darkmode;
+
+$jsondata['prefname'] = "mastodon_url";
+if( strlen($mastodon_url) > 160 ) {
+    //Log it
+    loggit(2,"The value for mastodon_url was too long: [$mastodon_url]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max mastodon_url length is 160 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['mastodon_url'] = $mastodon_url;
 //--------------------------------------------------------
 //--------------------------------------------------------
 
@@ -950,5 +962,3 @@ $jsondata['prefname'] = "";
 echo json_encode($jsondata);
 
 return(0);
-
-?>

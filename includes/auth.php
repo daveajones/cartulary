@@ -2204,11 +2204,12 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                   smtp_secure=?,
                   smtp_port=?,
                   payment_made=?,
-                  darkmode=?
+                  darkmode=?,
+                  mastodon_url=?
            WHERE uid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdsdds",
+    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdsddss",
         $prefs['publicdefault'],
         $prefs['publicrss'],
         $prefs['publicopml'],
@@ -2275,6 +2276,7 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
         $prefs['smtp_port'],
         $prefs['payment_made'],
         $prefs['darkmode'],
+        $prefs['mastodon_url'],
         $uid
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);

@@ -2543,6 +2543,36 @@ function twitter_is_enabled($uid = NULL)
 }
 
 
+//Return true or false if the user has valid mastodon app registered and a token
+function mastodon_is_enabled($uid = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "User id given is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Get user prefs
+    $prefs = get_user_prefs($uid);
+
+    //Check credentials
+    if (   !empty($prefs['mastodon_url'])
+        && !empty($prefs['mastodon_client_id'])
+        && !empty($prefs['mastodon_client_secret'])
+        && !empty($prefs['mastodon_access_token'])) {
+        loggit(1, "Mastodon is enabled for user: [$uid].");
+        return (TRUE);
+    }
+
+    //At least one pref was bad
+    loggit(1, "Mastodon is NOT enabled for user: [$uid].");
+    return (FALSE);
+}
+
+
 //Return true or false if the system has valid twitter credentials
 function sys_twitter_is_enabled()
 {

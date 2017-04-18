@@ -108,8 +108,8 @@
                             </div>
 
                             <!-- Tweet toggle -->
-                            <? if (twitter_is_enabled($g_uid)) { ?><input class="tweetcheck hide" name="tweet"
-                                                                          type="checkbox"/><? } ?>
+                            <? if (twitter_is_enabled($g_uid)) { ?><input class="tweetcheck hide" name="tweet" type="checkbox"/><? } ?>
+                            <? if (mastodon_is_enabled($g_uid)) { ?><input class="tootcheck hide" name="toot" type="checkbox"/><? } ?>
                         </div>
                     </fieldset>
                 </form>
@@ -117,6 +117,9 @@
         </div>
         <div class="modal-footer">
             <span style="float:left;">Length: <span class="mbcharcount"></span></span>
+            <? if (mastodon_is_enabled($g_uid)) { ?>
+                <span class="tooters"><img class="tooticon icon-nomastodon" src="/images/blank.gif" alt=""/></span>
+            <? } ?>
             <? if (twitter_is_enabled($g_uid)) { ?>
                 <span class="tweeters"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt=""/><span
                         class="warntweet hide">Tweet will be truncated...</span></span>

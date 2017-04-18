@@ -104,6 +104,24 @@ $(document).ready( function() {
 	                $('#imgTweet').toggleClass('icon-notwitter');
         	});
 
+		//Set up the mastodon check-box, img interaction
+        $('#imgToot').bind('click', function() {
+            $('#chkToot').prop("checked", !$('#chkToot').prop("checked"));
+            $('#imgToot').toggleClass('icon-mastodon');
+            $('#imgToot').toggleClass('icon-nomastodon');
+            $('#txtContent').trigger('keyup');
+        });
+        if( $('#chkToot').is(":checked") ) {
+            $('#imgToot').removeClass('icon-nomastodon').addClass('icon-mastodon');
+            $('#txtContent').trigger('keyup');
+        } else {
+            $('#imgToot').removeClass('icon-mastodon').addClass('icon-nomastodon');
+        }
+        $('#chkToot').bind('change', function() {
+            $('#imgToot').toggleClass('icon-mastodon');
+            $('#imgToot').toggleClass('icon-nomastodon');
+        });
+		
                 //Ajaxify the blog post form
                 $('#frmBlogPost').ajaxForm({
                         <?if($g_device=="android") {?>dataType:       'html',<?

@@ -444,7 +444,7 @@ $tree_location = "Preferences";
                     <div class="divPrefSubmit pull-right divPrefTwitter"><img class="imgSpinner imgSpinnerSub"
                                                                               src="/images/spinner.gif"/><span
                             class="message"></span>
-                        <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
+                        <button id="btnPrefSubmit" class="btn btn-success btnPrefSubmit" type="submit">Save</button>
                     </div>
                     <h3>Twitter
                         <small>(Create app <a href="https://dev.twitter.com/apps/new">here</a>. Instructions <a
@@ -475,8 +475,28 @@ $tree_location = "Preferences";
                     <h3>Mastodon</h3>
                     <ul>
                         <div class="control-group">
-                            <li>Instance url: <input name="mastodon_url" placeholder="<?echo $cg_mastodon_placeholder_url?>" type="text" value="<? echo $prefs['mastodon_url'] ?>"/></li>
+                            <li>Instance url: <input name="mastodon_url" placeholder="<?echo $cg_mastodon_placeholder_url?>" type="text" value="<? echo $prefs['mastodon_url'] ?>"/>
+                            </li>
+                            <div style="margin-left:30px;">
+                                <?if( mastodon_is_enabled($uid) ) echo "<li>App token: <span style='color:#900'>".$prefs['mastodon_access_token']."</span><br><button id='resetMastodon'>Re-register</button></li>"?>
+
+                            </div>
                         </div>
+                        <?if( !mastodon_is_enabled($uid) ) {?>
+                            <div style="margin-left:30px;">
+                            <p>Just fill out the username and password you used to register on the mastodon server and click the save button.  The username
+                            and password isn't saved in the FC database.  It's just used temporarily in the registration process to get an access token.  You'll
+                            have to temporarily disable 2-factor authentication for the app registration to work.  After, you can re-enable it.</p>
+                                <input type="hidden" name="mastodon_register_app" value="TRUE" />
+                                <div class="control-group">
+                                    <li>Server email: <input name="mastodon_server_email" type="text" placeholder="john@doe.com"/></li>
+                                </div>
+                                <div class="control-group">
+                                    <li>Server password: <input name="mastodon_server_password" type="text" placeholder="password"/>
+                                    </li>
+                                </div>
+                            </div>
+                        <?}?>
                     </ul>
                 </div>
 

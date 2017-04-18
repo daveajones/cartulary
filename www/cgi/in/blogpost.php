@@ -222,6 +222,48 @@ if (isset($_REQUEST['tweet']) && twitter_is_enabled($uid)) {
     }
 }
 
+//Does the user want his posts tooted?
+if (isset($_REQUEST['toot']) && mastodon_is_enabled($uid)) {
+    $twlink = "";
+    $twtext = "";
+
+    //What about enclosure pictures
+    $mid = "";
+    if (count($enclosures) > 0 && stripos($enclosures[0]['type'], 'image/') !== FALSE && (0 + $enclosures[0]['length']) < 3000000) {
+        $img = fetchUrl($enclosures[0]['url']);
+        $temp_file = tempnam(sys_get_temp_dir(), 'tootimage');
+        $bytes_written = file_put_contents($temp_file, $img);
+        if($bytes_written !== FALSE) {
+            $mid = toot_upload_picture($uid, $temp_file);
+        }
+        unlink($temp_file);
+
+        loggit(3, "DEBUG: Toot w/media. Enclosure: [".$enclosures[0]['url']."], Filepath: [$temp_file], BytesWritten: [$bytes_written], MediaId: [$mid]");
+    }
+
+    //Set the text of the tweet correctly
+    if (!empty($title)) {
+        $twtext = $title;
+    } else {
+        $twtext = strip_tags($content);
+    }
+
+    //Get the appropriate url
+    if (!empty($url)) {
+        $twlink = $url;
+    }
+    if (!empty($shorturl)) {
+        $twlink = $shorturl;
+    }
+    if (strlen($title . $content) < 498 && isset($archiveurl)) {
+        $twlink = "";
+    }
+
+    //Post it to mastodon
+    //$twresult = tweet($uid, $twtext, $twlink, $mid);
+    toot($uid, $twtext, $twlink, $mid);
+}
+
 //Rebuild static files
 //$aposts = get_blog_posts($uid);
 build_blog_rss_feed($uid, NULL, FALSE);

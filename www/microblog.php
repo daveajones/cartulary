@@ -102,6 +102,10 @@ $tree_location = "Microblog";
                                                      alt=""/><span
                                     id="spnTweetWarning">Tweet will be truncated...</span></span>
                         <? } ?>
+                        <? if (mastodon_is_enabled($uid)) { ?>
+                            <input id="chkToot" name="toot" type="checkbox" />
+                            <span id="spnToot"><img id="imgToot" class="icon-nomastodon" src="/images/blank.gif" alt=""/></span>
+                        <? } ?>
 
                         <div id="divPostIt">
                             <span id="spnCharCount"></span>

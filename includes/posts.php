@@ -1301,9 +1301,9 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
 
     $lastpostday = "";
     foreach ($posts as $post) {
+        $rsslink = "";
+        $linkfull = "";
         if ($post['url'] == "") {
-            $rsslink = "";
-            $linkfull = "";
             $guid = "        <span class=\"guid\">" . $post['id'] . "</span>";
         } else {
             if (!empty($post['shorturl'])) {

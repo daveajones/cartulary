@@ -904,7 +904,7 @@ $cg_database_updates[65][] = <<<CGDB0196
       `token` VARCHAR(48) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL , 
       `lastusedon` DATETIME NOT NULL , 
       `useragent` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL , 
-      `createdon` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP , 
+      `createdon` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , 
     PRIMARY KEY (`id`), 
     INDEX `userid` (`userid`), 
     UNIQUE `token` (`token`)

@@ -1,0 +1,23 @@
+#Release Notes - Freedom Controller v0.6.14
+
+
+
+- Bug Fixes
+    - dropping support for INSTALLing on Ubuntu 12 LTS now that it's reached EOL
+    - fixed flow bug in preferences setter script
+    - fixed bug with database include incompat with mysql 5.5
+    - fixed issue with multiple file selector buttons showing up on microblog post page
+    - corrected some stylesheet issues with twitter and mastodon cross-post checkboxes
+
+- New Feature: Mastodon posting support
+    - There is a new "Mastodon" section on the prefs page where you can register an app token with a mastodon instance.
+    - Once you register, a new option will appear on the microblog page and in the microblog options in the river beside
+      the twitter logo where you can choose to also post it to mastodon
+    - Please give feedback on any additional mastodon integration you'd like
+
+- New Feature: Dark mode theme
+    - There is a new dark mode setting in the "Style" section of the prefs page
+    - For now, dark mode is just for the desktop browser, but mobile is coming
+
+- Improvements:
+    - A couple of small improvements to navigation in the "radio" page

@@ -899,7 +899,7 @@ if( isset($_POST['reregistermastodon']) && !empty($_POST['reregistermastodon']) 
     $jsondata['goloc'] = "/prefs?ts=".time();
 } else
 //If mastodon app registration is set
-if( $prefs['mastodon_url']
+if( !empty($prefs['mastodon_url'])
     && isset($_POST['mastodon_register_app'])
     && isset($_POST['mastodon_server_email']) && !empty($_POST['mastodon_server_email'])
     && isset($_POST['mastodon_server_password']) && !empty($_POST['mastodon_server_password'])
@@ -954,7 +954,7 @@ if( $prefs['mastodon_url']
     }
 
     //Save the user prefs with the new values
-    set_user_prefs(666, $prefs);
+    set_user_prefs($uid, $prefs);
     $jsondata['goloc'] = "/prefs?ts=".time();
 }
 

@@ -1564,10 +1564,14 @@ function httpUploadFile($url, $post_parameters = array(), $post_headers = array(
     curl_setopt($curl, CURLOPT_ENCODING, "");
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
-    curl_setopt($curl, CURLOPT_SAFE_UPLOAD, TRUE);
     curl_setopt($curl, CURLOPT_POST, 1);
 
-    $post_parameters['file'] = new CurlFile($filepath);
+    if(class_exists("CurlFile")) {
+        curl_setopt($curl, CURLOPT_SAFE_UPLOAD, TRUE);
+        $post_parameters['file'] = new CurlFile($filepath);
+    } else {
+        $post_parameters['file'] = "@".$filepath
+    }
     curl_setopt($curl, CURLOPT_POSTFIELDS, $post_parameters);
 
     if(!empty($post_headers)) {

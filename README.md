@@ -34,14 +34,14 @@
 
 #### INSTALL:
   The software will run on any unix-like system with a LAMP stack fairly easily, but it 
-  installs and upgrades easiest on Unbuntu LTS 12, 14 or 16 etc.  That's what is assumed in the install
+  installs and upgrades easiest on Unbuntu LTS 14, 16, etc.  That's what is assumed in the install
   documentation.  Running on any other system will require installing by hand, which is
   not hard.
 
   Although the system will run without Amazon S3 configured, it loses a lot of the best
   functionality.  Amazon S3 is really cheap.  You should do it. :-)
 
-  Example: Ubuntu 12,14,16 LTS [on Amazon Ec2]:
+  Example: Ubuntu 14,16 LTS [on Amazon Ec2]:
 
     1. [Launch a "small" Ubuntu LTS ec2 instance.]
     2. [Create an Elastic IP and assign it to your instance.]

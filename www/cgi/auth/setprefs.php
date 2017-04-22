@@ -955,7 +955,7 @@ if( !empty($prefs['mastodon_url'])
 
     //Save the user prefs with the new values
     set_user_prefs($uid, $prefs);
-    $jsondata['goloc'] = "/prefs?ts=".time();
+    $jsondata['goloc'] = "/prefs#mastodon?ts=".time()."#mastodon";
 }
 
 //If the name or email changed, then change those too

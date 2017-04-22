@@ -472,7 +472,7 @@ $tree_location = "Preferences";
                         </div>
                     </ul>
 
-                    <h3>Mastodon</h3>
+                    <h3 id="mastodon">Mastodon</h3>
                     <ul>
                         <div class="control-group">
                             <li>Instance url: <input name="mastodon_url" placeholder="<?echo $cg_mastodon_placeholder_url?>" type="text" value="<? echo $prefs['mastodon_url'] ?>"/>

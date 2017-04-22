@@ -1570,7 +1570,7 @@ function httpUploadFile($url, $post_parameters = array(), $post_headers = array(
         curl_setopt($curl, CURLOPT_SAFE_UPLOAD, TRUE);
         $post_parameters['file'] = new CurlFile($filepath);
     } else {
-        $post_parameters['file'] = "@".$filepath
+        $post_parameters['file'] = "@".$filepath;
     }
     curl_setopt($curl, CURLOPT_POSTFIELDS, $post_parameters);
 

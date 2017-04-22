@@ -283,11 +283,16 @@ li.menubar-search-container { display:none; }
 }
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform .tweetbox {
     display:inline-block;
-    margin-right:10px;
 }
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform .tootbox {
     display:inline-block;
-    margin-right:10px;
+}
+.pageContentWrapper.River #stream #stream-items .stream-list .article .footer .mbinline .mbinform .tootcheck,
+.pageContentWrapper.River #stream #stream-items .stream-list .article .footer .mbinline .mbinform .tweetcheck {
+    display:none;
+}
+.pageContentWrapper.River #stream #stream-items .stream-list .article .footer .mbinline .mbinform .mbsubmit {
+    margin-left:10px;
 }
 .pageContentWrapper.River .stream .stream-items .stream-list > .article .footer .mbinline .mbinform .mbextenc ul {
 	list-style:none;

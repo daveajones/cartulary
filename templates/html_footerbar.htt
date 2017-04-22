@@ -17,6 +17,7 @@
 
 
     <!-- Global Modals -->
+    <?if($section != "Microblog" && $tree_location != "Microblog") {?>
     <!-- Microblog Post -->
     <div id="mdlMicroblogPost" class="modal hide fade fcmodal" tabindex="-1">
         <div class="modal-header">
@@ -128,7 +129,7 @@
         </div>
     </div>
     <!-- Microblog Post -->
-
+    <?}?>
 
     <!-- Editor search+replace dialog -->
     <div id="mdlEditorSearchReplace" class="modal hide fade" tabindex="-1">
@@ -252,6 +253,6 @@
     <!-- Global Modals -->
 
     <!-- End-of-body content -->
-    <script src="/script/upload.js"></script>
+    <? //<script src="/script/upload.js"></script> ?>
     <script src="/script/global-postload.js"></script>
 <? } ?>

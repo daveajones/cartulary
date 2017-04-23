@@ -19,7 +19,8 @@ header("Content-Security-Policy-Report: script-src 'self' https://apis.google.co
     <script src="/script/local-river.js"></script>
 </head>
 <? include "$confroot/$templates/$template_html_posthead" ?>
-<body>
+<? //--- The body tag and anything else needed ---?>
+<? include "$confroot/$templates/$template_html_bodystart" ?>
 <? include "$confroot/$templates/$template_html_logotop" ?>  <!-- This container is empty for the river so it can be fluid in the next line. -->
 </div>
 <div class="container-fluid">

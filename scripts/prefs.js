@@ -1,6 +1,7 @@
 //Globals
 acb = false;
 abb = false;
+gUid = '<?echo $g_uid?>';
 
 function feedcurl() {
     var s3curlprefix = "<?echo $s3curlprefix?>";
@@ -43,7 +44,7 @@ function feedcurl() {
     $('#s3curlD').append(s3curlprefix + "/" + bucketname + "<?echo $default_blog_opml_file_name?>");
     $('#aS3curlD').attr('href', s3curlprefix + "/" + bucketname + "<?echo $default_blog_opml_file_name?>");
 
-    return(true);
+    return (true);
 };
 
 $(document).ready(function () {
@@ -136,21 +137,21 @@ $(document).ready(function () {
             $('#liCartBookmarklet').append('<br/><textarea>' + $('#aCartBookmarklet').attr('href') + '</textarea>');
         }
         acb = true;
-        return(false);
+        return (false);
     });
     $('#aBlogBookmarklet').click(function () {
         if (abb == false) {
             $('#liBlogBookmarklet').append('<br/><textarea>' + $('#aBlogBookmarklet').attr('href') + '</textarea>');
         }
         abb = true;
-        return(false);
+        return (false);
     });
     $('#aSubscribeBookmarklet').click(function () {
         if (abb == false) {
             $('#liSubscribeBookmarklet').append('<br/><textarea>' + $('#aSubscribeBookmarklet').attr('href') + '</textarea>');
         }
         abb = true;
-        return(false);
+        return (false);
     });
 
     //Toggle public river stuff
@@ -161,28 +162,40 @@ $(document).ready(function () {
 
     //Toggle imap secure port number if standard
     $('#chkImapSecure').bind('change', function () {
-        if( $(this).is(':checked') && $('#txtImapPort').val() == "143" ) {
+        if ($(this).is(':checked') && $('#txtImapPort').val() == "143") {
             $('#txtImapPort').val("993");
-        } else
-        if( !$(this).is(':checked') && $('#txtImapPort').val() == "993" ) {
+        } else if (!$(this).is(':checked') && $('#txtImapPort').val() == "993") {
             $('#txtImapPort').val("143");
         }
     });
 
     //Toggle smtp secure port number if standard
     $('#chkSmtpSecure').bind('change', function () {
-        if( $(this).is(':checked') && $('#txtSmtpPort').val() == "25" ) {
+        if ($(this).is(':checked') && $('#txtSmtpPort').val() == "25") {
             $('#txtSmtpPort').val("465");
-        } else
-        if( !$(this).is(':checked') && $('#txtSmtpPort').val() == "465" ) {
+        } else if (!$(this).is(':checked') && $('#txtSmtpPort').val() == "465") {
             $('#txtSmtpPort').val("25");
         }
     });
 
     //SMTP should stop tracking on imap focus out
-    $('#txtImapServer').bind('blur', function() {
-        if( $('#txtSmtpServer').val() == "" ) {
-            $('#txtSmtpServer').val( $('#txtImapServer').val() );
+    $('#txtImapServer').bind('blur', function () {
+        if ($('#txtSmtpServer').val() == "") {
+            $('#txtSmtpServer').val($('#txtImapServer').val());
         }
+    });
+
+    //Open subs change
+    $('#chkOpenSubs').bind('change', function () {
+        if ($(this).is(':checked')) {
+            $('#chkOpenSubs').parent().append("<span>(Use <a href='" + "/opensub?u=" + gUid + "'> this</a> url for open subs page.)</span>");
+        } else {
+            $('#chkOpenSubs').parent().find('span').remove();
+        }
+    });
+
+    $('button#resetMastodon').bind('click', function() {
+        $('form#frmPrefs').append('<input type="hidden" name="reregistermastodon" value="TRUE" />');
+        $('button.btnPrefSubmit').trigger('click');
     });
 });

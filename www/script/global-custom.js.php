@@ -244,6 +244,16 @@ function newMicroblogPostWindow(item, opmlsource, type) {
         $(modal + ' .bpdescription textarea').trigger('keyup');
     });
 
+    //Set the mastodon toggle
+    $(modal + ' .tooticon').removeClass('icon-mastodon').addClass('icon-nomastodon');
+    $(modal + ' .tootcheck').prop('checked', false);
+    $(modal + ' .tooticon').bind('click', function () {
+        $(modal + ' .tootcheck').prop('checked', !$(modal + ' .tootcheck').prop('checked'));
+        $(modal + ' .tooticon').toggleClass('icon-mastodon');
+        $(modal + ' .tooticon').toggleClass('icon-nomastodon');
+        $(modal + ' .bpdescription textarea').trigger('keyup');
+    });
+    
     //Track text length
     $(modal + ' .mbcharcount').text($(modal + ' .bpdescription textarea').val().length);
     $(modal + ' .bpdescription textarea').bind('keyup', function () {
@@ -261,6 +271,7 @@ function newMicroblogPostWindow(item, opmlsource, type) {
     $(modal).on('hidden', function () {
         $(modal + ' .mbsubmit').unbind('click');
         $(modal + ' .tweeticon').unbind('click');
+        $(modal + ' .tooticon').unbind('click');
         $(modal + ' .bpdescription textarea').unbind('keyup');
     });
 

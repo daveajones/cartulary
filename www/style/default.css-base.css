@@ -4,6 +4,9 @@ body {
 	padding-bottom: 40px;
     background: #eee url(/images/bg_lightgrey.png) repeat;
 }
+body.darkmode {
+    background: #eee url(/images/bg_darkgrey.png) repeat;
+}
 body > .container {  margin-top:80px;  }
 .navbar-inner a.brand {  display:none;  }
 @media (min-width:1px) and (max-width:979px) {

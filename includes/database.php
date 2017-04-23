@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 65;
+$cg_database_version = 68;
 $cg_database_updates = array();
 
 
@@ -894,6 +894,58 @@ CGDB0194;
 $cg_database_updates[64][] = <<<CGDB0195
  INSERT INTO `dbversion` ( `version` ) VALUES ( '65' )
 CGDB0195;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 65 to 66 -----------------------------------------------------------------------------------------------
+$cg_database_updates[65][] = <<<CGDB0196
+  CREATE TABLE IF NOT EXISTS `tokens` ( 
+      `id` BIGINT NOT NULL AUTO_INCREMENT , 
+      `userid` VARCHAR(64) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL , 
+      `token` VARCHAR(48) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL , 
+      `lastusedon` DATETIME NOT NULL , 
+      `useragent` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL , 
+      `createdon` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , 
+    PRIMARY KEY (`id`), 
+    INDEX `userid` (`userid`), 
+    UNIQUE `token` (`token`)
+  ) ENGINE = InnoDB COMMENT = 'Application tokens'
+CGDB0196;
+$cg_database_updates[65][] = <<<CGDB0197
+  ALTER TABLE `tokens` ADD CONSTRAINT `userid` FOREIGN KEY (`userid`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0197;
+$cg_database_updates[65][] = <<<CGDB0198
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '66' )
+CGDB0198;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 66 to 67 -------------------------------------------------------------------------------------------------
+$cg_database_updates[66][] = <<<CGDB0199
+ ALTER TABLE `prefs` ADD `darkmode` TINYINT NOT NULL DEFAULT '0' COMMENT 'Used dark theme for the UI?'
+CGDB0199;
+$cg_database_updates[66][] = <<<CGDB0200
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '67' )
+CGDB0200;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 67 to 68 -----------------------------------------------------------------------------------------------
+$cg_database_updates[67][] = <<<CGDB0201
+ ALTER TABLE `prefs` ADD `mastodon_url` VARCHAR( 160 ) NOT NULL COMMENT 'url to mastodon instance'
+CGDB0201;
+$cg_database_updates[67][] = <<<CGDB0202
+ ALTER TABLE `prefs` ADD `mastodon_app_token` VARCHAR( 80 ) NOT NULL COMMENT 'mastodon app token'
+CGDB0202;
+$cg_database_updates[67][] = <<<CGDB0203
+ ALTER TABLE `prefs` ADD `mastodon_client_id` VARCHAR( 80 ) NOT NULL COMMENT 'mastodon app client_id'
+CGDB0203;
+$cg_database_updates[67][] = <<<CGDB0204
+ ALTER TABLE `prefs` ADD `mastodon_client_secret` VARCHAR( 80 ) NOT NULL COMMENT 'mastodon app client_secret'
+CGDB0204;
+$cg_database_updates[67][] = <<<CGDB0205
+ ALTER TABLE `prefs` ADD `mastodon_access_token` VARCHAR( 80 ) NOT NULL COMMENT 'mastodon app access token'
+CGDB0205;
+$cg_database_updates[67][] = <<<CGDB0206
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '68' )
+CGDB0206;
 //----------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------

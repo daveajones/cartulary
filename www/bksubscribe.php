@@ -16,7 +16,10 @@ $tree_location = "Feed Finder";
     </script>
 </head>
 <? include "$confroot/$templates/$template_html_posthead" ?>
-<body>
+
+<? //--- The body tag and anything else needed ---?>
+<? include "$confroot/$templates/$template_html_bodystart" ?>
+
 <? //--- Include the logo and menu bar html fragments --?>
 <? include "$confroot/$templates/$template_html_logotop" ?>
 <? include "$confroot/$templates/$template_html_menubar" ?>

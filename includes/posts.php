@@ -553,7 +553,7 @@ function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
 
 
 //Build an rss feed for the given user
-function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts = NULL, $nos3 = FALSE, $fromeditor = FALSE)
+function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts = NULL, $nos3 = FALSE, $fromeditor = FALSE, $usetitles = FALSE)
 {
     //Check parameters
     if ($uid == NULL) {
@@ -739,6 +739,8 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
       <item>\n";
         if (!empty($post['title'])) {
             $rss .= "        <title>" . htmlspecialchars(trim($post['title'])) . "</title>\n";
+        } else if ($usetitles) {
+            $rss .= "        <title>" . htmlspecialchars(trim($post['content'])) . "</title>\n";
         }
         //TODO: their should be a pref check here on whether to include enclosures as html
         $rss .= "        <description><![CDATA[" . trim($post['content'].$html_enclosures) . "]]></description>
@@ -773,6 +775,9 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
 
         //Get the microblog feed file name
         $filename = $mbfeedfile;
+        if($usetitles) {
+            $filename = "titles-".$mbfeedfile;
+        }
         $arcpath = '';
 
         //Was this a request for a monthly archive?
@@ -1296,9 +1301,9 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
 
     $lastpostday = "";
     foreach ($posts as $post) {
+        $rsslink = "";
+        $linkfull = "";
         if ($post['url'] == "") {
-            $rsslink = "";
-            $linkfull = "";
             $guid = "        <span class=\"guid\">" . $post['id'] . "</span>";
         } else {
             if (!empty($post['shorturl'])) {

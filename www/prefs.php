@@ -20,7 +20,9 @@ $tree_location = "Preferences";
 </head>
 <? include "$confroot/$templates/$template_html_posthead" ?>
 
-<body>
+<? //--- The body tag and anything else needed ---?>
+<? include "$confroot/$templates/$template_html_bodystart" ?>
+
 <? //--- Include the logo and menu bar html fragments --?>
 <? include "$confroot/$templates/$template_html_logotop" ?>
 <? include "$confroot/$templates/$template_html_menubar" ?>
@@ -401,7 +403,7 @@ $tree_location = "Preferences";
                     <h3>Links</h3>
                     <ul>
                         <li>I want analytics code on my pages and links:<br/><textarea name="analyticscode"
-                                                                                       style="width:600px;height:200px;"></textarea>
+                                                                                       style="width:600px;height:200px;font-family:monospace;" wrap="off"><?echo $prefs['analyticscode']?></textarea>
                         </li>
                         <li><label class="checkbox inline"><input name="sourceurlrt"
                                                                   type="checkbox" <? if ($prefs['sourceurlrt'] == 1) echo "checked "; ?>/>
@@ -430,6 +432,11 @@ $tree_location = "Preferences";
                                 feeds and on pages by default.
                             </li>
                         </div>
+                        <div class="control-group">
+                            <li><label class="checkbox inline"><input name="darkmode"
+                                                                      type="checkbox" <? if ($prefs['darkmode'] == 1) echo "checked "; ?>/>
+                                    I want to use the dark mode theme.</label></li>
+                        </div>
                     </ul>
                 </div>
 
@@ -437,7 +444,7 @@ $tree_location = "Preferences";
                     <div class="divPrefSubmit pull-right divPrefTwitter"><img class="imgSpinner imgSpinnerSub"
                                                                               src="/images/spinner.gif"/><span
                             class="message"></span>
-                        <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
+                        <button id="btnPrefSubmit" class="btn btn-success btnPrefSubmit" type="submit">Save</button>
                     </div>
                     <h3>Twitter
                         <small>(Create app <a href="https://dev.twitter.com/apps/new">here</a>. Instructions <a
@@ -446,23 +453,50 @@ $tree_location = "Preferences";
                     </h3>
                     <ul>
                         <div class="control-group">
-                            <li>My Twitter oAuth consumer key is <input name="twitterkey" type="text"
+                            <li>My Twitter oAuth consumer key is: <input name="twitterkey" type="text"
                                                                         value="<? echo $prefs['twitterkey'] ?>"/></li>
                         </div>
                         <div class="control-group">
-                            <li>My Twitter oAuth consumer secret is <input name="twittersecret" type="text"
+                            <li>My Twitter oAuth consumer secret is: <input name="twittersecret" type="text"
                                                                            value="<? echo $prefs['twittersecret'] ?>"/>
                             </li>
                         </div>
                         <div class="control-group">
-                            <li>My Twitter oAuth access token is <input name="twittertoken" type="text"
+                            <li>My Twitter oAuth access token is: <input name="twittertoken" type="text"
                                                                         value="<? echo $prefs['twittertoken'] ?>"/></li>
                         </div>
                         <div class="control-group">
-                            <li>My Twitter oAuth access secret is <input name="twittertokensecret" type="text"
+                            <li>My Twitter oAuth access secret is: <input name="twittertokensecret" type="text"
                                                                          value="<? echo $prefs['twittertokensecret'] ?>"/>
                             </li>
                         </div>
+                    </ul>
+
+                    <h3 id="mastodon">Mastodon</h3>
+                    <ul>
+                        <div class="control-group">
+                            <li>Instance url: <input name="mastodon_url" placeholder="<?echo $cg_mastodon_placeholder_url?>" type="text" value="<? echo $prefs['mastodon_url'] ?>"/>
+                            </li>
+                            <div style="margin-left:30px;">
+                                <?if( mastodon_is_enabled($uid) ) echo "<li>App token: <span style='color:#900'>".$prefs['mastodon_access_token']."</span><br><button id='resetMastodon'>Re-register</button></li>"?>
+
+                            </div>
+                        </div>
+                        <?if( !mastodon_is_enabled($uid) ) {?>
+                            <div style="margin-left:30px;">
+                            <p>Just fill out the username and password you used to register on the mastodon server and click the save button.  The username
+                            and password isn't saved in the FC database.  It's just used temporarily in the registration process to get an access token.  You'll
+                            have to temporarily disable 2-factor authentication for the app registration to work.  After, you can re-enable it.</p>
+                                <input type="hidden" name="mastodon_register_app" value="TRUE" />
+                                <div class="control-group">
+                                    <li>Server email: <input name="mastodon_server_email" type="text" placeholder="john@doe.com"/></li>
+                                </div>
+                                <div class="control-group">
+                                    <li>Server password: <input name="mastodon_server_password" type="text" placeholder="password"/>
+                                    </li>
+                                </div>
+                            </div>
+                        <?}?>
                     </ul>
                 </div>
 

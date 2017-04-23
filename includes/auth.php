@@ -2203,11 +2203,17 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                   smtp_server=?,
                   smtp_secure=?,
                   smtp_port=?,
-                  payment_made=?
+                  payment_made=?,
+                  darkmode=?,
+                  mastodon_url=?,
+                  mastodon_app_token=?,
+                  mastodon_client_id=?,
+                  mastodon_client_secret=?,
+                  mastodon_access_token=?
            WHERE uid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdsds",
+    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdsddssssss",
         $prefs['publicdefault'],
         $prefs['publicrss'],
         $prefs['publicopml'],
@@ -2273,6 +2279,12 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
         $prefs['smtp_secure'],
         $prefs['smtp_port'],
         $prefs['payment_made'],
+        $prefs['darkmode'],
+        $prefs['mastodon_url'],
+        $prefs['mastodon_app_token'],
+        $prefs['mastodon_client_id'],
+        $prefs['mastodon_client_secret'],
+        $prefs['mastodon_access_token'],
         $uid
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -2527,6 +2539,36 @@ function twitter_is_enabled($uid = NULL)
 
     //At least one pref was bad
     loggit(1, "Twitter is NOT enabled for user: [$uid].");
+    return (FALSE);
+}
+
+
+//Return true or false if the user has valid mastodon app registered and a token
+function mastodon_is_enabled($uid = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "User id given is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Get user prefs
+    $prefs = get_user_prefs($uid);
+
+    //Check credentials
+    if (   !empty($prefs['mastodon_url'])
+        && !empty($prefs['mastodon_client_id'])
+        && !empty($prefs['mastodon_client_secret'])
+        && !empty($prefs['mastodon_access_token'])) {
+        loggit(1, "Mastodon is enabled for user: [$uid].");
+        return (TRUE);
+    }
+
+    //At least one pref was bad
+    loggit(1, "Mastodon is NOT enabled for user: [$uid].");
     return (FALSE);
 }
 

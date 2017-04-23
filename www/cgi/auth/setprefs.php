@@ -78,6 +78,8 @@ if ( isset($_POST['imap_port']) ) { $imap_port = $_POST['imap_port']; } else { $
 if ( isset($_POST['smtp_server']) ) { $smtp_server = $_POST['smtp_server']; } else { $smtp_server = ""; };
 if ( isset($_POST['smtp_secure']) ) { $smtp_secure = 1; } else { $smtp_secure = 0; };
 if ( isset($_POST['smtp_port']) ) { $smtp_port = $_POST['smtp_port']; } else { $smtp_port = ""; };
+if ( isset($_POST['darkmode']) ) { $darkmode = 1; } else { $darkmode = 0; };
+if ( isset($_POST['mastodon_url']) ) { $mastodon_url = $_POST['mastodon_url']; } else { $mastodon_url = ""; };
 $jsondata = array();
 $jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
@@ -842,6 +844,28 @@ if( ($smtp_port < 1) || ($smtp_port > 65535) || !is_numeric($smtp_port) ) {
     exit(1);
 }
 $prefs['smtp_port'] = $smtp_port;
+
+$jsondata['prefname'] = "darkmode";
+if( ($darkmode < 0) || ($darkmode > 1) ) {
+    //Log it
+    loggit(2,"The value for darkmode pref was not within acceptable range: [$darkmode]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Value of pref is out of range.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['darkmode'] = $darkmode;
+
+$jsondata['prefname'] = "mastodon_url";
+if( strlen($mastodon_url) > 160 ) {
+    //Log it
+    loggit(2,"The value for mastodon_url was too long: [$mastodon_url]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max mastodon_url length is 160 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['mastodon_url'] = $mastodon_url;
 //--------------------------------------------------------
 //--------------------------------------------------------
 
@@ -864,6 +888,75 @@ if( ($oldprefs['s3key'] != $prefs['s3key'] || $oldprefs['s3secret'] != $prefs['s
 
 //Set the prefs
 set_user_prefs($uid, $prefs);
+
+//Does this user want to re-register the mastodon app
+if( isset($_POST['reregistermastodon']) && !empty($_POST['reregistermastodon']) ) {
+    $prefs['mastodon_app_token'] = "";
+    $prefs['mastodon_access_token'] = "";
+    $prefs['mastodon_client_id'] = "";
+    $prefs['mastodon_client_secret'] = "";
+    set_user_prefs($uid, $prefs);
+    $jsondata['goloc'] = "/prefs?ts=".time();
+} else
+//If mastodon app registration is set
+if( !empty($prefs['mastodon_url'])
+    && isset($_POST['mastodon_register_app'])
+    && isset($_POST['mastodon_server_email']) && !empty($_POST['mastodon_server_email'])
+    && isset($_POST['mastodon_server_password']) && !empty($_POST['mastodon_server_password'])
+) {
+    $masturl = $prefs['mastodon_url'];
+
+    //Register or get the registration of the app
+    if( empty($prefs['mastodon_client_id']) || empty($prefs['mastodon_client_secret'])) {
+        $result = postUrlExtra("$masturl/api/v1/apps", array(
+            "client_name" => $cg_mastodon_app_name,
+            "redirect_uris" => "urn:ietf:wg:oauth:2.0:oob",
+            "scopes" => $cg_mastodon_app_scope,
+            "website" => $cg_mastodon_app_website
+        ));
+        $response = json_decode($result['body'], TRUE);
+        if($result['status_code'] == 200 && !empty($response['client_id']) && !empty($response['client_secret'])) {
+            $prefs['mastodon_app_token'] = "";
+            $prefs['mastodon_access_token'] = "";
+            $prefs['mastodon_client_id'] = $response['client_id'];
+            $prefs['mastodon_client_secret'] = $response['client_secret'];
+        } else {
+            //Log it
+            loggit(2,"Mastodon app registration failed: [".print_r($result, TRUE)."].");
+            $jsondata['status'] = "false";
+            $jsondata['description'] = "Mastodon app registration failed. Response was: [".$result['status_code']."]";
+            echo json_encode($jsondata);
+            exit(1);
+        }
+    }
+
+    //Get the bearer token
+    if( empty($prefs['mastodon_access_token']) ) {
+        $result = postUrlExtra("$masturl/oauth/token", array(
+            "client_id" => $prefs['mastodon_client_id'],
+            "client_secret" => $prefs['mastodon_client_secret'],
+            "grant_type" => $cg_mastodon_app_grant_type,
+            "username" => $_POST['mastodon_server_email'],
+            "password" => $_POST['mastodon_server_password'],
+            "scope" => $cg_mastodon_app_scope
+        ));
+        $response = json_decode($result['body'], TRUE);
+        if($result['status_code'] == 200 && !empty($response['access_token'])) {
+            $prefs['mastodon_access_token'] = $response['access_token'];
+        } else {
+            //Log it
+            loggit(2,"Failed to get mastodon app token: [".print_r($result, TRUE)."].");
+            $jsondata['status'] = "false";
+            $jsondata['description'] = "Failed to get mastodon app token. Response was: [".$result['status_code']."]";
+            echo json_encode($jsondata);
+            exit(1);
+        }
+    }
+
+    //Save the user prefs with the new values
+    set_user_prefs($uid, $prefs);
+    $jsondata['goloc'] = "/prefs#mastodon?ts=".time()."#mastodon";
+}
 
 //If the name or email changed, then change those too
 if( isset($myname) ) {
@@ -910,6 +1003,11 @@ if( empty($utps16) || ($oldprefs['usetotp'] != $prefs['usetotp']) ) {
     $jsondata['goloc'] = "/prefs?ts=".time();
 }
 
+//If darkmode preference changed
+if( ($oldprefs['darkmode'] != $prefs['darkmode']) ) {
+    $jsondata['goloc'] = "/prefs?ts=".time();
+}
+
 //If the user wants session-only cookies, set a new cookie
 $cookieexpire = 0;
 if( $prefs['sessioncookies'] == 0 ) {
@@ -933,5 +1031,3 @@ $jsondata['prefname'] = "";
 echo json_encode($jsondata);
 
 return(0);
-
-?>

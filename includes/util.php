@@ -1226,6 +1226,194 @@ function fetchUrl($url, $timeout = 30)
 }
 
 
+//Gets the data from a URL with SSL verification
+function fetchUrlSafe($url, $timeout = 30)
+{
+    $url = clean_url($url);
+
+    $curl = curl_init();
+    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    curl_setopt($curl, CURLOPT_USERAGENT, $ua);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_COOKIEFILE, "");
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_ENCODING, "");
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, TRUE);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+
+    $data = curl_exec($curl);
+    $response = curl_getinfo($curl);
+    curl_close($curl);
+    if (!empty($cookie)) {
+        //unlink($cookie);
+    }
+
+    $rcode = $response['http_code'];
+    if ($rcode != 200) {
+        loggit(2, "Got back response code: [$rcode] while fetching: [$url].");
+        return (FALSE);
+    }
+
+    return $data;
+}
+
+
+//Gets the data from a URL with SSL verification
+function getMastodonTimeline($hosturl, $token, $timeout = 30)
+{
+    if (stripos($hosturl, "http://") !== 0 && stripos($hosturl, "https://") !== 0) {
+        loggit(2, "The host url must start with a protocol spec: [$hosturl].");
+        return (FALSE);
+    }
+
+    $url = trim($hosturl, "/ ")."/api/v1/timelines/home";
+    $url = clean_url($url);
+
+    $curl = curl_init();
+    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    curl_setopt($curl, CURLOPT_USERAGENT, $ua);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_COOKIEFILE, "");
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_ENCODING, "");
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, TRUE);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        "Authorization: Bearer ".trim($token)
+    ));
+
+    $data = curl_exec($curl);
+    $response = curl_getinfo($curl);
+    curl_close($curl);
+    if (!empty($cookie)) {
+        //unlink($cookie);
+    }
+
+    $rcode = $response['http_code'];
+    if ($rcode != 200) {
+        loggit(2, "Got back response code: [$rcode] while fetching: [$url].");
+        return (FALSE);
+    }
+
+    return $data;
+}
+
+
+//Send a status update to twitter
+function toot($uid = NULL, $content = NULL, $link = "", $media_id = "")
+{
+    //Check parameters
+    if ($uid == NULL) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ($content == NULL) {
+        loggit(2, "The post content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Globals
+    $prefs = get_user_prefs($uid);
+    $charcount = 498;
+
+    if (!empty($link)) {
+        $charcount -= 22;
+    }
+
+    if (!empty($media_id)) {
+        $charcount -= 22;
+    }
+
+    //Truncate text if too long to fit in remaining space
+    if (strlen($content) > $charcount) {
+        $twcontent = truncate_text($content, ($charcount - 3)) . "...";
+        loggit(1, "Had to truncate tweet: [$content] to: [$twcontent] for user: [$uid].");
+    } else {
+        $twcontent = $content;
+    }
+
+    //Assemble tweet
+    $tweet = $twcontent . " " . $link;
+
+    $twstatus = array('status' => $tweet);
+    //$twstatus['visibility'] = "unlisted";
+    if (!empty($media_id)) {
+        $twstatus['media_ids'] = array($media_id);
+    }
+
+    loggit(3, "DEBUG: Toot upload: [".print_r($twstatus, TRUE)."]");
+
+    //Make an API call to post the tweet
+    $result = postUrlExtra(trim($prefs['mastodon_url'])."/api/v1/statuses", $twstatus, array(
+        "Authorization: Bearer ".$prefs['mastodon_access_token']
+    ), TRUE);
+
+    //Log and return
+    if ($result != FALSE) {
+        loggit(1, "Tooted a new post: [$tweet] for user: [$uid].");
+        return (TRUE);
+    } else {
+        loggit(2, "Tooting post did not work posting: [$tweet] for user: [$uid].");
+        return (FALSE);
+    }
+}
+
+
+//Upload a media file to mastodon
+function toot_upload_picture($uid = NULL, $filepath = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if (empty($filepath)) {
+        loggit(2, "The file path is blank or corrupt: [$filepath]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/oauth/tmhOAuth.php";
+
+    //Globals
+    $prefs = get_user_prefs($uid);
+
+    //Make an API call to post the tweet
+    $result = httpUploadFile(trim($prefs['mastodon_url'])."/api/v1/media", array(), array(
+        "Authorization: Bearer ".$prefs['mastodon_access_token']
+    ), $filepath);
+
+    if( $result['status_code'] != 200 ) {
+        loggit(2, "Uploading media file: [$filepath] to mastodon for user: [$uid] didn't work. Response code: [".$result['status_code']."]");
+        return (FALSE);
+    }
+
+    $response = json_decode($result['body'], TRUE);
+    $mediaid = $response['id'];
+
+    loggit(3, "DEBUG: toot_upload_picture: [".print_r($response, TRUE)."]");
+
+    //Log and return
+    if ($result != FALSE) {
+        loggit(3, "Uploaded a media file to mastodon for user: [$uid]. Got back media id: [$mediaid].");
+        return ($mediaid);
+    } else {
+        loggit(2, "Uploading media file: [$filepath] to mastodon for user: [$uid] didn't work. Response code: [".$result['status_code']."]");
+        return (FALSE);
+    }
+}
+
+
 //Gets a feed from a URL
 function fetchFeedUrl($url, $subcount = 0, $sysver = '', $timeout = 30)
 {
@@ -1300,6 +1488,108 @@ function fetchUrlExtra($url, $timeout = 30)
 
     //loggit(3, "DEBUG: [" . substr($response['body'], 0, 10) . "]");
 
+    return $response;
+}
+
+
+//Gets the data from a URL along with extra info returned */
+function postUrlExtra($url, $post_parameters = array(), $post_headers = array(), $as_json = FALSE, $timeout = 30)
+{
+    $url = clean_url($url);
+
+    $curl = curl_init();
+    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    curl_setopt($curl, CURLOPT_USERAGENT, $ua);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_HEADER, FALSE);
+    curl_setopt($curl, CURLOPT_COOKIEFILE, "");
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_ENCODING, "");
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+    curl_setopt($curl, CURLOPT_POST, 1);
+
+    if($as_json) {
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($post_parameters));
+        $post_headers[] = "Content-Type: application/json";
+    } else {
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $post_parameters);
+    }
+
+
+    if(!empty($post_headers)) {
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $post_headers);
+    }
+
+    $data = curl_exec($curl);
+    $response = curl_getinfo($curl);
+
+    $response['effective_url'] = $url;
+    $response['status_code'] = $response['http_code'];
+    $response['body'] = $data;
+
+    curl_close($curl);
+
+    //loggit(3, "DEBUG: [" . substr($response['body'], 0, 10) . "]");
+
+    //return $response;
+    return $response;
+}
+
+
+//Upload a file over http using curl
+function httpUploadFile($url, $post_parameters = array(), $post_headers = array(), $filepath = NULL, $timeout = 30)
+{
+    //Check parameters
+    if (empty($filepath)) {
+        loggit(2, "The file path is blank or corrupt: [$filepath]");
+        return (FALSE);
+    }
+
+    $url = clean_url($url);
+
+    $curl = curl_init();
+    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    curl_setopt($curl, CURLOPT_USERAGENT, $ua);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_HEADER, FALSE);
+    curl_setopt($curl, CURLOPT_COOKIEFILE, "");
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($curl, CURLOPT_ENCODING, "");
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+    curl_setopt($curl, CURLOPT_POST, 1);
+
+    if(class_exists("CurlFile")) {
+        curl_setopt($curl, CURLOPT_SAFE_UPLOAD, TRUE);
+        $post_parameters['file'] = new CurlFile($filepath);
+    } else {
+        $post_parameters['file'] = "@".$filepath;
+    }
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $post_parameters);
+
+    if(!empty($post_headers)) {
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $post_headers);
+    }
+
+    $data = curl_exec($curl);
+    $response = curl_getinfo($curl);
+
+    $response['effective_url'] = $url;
+    $response['status_code'] = $response['http_code'];
+    $response['body'] = $data;
+
+    curl_close($curl);
+
+    loggit(3, "DEBUG: httpUploadFile: [".print_r($response, TRUE)."]");
+
+    //return $response;
     return $response;
 }
 

@@ -17,6 +17,7 @@
 
 
     <!-- Global Modals -->
+    <?if($section != "Microblog" && $tree_location != "Microblog") {?>
     <!-- Microblog Post -->
     <div id="mdlMicroblogPost" class="modal hide fade fcmodal" tabindex="-1">
         <div class="modal-header">
@@ -108,8 +109,8 @@
                             </div>
 
                             <!-- Tweet toggle -->
-                            <? if (twitter_is_enabled($g_uid)) { ?><input class="tweetcheck hide" name="tweet"
-                                                                          type="checkbox"/><? } ?>
+                            <? if (twitter_is_enabled($g_uid)) { ?><input class="tweetcheck hide" name="tweet" type="checkbox"/><? } ?>
+                            <? if (mastodon_is_enabled($g_uid)) { ?><input class="tootcheck hide" name="toot" type="checkbox"/><? } ?>
                         </div>
                     </fieldset>
                 </form>
@@ -117,6 +118,9 @@
         </div>
         <div class="modal-footer">
             <span style="float:left;">Length: <span class="mbcharcount"></span></span>
+            <? if (mastodon_is_enabled($g_uid)) { ?>
+                <span class="tooters"><img class="tooticon icon-nomastodon" src="/images/blank.gif" alt=""/></span>
+            <? } ?>
             <? if (twitter_is_enabled($g_uid)) { ?>
                 <span class="tweeters"><img class="tweeticon icon-notwitter" src="/images/blank.gif" alt=""/><span
                         class="warntweet hide">Tweet will be truncated...</span></span>
@@ -125,7 +129,7 @@
         </div>
     </div>
     <!-- Microblog Post -->
-
+    <?}?>
 
     <!-- Editor search+replace dialog -->
     <div id="mdlEditorSearchReplace" class="modal hide fade" tabindex="-1">
@@ -249,6 +253,6 @@
     <!-- Global Modals -->
 
     <!-- End-of-body content -->
-    <script src="/script/upload.js"></script>
+    <? //<script src="/script/upload.js"></script> ?>
     <script src="/script/global-postload.js"></script>
 <? } ?>

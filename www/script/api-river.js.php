@@ -34,6 +34,7 @@ freedomController.v1.river.methods = (function () {
     var lsRiverDataPullTime = freedomController.v1.river.statics.lsRiverDataPullTime;
     var lsStickyDataKey = freedomController.v1.river.statics.lsStickyDataKey;
     var lsSessionIdKey = freedomController.v1.river.statics.lsSessionIdKey;
+    var videoShowPopout = true;
 
 
     //----- River functions -----
@@ -608,6 +609,19 @@ freedomController.v1.river.methods = (function () {
                 });
             }
 
+            //Add a mastodon toggle if mastodon is enabled
+            if (cuMastodonIsEnabled) {
+                $(pathToForm).append('<label class="checkbox tootbox"><img class="tooticon icon-nomastodon" src="/images/blank.gif" alt="" /><input class="tootcheck" name="toot" type="checkbox" /></label>');
+                $(pathToForm + ' .tooticon').unbind('click');
+                $(pathToForm + ' .tooticon').bind('click', function () {
+                    if ($(pathToForm + ' .tootcheck').prop("checked") == false) {
+                        $(pathToForm + ' .tootcheck').prop("checked", true);
+                    } else {
+                        $(pathToForm + ' .tootcheck').prop("checked", false);
+                    }
+                });
+            }            
+
             //Submit buttons go in the div and we'll trigger form submission from outside
             $(pathToForm).append('<a class="btn btn-success mbsubmit ' + postId + '" href="#">Post</a> <a class="btn btn-error mbcancel ' + postId + '" href="#">Cancel</a>');
 
@@ -683,6 +697,16 @@ freedomController.v1.river.methods = (function () {
                 $(pathToForm + ' .tweetbox .tweeticon').toggleClass('icon-notwitter');
                 $(pathToForm + ' .tweetbox .mbdescription').trigger('keyup');
             });
+
+            //Set the mastodon toggle
+            $(pathToForm + ' .tootbox .tooticon').removeClass('icon-mastodon').addClass('icon-nomastodon');
+            $(pathToForm + ' .tootbox .tootcheck').prop('checked', false);
+            $(pathToForm + ' .tootbox .tooticon').bind('click', function () {
+                $(pathToForm + ' .tootbox .tootcheck').prop('checked', !$(pathToForm + ' .tootbox .tootcheck').prop('checked'));
+                $(pathToForm + ' .tootbox .tooticon').toggleClass('icon-mastodon');
+                $(pathToForm + ' .tootbox .tooticon').toggleClass('icon-nomastodon');
+                $(pathToForm + ' .tootbox .mbdescription').trigger('keyup');
+            });            
 
             return false;
         });
@@ -1316,8 +1340,47 @@ freedomController.v1.river.methods = (function () {
             $(this).children('div.play').unbind('click');
             $(this).children('div.play').bind('click', function () {
                 var dsrc = $(_this).attr("data-src");
+                $('div#videoBox').addClass('oldVideoBox').removeAttr('id');
+                $('#videoBox').removeClass('out').removeClass('in');
+                $('#videoBox').css('bottom','');
+                $('div.enclosureview').removeClass('keepVidHeight');
+                videoShowPopout = true;
+                var $closebtn = $('<button>', {id:'videoBoxClose', class:'btn-link fa fa-close'});
                 var $iframe = $('<iframe>', {class: 'encobj enciframe', src: dsrc, frameborder: 0, allowfullscreen: true});
-                $(_this).replaceWith($iframe)
+                var $vidBox = $('<div>', {id: 'videoBox', class: 'box'});
+                $vidBox.append($closebtn);
+                $vidBox.append($iframe);
+                $(_this).parent().addClass('keepVidHeight');
+                $(_this).replaceWith($vidBox);
+
+                //Pop out playing videos to the bottom of the viewport when scrolling down past them
+                var boxtop = Math.floor( $('#videoBox').offset().top );
+                var boxbottom = Math.floor( $('#videoBox').offset().top + $('#videoBox').height() );
+
+                $(window).unbind('scroll');
+                $(window).scroll(function(){
+                    var viewporttop = $(window).scrollTop();
+                    var viewportbottom = viewporttop + $(window).height();
+                    //Only show the video popout if the popout hasn't been closed manually before
+                    if(videoShowPopout) {
+                        //This means the video has scrolled entirely outside of the viewing area
+                        if ( (viewporttop > boxbottom + 200) || (viewportbottom < boxtop - 200) ) {
+                            $('#videoBox').removeClass('in').addClass('out');
+                            $('#videoBox').css('bottom','0');
+
+                        //This means the video is entirely within the viewing area
+                        } else if ( (viewporttop - 200 < boxtop) && ( viewportbottom + 200 > boxbottom) ) {
+                            $('#videoBox').css('bottom','-500px');
+                            $('#videoBox').removeClass('out').addClass('in');
+                        };
+                    }
+                });
+
+                $(document).on('click', 'button#videoBoxClose', function() {
+                    videoShowPopout = false;
+                    $('#videoBox').removeClass('out').removeClass('in');
+                    $('#videoBox').css('bottom','');
+                });
             });
         });
 

@@ -3407,17 +3407,17 @@ function build_search_sql($q = NULL, $colnames = NULL)
     $rn = makeValuesReferenced($q['not']);
     foreach ($rl as &$qlar) {
         foreach ($colnames as $colname) {
-            $refArr[] = $qlar;
+            $refArr[] = &$qlar;
         }
     }
     foreach ($rn as &$qnar) {
         foreach ($colnames as $colname) {
-            $refArr[] = $qnar;
+            $refArr[] = &$qnar;
         }
     }
     $sqla['bind'] = $refArr;
 
-    loggit(1, "SEARCH: " . print_r($sqla, TRUE));
+    loggit(3, "SEARCHBUILD: " . print_r($sqla, TRUE));
 
     return ($sqla);
 }

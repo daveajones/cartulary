@@ -1,0 +1,18 @@
+#Release Notes - Freedom Controller v0.6.15
+
+
+
+- Bug Fixes
+    - There was a major breakage to the new search version 2.  I can't find where it was
+      introduced but it pretty much broke the whole thing.  That's fixed now.
+
+- New Feature: OPML export in search results
+    - You can now add the "opml:" keyword to any search string.  That will add a little
+      opml icon to the search result window which you can click on to send those results
+      to the editor as an opml file which you can save, edit, etc. just like any other
+      opml document.
+    - An example search might look like this "clinton trump 2016 opml: max:200"
+    - That would return a max of 200 results (default is 100) and give you an opml export
+    - This technique should work on all sections that have search enabled (river, articles,
+      opml, editor, subscriptions)
+

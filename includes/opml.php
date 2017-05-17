@@ -2189,7 +2189,7 @@ function convert_opml_to_ia($content = NULL, $link = NULL, $max = NULL)
     $html .= "                      <time class=\"op-modified\" dateTime=\"" . (string)$x->head->dateModified . "\"></time>\n";
     foreach ($nodes as $entry) {
         $line = "";
-        //loggit(3, "DEBUG: ".print_r($entry, TRUE));
+        loggit(3, "DEBUG(entry): ".print_r($entry, TRUE));
 
         $text = (string)$entry->attributes()->text;
         $name = (string)$entry->attributes()->name;
@@ -2208,7 +2208,7 @@ function convert_opml_to_ia($content = NULL, $link = NULL, $max = NULL)
             $line = "                      <br>\n";
         }
 
-        //$html .= $line . "\n";
+        $html .= $line . "\n";
 
         $count++;
     }
@@ -2423,12 +2423,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             }
 
             //Set an expanded class on outline nodes that match the expansionState counter
-            if(isset($parents)) {
-                $parent = end(array_values($parents));
-            } else {
-                $parent = "";
-            }
-
+            $parent = end(array_values($parents));
             if ($type == "menu" && $menuexists == 0) {
                 $htmlcontent .= "<div class=\"navbar navbar-fixed-top navbar-inverse\" role=\"navigation\">\n<div class=\"container\">\n<div class=\"navbar-header\">\n<button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\"#navbar-collapse-1\">\n<span class=\"sr-only\">Toggle navigation</span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n</button>\n<a class=\"navbar-brand\" href='#'>$nodetext</a>\n</div>\n<div class=\"collapse navbar-collapse\" id=\"navbar-collapse-1\"><ul class=\"nav navbar-nav\">\n";
                 $menuexists++;
@@ -3146,7 +3141,7 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
 
 
 //Search for editor files that match query
-function search_editor_files($uid = NULL, $query = NULL, $max = NULL)
+function search_editor_files($uid = NULL, $query = NULL, $max = NULL, $withopml = FALSE)
 {
     //Check parameters
     if ($uid == NULL) {
@@ -3174,7 +3169,7 @@ function search_editor_files($uid = NULL, $query = NULL, $max = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Do the query
-    $sqltxt = "SELECT url, title, outline
+    $sqltxt = "SELECT url, title, outline, time, type
 	           FROM $table_recentfiles
 	           WHERE userid=?
     ";
@@ -3197,6 +3192,7 @@ function search_editor_files($uid = NULL, $query = NULL, $max = NULL)
 
     $ref = new ReflectionClass('mysqli_stmt');
     $method = $ref->getMethod("bind_param");
+    loggit(3, "DEBUG: ".print_r($qsql, TRUE));
     $method->invokeArgs($sql, $qsql['bind']);
 
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -3210,19 +3206,150 @@ function search_editor_files($uid = NULL, $query = NULL, $max = NULL)
         return (FALSE);
     }
 
-    $sql->bind_result($furl, $ftitle, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($furl, $ftitle, $foutline, $ftime, $ftype) or loggit(2, "MySql error: " . $dbh->error);
 
     $files = array();
     $count = 0;
     while ($sql->fetch()) {
-        $files[$count] = array('url' => $furl, 'title' => $ftitle, 'outline' => $foutline);
+        $files[$count] = array('url' => $furl, 'title' => $ftitle, 'outline' => $foutline, 'time' => $ftime, 'type' => $ftype);
         $count++;
     }
 
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
+    if($withopml) {
+        $s3url = build_opml_editor_feed($uid, $max, FALSE, $files, FALSE, "search/editorsearch", TRUE, "Editor search results: [".$query['flat']."]");
+        loggit(3, "OPMLURL: $s3url");
+        if(is_string($s3url)) {
+            $files['opmlurl'] = $s3url;
+            loggit(3, "OPMLURL: ".$files['opmlurl']);
+        }
+    }
+
     loggit(3, "Returning: [$count] editor files for user: [$uid]");
     return ($files);
+}
+
+
+//Build an opml outline containing the requested editor files
+function build_opml_editor_feed($uid = NULL, $max = NULL, $archive = FALSE, $files = NULL, $nos3 = FALSE, $s3filename = NULL, $returns3url = FALSE, $giventitle = NULL)
+{
+    //Check parameters
+    if ($uid == NULL) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/s3/S3.php";
+
+    //Get some essentials
+    $username = get_user_name_from_uid($uid);
+    $prefs = get_user_prefs($uid);
+
+    //Lets set a sane limit for feed size
+    if ($max == NULL) {
+        if (!empty($prefs['maxlist'])) {
+            $max = $prefs['maxlist'];
+        } else {
+            loggit(1, "No max given. Setting to default of: [$default_max_opml_items].");
+            $max = $default_max_opml_items;
+        }
+    }
+
+    //Allow passing in a list of feeds as a param
+    if ($files == NULL || !is_array($files)) {
+        loggit(2, "The feed item list passed in was blank or corrupt.");
+        return (FALSE);
+    }
+
+    //Get the dates straight
+    $dateCreated = date("D, d M Y H:i:s O");
+    $dateModified = date("D, d M Y H:i:s O");
+
+    //Set the title
+    $outlinetitle = "Editor file list.";
+    if(!empty($giventitle)) {
+        $outlinetitle = $giventitle;
+    }
+
+    //The feed string
+    $opml = '<?xml version="1.0" encoding="ISO-8859-1"?>' . "\n";
+    $opml .= "<!-- OPML generated by " . $system_name . " v" . $version . " on " . date("D, d M Y H:i:s O") . " -->\n";
+    $opml .= '<opml version="2.0">' . "\n";
+
+    $opml .= "
+      <head>
+        <title>" . xmlentities($outlinetitle) . "</title>
+        <dateCreated>$dateCreated</dateCreated>
+        <dateModified>$dateModified</dateModified>
+        <ownerName>" . xmlentities(get_user_name_from_uid($uid)) . "</ownerName>
+        <ownerId>" . $uid . "</ownerId>
+        <expansionState></expansionState>
+        <expansionState></expansionState>
+        <vertScrollState>1</vertScrollState>
+        <windowTop>146</windowTop>
+        <windowLeft>107</windowLeft>
+        <windowBottom>468</windowBottom>
+        <windowRight>560</windowRight>
+      </head>\n";
+
+    $opml .= "
+      <body>";
+
+    foreach ($files as $file) {
+        $opml .= '
+              <outline type="include" url="'.htmlspecialchars($file['url']).'" text="'.xmlentities(trim(str_replace(array("\r", "\n", "\t", '&#13;'), '', $file['title']))).'" ';
+        if($file['type'] == 1) {
+            $opml .= 'icon="rss-square" ';
+        }
+        $opml .=' />';
+    }
+
+    $opml .= "      </body>
+  ";
+
+    $opml .= "</opml>";
+
+
+    //If this user has S3 storage enabled, then do it
+    $s3res = FALSE;
+    if ((s3_is_enabled($uid) || sys_s3_is_enabled()) && !$nos3) {
+        //First we get all the key info
+        $s3info = get_s3_info($uid);
+
+        //Get the feed file name
+        if(!empty($s3filename)) {
+            $filename = $s3filename.".".time().".opml";
+        } else {
+            $filename = "feeditemlisting".time().".opml";
+        }
+        $arcpath = '';
+
+        //Was this a request for a monthly archive?
+        if ($archive != FALSE) {
+            $arcpath = "/arc/" . date('Y') . "/" . date('m') . "/" . date('d');
+            //loggit(3, "Archive path: [".$arcpath."]");
+        }
+
+        //Put the file
+        $s3res = putInS3($opml, $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], "text/xml");
+        if (!$s3res) {
+            loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+            //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+        } else {
+            $s3url = get_s3_url($uid, $arcpath, $filename);
+            loggit(3, "Wrote feed to S3 at url: [$s3url].");
+        }
+    }
+
+
+    loggit(3, "Built newsfeed item opml feed for user: [$username | $uid].");
+    if($returns3url && $s3res) {
+        return($s3url);
+    }
+    return ($opml);
 }
 
 

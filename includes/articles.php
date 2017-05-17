@@ -685,7 +685,7 @@ function get_articles_in_range($uid = NULL, $max = NULL, $pub = FALSE, $dstart =
 
 
 //Search for articles that match query
-function search_articles($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
+function search_articles($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE, $withopml = FALSE)
 {
     //Check parameters
     if ($uid == NULL) {
@@ -716,15 +716,33 @@ function search_articles($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
 
     //Look for the sid in the session table
     if ($pub == TRUE) {
-        $sqltxt = "SELECT $table_article.id,$table_article.title,$table_article.url
-	     FROM $table_article,$table_catalog
-	     WHERE ( $table_catalog.userid=? AND ($table_catalog.articleid=$table_article.id OR $table_catalog.public=1) )
-    ";
+        $sqltxt = "SELECT $table_article.id,
+                          $table_article.title,
+                          $table_article.url
+	              FROM $table_article,$table_catalog
+	              WHERE ( $table_catalog.userid=? AND ($table_catalog.articleid=$table_article.id OR $table_catalog.public=1) )";
+        if($withopml) {
+            $sqltxt = "SELECT $table_article.id,
+                              $table_article.title,
+                              $table_article.url,
+                              $table_article.content,
+                              $table_catalog.staticurl
+                       FROM $table_article,$table_catalog
+	                   WHERE ( $table_catalog.userid=? AND ($table_catalog.articleid=$table_article.id OR $table_catalog.public=1) )";
+        }
     } else {
         $sqltxt = "SELECT $table_article.id,$table_article.title,$table_article.url
 	     FROM $table_article,$table_catalog
-	     WHERE ( $table_catalog.userid=? AND ($table_catalog.articleid=$table_article.id) )
-    ";
+	     WHERE ( $table_catalog.userid=? AND ($table_catalog.articleid=$table_article.id) )";
+        if($withopml) {
+           $sqltxt = "SELECT $table_article.id,
+                             $table_article.title,
+                             $table_article.url,
+                             $table_article.content,
+                             $table_catalog.staticurl
+	                  FROM $table_article,$table_catalog
+	                  WHERE ( $table_catalog.userid=? AND ($table_catalog.articleid=$table_article.id) )";
+        }
     }
 
     //Append search criteria
@@ -758,16 +776,33 @@ function search_articles($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
         return (FALSE);
     }
 
-    $sql->bind_result($aid, $atitle, $aurl) or loggit(2, "MySql error: " . $dbh->error);
+    if($withopml) {
+        $sql->bind_result($aid, $atitle, $aurl, $acontent, $astaticurl) or loggit(2, "MySql error: " . $dbh->error);
+    } else {
+        $sql->bind_result($aid, $atitle, $aurl) or loggit(2, "MySql error: " . $dbh->error);
+    }
 
     $articles = array();
     $count = 0;
     while ($sql->fetch()) {
         $articles[$count] = array('id' => $aid, 'title' => $atitle, 'url' => $aurl);
+        if($withopml) {
+            $articles[$count]['content'] = $acontent;
+            $articles[$count]['staticurl'] = $astaticurl;
+        }
         $count++;
     }
 
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    if($withopml) {
+        $s3url = build_opml_feed($uid, $max, FALSE, $articles, FALSE, "search/articlesearch", TRUE, "Article search results: [".$query['flat']."]");
+        loggit(3, "OPMLURL: $s3url");
+        if(is_string($s3url)) {
+            $articles['opmlurl'] = $s3url;
+            loggit(3, "OPMLURL: ".$articles['opmlurl']);
+        }
+    }
 
     loggit(1, "Returning: [$count] articles for user: [$uid]");
     return ($articles);
@@ -967,7 +1002,7 @@ function purge_orphaned_articles()
 
 
 //Build an opml version of the user's article list
-function build_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles = NULL, $nos3 = FALSE)
+function build_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles = NULL, $nos3 = FALSE, $s3filename = NULL, $returns3url = FALSE, $giventitle = NULL)
 {
     //Check parameters
     if ($uid == NULL) {
@@ -984,7 +1019,7 @@ function build_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles =
     $prefs = get_user_prefs($uid);
 
     //If this user doesn't want his cart feed public, then exit
-    if ($prefs['publicopml'] == 1 && $nos3 == FALSE) {
+    if ($prefs['publicopml'] == 1 && $nos3 == FALSE && (empty($articles) || !is_array($articles) || empty($s3filename))) {
         loggit(3, "User: [$uid] want's their article feed to be private.");
         return (FALSE);
     }
@@ -1013,6 +1048,11 @@ function build_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles =
         $dateModified = date("D, d M Y H:i:s O", $articles[0]['createdon']);
     }
 
+    $outlinetitle = "What $username is reading";
+    if(!empty($giventitle)) {
+        $outlinetitle = $giventitle;
+    }
+
     //The feed string
     $opml = '<?xml version="1.0" encoding="ISO-8859-1"?>' . "\n";
     $opml .= "<!-- OPML generated by " . $system_name . " v" . $version . " on " . date("D, d M Y H:i:s O") . " -->\n";
@@ -1020,7 +1060,7 @@ function build_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles =
 
     $opml .= "
       <head>
-        <title>" . xmlentities("What $username is reading") . "</title>
+        <title>" . xmlentities($outlinetitle) . "</title>
         <dateCreated>$dateCreated</dateCreated>
         <dateModified>$dateModified</dateModified>
         <ownerName>" . xmlentities(get_user_name_from_uid($uid)) . "</ownerName>
@@ -1071,12 +1111,17 @@ function build_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles =
 
 
     //If this user has S3 storage enabled, then do it
+    $s3res = FALSE;
     if ((s3_is_enabled($uid) || sys_s3_is_enabled()) && !$nos3) {
         //First we get all the key info
         $s3info = get_s3_info($uid);
 
         //Get the microblog feed file name
-        $filename = $default_opml_file_name;
+        if(!empty($s3filename)) {
+            $filename = $s3filename.".".time().".opml";
+        } else {
+            $filename = $default_opml_file_name;
+        }
         $arcpath = '';
 
         //Was this a request for a monthly archive?
@@ -1092,12 +1137,15 @@ function build_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $articles =
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
         } else {
             $s3url = get_s3_url($uid, $arcpath, $filename);
-            loggit(1, "Wrote feed to S3 at url: [$s3url].");
+            loggit(3, "Wrote feed to S3 at url: [$s3url].");
         }
     }
 
 
-    loggit(1, "Built article opml feed for user: [$username | $uid].");
+    loggit(3, "Built article opml feed for user: [$username | $uid].");
+    if($returns3url && $s3res) {
+        return($s3url);
+    }
     return ($opml);
 }
 

@@ -2016,6 +2016,55 @@ function get_feed_item($id = NULL)
 }
 
 
+//Retrieve details for a list of items
+//  !!!!! new function incomplete !!!!!! //
+function get_nfitems($ids = NULL)
+{
+    //Check parameters
+    if (empty($ids) || !is_array($ids)) {
+        loggit(2, "The id is blank or corrupt: [$id]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Get all feed items up to max
+    $sqltxt = "SELECT id,title,url,description FROM $table_nfitem WHERE id=?";
+
+    //Run the query
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $id) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any feed items returned
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "No feed item found.");
+        return (array());
+    }
+
+    $sql->bind_result($iid, $ititle, $iurl, $idescription) or loggit(2, "MySql error: " . $dbh->error);
+
+    $items = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $items[$count] = array('id' => $iid, 'title' => $ititle, 'url' => $iurl, 'description' => $idescription);
+        $count++;
+    }
+
+    $sql->close();
+
+    loggit(1, "Returning feed item: [$id].");
+    return ($items[0]);
+}
+
+
 //Retrieve a list of all the feed items in the database
 function get_all_feed_items($max = NULL, $collapsebyurl = TRUE)
 {
@@ -3363,7 +3412,7 @@ function get_unique_id_for_rdf_feed_item($item = NULL, $namespaces = array())
 
 
 //Search for river items that match the query for this user
-function search_feed_items($uid = NULL, $query = NULL, $max = NULL)
+function search_feed_items($uid = NULL, $query = NULL, $max = NULL, $withopml = FALSE)
 {
     //Check parameters
     if ($uid == NULL) {
@@ -3458,10 +3507,23 @@ function search_feed_items($uid = NULL, $query = NULL, $max = NULL)
             $title = $description;
         }
         $nfitems[$count] = array('id' => $id, 'title' => $title, 'url' => $url);
+        if($withopml) {
+            $nfitems[$count]['description'] = $description;
+            $nfitems[$count]['timeadded'] = $timeadded;
+        }
         $count++;
     }
 
     $sql->close();
+
+    if($withopml) {
+        $s3url = build_opml_nfitem_feed($uid, $max, FALSE, $nfitems, FALSE, "search/riversearch", TRUE, "River search results: [".$query['flat']."]");
+        loggit(3, "OPMLURL: $s3url");
+        if(is_string($s3url)) {
+            $nfitems['opmlurl'] = $s3url;
+            loggit(3, "OPMLURL: ".$nfitems['opmlurl']);
+        }
+    }
 
     loggit(1, "Returning: [$count] newsfeed items for user: [$uid]");
     return ($nfitems);
@@ -5606,7 +5668,7 @@ function get_feed_items_with_enclosures2($uid = NULL, $tstart = NULL, $max = NUL
 
 
 //Retrieve the feed items that are sticky
-function get_sticky_feed_items($uid = NULL)
+function get_sticky_feed_items($uid = NULL, $max = 100)
 {
     //Check parameters
     if (empty($uid)) {
@@ -5651,11 +5713,11 @@ function get_sticky_feed_items($uid = NULL)
              LEFT JOIN nfitems ON nfitems.id = tsub.itemid
 			 LEFT JOIN newsfeeds ON nfitems.feedid = newsfeeds.id
 			 LEFT JOIN nfcatalog ON nfitems.feedid = nfcatalog.feedid AND nfcatalog.userid = ?
-             ORDER BY timeadded ASC";
+             ORDER BY timeadded ASC LIMIT ?";
 
     //loggit(3, "[$sqltxt]");
     $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("ss", $uid, $uid) or loggit(2, $sql->error);
+    $sql->bind_param("ssd", $uid, $uid, $max) or loggit(2, $sql->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
 
@@ -5691,6 +5753,160 @@ function get_sticky_feed_items($uid = NULL)
         $lfhidden,
         $lffulltext
     ) or loggit(2, "MySql error: " . $dbh->error);
+
+    $items = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        //Construct item body
+        if ($prefs['fulltextriver'] == 0) {
+            if ($lffulltext == 1) {
+                $itembody = $ldescription;
+            } else
+                if (strlen($ldescription) > 300) {
+                    $itembody = truncate_text($ldescription, 300) . "...";
+                } else {
+                    $itembody = $ldescription;
+                }
+        } else {
+            $itembody = $ldescription;
+        }
+
+        //Construct the item array
+        $items[$count] = array('author' => $lauthor,
+            'avatarUrl' => $lavatarurl,
+            'body' => $itembody,
+            'guid' => $lguid,
+            'id' => $litemid,
+            'index' => $count,
+            'link' => $lurl,
+            'origin' => $lorigin,
+            'enclosure' => unserialize($lenclosure),
+            'permaLink' => $lurl,
+            'pubDate' => date("D, d M Y H:i:s O", $ltimeadded),
+            'sourcetitle' => $lsourcetitle,
+            'sourceurl' => $lsourceurl,
+            'sticky' => 1,
+            'hidden' => 0,
+            'fullText' => $lfulltext,
+            'title' => $ltitle,
+            'feed' => array(
+                'feedDescription' => '',
+                'feedFullText' => $lffulltext,
+                'feedHidden' => $lfhidden,
+                'feedId' => $lfeedid,
+                'feedSticky' => $lfsticky,
+                'feedTitle' => $lfeedtitle,
+                'feedUrl' => $lfeedurl,
+                'websiteUrl' => $lfeedlink,
+                'whenLastUpdate' => $lfeedpubdate
+            )
+        );
+
+        //Check if this feed is linked to an outline this user subscribes to
+        $oid = get_feed_outline_by_user($lfeedid, $uid);
+        if ($oid != FALSE) {
+            $ou = get_outline_info($oid);
+            $items[$count]['feed']['linkedOutlineId'] = $oid;
+            if (!empty($ou['type'])) {
+                $items[$count]['feed']['linkedOutlineType'] = $ou['type'];
+            }
+            if (!empty($ou['title'])) {
+                $items[$count]['feed']['linkedOutlineTitle'] = $ou['title'];
+            }
+            if (!empty($ou['url'])) {
+                $items[$count]['feed']['linkedOutlineUrl'] = $ou['url'];
+            }
+            if (!empty($ou['ownername'])) {
+                $items[$count]['feed']['ownerName'] = $ou['ownername'];
+            }
+            if (!empty($ou['avatarurl'])) {
+                $items[$count]['feed']['avatarUrl'] = $ou['avatarurl'];
+            }
+        }
+
+        $count++;
+    }
+
+    $sql->close();
+
+    //loggit(3, print_r($items, TRUE));
+
+    loggit(1, "Returning: [$count] items.");
+    return ($items);
+}
+
+
+//Retrieve the feed items that are sticky
+function get_river_feed_items($uid = NULL, $max = 100)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Get prefs
+    $prefs = get_user_prefs($uid);
+
+    $timeadded = time() - 7200;
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Run the query
+    $sqltxt = "SELECT $table_nfitem.id,
+                    $table_nfitem.title,
+                    $table_nfitem.url,
+                    $table_nfitem.timestamp,
+                    $table_nfitem.feedid,
+                    $table_nfitem.timeadded,
+                    $table_nfitem.enclosure,
+                    $table_nfitem.description,
+                    $table_nfitem.guid,
+                    $table_nfitem.origin,
+                    $table_nfitem.sourceurl,
+                    $table_nfitem.sourcetitle,
+                    $table_nfitem.author,
+                    $table_nfitemprop.sticky,
+                    $table_nfcatalog.sticky,
+                    $table_nfitemprop.hidden,
+                    $table_nfcatalog.hidden,
+                    $table_nfitemprop.`fulltext`,
+                    $table_nfcatalog.`fulltext`,
+                    $table_newsfeed.url,
+                    $table_newsfeed.title,
+                    $table_newsfeed.link,
+                    $table_newsfeed.avatarurl,
+                    $table_newsfeed.pubdate
+             FROM $table_nfitem
+             LEFT JOIN $table_newsfeed ON $table_newsfeed.id = $table_nfitem.feedid
+             LEFT OUTER JOIN $table_nfitemprop ON $table_nfitemprop.itemid = $table_nfitem.id AND $table_nfitemprop.userid=?
+             INNER JOIN $table_nfcatalog ON $table_nfcatalog.feedid = $table_nfitem.feedid
+             WHERE $table_nfcatalog.userid=?
+             AND $table_nfitem.timeadded > ?
+             AND $table_nfitem.`old` = 0";
+    $sqltxt .= " ORDER BY $table_nfitem.timeadded DESC LIMIT ?";
+
+    //loggit(3, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ssdd", $uid, $uid, $timeadded, $max) or loggit(2, $sql->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any items returned
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No feed items returned for: [$uid].");
+        return (array());
+    }
+
+    $sql->bind_result($litemid, $ltitle, $lurl, $ltimestamp, $lfeedid, $ltimeadded, $lenclosure, $ldescription, $lguid, $lorigin, $lsourceurl,
+        $lsourcetitle, $lauthor, $lsticky, $lfsticky, $lhidden, $lfhidden, $lfulltext, $lffulltext, $lfeedurl, $lfeedtitle, $lfeedlink, $lavatarurl,
+        $lfeedpubdate) or loggit(2, "MySql error: " . $dbh->error);
 
     $items = array();
     $count = 0;
@@ -6022,4 +6238,145 @@ function create_m3u_from_river_enclosures($uid = NULL, $max = 50) {
     }
 
     return($m3utxt);
+}
+
+
+//Build an opml outline containing the requested feed items
+function build_opml_nfitem_feed($uid = NULL, $max = NULL, $archive = FALSE, $feeditems = NULL, $nos3 = FALSE, $s3filename = NULL, $returns3url = FALSE, $giventitle = NULL)
+{
+    //Check parameters
+    if ($uid == NULL) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    require_once "$confroot/$libraries/s3/S3.php";
+
+    //Get some essentials
+    $username = get_user_name_from_uid($uid);
+    $prefs = get_user_prefs($uid);
+
+    //Lets set a sane limit for feed size
+    if ($max == NULL) {
+        if (!empty($prefs['maxlist'])) {
+            $max = $prefs['maxlist'];
+        } else {
+            loggit(1, "No max given. Setting to default of: [$default_max_opml_items].");
+            $max = $default_max_opml_items;
+        }
+    }
+
+    //Allow passing in a list of articles as a param
+    if ($feeditems == NULL || !is_array($feeditems)) {
+        loggit(2, "The feed item list passed in was blank or corrupt.");
+        return (FALSE);
+    }
+
+    //Get the dates straight
+    $dateCreated = date("D, d M Y H:i:s O");
+    $dateModified = date("D, d M Y H:i:s O");
+
+    //Set the title
+    $outlinetitle = "Feed item list.";
+    if(!empty($giventitle)) {
+        $outlinetitle = $giventitle;
+    }
+
+    //The feed string
+    $opml = '<?xml version="1.0" encoding="ISO-8859-1"?>' . "\n";
+    $opml .= "<!-- OPML generated by " . $system_name . " v" . $version . " on " . date("D, d M Y H:i:s O") . " -->\n";
+    $opml .= '<opml version="2.0">' . "\n";
+
+    $opml .= "
+      <head>
+        <title>" . xmlentities($giventitle) . "</title>
+        <dateCreated>$dateCreated</dateCreated>
+        <dateModified>$dateModified</dateModified>
+        <ownerName>" . xmlentities(get_user_name_from_uid($uid)) . "</ownerName>
+        <ownerId>" . $uid . "</ownerId>
+        <expansionState></expansionState>
+        <expansionState></expansionState>
+        <vertScrollState>1</vertScrollState>
+        <windowTop>146</windowTop>
+        <windowLeft>107</windowLeft>
+        <windowBottom>468</windowBottom>
+        <windowRight>560</windowRight>
+      </head>\n";
+
+    $opml .= "
+      <body>";
+
+    foreach ($feeditems as $feeditem) {
+        $opml .= "
+              <outline text=\"" . xmlentities(trim(str_replace(array("\r", "\n", "\t", '&#13;'), '', $feeditem['title']))) . "\">
+                      <outline text=\"Link to Article\" type=\"link\" url=\"" . htmlspecialchars($feeditem['url']) . "\" />";
+
+        if (!empty($feeditem['staticurl'])) {
+            $opml .= "        <outline text=\"Archived Version\" type=\"link\" url=\"" . htmlspecialchars($feeditem['staticurl']) . "\" />" . "\n";
+        }
+
+        if (!empty($feeditem['sourceurl']) || !empty($feeditem['sourcetitle'])) {
+            $opml .= '        <outline text="Source: ' . htmlspecialchars(trim($feeditem['sourcetitle'])) . '" type="link" url="' . htmlspecialchars(trim($feeditem['sourceurl'])) . '" />' . "\n";
+        }
+
+
+        $opml .= "      <outline text=\"" . date("D, d M Y H:i", $feeditem['timeadded']) . "\" />
+                      <outline text=\"\" />";
+        foreach (explode("</p>", trim(str_replace(array("\r", "\n", "\t", '&#13;'), '', $feeditem['description']))) as $line) {
+            //loggit(3, "DEBUGLINE: ".$line);
+            $line = trim(strip_tags($line));
+            if (!empty($line)) {
+                $opml .= "
+                      <outline text=\"" . xmlentities($line) . "\" />";
+            }
+        }
+        $opml .= "
+              </outline>\n";
+    }
+
+    $opml .= "      </body>
+  ";
+
+    $opml .= "</opml>";
+
+
+    //If this user has S3 storage enabled, then do it
+    $s3res = FALSE;
+    if ((s3_is_enabled($uid) || sys_s3_is_enabled()) && !$nos3) {
+        //First we get all the key info
+        $s3info = get_s3_info($uid);
+
+        //Get the feed file name
+        if(!empty($s3filename)) {
+            $filename = $s3filename.".".time().".opml";
+        } else {
+            $filename = "feeditemlisting".time().".opml";
+        }
+        $arcpath = '';
+
+        //Was this a request for a monthly archive?
+        if ($archive != FALSE) {
+            $arcpath = "/arc/" . date('Y') . "/" . date('m') . "/" . date('d');
+            //loggit(3, "Archive path: [".$arcpath."]");
+        }
+
+        //Put the file
+        $s3res = putInS3($opml, $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], "text/xml");
+        if (!$s3res) {
+            loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
+            //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
+        } else {
+            $s3url = get_s3_url($uid, $arcpath, $filename);
+            loggit(3, "Wrote feed to S3 at url: [$s3url].");
+        }
+    }
+
+
+    loggit(3, "Built newsfeed item opml feed for user: [$username | $uid].");
+    if($returns3url && $s3res) {
+        return($s3url);
+    }
+    return ($opml);
 }

@@ -40,10 +40,14 @@ $(document).ready(function () {
                     }
 
                     //Position the search results box to where we're at now
-                    $('.searchbar').css('top', $('.navbar').offset().top + 60 + 'px');
+                    //$('.searchbar').css('top', $('.navbar').offset().top + 60 + 'px');
 
                     //Show the results
-                    $('.searchbar .head h4 small').empty().append('(' + data.query + ') max:' + data.max);
+                    $('.searchbar .head h4 small').empty();
+                    if(data.opmlurl) {
+                        $('.searchbar .head h4 small').append('<a title="Send results to editor." target="_blank" href="/editor?url='+data.opmlurl+'"><i class="fa fa-edit"></i></a> ');
+                    }
+                    $('.searchbar .head h4 small').append('(' + data.query + ') max:' + data.max);
                     $('.searchbar').show();
                     $('.searchbar .head .btnCloseSearchResults').unbind('click');
                     $('.searchbar .head .btnCloseSearchResults').click(function () {

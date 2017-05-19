@@ -3275,6 +3275,7 @@ function parse_search_query($inq = NULL, $section = NULL)
         'like' => array(),
         'not' => array(),
         'flat' => '',
+        'opml' => FALSE,
         'max' => 100
     );
 
@@ -3285,6 +3286,15 @@ function parse_search_query($inq = NULL, $section = NULL)
         preg_match('/max:([0-9]*)/', $str, $vmax);
         $inq = preg_replace('/max:[0-9]{0,9}/s', '', $inq); //Strip out quoted text
         $psearch['max'] = $vmax[1];
+    }
+
+    //Was opml requested?
+    $str = preg_replace('/"[^"]*"/s', '', $inq); //Strip out quoted text
+    $opml = stripos($str, "opml:"); //Look for the position of a colon
+    if ($opml !== FALSE) {
+        preg_match('/opml:/', $str, $vmax);
+        $inq = preg_replace('/opml:/s', '', $inq); //Strip out quoted text
+        $psearch['opml'] = TRUE;
     }
 
     //Is there a section prefix embedded in the search?

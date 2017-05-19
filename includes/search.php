@@ -5,7 +5,7 @@
 
 
 //Search for river items that match the query for this user
-function search2_feed_items($uid = NULL, $query = NULL, $max = NULL)
+function search2_feed_items($uid = NULL, $query = NULL, $max = NULL, $withopml = FALSE)
 {
     //Check parameters
     if ($uid == NULL) {
@@ -48,7 +48,7 @@ function search2_feed_items($uid = NULL, $query = NULL, $max = NULL)
     }
 
     //We search by doing the equivelant of a river build, but we limit based on the query text
-    $sqltxt = "SELECT mapcat.nfitemid,items.title,items.description,items.url
+    $sqltxt = "SELECT mapcat.nfitemid,items.title,items.description,items.url,items.timeadded
                FROM $table_nfitem_map_catalog mapcat
                JOIN $table_nfitem items ON mapcat.nfitemid=items.id
                WHERE";
@@ -89,7 +89,7 @@ function search2_feed_items($uid = NULL, $query = NULL, $max = NULL)
         $sqltxt .= " LIMIT 30";
     }
 
-    loggit(3, "[$sqltxt]");
+    loggit(3, "SEARCH_V2: [$sqltxt]");
     $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
 
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -103,7 +103,7 @@ function search2_feed_items($uid = NULL, $query = NULL, $max = NULL)
         return (FALSE);
     }
 
-    $sql->bind_result($id, $title, $description, $url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($id, $title, $description, $url, $timeadded) or loggit(2, "MySql error: " . $dbh->error);
 
     $nfitems = array();
     $count = 0;
@@ -112,10 +112,23 @@ function search2_feed_items($uid = NULL, $query = NULL, $max = NULL)
             $title = $description;
         }
         $nfitems[$count] = array('id' => $id, 'title' => $title, 'url' => $url);
+        if($withopml) {
+            $nfitems[$count]['description'] = $description;
+            $nfitems[$count]['timeadded'] = $timeadded;
+        }
         $count++;
     }
 
     $sql->close();
+
+    if($withopml) {
+        $s3url = build_opml_nfitem_feed($uid, $max, FALSE, $nfitems, FALSE, "search/riversearch", TRUE, "River search results: [".$query['flat']."]");
+        loggit(3, "OPMLURL: $s3url");
+        if(is_string($s3url)) {
+            $nfitems['opmlurl'] = $s3url;
+            loggit(3, "OPMLURL: ".$nfitems['opmlurl']);
+        }
+    }
 
     loggit(1, "Returning: [$count] newsfeed items for user: [$uid]");
     return ($nfitems);

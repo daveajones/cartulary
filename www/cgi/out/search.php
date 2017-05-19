@@ -29,30 +29,39 @@ $query = $trimmed;
 //Section given?
 $section = $_REQUEST['s'];
 
+//OPML requested?
+$withopml = FALSE;
+if( isset($_REQUEST['withopml']) ) {
+  $withopml = TRUE;
+}
+
 //Parse the query
 $query = parse_search_query($query, $section);
 $jsondata['query'] = $query['flat'];
 $jsondata['section'] = $query['section'];
 $jsondata['max'] = $query['max'];
+if( $query['opml'] ) {
+    $withopml = TRUE;
+}
 
 //What are we searching?
 $section = $query['section'];
 if( $section == "articles" ) {
-  $results = search_articles($uid, $query, $query['max']);
+  $results = search_articles($uid, $query, $query['max'], NULL, $withopml);
 } elseif( $section == "river" ) {
     if( $cg_search_v2_enable ) {
-        $results = search2_feed_items($uid, $query, $query['max']);
+        $results = search2_feed_items($uid, $query, $query['max'], $withopml);
     } else {
-        $results = search_feed_items($uid, $query, $query['max']);
+        $results = search_feed_items($uid, $query, $query['max'], $withopml);
     }
 } elseif( $section == "microblog" ) {
-  $results = search_posts($uid, $query, $query['max']);
+  $results = search_posts($uid, $query, $query['max'], NULL, $withopml);
 } elseif( $section == "subscribe" ) {
-  $results = search_feeds($uid, $query, $query['max']);
+  $results = search_feeds($uid, $query, $query['max'], NULL, $withopml);
 } elseif( $section == "people" ) {
   $results = get_social_outline_directory($query, $query['max']);
 } elseif( $section == "editor" ) {
-  $results = search_editor_files($uid, $query, NULL);
+  $results = search_editor_files($uid, $query, NULL, $withopml);
 } else {
   //Log it
   loggit(2, "Given section:[$section] not searchable.");
@@ -65,6 +74,11 @@ if( $section == "articles" ) {
 
 //Did we get any results?
 if( $results != FALSE ) {
+  if( isset($results['opmlurl']) && $withopml ) {
+    $jsondata['opmlurl'] = $results['opmlurl'];
+    unset($results['opmlurl']);
+  }
+
   $jsondata['data'] = $results;
 }
 
@@ -90,5 +104,3 @@ echo $resp;
 //Give feedback that all went well
 
 return(0);
-
-?>

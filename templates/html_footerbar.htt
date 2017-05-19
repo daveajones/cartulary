@@ -254,5 +254,5 @@
 
     <!-- End-of-body content -->
     <? //<script src="/script/upload.js"></script> ?>
-    <script src="/script/global-postload.js"></script>
+    <script src="/script/global-postload.js?v=<?echo $cg_sys_version?>"></script>
 <? } ?>

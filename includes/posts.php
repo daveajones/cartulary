@@ -457,7 +457,7 @@ function get_first_blog_post($uid = NULL)
 
 
 //Search for posts that match query
-function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
+function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE, $withopml = FALSE)
 {
     //Check parameters
     if ($uid == NULL) {
@@ -520,6 +520,7 @@ function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
 
     $ref = new ReflectionClass('mysqli_stmt');
     $method = $ref->getMethod("bind_param");
+    loggit(3, "DEBUG: ".print_r($qsql, TRUE));
     $method->invokeArgs($sql, $qsql['bind']);
 
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -541,11 +542,19 @@ function search_posts($uid = NULL, $query = NULL, $max = NULL, $pub = FALSE)
         if (empty($title)) {
             $title = $content;
         }
-        $posts[$count] = array('id' => $id, 'title' => $title, 'url' => $url);
+        $posts[$count] = array('id' => $id, 'title' => $title, 'url' => $url, 'content' => $content);
         $count++;
     }
 
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    if($withopml) {
+        $s3url = build_blog_opml_feed($uid, $max, FALSE, $posts, FALSE, "search/mbsearch", TRUE, "Microblog search results: [".$query['flat']."]");
+        if(is_string($s3url)) {
+            $posts['opmlurl'] = $s3url;
+            loggit(3, "OPMLURL: ".$posts['opmlurl']);
+        }
+    }
 
     loggit(1, "Returning: [$count] posts for user: [$uid]");
     return ($posts);
@@ -875,8 +884,8 @@ function delete_post($pid = NULL)
 }
 
 
-//Build an rss feed for the given user
-function build_blog_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts = NULL, $nos3 = FALSE)
+//Build an opml outline of posts for the given user
+function build_blog_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts = NULL, $nos3 = FALSE, $s3filename = NULL, $returns3url = FALSE, $giventitle = NULL)
 {
     //Check parameters
     if ($uid == NULL) {
@@ -896,6 +905,9 @@ function build_blog_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts
         $title = $prefs['microblogtitle'];
     } else {
         $title = "What $username is saying.";
+    }
+    if ( !empty($giventitle) ) {
+        $title = $giventitle;
     }
 
     //Get a proper max value
@@ -979,12 +991,17 @@ function build_blog_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts
 
 
     //If this user has S3 storage enabled, then do it
+    $s3res = FALSE;
     if ((s3_is_enabled($uid) || sys_s3_is_enabled()) && !$nos3) {
         //First we get all the key info
         $s3info = get_s3_info($uid);
 
         //Get the microblog feed file name
-        $filename = get_microblog_opml_filename($uid);
+        if(!empty($s3filename)) {
+            $filename = $s3filename.".".time().".opml";
+        } else {
+            $filename = get_microblog_opml_filename($uid);
+        }
         $arcpath = '';
 
         //Was this a request for a monthly archive?
@@ -1000,12 +1017,15 @@ function build_blog_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
         } else {
             $s3url = get_s3_url($uid, $arcpath, $filename);
-            loggit(1, "Wrote feed to S3 at url: [$s3url].");
+            loggit(3, "Wrote feed to S3 at url: [$s3url].");
         }
     }
 
 
     loggit(1, "Built blog opml feed for user: [$username | $uid].");
+    if($returns3url && $s3res) {
+        return($s3url);
+    }
     return ($opml);
 }
 

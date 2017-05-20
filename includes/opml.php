@@ -1883,7 +1883,7 @@ function build_reading_list($title = NULL, $uid = NULL, $oid = NULL, $nos3 = FAL
             $feed = get_feed_info($ofeed);
             //loggit(3, print_r($feed, TRUE));
             $opml .= "
-              <outline text=\"" . trim(str_replace("\n", '', htmlspecialchars($feed['title']))) . "\" description=\"\" htmlUrl=\"" . htmlspecialchars($feed['link']) . "\" xmlUrl=\"" . htmlspecialchars($feed['url']) . "\" />";
+              <outline text=\"" . trim(str_replace("\n", '', htmlspecialchars($feed['title']))) . "\" description=\"\" type=\"rss\" htmlUrl=\"" . htmlspecialchars($feed['link']) . "\" xmlUrl=\"" . htmlspecialchars($feed['url']) . "\" />";
         }
     }
 

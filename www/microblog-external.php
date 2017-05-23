@@ -19,6 +19,14 @@ if (isset($_REQUEST['uid'])) {
     exit(1);
 }
 
+if( isset($_REQUEST['type']) && $_REQUEST['type'] == 'opml') {
+    echo build_blog_opml_feed($uid, $max);
+}
+
+if( isset($_REQUEST['type']) && $_REQUEST['type'] == 'html') {
+    echo build_blog_html_archive($uid, $max);
+}
+
 //header("Content-Type: text/plain");
 if( isset($_REQUEST['feed']) && $_REQUEST['feed'] == 'blog' ) {
     echo build_blog_rss_feed($uid, $max, FALSE, NULL, FALSE, TRUE);

@@ -103,6 +103,8 @@ if ($content == FALSE) {
     exit(1);
 }
 
+//Strip blank lines from top of this file
+$content = ltrim($content);
 
 //Is this an opml outline?
 if (is_outline($content)) {

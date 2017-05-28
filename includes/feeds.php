@@ -41,6 +41,38 @@ function is_feed($content = NULL)
 }
 
 
+//Test if the given content is an opml outline
+function is_jsonfeed($content = NULL)
+{
+    //Check parameters
+    if ($content == NULL) {
+        loggit(2, "The content to test is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Is it even json?
+    if( !is_json($content)) {
+        loggit(2, "This feed is not valid jsonfeed.");
+        return (FALSE);
+    }
+
+    $jsonFeed = json_decode($content, TRUE);
+    loggit(3, "JSONFEED: ".print_r($jsonFeed, TRUE));
+
+    //Look for key elements
+    if( !isset($jsonFeed['version']) ) return FALSE;
+    if( !isset($jsonFeed['title']) ) return FALSE;
+    if( !isset($jsonFeed['items']) ) return FALSE;
+
+    //None of the tests passed so return FALSE
+    loggit(1, "The content seems to be a valid jsonfeed.");
+    return ("application/json");
+}
+
+
 //Test if the given content is a valid feed
 function feed_is_valid($content = NULL)
 {
@@ -67,6 +99,12 @@ function feed_is_valid($content = NULL)
     //Look for atom nodes
     if (isset($x->entry)) {
         loggit(1, "Found and entry node. This content looks like ATOM.");
+        return (TRUE);
+    }
+
+    //See if it's JSONfeed
+    if (is_jsonfeed($content)) {
+        loggit(3, "This content is JSON. Assuming it's a JSONfeed.");
         return (TRUE);
     }
 
@@ -434,20 +472,21 @@ function get_feed_info($id = NULL)
 
     //Look for the sid in the session table
     $stmt = "SELECT $table_newsfeed.url,
-		  $table_newsfeed.title,
-		  $table_newsfeed.content,
-		  $table_newsfeed.lastcheck,
-	          $table_newsfeed.lastupdate,
-                  $table_newsfeed.lastmod,
-                  $table_newsfeed.createdon,
-                  $table_newsfeed.link,
-                  $table_newsfeed.updated,
-                  $table_newsfeed.lastitemid,
-                  $table_newsfeed.oid,
-		  $table_newsfeed.pubdate,
-                  $table_newsfeed.errors,
-                  $table_newsfeed.avatarurl,
-		  $table_newsfeed.id
+		            $table_newsfeed.title,
+		            $table_newsfeed.content,
+		            $table_newsfeed.lastcheck,
+	                $table_newsfeed.lastupdate,
+                    $table_newsfeed.lastmod,
+                    $table_newsfeed.createdon,
+                    $table_newsfeed.link,
+                    $table_newsfeed.updated,
+                    $table_newsfeed.lastitemid,
+                    $table_newsfeed.oid,
+		            $table_newsfeed.pubdate,
+                    $table_newsfeed.errors,
+                    $table_newsfeed.avatarurl,
+		            $table_newsfeed.id,
+		            $table_newsfeed.type
            FROM $table_newsfeed
            WHERE $table_newsfeed.id=?";
 
@@ -465,9 +504,14 @@ function get_feed_info($id = NULL)
     $feed = array();
     $sql->bind_result($feed['url'], $feed['title'], $feed['content'], $feed['lastcheck'], $feed['lastupdate'],
         $feed['lastmod'], $feed['createdon'], $feed['link'], $feed['updated'], $feed['lastitemid'], $feed['oid'],
-        $feed['pubdate'], $feed['errors'], $feed['avatarurl'], $feed['id']) or loggit(2, "MySql error: " . $dbh->error);
+        $feed['pubdate'], $feed['errors'], $feed['avatarurl'], $feed['id'], $feed['type']) or loggit(2, "MySql error: " . $dbh->error);
     $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close();
+
+    //JSONfeed
+    if ($feed['type'] == 1) {
+        $feed['content'] = convert_jsonfeed_to_rss($feed['content']);
+    }
 
     //loggit(1,"Returning feed info for feed: [$id]");
     return ($feed);
@@ -6379,4 +6423,68 @@ function build_opml_nfitem_feed($uid = NULL, $max = NULL, $archive = FALSE, $fee
         return($s3url);
     }
     return ($opml);
+}
+
+
+//Convert a news feed to opml structure
+function convert_jsonfeed_to_rss($content = NULL, $max = NULL)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Check params
+    if (empty($content) || !is_jsonfeed($content)) {
+        loggit(2, "The jsonfeed content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    $jf = json_decode($content, TRUE);
+
+    //Get the latest item publish date
+    $latestDate = 0;
+    foreach( $jf['items'] as $item ) {
+        if( strtotime($item['date_published']) > $latestDate ) $latestDate = strtotime($item['date_published']);
+    }
+    $lastBuildDate = date(DATE_RSS, $latestDate);
+
+    //Create the xml feed
+    $xmlFeed = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"></rss>');
+    $xmlFeed->addChild("channel");
+
+    //Required
+    $xmlFeed->channel->addChild("title", $jf['title']);
+    $xmlFeed->channel->addChild("pubDate", $lastBuildDate);
+    $xmlFeed->channel->addChild("lastBuildDate", $lastBuildDate);
+
+    //Optional
+    if(isset($jf['description'])) $xmlFeed->channel->description = $jf['description'];
+    if(isset($jf['home_page_url'])) $xmlFeed->channel->link = $jf['home_page_url'];
+
+    //Items
+    foreach( $jf['items'] as $item ) {
+        loggit(3, "DEBUG: ".print_r($item, TRUE));
+
+        $newItem = $xmlFeed->channel->addChild('item');
+
+        if(isset($item['id'])) $newItem->addChild('guid', $item['id']);
+        if(isset($item['title'])) $newItem->addChild('title', $item['title']);
+        if(isset($item['content_text'])) $newItem->addChild('description', $item['content_text']);
+        if(isset($item['content_html'])) $newItem->addChild('description', $item['content_html']);
+        if(isset($item['date_published'])) $newItem->addChild('pubDate', $item['date_published']);
+        if(isset($item['url'])) $newItem->addChild('link', $item['url']);
+
+        //Enclosures?
+        if(isset($item['attachments'])) {
+            foreach($item['attachments'] as $attachment) {
+                $enclosure = $newItem->addChild('enclosure');
+                $enclosure['url'] = $attachment['url'];
+                $enclosure['type'] = $attachment['mime_type'];
+                $enclosure['length'] = $attachment['size_in_bytes'];
+            }
+        }
+    }
+
+    //Log and leave
+    loggit(1, "Converted: [$count] items from JSONfeed to RSS.");
+    return($xmlFeed->asXML());
 }

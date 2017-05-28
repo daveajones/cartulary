@@ -280,7 +280,11 @@ if (feed_is_linked_by_url($url, $uid)) {
 }
 
 //Add the feed for this user
-$fid = add_feed($url, $uid, FALSE);
+if(is_jsonfeed($content)) {
+    $fid = add_feed($url, $uid, FALSE, NULL, 1);
+} else {
+    $fid = add_feed($url, $uid, FALSE, NULL);
+}
 mark_feed_as_updated($fid);
 loggit(1, "Added feed: [$url] to the database.");
 

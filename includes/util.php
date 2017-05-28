@@ -2558,7 +2558,7 @@ function getAlternateLinkUrl($html = NULL)
     $count = 0;
 
     //First look for the right way to do it
-    $tags = $xpath->query('//link[@rel="alternate" and contains(@type, "rss") or contains(@type, "atom") or contains(@type, "opml")]');
+    $tags = $xpath->query('//link[@rel="alternate" and contains(@type, "rss") or contains(@type, "atom") or contains(@type, "json") or contains(@type, "opml")]');
     foreach ($tags as $tag) {
         $url = (string)trim($tag->getAttribute("href"));
         if (!in_array($url, $seenurls)) {
@@ -4124,4 +4124,16 @@ function remove_non_tag_space($string)
     $pattern = '/>\s+</';
     $replacement = '><';
     return preg_replace($pattern, $replacement, $string);
+}
+
+
+//JSON encoding detection
+function is_json($strJson) {
+    json_decode($strJson);
+    if( json_last_error() !== JSON_ERROR_NONE) {
+        loggit(2, "Error parsing json string: [$strJson]");
+        return false;
+    }
+
+    return true;
 }

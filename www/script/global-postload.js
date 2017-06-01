@@ -40,7 +40,7 @@ $(document).ready(function () {
                     }
 
                     //Position the search results box to where we're at now
-                    //$('.searchbar').css('top', $('.navbar').offset().top + 60 + 'px');
+                    $('.searchbar').css('top', $('.navbar').offset().top + 60 + 'px');
 
                     //Show the results
                     $('.searchbar .head h4 small').empty();

@@ -210,6 +210,26 @@ if( $type == 1 ) {
 
 }
 
+//Get the current file details
+if( $s3oldurl != $s3url && !empty($s3oldurl) && !empty($s3url) ) {
+    $cfile = get_recent_file_by_url($uid, $s3oldurl, TRUE);
+    $cfile = $cfile[0];
+} else {
+    $cfile = get_recent_file_by_url($uid, $s3url, TRUE);
+    $cfile = $cfile[0];
+}
+
+//Update the recent file version table
+$temp_opml = preg_replace('/\<dateModified\>.*\<\/dateModified\>/', '', $opml);
+$temp_prevopml = preg_replace('/\<dateModified\>.*\<\/dateModified\>/', '', $cfile['content']);
+if( $temp_opml != $temp_prevopml && !empty($cfile['content']) && !empty($opml) && !empty($temp_opml) && !empty($temp_prevopml) ) {
+    loggit(3, "DEBUG: Editor file content changed. Saving old version in version table.");
+    add_recent_file_version($uid, $s3url, $cfile['title'], $cfile['content'], $cfile['type'], $cfile['disqus'], $cfile['wysiwyg'], $cfile['watched'], $cfile['articleid'], $cfile['locked'], $cfile['ipfshash']);
+} else {
+    loggit(3, "DEBUG: Editor file content not changed.");
+}
+
+
 //Update recent file table
 $rid = update_recent_file($uid, $s3url, $title, $opml, $type, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked, $opmlhash);
 loggit(3, "DEBUG: Recent file id is [$rid].");

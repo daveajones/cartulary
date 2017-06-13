@@ -1414,6 +1414,68 @@ function toot_upload_picture($uid = NULL, $filepath = NULL)
 }
 
 
+//Send a status update to a micropub api
+function micropub_post($uid = NULL, $content = NULL, $link = "", $media_id = "")
+{
+    //Check parameters
+    if ($uid == NULL) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if ($content == NULL) {
+        loggit(2, "The post content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Globals
+    $prefs = get_user_prefs($uid);
+    $charcount = 498;
+
+    if (!empty($link)) {
+        $charcount -= 22;
+    }
+
+    if (!empty($media_id)) {
+        $charcount -= 22;
+    }
+
+    //Truncate text if too long to fit in remaining space
+    if (strlen($content) > $charcount) {
+        $twcontent = truncate_text($content, ($charcount - 3)) . "...";
+        loggit(1, "Had to truncate tweet: [$content] to: [$twcontent] for user: [$uid].");
+    } else {
+        $twcontent = $content;
+    }
+
+    //Assemble tweet
+    $tweet = $twcontent . " " . $link;
+
+    $twstatus = array('status' => $tweet);
+    //$twstatus['visibility'] = "unlisted";
+    if (!empty($media_id)) {
+        $twstatus['media_ids'] = array($media_id);
+    }
+
+    loggit(3, "DEBUG: Toot upload: [".print_r($twstatus, TRUE)."]");
+
+    //Make an API call to post the tweet
+    $result = postUrlExtra(trim($prefs['mastodon_url'])."/api/v1/statuses", $twstatus, array(
+        "Authorization: Bearer ".$prefs['mastodon_access_token']
+    ), TRUE);
+
+    //Log and return
+    if ($result != FALSE) {
+        loggit(1, "Tooted a new post: [$tweet] for user: [$uid].");
+        return (TRUE);
+    } else {
+        loggit(2, "Tooting post did not work posting: [$tweet] for user: [$uid].");
+        return (FALSE);
+    }
+}
+
 //Gets a feed from a URL
 function fetchFeedUrl($url, $subcount = 0, $sysver = '', $timeout = 30)
 {
@@ -2888,6 +2950,20 @@ function strposa($haystack, $needles = array(), $offset = 0)
 }
 
 
+//Search for a substring with an array as the needle
+//via: http://stackoverflow.com/questions/6284553/using-an-array-as-needles-in-strpos
+function striposa($haystack, $needles = array(), $offset = 0)
+{
+    $chr = array();
+    foreach ($needles as $needle) {
+        $res = stripos($haystack, $needle, $offset);
+        if ($res !== false) $chr[$needle] = $res;
+    }
+    if (empty($chr)) return false;
+    return min($chr);
+}
+
+
 //Do our best to make a good mime type for a given url/type
 function make_mime_type($url = NULL, $type = NULL)
 {
@@ -4128,12 +4204,40 @@ function remove_non_tag_space($string)
 
 
 //JSON encoding detection
-function is_json($strJson) {
+function is_json($strJson = NULL, $errorLog = FALSE) {
     json_decode($strJson);
     if( json_last_error() !== JSON_ERROR_NONE) {
-        loggit(2, "Error parsing json string: [$strJson]");
+        if($errorLog) {
+            loggit(2, "Error parsing json string: [".substr($strJson, 0, 255)."]");
+        }
         return false;
     }
 
     return true;
+}
+
+
+//Rotate image according to exif data
+//__via: https://stackoverflow.com/questions/7489742/php-read-exif-data-and-adjust-orientation
+function image_fix_orientation($filename) {
+    loggit(3, "Fixing rotation of file: [$filename]");
+    $exif = exif_read_data($filename);
+    if (!empty($exif['Orientation'])) {
+        $image = imagecreatefromjpeg($filename);
+        switch ($exif['Orientation']) {
+            case 3:
+                $image = imagerotate($image, -180, 0);
+                break;
+
+            case 6:
+                $image = imagerotate($image, -90, 0);
+                break;
+
+            case 8:
+                $image = imagerotate($image, 90, 0);
+                break;
+        }
+
+        imagejpeg($image, $filename, 90);
+    }
 }

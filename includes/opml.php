@@ -2189,7 +2189,7 @@ function convert_opml_to_ia($content = NULL, $link = NULL, $max = NULL)
     $html .= "                      <time class=\"op-modified\" dateTime=\"" . (string)$x->head->dateModified . "\"></time>\n";
     foreach ($nodes as $entry) {
         $line = "";
-        loggit(3, "DEBUG(entry): ".print_r($entry, TRUE));
+        loggit(1, "DEBUG(entry): ".print_r($entry, TRUE));
 
         $text = (string)$entry->attributes()->text;
         $name = (string)$entry->attributes()->name;
@@ -3011,9 +3011,9 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 
     //Do the query
     if ($blob) {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash, outline FROM $table_recentfiles WHERE userid=? AND url=?";
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, articleid, ipfshash, outline FROM $table_recentfiles WHERE userid=? AND url=?";
     } else {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash FROM $table_recentfiles WHERE userid=? AND url=?";
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, articleid, ipfshash FROM $table_recentfiles WHERE userid=? AND url=?";
     }
 
 
@@ -3032,9 +3032,9 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
     }
 
     if ($blob) {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $farticleid, $ipfshash, $foutline) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $farticleid, $ipfshash) or loggit(2, "MySql error: " . $dbh->error);
     }
 
 
@@ -3050,6 +3050,7 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
             'watched' => $fwatched,
             'type' => $ftype,
             'locked' => $flocked,
+            'articleid' => $farticleid,
             'ipfshash' => $ipfshash
         );
         if ($blob) {
@@ -3062,6 +3063,159 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 
     loggit(1, "Returning: [$count] files for user: [$uid]");
     return ($files);
+}
+
+
+//Return a list of file versions recently edited by this user in the editor
+function get_recent_file_versions_by_url($uid = NULL, $url = NULL, $blob = FALSE)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+    if (empty($url)) {
+        loggit(2, "The url given is corrupt or blank: [$url]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    if ($blob) {
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash, outline, CHAR_LENGTH(outline) 
+                   FROM $table_recentfilesversions 
+                   WHERE userid=? AND url=?
+                   ORDER BY time DESC";
+    } else {
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash, CHAR_LENGTH(outline)
+                   FROM $table_recentfilesversions 
+                   WHERE userid=? AND url=?
+                   ORDER BY time DESC";
+    }
+
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $uid, $url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No files returned for: [$uid | $url] with the given criteria.");
+        return (array());
+    }
+
+    if ($blob) {
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash, $foutline, $fsize) or loggit(2, "MySql error: " . $dbh->error);
+    } else {
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash, $fsize) or loggit(2, "MySql error: " . $dbh->error);
+    }
+
+
+    $files = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $files[$count] = array('id' => $fid,
+            'title' => $ftitle,
+            'url' => $furl,
+            'time' => $ftime,
+            'disqus' => $fdisqus,
+            'wysiwyg' => $fwysiwyg,
+            'watched' => $fwatched,
+            'type' => $ftype,
+            'locked' => $flocked,
+            'ipfshash' => $ipfshash,
+            'size' => $fsize
+        );
+        if ($blob) {
+            $files[$count]['content'] = $foutline;
+        }
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning: [$count] files for user: [$uid]");
+    return ($files);
+}
+
+
+//Get a certain version of an outline based on a url and a version id
+function get_recent_file_version_by_url($uid = NULL, $url = NULL, $vid = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+    if (empty($url)) {
+        loggit(2, "The url given is corrupt or blank: [$url]");
+        return (FALSE);
+    }
+    if (empty($vid)) {
+        loggit(2, "The version id given is corrupt or blank: [$vid]");
+        return (FALSE);
+    }
+
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash, outline 
+               FROM $table_recentfilesversions 
+               WHERE userid=? AND url=? AND id=?
+               ORDER BY time DESC";
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ssd", $uid, $url, $vid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No files returned for: [$uid | $url] with the given criteria.");
+        return (array());
+    }
+
+    $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+
+    $files = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $files[$count] = array('id' => $fid,
+            'title' => $ftitle,
+            'url' => $furl,
+            'time' => $ftime,
+            'disqus' => $fdisqus,
+            'wysiwyg' => $fwysiwyg,
+            'watched' => $fwatched,
+            'type' => $ftype,
+            'locked' => $flocked,
+            'ipfshash' => $ipfshash
+        );
+        $files[$count]['content'] = $foutline;
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning: [$count] files for user: [$uid]");
+    return ($files[0]);
 }
 
 
@@ -3130,6 +3284,73 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
         $sql->bind_param("ssssddddsddssdssdddsds", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $ipfshash, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched, $articleid, $locked, $ipfshash) or loggit(2, "MySql error: " . $dbh->error);
         loggit(3, "User: [$uid] changed old url: [$oldurl] to new url: [$url].");
     }
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $rid = $sql->insert_id;
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "User: [$uid] edited a file: [$title] at: [$url]. Article: [$articleid].");
+    return ($rid);
+}
+
+
+//Add a version history entry for an editor file
+function add_recent_file_version($uid = NULL, $url = NULL, $title = NULL, $outline = "", $type = 0, $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE, $articleid = NULL, $locked = FALSE, $ipfshash = "")
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if (empty($url)) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+    if (empty($title)) {
+        $title = "Edited at - " . time();
+        loggit(1, "No title for file, so generating one: [$title]");
+    }
+    if (!$disqus) {
+        $disqus = 0;
+    } else {
+        $disqus = 1;
+    }
+    if (!$wysiwyg) {
+        $wysiwyg = 0;
+    } else {
+        $wysiwyg = 1;
+    }
+    if (!$watched) {
+        $watched = 0;
+    } else {
+        $watched = 1;
+    }
+    if (!$locked) {
+        $locked = 0;
+    } else {
+        $locked = 1;
+    }
+    if (empty($ipfshash)) {
+        $ipfshash = "";
+    }
+
+
+    //Timestamp
+    $time = time();
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Insert recent file entry
+    $stmt = "INSERT INTO $table_recentfilesversions (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type, ipfshash)
+                                             VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?,        ?)";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ssssddddsdds", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $ipfshash)
+           or loggit(2, "MySql error: " . $dbh->error);
+
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $rid = $sql->insert_id;
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);

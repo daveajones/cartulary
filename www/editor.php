@@ -12,8 +12,12 @@ $redirect = "";
 $aid = "";
 $rhost = "";
 $ipfs = FALSE;
+
 if (isset($_REQUEST['aid'])) {
     $aid = trim($_REQUEST['aid']);
+}
+if (isset($_REQUEST['versionid'])) {
+    $versionid = $_REQUEST['versionid'];
 }
 
 if (!empty($aid)) {
@@ -37,18 +41,17 @@ if (!empty($aid)) {
                 $ipfs = FALSE;
             }
         } else {
-            /*
-            $opmldata = fetchUrl(get_final_url($url));
-            $opmldata = stripInvalidXml($opmldata);
-            if( !is_outline($opmldata) ) {
-                $badurl = true;
-            }
-            */
             $opmldata = "";
         }
 
         //Get side info
         if($ipfs == FALSE) {
+            //Was a certain version requested?
+            if(isset($versionid) && !empty($versionid)) {
+                $seenfile = get_recent_file_version_by_url($g_uid, $url, $versionid);
+                $opmldata = $seenfile['content'];
+                //loggit(3, print_r($seenfile,TRUE));
+            }
             $seenfile = get_recent_file_by_url($g_uid, $url);
 
             //Set the redirect host for this document
@@ -111,7 +114,11 @@ $tree_location = "Edit Outline";
         var badurl = false;
         <?if( isset($opmldata) && !empty($aid) ) {?>
         var initialOpmlText = '<?echo $opmldata?>';
+        <?} else if( isset($opmldata) && !empty($versionid) ) {?>
+        var versionRequest = true;
+        var initialOpmlText = '<?echo $opmldata?>';
         <?} else {?>
+        var versionRequest = false;
         var initialOpmlText = initialOpmltext;
         <?}?>
         var initialRssOpmlText = '<?echo $cg_rsseditoropmltemplate?>';

@@ -24,6 +24,10 @@ $urldata = fetchUrl(get_final_url($url));
 if(is_feed($urldata)) {
     $datatype = 'feed';
     $urldata = convert_feed_to_opml($urldata);
+} else if (is_outline($urldata)) {
+    $datatype = 'opml';
+} else if (is_json($urldata)) {
+    $datatype = 'json';
 }
 
 //--------------------------------------------------------------------------------

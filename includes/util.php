@@ -2181,11 +2181,18 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
         'Body'   => $content
     );
 
+    loggit(3, "HEADERS: ".print_r($headers, TRUE));
+
     //Add headers if any
     if(!empty($headers)) {
-        foreach($headers as $hkey => $hvalue) {
-            $hkey = str_replace('-', '', $hkey);
-            $s3object[$hkey] = $hvalue;
+        if(is_array($headers)) {
+            foreach($headers as $hkey => $hvalue) {
+                loggit(3, "HEADER: [$hkey] => [$hvalue]");
+                $hkey = str_replace('-', '', $hkey);
+                $s3object[$hkey] = $hvalue;
+            }
+        } else {
+            $s3object['ContentType'] = $headers;
         }
     }
 
@@ -2338,7 +2345,7 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
             ));
         }
     }
-    loggit(3, "S3DEBUG: ".print_r($s3res, TRUE));
+    //loggit(3, "S3DEBUG: ".print_r($s3res, TRUE));
 
     if (!$s3res) {
         loggit(2, "Could not create S3 file: [$bucket/$subpath$filename].");

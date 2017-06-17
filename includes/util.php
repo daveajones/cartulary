@@ -1846,7 +1846,8 @@ function test_s3_bucket_access($key, $secret, $bucket)
     $s3 = new S3($key, $secret);
 
     //Get a list of buckets
-    $s3res = $s3->putObject("Test write from FC", $bucket, "fctestwrite", S3::ACL_PRIVATE, array());
+    //$s3res = $s3->putObject("Test write from FC", $bucket, "fctestwrite", S3::ACL_PRIVATE, array());
+    $s3res = putInS3("Test write from FC", "fctestwrite", $bucket, $key, $secret, NULL, TRUE);
 
     //Were we able to get a list?
     if (!$s3res) {
@@ -2054,7 +2055,7 @@ function get_s3_regional_dns($location)
 
 
 //Put a string of data into an S3 file
-function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $private = FALSE)
+function putInS3old($content, $filename, $bucket, $key, $secret, $headers = NULL, $private = FALSE)
 {
 
     //Check parameters
@@ -2099,7 +2100,7 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
     }
 
     loggit(1, "putInS3(): Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
-    //get_s3_bucket_location($key, $secret, $bucket);
+    loggit(3, "S3: ".print_r($headers, TRUE));
 
     if ($private) {
         $s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PRIVATE, array(), $headers);
@@ -2113,6 +2114,124 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
     } else {
         $s3url = "http://s3.amazonaws.com/$bucket/$subpath$filename";
         loggit(1, "Wrote feed to S3: [$s3url].");
+    }
+
+    return (TRUE);
+}
+
+
+//Put a string of data into an S3 file
+function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $private = FALSE)
+{
+
+    //Check parameters
+    if (empty($content)) {
+        loggit(2, "Content missing from S3 put call: [$content].");
+        return (FALSE);
+    }
+    if (empty($filename)) {
+        loggit(2, "Filename missing from S3 put call: [$filename].");
+        return (FALSE);
+    }
+    if (empty($bucket)) {
+        loggit(2, "Bucket missing from S3 put call: [$bucket].");
+        return (FALSE);
+    }
+    if (empty($key)) {
+        loggit(2, "Key missing from S3 put call: [$key].");
+        return (FALSE);
+    }
+    if (empty($secret)) {
+        loggit(2, "Secret missing from S3 put call: [$secret].");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    //Set up
+    require_once "$confroot/$libraries/aws/aws-autoloader.php";
+
+    //$s3 = S3Client::factory(array("signature" => "v4", "key" => $key, "secret" => $secret));
+    // You can also use the client constructor
+    $s3 = new \Aws\S3\S3MultiRegionClient([
+        'version' => 'latest',
+        'signature' => 'v4',
+        'credentials' => array(
+            'key' => $key,
+            'secret' => $secret
+        )
+    ]);
+
+
+    //Construct bucket subfolder path, if any
+    $s3bucket = $bucket;
+    if (stripos($s3bucket, '/', 1) === FALSE) {
+        $subpath = "";
+    } else {
+        $spstart = stripos($s3bucket, '/', 1);
+        $bucket = str_replace('/', '', substr($s3bucket, 0, stripos($s3bucket, '/', 1)));
+        $subpath = rtrim(substr($s3bucket, $spstart + 1), '/') . "/";
+    }
+    $keyname = $subpath.$filename;
+
+    //Assemble object to upload
+    $s3object = array(
+        'Bucket' => $bucket,
+        'Key'    => $keyname,
+        'Body'   => $content
+    );
+
+    //Add headers if any
+    if(!empty($headers)) {
+        foreach($headers as $hkey => $hvalue) {
+            $hkey = str_replace('-', '', $hkey);
+            $s3object[$hkey] = $hvalue;
+        }
+    }
+
+    loggit(1, "putInS3(): Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
+    //get_s3_bucket_location($key, $secret, $bucket);
+
+    if ($private) {
+        //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PRIVATE, array(), $headers);
+        try {
+            // Upload data.
+            $s3object['ACL'] = 'private';
+            //loggit(3, "S3: ".print_r($s3object, TRUE));
+            $s3res = $s3->putObject($s3object);
+
+            // Print the URL to the object.
+            loggit(3, "Wrote file to S3: [".$s3res['ObjectURL']."].");
+        } catch (S3Exception $e) {
+            loggit(2, "S3 Error: [".$e->getMessage()."].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
+        }
+    } else {
+        //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PUBLIC_READ, array(), $headers);
+        try {
+            // Upload data.
+            $s3object['ACL'] = 'public-read';
+            //loggit(3, "S3: ".print_r($s3object, TRUE));
+            $s3res = $s3->putObject($s3object);
+
+            // Print the URL to the object.
+            loggit(3, "Wrote file to S3: [".$s3res['ObjectURL']."].");
+        } catch (S3Exception $e) {
+            loggit(2, "S3 Error: [".$e->getMessage()."].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
+        }
+    }
+    if (!$s3res) {
+        loggit(2, "Could not create S3 file: [$bucket/$subpath$filename].");
+        //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+        return (FALSE);
+    } else {
+        $s3url = "http://s3.amazonaws.com/$bucket/$subpath$filename";
+        loggit(1, "Wrote file to S3: [$s3url].");
     }
 
     return (TRUE);
@@ -2147,11 +2266,19 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
-    require_once "$confroot/$libraries/oauth/tmhOAuth.php";
-
     //Set up
-    require_once "$confroot/$libraries/s3/S3.php";
-    $s3 = new S3($key, $secret);
+    require_once "$confroot/$libraries/aws/aws-autoloader.php";
+
+    //$s3 = S3Client::factory(array("signature" => "v4", "key" => $key, "secret" => $secret));
+    // You can also use the client constructor
+    $s3 = new \Aws\S3\S3MultiRegionClient([
+        'version' => 'latest',
+        'signature' => 'v4',
+        'credentials' => array(
+            'key' => $key,
+            'secret' => $secret
+        )
+    ]);
 
     //Construct bucket subfolder path, if any
     $s3bucket = $bucket;
@@ -2162,31 +2289,64 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
         $bucket = str_replace('/', '', substr($s3bucket, 0, stripos($s3bucket, '/', 1)));
         $subpath = rtrim(substr($s3bucket, $spstart + 1), '/') . "/";
     }
+    $keyname = $subpath.$filename;
 
     loggit(1, "Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
     //get_s3_bucket_location($key, $secret, $bucket);
 
-    $content = $s3->inputFile($file);
+    $filepath = $file;
     if ($contenttype == NULL) {
         if ($private == FALSE) {
-            $s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PUBLIC_READ);
+            //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PUBLIC_READ);
+            $s3res = $s3->putObject(array(
+                'Bucket'       => $bucket,
+                'Key'          => $keyname,
+                'SourceFile'   => $filepath,
+                'ACL'          => 'public-read',
+                'StorageClass' => 'REDUCED_REDUNDANCY'
+            ));
         } else {
-            $s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PRIVATE);
+            //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PRIVATE);
+            $s3res = $s3->putObject(array(
+                'Bucket'       => $bucket,
+                'Key'          => $keyname,
+                'SourceFile'   => $filepath,
+                'ACL'          => 'private',
+                'StorageClass' => 'REDUCED_REDUNDANCY'
+            ));
         }
     } else {
         if ($private == FALSE) {
-            $s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PUBLIC_READ, array(), $contenttype);
+            //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PUBLIC_READ, array(), $contenttype);
+            $s3res = $s3->putObject(array(
+                'Bucket'       => $bucket,
+                'Key'          => $keyname,
+                'SourceFile'   => $filepath,
+                'ContentType'  => $contenttype,
+                'ACL'          => 'public-read',
+                'StorageClass' => 'REDUCED_REDUNDANCY'
+            ));
         } else {
-            $s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PRIVATE, array(), $contenttype);
+            //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PRIVATE, array(), $contenttype);
+            $s3res = $s3->putObject(array(
+                'Bucket'       => $bucket,
+                'Key'          => $keyname,
+                'SourceFile'   => $filepath,
+                'ContentType'  => $contenttype,
+                'ACL'          => 'private',
+                'StorageClass' => 'REDUCED_REDUNDANCY'
+            ));
         }
     }
+    loggit(3, "S3DEBUG: ".print_r($s3res, TRUE));
+
     if (!$s3res) {
         loggit(2, "Could not create S3 file: [$bucket/$subpath$filename].");
         loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
         return (FALSE);
     } else {
         $s3url = "http://s3.amazonaws.com/$bucket/$subpath$filename";
-        loggit(1, "Wrote file to S3: [$s3url].");
+        loggit(1, "Wrote file to S3: [$s3url | ".$s3res['ObjectURL']."].");
     }
 
     return (TRUE);

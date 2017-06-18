@@ -1802,22 +1802,29 @@ function get_s3_buckets($key, $secret)
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
-
     //Set up
-    require_once "$confroot/$libraries/s3/S3.php";
-    $s3 = new S3($key, $secret);
+    require_once "$confroot/$libraries/aws/aws-autoloader.php";
+
+    $s3 = new \Aws\S3\S3MultiRegionClient([
+        'version' => 'latest',
+        'signature' => 'v4',
+        'credentials' => array(
+            'key' => $key,
+            'secret' => $secret
+        )
+    ]);
 
     //Get a list of buckets
-    $buckets = $s3->listBuckets();
+    $result = $s3->listBuckets();
 
     //Were we able to get a list?
-    if ($buckets == FALSE) {
-        loggit(2, "Could not get a bucket list using: [$key | $secret].");
+    if (!isset($result['Buckets']) || !$result['Buckets'] || empty($result['Buckets'])) {
+        loggit(2, "Could not get an S3 bucket list using: [$key | $secret].");
         return (FALSE);
     }
 
     //Give back the buckets array
-    return ($buckets);
+    return ($result['Buckets']);
 }
 
 
@@ -1841,21 +1848,16 @@ function test_s3_bucket_access($key, $secret, $bucket)
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
-    //Set up
-    require_once "$confroot/$libraries/s3/S3.php";
-    $s3 = new S3($key, $secret);
-
-    //Get a list of buckets
-    //$s3res = $s3->putObject("Test write from FC", $bucket, "fctestwrite", S3::ACL_PRIVATE, array());
+    //Put d dummy file in a bucket to test write access
     $s3res = putInS3("Test write from FC", "fctestwrite", $bucket, $key, $secret, NULL, TRUE);
 
-    //Were we able to get a list?
+    //Success?
     if (!$s3res) {
         loggit(2, "Could not write to bucket: [$bucket] using supplied credentials.");
         return (FALSE);
     }
 
-    //Give back the buckets array
+    //Give back the result
     return (TRUE);
 }
 
@@ -1879,21 +1881,37 @@ function create_s3_bucket($key, $secret, $bucket)
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
-
     //Set up
-    require_once "$confroot/$libraries/s3/S3.php";
-    $s3 = new S3($key, $secret);
+    require_once "$confroot/$libraries/aws/aws-autoloader.php";
 
-    //Get a list of buckets
-    $s3res = $s3->putBucket($bucket, S3::ACL_PUBLIC_READ);
+    // You can also use the client constructor
+    $s3 = new \Aws\S3\S3MultiRegionClient([
+        'version' => 'latest',
+        'signature' => 'v4',
+        'credentials' => array(
+            'key' => $key,
+            'secret' => $secret
+        )
+    ]);
 
-    //Were we able to get a list?
+    //Try to create a bucket
+    try {
+        $s3res = $s3Client->createBucket([
+            'Bucket' => $bucket,
+        ]);
+    } catch (S3Exception $e) {
+        //Log and leave on fail
+        loggit(2, "S3 Error: [".$e->getMessage()."].");
+        return (FALSE);
+    }
+
+    //Did it fail?
     if (!$s3res) {
         loggit(2, "Could not create s3 bucket: [$bucket] using supplied credentials.");
         return (FALSE);
     }
 
-    //Give back the buckets array
+    //Report back
     return (TRUE);
 }
 
@@ -1956,15 +1974,22 @@ function set_s3_bucket_cors($key, $secret, $bucket)
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
-
     //Set up
     require_once "$confroot/$libraries/aws/aws-autoloader.php";
 
-    $client = S3Client::factory(array("key" => $key, "secret" => $secret));
+    // You can also use the client constructor
+    $s3 = new \Aws\S3\S3MultiRegionClient([
+        'version' => 'latest',
+        'signature' => 'v4',
+        'credentials' => array(
+            'key' => $key,
+            'secret' => $secret
+        )
+    ]);
 
     //Set the CORS policy of this bucket
     try {
-        $res = $client->putBucketCors(array(
+        $s3 = $client->putBucketCors(array(
             'Bucket' => $bucket,
             'CORSRules' => array(
                 array(
@@ -1976,8 +2001,8 @@ function set_s3_bucket_cors($key, $secret, $bucket)
                 )
             )
         ));
-    } catch (\Aws\S3\Exception\S3Exception $e) {
-        loggit(3, "Error setting s3 cors config: " . $e->getAwsErrorCode() . " : " . $e->getMessage());
+    } catch (S3Exception $e) {
+        loggit(3, "Error setting s3 cors config: " . $e->getMessage());
         return (FALSE);
     }
 
@@ -2151,8 +2176,6 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
     //Set up
     require_once "$confroot/$libraries/aws/aws-autoloader.php";
 
-    //$s3 = S3Client::factory(array("signature" => "v4", "key" => $key, "secret" => $secret));
-    // You can also use the client constructor
     $s3 = new \Aws\S3\S3MultiRegionClient([
         'version' => 'latest',
         'signature' => 'v4',
@@ -2197,10 +2220,8 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
     }
 
     loggit(1, "putInS3(): Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
-    //get_s3_bucket_location($key, $secret, $bucket);
 
     if ($private) {
-        //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PRIVATE, array(), $headers);
         try {
             // Upload data.
             $s3object['ACL'] = 'private';
@@ -2216,7 +2237,6 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
             return (FALSE);
         }
     } else {
-        //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PUBLIC_READ, array(), $headers);
         try {
             // Upload data.
             $s3object['ACL'] = 'public-read';
@@ -2276,8 +2296,6 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
     //Set up
     require_once "$confroot/$libraries/aws/aws-autoloader.php";
 
-    //$s3 = S3Client::factory(array("signature" => "v4", "key" => $key, "secret" => $secret));
-    // You can also use the client constructor
     $s3 = new \Aws\S3\S3MultiRegionClient([
         'version' => 'latest',
         'signature' => 'v4',
@@ -2299,12 +2317,10 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
     $keyname = $subpath.$filename;
 
     loggit(1, "Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
-    //get_s3_bucket_location($key, $secret, $bucket);
 
     $filepath = $file;
     if ($contenttype == NULL) {
         if ($private == FALSE) {
-            //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PUBLIC_READ);
             $s3res = $s3->putObject(array(
                 'Bucket'       => $bucket,
                 'Key'          => $keyname,
@@ -2313,7 +2329,6 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
                 'StorageClass' => 'REDUCED_REDUNDANCY'
             ));
         } else {
-            //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PRIVATE);
             $s3res = $s3->putObject(array(
                 'Bucket'       => $bucket,
                 'Key'          => $keyname,
@@ -2324,7 +2339,6 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
         }
     } else {
         if ($private == FALSE) {
-            //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PUBLIC_READ, array(), $contenttype);
             $s3res = $s3->putObject(array(
                 'Bucket'       => $bucket,
                 'Key'          => $keyname,
@@ -2334,7 +2348,6 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
                 'StorageClass' => 'REDUCED_REDUNDANCY'
             ));
         } else {
-            //$s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PRIVATE, array(), $contenttype);
             $s3res = $s3->putObject(array(
                 'Bucket'       => $bucket,
                 'Key'          => $keyname,
@@ -2640,47 +2653,6 @@ function get_s3_url($uid = NULL, $path = NULL, $filename = NULL)
     return ($url);
 }
 
-
-//Build an s3 url off of a given bucket
-/*
-function get_s3_bucket_url($bucket = NULL, $path = NULL, $filename = NULL)
-{
-
-    if (empty($bucket)) {
-        loggit(2, "The bucket string was empty: [$bucket].");
-        return (FALSE);
-    }
-
-    //Includes
-    include get_cfg_var("cartulary_conf") . '/includes/env.php';
-
-
-    //Globals
-    $url = '';
-    $prot = 'http://';
-    $host = $bucket . '.s3.amazonaws.com';
-    $path = trim($path, '/');
-    $filename = ltrim($filename, '/');
-
-    //First let's get a proper hostname value
-    $url = $prot . $host . "/" . $path . "/" .$filename;
-
-
-    $url = trim($url, "/");
-
-    if (!empty($path)) {
-        $url .= "/" . $path;
-    }
-
-    if (!empty($filename)) {
-        $url .= "/" . $filename;
-    }
-
-    //loggit(3, "DEBUG: ".print_r($s3info, TRUE));
-    //loggit(3, "DEBUG: $url");
-    return ($url);
-}
-*/
 
 //Build an s3 url for the server's river files
 function get_server_river_s3_url($path = NULL, $filename = NULL)

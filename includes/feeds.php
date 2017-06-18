@@ -45,7 +45,7 @@ function is_feed($content = NULL)
 function is_jsonfeed($content = NULL)
 {
     //Check parameters
-    if ($content == NULL) {
+    if (empty($content)) {
         loggit(2, "The content to test is blank or corrupt: [$content]");
         return (FALSE);
     }
@@ -60,7 +60,7 @@ function is_jsonfeed($content = NULL)
     }
 
     $jsonFeed = json_decode($content, TRUE);
-    loggit(3, "JSONFEED: ".print_r($jsonFeed, TRUE));
+    //loggit(3, "JSONFEED: ".print_r($jsonFeed, TRUE));
 
     //Look for key elements
     if( !isset($jsonFeed['version']) ) return FALSE;
@@ -6462,7 +6462,7 @@ function convert_jsonfeed_to_rss($content = NULL, $max = NULL)
 
     //Items
     foreach( $jf['items'] as $item ) {
-        loggit(3, "DEBUG: ".print_r($item, TRUE));
+        loggit(1, "DEBUG: ".print_r($item, TRUE));
 
         $newItem = $xmlFeed->channel->addChild('item');
 

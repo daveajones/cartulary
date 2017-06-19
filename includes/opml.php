@@ -2395,7 +2395,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
 
         //If this is an outline node, open a tag for it
         if ((string)$child->getName() == "outline") {
-            if ($type == "link") {
+            if ($type == "link" || $type == "enclosure" || $type == "include") {
                 $nodetext = "<a href=\"$link\" target=\"_blank\">" . (string)$child->attributes()->text . "</a>";
             } else {
                 $nodetext = (string)$child->attributes()->text;

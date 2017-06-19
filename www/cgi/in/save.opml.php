@@ -178,6 +178,9 @@ if( $type == 1 ) {
     if($rssdata == FALSE || (is_numeric($rssdata) && $rssdata < 0)) {
         loggit(2, "RSS Error code: [$rssdata]");
         $jsondata['status'] = "false";
+        if($rssdata == -5) {
+            $jsondata['description'] = "One of the enclosures in this feed returned a bad response code. Make sure the url for the enclosure file is valid.";
+        } else
         if($rssdata == -4) {
             $jsondata['description'] = "One of the items has both a blank title and description. At least one is required.";
         } else
@@ -187,7 +190,7 @@ if( $type == 1 ) {
         if($rssdata == -2) {
             $jsondata['description'] = "There were no 'item' nodes found while building the rss feed.";
         } else {
-            $jsondata['description'] = "An unknown error occured during opml to rss conversion.";
+            $jsondata['description'] = "An unknown error occurred during OPML to RSS conversion.";
         }
 
         echo json_encode($jsondata);
@@ -205,10 +208,30 @@ if( $type == 1 ) {
     } else {
         $s3rss = get_s3_url($uid, "/rss/", $rssfilename);
         loggit(3, "Wrote rss to S3 at url: [$s3rss].");
-        set_s3_bucket_cors($s3info['key'], $s3info['secret'], $s3info['bucket']);
+        //set_s3_bucket_cors($s3info['key'], $s3info['secret'], $s3info['bucket']);
     }
 
 }
+
+//Get the current file details
+if( $s3oldurl != $s3url && !empty($s3oldurl) && !empty($s3url) ) {
+    $cfile = get_recent_file_by_url($uid, $s3oldurl, TRUE);
+    $cfile = $cfile[0];
+} else {
+    $cfile = get_recent_file_by_url($uid, $s3url, TRUE);
+    $cfile = $cfile[0];
+}
+
+//Update the recent file version table
+$temp_opml = preg_replace('/\<dateModified\>.*\<\/dateModified\>/', '', $opml);
+$temp_prevopml = preg_replace('/\<dateModified\>.*\<\/dateModified\>/', '', $cfile['content']);
+if( $temp_opml != $temp_prevopml && !empty($cfile['content']) && !empty($opml) && !empty($temp_opml) && !empty($temp_prevopml) ) {
+    loggit(3, "DEBUG: Editor file content changed. Saving old version in version table.");
+    add_recent_file_version($uid, $s3url, $cfile['title'], $cfile['content'], $cfile['type'], $cfile['disqus'], $cfile['wysiwyg'], $cfile['watched'], $cfile['articleid'], $cfile['locked'], $cfile['ipfshash']);
+} else {
+    loggit(3, "DEBUG: Editor file content not changed.");
+}
+
 
 //Update recent file table
 $rid = update_recent_file($uid, $s3url, $title, $opml, $type, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked, $opmlhash);

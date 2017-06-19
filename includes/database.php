@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 68;
+$cg_database_version = 69;
 $cg_database_updates = array();
 
 
@@ -946,6 +946,39 @@ CGDB0205;
 $cg_database_updates[67][] = <<<CGDB0206
  INSERT INTO `dbversion` ( `version` ) VALUES ( '68' )
 CGDB0206;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 68 to 69 -----------------------------------------------------------------------------------------------
+$cg_database_updates[68][] = <<<CGDB0207
+ CREATE TABLE IF NOT EXISTS `recentfiles_versions` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `userid` varchar(64) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL,
+  `url` varchar(767) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL,
+  `title` varchar(512) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Title of the file.',
+  `time` int(11) NOT NULL,
+  `outline` longtext CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL COMMENT 'The actual outline content.',
+  `disqus` tinyint(4) NOT NULL COMMENT 'Comments enabled?',
+  `wysiwyg` tinyint(4) NOT NULL COMMENT 'Wysiwyg enabled?',
+  `qrcode` varchar(767) NOT NULL COMMENT 'QR code for this outline url.',
+  `watched` tinyint(4) NOT NULL COMMENT 'watch this files links for changes?',
+  `articleid` varchar(128) NOT NULL COMMENT 'article id this file corresponds to',
+  `locked` tinyint(4) NOT NULL COMMENT 'Is this article locked?',
+  `type` int(11) NOT NULL,
+  `ipfshash` varchar(48) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userid` (`userid`,`time`),
+  KEY `articleid` (`articleid`),
+  KEY `type` (`type`),
+  KEY `ipfshash` (`ipfshash`),
+  KEY `url` (`url`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Version history of recently saved files in the editor.'
+CGDB0207;
+$cg_database_updates[68][] = <<<CGDB0208
+ ALTER TABLE `recentfiles_versions` ADD CONSTRAINT `url_link` FOREIGN KEY (`url`) REFERENCES `recentfiles` (`url`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0208;
+$cg_database_updates[68][] = <<<CGDB0209
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '69' )
+CGDB0209;
 //----------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------

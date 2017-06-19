@@ -40,7 +40,7 @@ $tree_location = "Feed Finder";
     $url = get_final_url($url);
     loggit(3, "Subscribe bookmarklet: [$url]");
     $content = fetchUrl($url);
-    if (($ftype = is_feed($content)) != FALSE) {
+    if (($ftype = is_feed($content)) != FALSE || ($ftype = is_jsonfeed($content)) != FALSE) {
         loggit(3, "DEBUG: Url itself is a feed.");
         $feedlocs[] = array('url' => $url, 'type' => $ftype, 'title' => $url, 'text' => '', 'element' => 'link');
     } else {
@@ -77,6 +77,9 @@ $tree_location = "Feed Finder";
                             if ($feedloc['element'] == "link" && stripos($feedloc['type'], 'rss') !== FALSE && stripos($url, 'comments') === FALSE && stripos($feedloc['title'], 'comments') === FALSE):
                                 $btnclass = "btn-success";
                                 $btndesc = "Main RSS Feed";
+                            elseif ($feedloc['element'] == "link" && stripos($feedloc['type'], 'json') !== FALSE && stripos($url, 'comments') === FALSE && stripos($feedloc['title'], 'comments') === FALSE):
+                                $btnclass = "btn-success";
+                                $btndesc = "Main JSON Feed";
                             elseif ($feedloc['element'] == "link" && stripos($feedloc['type'], 'atom') !== FALSE && stripos($url, 'comments') === FALSE && stripos($feedloc['title'], 'comments') === FALSE):
                                 $btnclass = "btn-success";
                                 $btndesc = "Main ATOM Feed";

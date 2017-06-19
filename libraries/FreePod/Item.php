@@ -58,7 +58,14 @@ class Item extends Podcast {
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             $data = curl_exec($ch);
             $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
+
+            //Bail if return is not a 2xx or 3xx
+            if($httpcode >= 400) {
+                return(FALSE);
+            }
+
             if (preg_match('/Content-Length: (\d+)/', $data, $matches)) {
                 // Contains file size in bytes
                 $length = (int)$matches[1];

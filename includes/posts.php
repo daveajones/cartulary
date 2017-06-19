@@ -124,7 +124,7 @@ function add_post($uid = NULL, $content = NULL, $url = NULL, $shorturl = FALSE, 
 
     //Set the origin
     if ($origin == FALSE) {
-        loggit(3, "The origin is blank or corrupt: [$origin]. Set it to be an empty value.");
+        loggit(1, "The origin is blank or corrupt: [$origin]. Set it to be an empty value.");
         $origin = "";
     }
 
@@ -451,7 +451,7 @@ function get_first_blog_post($uid = NULL)
 
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
-    loggit(3, "Earliest post for user: [$uid] is timestamp: [" . $posts[0]['linkedon'] . "]");
+    loggit(1, "Earliest post for user: [$uid] is timestamp: [" . $posts[0]['linkedon'] . "]");
     return ($posts[0]);
 }
 

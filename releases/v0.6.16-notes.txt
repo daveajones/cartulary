@@ -1,0 +1,31 @@
+#Release Notes - Freedom Controller v0.6.16
+
+
+
+- Bug Fixes (the notable ones)
+    - There was a big bug in handling non-us regions in AWS.  I was using a third-party S3 library and didn't
+      realize that AWS had implemented a new API signing version (v4) in recent years.  All new AWS regions
+      require v4 signatures.  All older regions still support v2.  This release updates all S3 calls to use the
+      newest AWS SDK and v4 signing.  It also uses multi-region safe calling.  It's a little slower than the old
+      library but it "just works", so I'll take it. :-)  Thanks to Dan Curry for first spotting this bug, and
+      Frank Meeuwsen for helping me test the new fix.
+
+- New Feature: Version history in the Editor
+    - One thing that has bugged me for a while is how easy it is to accidently save over top of an existing outline
+      when you intended to do a "save as" but forgot out of habit.  Now, there is a version history option that will
+      let you open up any historical version of an outline so you can recover if this happens.
+    - You just click the version history button and choose which one you want to open.  It will open in a new window.
+    - Once you open it, just click save and that outline is restored to that version.
+    - You can then go back to the other tab and do a proper "save as..." on your modified version.
+    - This feels like the right solution.  I'd love some feedback on it.
+
+- New Feature: JSONfeed support
+    - You can now subscribe to JSONfeed feeds.  Internally, I'm just converting the JSONfeed back to RSS2 and then
+      passing it on in to the parser.  It's a little inefficient but gets the job done without having to rewrite a
+      bunch of aggregator code that expects to be passing XML objects around.
+    - These feeds are also surfaced on the subscribe bookmarklet.
+    - The JSONfeed spec is here: [https://jsonfeed.org/]
+    - The PHP function I wrote to convert JSONfeed to RSS2 is here:  [https://gist.github.com/daveajones/be26f5ca9cb7559d0c33549b53323770]
+
+- Improvement: Rotate uploaded images based on Exif data
+    - This should be on the [Should have happened 3 years ago] list.  :-)

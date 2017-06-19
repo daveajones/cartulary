@@ -12,6 +12,7 @@ $(document).ready(function () {
     var chkToggleLock = $('.menuLockToggle');
     var menubar = $('#menubarEditor');
     var nodeTypeSelector = menubar.find('.menuType ul.dropdown-menu');
+    var nodeVersionHistory = menubar.find('.menuVersionHistory ul.dropdown-menu');
     var elTitle = $('.divOutlineTitle input.title');
     var oscillator;
     var amp;
@@ -22,6 +23,7 @@ $(document).ready(function () {
     var audioAnimate;
     var fileMultiDrop = false;
     var uploaddatestamp = new Date().valueOf() / 1000;
+    var outlinechanged = false;
 
 
 
@@ -867,7 +869,7 @@ $(document).ready(function () {
     });
 
     //Load the outline content
-    if (!isBlank(url) && type != 2) {
+    if (!isBlank(url) && type != 2 && !versionRequest) {
         if (url.indexOf("ipfs://") == 0) {
             actionurl = '/cgi/out/get.ipfs.json';
         } else {
@@ -890,7 +892,13 @@ $(document).ready(function () {
                 //htmlurl = data.html;
 
                 //Load the outline body data
-                opXmlToOutline(data.data);
+                if( data.type == 'json' ) {
+                    console.log("DEBUG: calling opJsonToOutline()");
+                    opJsonToOutline(data.data);
+                } else {
+                    console.log("DEBUG: calling opXmlToOutline()");
+                    opXmlToOutline(data.data);
+                }
                 title = opGetTitle();
 
                 //Set a title
@@ -1329,6 +1337,9 @@ $(document).ready(function () {
             $('#menubarEditor').find('.menuRedirect').html("Redirect");
             $('#menubarEditor').find('.menuRedirect').parent().removeClass('active');
         }
+
+        buildNodeVersionHistory(url);
+
         return true;
     }
 
@@ -1845,6 +1856,36 @@ $(document).ready(function () {
 
         menuArray.map(function (item) {
             nodeTypeSelector.append('<li><a href="#" class="menuTypeSelection ' + item.class + '" title="' + item.title + '" data-type="' + item.type + '">' + item.text + '</a></li>');
+        });
+    }
+
+    //Calls for version history and builds the version drop-down from it
+    function buildNodeVersionHistory(fileurl) {
+
+        //Make the ajax call
+        $.ajax({
+            type: 'GET',
+            url: '/cgi/out/get.recentfile.versions?url=' + fileurl,
+            dataType: "json",
+            beforeSend: function() {
+                //Clear the table for new data
+                nodeVersionHistory.empty();
+                //nodeVersionHistory.append('<li><a>Version History</a></li><li role="separator" class="divider"></li>');
+            },
+            success: function (data) {
+                //Iterate
+                data.versions.map(function (item) {
+                    var df = new Date(0);
+                    df.setUTCSeconds(item.time);
+                    nodeVersionHistory.append('<li><a href="/editor?url='+item.url+'&versionid='+item.id+'" class="menuTypeSelection version" title="' + item.title + '" data-type="' + item.type + '">' + dateFormat(df, "m/d/yy @ h:MM:ss TT") + ' ('+bytesToSize(item.size, 2)+')</a></li>');
+                });
+                if (data.versions.length < 1) {
+                    nodeVersionHistory.append('<li><a href="#" class="menuTypeSelection message">No history...</a></li>');
+                }
+            },
+            error: function(data) {
+                nodeVersionHistory.append('<li><a href="#" class="menuTypeSelection message">Error getting history.</a></li>');
+            }
         });
     }
 });

@@ -9,8 +9,8 @@ $jsondata['fieldname'] = "";
 $s3info = get_s3_info($uid);
 
 //Get the content of the post
-loggit(3, "Blog post form: " . print_r($_REQUEST, TRUE));
-loggit(3, "Blog post files: " . print_r($_FILES, TRUE));
+loggit(1, "Blog post form: " . print_r($_REQUEST, TRUE));
+loggit(1, "Blog post files: " . print_r($_FILES, TRUE));
 $jsondata['fieldname'] = "content";
 if (isset($_REQUEST['content'])) {
     $content = $_REQUEST['content'];
@@ -145,7 +145,11 @@ if (isset($_FILES['file_mobile']) && $_FILES['file_mobile']['size'] > 0 && ($s3i
     if (!isset($enclosures)) {
         $enclosures = array();
     }
-    loggit(3, "Enclosures incoming: " . print_r($enclosures, TRUE));
+    loggit(1, "Enclosures incoming: " . print_r($enclosures, TRUE));
+    // If this is a jpeg, rotate it correctly
+    if (striposa($files['tmp_name'], array('.jpg', '.jpeg')) !== FALSE || striposa($files['type'], array('jpg', 'jpeg')) !== FALSE) {
+        image_fix_orientation($files['tmp_name']);
+    }
     $encfile = date('YmdHis') . "_" . strtolower($files['name']);
     putFileInS3($files['tmp_name'], $encfile, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret']);
     $enclosures[] = array(
@@ -153,7 +157,7 @@ if (isset($_FILES['file_mobile']) && $_FILES['file_mobile']['size'] > 0 && ($s3i
         'length' => $files['size'],
         'type' => $files['type']
     );
-    loggit(3, "Enclosures outgoing: " . print_r($enclosures, TRUE));
+    loggit(1, "Enclosures outgoing: " . print_r($enclosures, TRUE));
 }
 
 //If there is no link, but there is an enclosure let's use the enclosure url as the link
@@ -306,5 +310,5 @@ if (!$xhr) {
 }
 echo $resp;
 
-loggit(3, "Blogpost cgi returning: [$resp]");
+loggit(1, "Blogpost cgi returning: [$resp]");
 return (0);

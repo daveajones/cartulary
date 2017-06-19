@@ -585,3 +585,22 @@ function stripTags(html) {
     tmp.innerHTML = html;
     return tmp.textContent || tmp.innerText;
 }
+
+
+/**
+ * Convert number of bytes into human readable format
+ *
+ * @param integer bytes     Number of bytes to convert
+ * @param integer precision Number of digits after the decimal separator
+ * @return string
+ */
+function bytesToSize(bytes, precision) {
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    var posttxt = 0;
+    if (bytes == 0) return 'n/a';
+    while( bytes >= 1024 ) {
+        posttxt++;
+        bytes = bytes / 1024;
+    }
+    return parseInt(bytes).toFixed(precision) + " " + sizes[posttxt];
+}

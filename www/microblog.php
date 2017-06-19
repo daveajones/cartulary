@@ -53,13 +53,15 @@ function unlinkspool($t)
 
 //Get feed locations
 if (s3_is_enabled($uid) || sys_s3_is_enabled()) {
-    $s3blogfeed = get_s3_url($uid, NULL, get_microblog_feed_filename($uid));
+    $s3blogfeed = get_s3_url($uid, NULL, get_blog_feed_filename($uid));
+    $s3microblogfeed = get_s3_url($uid, NULL, get_microblog_feed_filename($uid));
     $s3blogopml = get_s3_url($uid, NULL, get_microblog_opml_filename($uid));
     $s3bloghtml = get_s3_url($uid, NULL, get_microblog_html_filename($uid));
 } else {
-    $s3blogfeed = $system_url . "/" . $microblogpage . "?uid=$uid";
-    $s3blogopml = $system_url . "/" . $microblogpage . "-opml?uid=$uid";
-    $s3bloghtml = $system_url . "/" . $microblogpage . "-html?uid=$uid";
+    $s3blogfeed = rtrim($system_url, "/").$microblogpage."-external?uid=$uid&feed=blog";
+    $s3microblogfeed = rtrim($system_url, "/").$microblogpage."-external?uid=$uid";
+    $s3blogopml = rtrim($system_url, "/").$microblogpage."-external?uid=$uid&type=opml";
+    $s3bloghtml = rtrim($system_url, "/").$microblogpage."-external?uid=$uid&type=html";
 }
 
 //Generate a datestamp

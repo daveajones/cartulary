@@ -1977,7 +1977,6 @@ function set_s3_bucket_cors($key, $secret, $bucket)
     //Set up
     require_once "$confroot/$libraries/aws/aws-autoloader.php";
 
-    // You can also use the client constructor
     $s3 = new \Aws\S3\S3MultiRegionClient([
         'version' => 'latest',
         'signature' => 'v4',
@@ -1989,26 +1988,26 @@ function set_s3_bucket_cors($key, $secret, $bucket)
 
     //Set the CORS policy of this bucket
     try {
-        $s3 = $client->putBucketCors(array(
+        $res = $s3->putBucketCors([
             'Bucket' => $bucket,
-            'CORSRules' => array(
-                array(
-                    'AllowedHeaders' => array('*'),
-                    'AllowedMethods' => array('GET'),
-                    'AllowedOrigins' => array('*'),
-                    'ExposeHeaders' => array('Content-Type', 'Content-Length', 'Date'),
+            'CORSConfiguration' => [
+                'CORSRules' => [[
+                    'AllowedHeaders' => ['*'],
+                    'AllowedMethods' => ['GET'],
+                    'AllowedOrigins' => ['*'],
+                    'ExposeHeaders' => ['Content-Type', 'Content-Length', 'Date'],
                     'MaxAgeSeconds' => 3000
-                )
-            )
-        ));
+                ]]
+            ],
+        ]);
     } catch (S3Exception $e) {
         loggit(3, "Error setting s3 cors config: " . $e->getMessage());
         return (FALSE);
     }
 
-    //Give back the buckets array
+    //Give back the result
     loggit(3, "S3 CORS config is now set for bucket: [$bucket]");
-    return ($res);
+    return (TRUE);
 }
 
 

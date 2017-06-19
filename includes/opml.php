@@ -2423,7 +2423,8 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
             }
 
             //Set an expanded class on outline nodes that match the expansionState counter
-            $parent = end(array_values($parents));
+            $parent_tmp = array_values($parents);
+            $parent = end($parent_tmp);
             if ($type == "menu" && $menuexists == 0) {
                 $htmlcontent .= "<div class=\"navbar navbar-fixed-top navbar-inverse\" role=\"navigation\">\n<div class=\"container\">\n<div class=\"navbar-header\">\n<button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\"#navbar-collapse-1\">\n<span class=\"sr-only\">Toggle navigation</span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n</button>\n<a class=\"navbar-brand\" href='#'>$nodetext</a>\n</div>\n<div class=\"collapse navbar-collapse\" id=\"navbar-collapse-1\"><ul class=\"nav navbar-nav\">\n";
                 $menuexists++;
@@ -4409,7 +4410,7 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
         if (!empty($converted_author)) {
             $pitem->author = $converted_author;
         } else {
-            $pitem->author = $converted['author'];
+            if(isset($converted['author'])) $pitem->author = $converted['author'];
         }
 
         //Pubdate check
@@ -4435,7 +4436,12 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
 
         //Enclosure check
         if (!empty($converted_enclosures[0])) {
-            $pitem->addEnclosure($converted_enclosures[0]['url'], $converted_enclosures[0]['length'], $converted_enclosures[0]['type']);
+            loggit(3, "RSS: Adding enclosure: [".$converted_enclosures[0]['url']."] to feed.");
+            $res = $pitem->addEnclosure($converted_enclosures[0]['url'], $converted_enclosures[0]['length'], $converted_enclosures[0]['type']);
+            if(!$res) {
+                loggit(3, "RSS: Enclosure: [".$converted_enclosures[0]['url']."] failed HEAD check with a bad http status code.");
+                return(-5);
+            }
         }
 
         //Explicit episode check
@@ -4472,197 +4478,4 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
 
     loggit(3, "DEBUG! RSS XML generated successfully.");
     return ($xxp);
-}
-
-
-//Recursive function for parsing an entire outline structure into rss format
-function buildRssFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $expansionState = array(), $expand = 1, $expanded = FALSE, &$parents, &$extrahtml, $menuexists = 0, &$extrahead)
-{
-
-    include get_cfg_var("cartulary_conf") . '/includes/env.php';
-    foreach ($x->children() as $child) {
-        $text = (string)$child->attributes()->text;
-        $name = (string)$child->attributes()->name;
-        $link = (string)$child->attributes()->url;
-        $type = strtolower((string)$child->attributes()->type);
-        $attr = (string)$child->attributes();
-        $oldindent = 0;
-
-        //Set up class strings for different conditions
-        $classes = "outline";
-        if (!empty($type) && $type != "outline") {
-            $classes .= " $type";
-        }
-
-        //Push the current type onto the stack
-        if (($type == "tabs" || $type == "html" || $type == "document" || $type == "menu" || $type == "presentation") && end(array_values($parents)) != "tabs") {
-            array_push($parents, $type);
-        }
-
-        //If no expansionState value matches the current visible node count then add a collapsed class
-        $exco = "";
-        if (!in_array($expand, $expansionState)) {
-            $exco .= " collapsed";
-        }
-
-        //If this is an outline node, open a tag for it
-        if ((string)$child->getName() == "outline") {
-            if ($type == "link") {
-                $nodetext = "<a href=\"$link\" target=\"_blank\">" . (string)$child->attributes()->text . "</a>";
-            } else {
-                $nodetext = (string)$child->attributes()->text;
-            }
-            if (empty($nodetext)) {
-                $nodetext = "&nbsp;";
-            }
-
-            //Check for aspects of the outline node that might need more classes added for styling
-            if (stripos($nodetext, "<a") !== FALSE) {
-                $classes .= " wanchor";
-            }
-            if (stripos($nodetext, "<img") !== FALSE) {
-                $classes .= " wimg";
-            }
-
-            //Set the variable for holding the next content under certain conditions like tabs
-            if (in_array('tab', $parents)) {
-                $htmlcontent =& $extrahtml;
-            } else {
-                $htmlcontent =& $html;
-            }
-
-            //Set an expanded class on outline nodes that match the expansionState counter
-            $parent = end(array_values($parents));
-            if ($type == "menu" && $menuexists == 0) {
-                $htmlcontent .= "<div class=\"navbar navbar-fixed-top navbar-inverse\" role=\"navigation\">\n<div class=\"container\">\n<div class=\"navbar-header\">\n<button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\"#navbar-collapse-1\">\n<span class=\"sr-only\">Toggle navigation</span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n<span class=\"icon-bar\"></span>\n</button>\n<a class=\"navbar-brand\" href='#'>$nodetext</a>\n</div>\n<div class=\"collapse navbar-collapse\" id=\"navbar-collapse-1\"><ul class=\"nav navbar-nav\">\n";
-                $menuexists++;
-            } else if ($type == "collaborate") {
-                $colltime = time();
-                $extrahead .= "<script>var TogetherJSConfig_findRoom = \"$colltime\";var TogetherJSConfig_inviteFromRoom = true; var TogetherJSConfig_suppressJoinConfirmation = true;</script><script id='togetherJS' src=\"//togetherjs.com/togetherjs-min.js\"></script>";
-            } else if ($type == "presentation") {
-                //Bring in the reveal.js style
-                $fh = fopen("$confroot/$templates/$cg_editor_presentation_style_filename", "r");
-                $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_editor_presentation_style_filename"));
-                fclose($fh);
-                $extrahead .= "\n      <style>" . $rftemplate . "</style>";
-                //Now the script
-                $fh = fopen("$confroot/$templates/$cg_editor_presentation_js_filename", "r");
-                $rftemplate = fread($fh, filesize("$confroot/$templates/$cg_editor_presentation_js_filename"));
-                fclose($fh);
-                $extrahead .= "\n      <script id='revealJS'>" . $rftemplate . "</script>";
-
-                //Make collaboration track clicks
-                $extrahead .= "<script>var TogetherJSConfig_cloneClicks = true;</script>";
-
-                //Begin the slide sections
-                $htmlcontent .= "<section>$nodetext</section>";
-            } else if ($type == "tabs") {
-                $html .= "\n" . str_repeat('    ', $indent + 1) . "<ul class=\"nav nav-tabs\" id=\"myTab\">";
-                $extrahtml .= "<div class=\"tab-content\">\n";
-            } else if ($parent == "slide" || $type == "slide" || in_array('slide', $parents)) {
-                if (isset($child->outline)) {
-                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<section>$nodetext</section><section>\n";
-                } else {
-                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<section>$nodetext</section>\n";
-                }
-            } else if ($parent == "presentation") {
-                array_push($parents, 'slide');
-                $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<section>$nodetext</section>\n";
-            } else if ($parent == "tabs") {
-                array_push($parents, 'tab');
-                $tabid = 'tab' . stripText((string)$child->attributes()->text);
-                $html .= "\n" . str_repeat('    ', $indent + 1) . "<li><a href=\"#$tabid\" data-toggle=\"tab\">" . strip_tags($nodetext) . "</a></li>";
-                $extrahtml .= "<div class=\"tab-pane\" id=\"$tabid\">\n";
-            } else if (in_array('menu', $parents)) {
-                if (stripos($nodetext, "navatar") !== FALSE) {
-                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "</ul><ul class=\"nav navbar-nav pull-right\"><li>$nodetext</li></ul><ul class=\"nav navbar-nav\">";
-                } else {
-                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<li>$nodetext</li>";
-                }
-            } else if (in_array('html', $parents)) {
-                $htmlcontent .= str_repeat('    ', $indent) . "$nodetext\n";
-            } else if ($type == 'html') {
-                $oldindent = $indent;
-                $indent = 0;
-                $htmlcontent .= str_repeat('    ', $indent) . "$nodetext\n";
-            } else {
-                if (isset($child->outline)) {
-                    $expandible = "<li class=\"owedge$exco\"><span>$nodetext</span>";
-                } else {
-                    $expandible = "";
-                    $expandible = "<li class=\"ou $classes\">$nodetext";
-                    $exco = "";
-                }
-                $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "<ul class=\"$classes\">$expandible";
-            }
-        }
-
-        //Adjust the expansion state tracking
-        $lb = $line + 1;
-        $ne = $expand;
-        $ex = FALSE;
-        if (in_array($expand, $expansionState)) {
-            $ex = TRUE;
-        }
-        if ($expanded || $ex) {
-            $ne = $expand + 1;
-        }
-
-        //Make the recursion call for the next set of nodes
-        list($line, $expand) = buildHtmlFromOpmlRecursive($child, $html, $indent + 1, $line + 1, $expansionState, $ne, $ex, $parents, $extrahtml, $menuexists, $extrahead);
-
-
-        //If this is an outline node, close the open tag.  We take care to keep the html looking good, so don't add spaces
-        //to the end of single line node tags
-        $indention = $indent + 1;
-        if ($lb == $line) {
-            $indention = 0;
-        }
-        if ((string)$child->getName() == "outline") {
-            if ($type == "menu" && $menuexists < 2) {
-                $htmlcontent .= str_repeat('    ', $indention) . "</ul>\n</div>\n</div>\n</div>";
-                $menuexists++;
-            } else if ($type == "collaborate") {
-                $htmlcontent .= "\n";
-            } else if ($type == "presentation") {
-                $htmlcontent .= "";
-            } else if ($type == "tabs") {
-                $html .= str_repeat('    ', $indention) . "</ul>\n";
-                $extrahtml .= str_repeat('    ', $indention) . "</div>\n";
-            } else if ($parent == "slide" || $type == "slide" || in_array('slide', $parents)) {
-                if (isset($child->outline)) {
-                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "</section>\n";
-                } else {
-                    $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "\n";
-                }
-            } else if ($parent == "presentation") {
-                array_pop($parents);
-                $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "\n";
-            } else if ($parent == "tabs") {
-                array_pop($parents);
-                $html .= str_repeat('    ', $indention) . "\n";
-                $extrahtml .= str_repeat('    ', $indention) . "</div>\n";
-            } else if (in_array('menu', $parents) && $type != "html") {
-                $htmlcontent .= "\n" . str_repeat('    ', $indent + 1) . "\n";
-            } else if (in_array('html', $parents)) {
-                $htmlcontent .= str_repeat('    ', $indent) . "";
-            } else if ($type == 'html') {
-                $htmlcontent .= str_repeat('    ', $indent) . "";
-                $indent = $oldindent;
-            } else {
-                $htmlcontent .= str_repeat('    ', $indention) . "</li></ul>\n";
-            }
-
-        }
-
-        if ($indent == 0 && $ex == FALSE) {
-            $expand++;
-        }
-        if (($type == "tabs" || $type == "html" || $type == "document" || $type == "menu" || $type == "presentation") && end(array_values($parents)) != "tabs") {
-            array_pop($parents);
-        }
-    }
-
-
-    return (array($line, $expand));
 }

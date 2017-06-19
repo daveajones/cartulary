@@ -178,6 +178,9 @@ if( $type == 1 ) {
     if($rssdata == FALSE || (is_numeric($rssdata) && $rssdata < 0)) {
         loggit(2, "RSS Error code: [$rssdata]");
         $jsondata['status'] = "false";
+        if($rssdata == -5) {
+            $jsondata['description'] = "One of the enclosures in this feed returned a bad response code. Make sure the url for the enclosure file is valid.";
+        } else
         if($rssdata == -4) {
             $jsondata['description'] = "One of the items has both a blank title and description. At least one is required.";
         } else
@@ -187,7 +190,7 @@ if( $type == 1 ) {
         if($rssdata == -2) {
             $jsondata['description'] = "There were no 'item' nodes found while building the rss feed.";
         } else {
-            $jsondata['description'] = "An unknown error occured during opml to rss conversion.";
+            $jsondata['description'] = "An unknown error occurred during OPML to RSS conversion.";
         }
 
         echo json_encode($jsondata);

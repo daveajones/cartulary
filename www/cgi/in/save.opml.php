@@ -208,7 +208,7 @@ if( $type == 1 ) {
     } else {
         $s3rss = get_s3_url($uid, "/rss/", $rssfilename);
         loggit(3, "Wrote rss to S3 at url: [$s3rss].");
-        set_s3_bucket_cors($s3info['key'], $s3info['secret'], $s3info['bucket']);
+        //set_s3_bucket_cors($s3info['key'], $s3info['secret'], $s3info['bucket']);
     }
 
 }

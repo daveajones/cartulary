@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 69;
+$cg_database_version = 70;
 $cg_database_updates = array();
 
 
@@ -981,6 +981,17 @@ $cg_database_updates[68][] = <<<CGDB0209
 CGDB0209;
 //----------------------------------------------------------------------------------------------------------------
 
+//Version 69 to 70 -----------------------------------------------------------------------------------------------
+$cg_database_updates[69][] = <<<CGDB0210
+ ALTER TABLE `recentfiles` ADD `private` TINYINT NOT NULL AFTER `ipfshash`
+CGDB0210;
+$cg_database_updates[69][] = <<<CGDB0211
+ ALTER TABLE `recentfiles_versions` ADD `private` TINYINT NOT NULL AFTER `ipfshash`
+CGDB0211;
+$cg_database_updates[69][] = <<<CGDB0212
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '70' )
+CGDB0212;
+//----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 
 

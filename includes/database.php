@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 71;
+$cg_database_version = 72;
 $cg_database_updates = array();
 
 
@@ -994,15 +994,27 @@ CGDB0212;
 //----------------------------------------------------------------------------------------------------------------
 
 //Version 70 to 71 -----------------------------------------------------------------------------------------------
-$cg_database_updates[70][] = <<<CGDB0210
+$cg_database_updates[70][] = <<<CGDB0213
  ALTER TABLE `recentfiles` ADD `privtoken` VARCHAR( 80 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'token for private access'
-CGDB0210;
-$cg_database_updates[70][] = <<<CGDB0211
+CGDB0213;
+$cg_database_updates[70][] = <<<CGDB0214
  ALTER TABLE `recentfiles_versions` ADD `privtoken` VARCHAR( 80 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'token for private access'
-CGDB0211;
-$cg_database_updates[70][] = <<<CGDB0212
+CGDB0214;
+$cg_database_updates[70][] = <<<CGDB0215
  INSERT INTO `dbversion` ( `version` ) VALUES ( '71' )
-CGDB0212;
+CGDB0215;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 70 to 71 -----------------------------------------------------------------------------------------------
+$cg_database_updates[71][] = <<<CGDB0216
+  ALTER TABLE `recentfiles` ADD UNIQUE (`privtoken`)
+CGDB0216;
+$cg_database_updates[71][] = <<<CGDB0217
+  ALTER TABLE `recentfiles_versions` ADD UNIQUE (`privtoken`)
+CGDB0217;
+$cg_database_updates[71][] = <<<CGDB0218
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '72' )
+CGDB0218;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

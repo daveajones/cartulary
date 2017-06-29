@@ -10,6 +10,7 @@ $(document).ready(function () {
     var chkDisqusInclude = $('.menuDisqusToggle');
     var chkToggleWatch = $('.menuWatchToggle');
     var chkToggleLock = $('.menuLockToggle');
+    var chkTogglePrivate = $('.menuPrivateToggle');
     var menubar = $('#menubarEditor');
     var nodeTypeSelector = menubar.find('.menuType ul.dropdown-menu');
     var nodeVersionHistory = menubar.find('.menuVersionHistory ul.dropdown-menu');
@@ -23,7 +24,6 @@ $(document).ready(function () {
     var audioAnimate;
     var fileMultiDrop = false;
     var uploaddatestamp = new Date().valueOf() / 1000;
-    var outlinechanged = false;
 
 
 
@@ -82,6 +82,8 @@ $(document).ready(function () {
 
     //Save buttons
     menubar.find('.menuSaveAs').click(function () {
+        title = elTitle.val();
+
         if (lockedOutline) {
             bbCaption = "This outline is locked. Type a new file name.";
         } else {
@@ -96,9 +98,11 @@ $(document).ready(function () {
                 opSetTitle(title);
                 lasttitle = title;
 
-                //Get the filenames sorted
-                //oldfilename = filename;
-                filename = result.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
+                //Get a new filename
+                filename = getFileName(result);
+
+                //This is a new file so clear the token to make the cgi gen a new one
+                privtoken = "";
 
                 //Save the file
                 saveFile(
@@ -110,6 +114,8 @@ $(document).ready(function () {
                     wysiwygOn,
                     watchedOutline,
                     lockedOutline,
+                    privateOutline,
+                    privtoken,
                     opOutlineToXml(ownerName, ownerEmail),
                     undefined,
                     undefined,
@@ -117,6 +123,15 @@ $(document).ready(function () {
                 );
             }
         });
+
+        //Put an existing value in the input box
+        console.log(title);
+        if(title.toLowerCase() != "untitled" && title != "") {
+            setTimeout(function () {
+                $('input.bootbox-input').val(title);
+            }, 500);
+        }
+
         $('#dropdownSave').dropdown('hide');
         return false;
     });
@@ -124,27 +139,50 @@ $(document).ready(function () {
         //Grab the current title
         title = elTitle.val();
 
-        //Get a file name
-        oldfilename = "";
-        if (filename == "") {
-            if (title != "") {
-                filename = title.replace(/\W/g, '').substring(0, 20) + '-' + Math.round((new Date()).getTime() / 1000) + '.opml';
-            } else {
-                filename = bufilename;
-            }
-        }
-
         //Set a title
         opSetTitle(title);
-        lasttitle = title;
 
-        //Save the file
-        if (lockedOutline && wasLocked) {
+        //Check for conditions that would force a "save as..."
+        if ( (lockedOutline && wasLocked) || title.toLowerCase() == "untitled" || title == "") {
             menubar.find('.menuSaveAs').trigger('click');
-        } else {
-            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false);
+            $('#dropdownSave').dropdown('hide');
+            return false;
         }
+
+        //If the title of the outline changed prompt if the user wants to save
+        //this as a new file or not
+        if( title != lasttitle ) {
+            bootbox.dialog({
+                message: "You changed the title of this outline. Do you want to save it as a new file or overwrite the current file?",
+                buttons: {
+                    confirm: {
+                        label: 'Save as New',
+                        callback: function() {
+                            console.log("confirm callback");
+                            //Get a file name
+                            oldfilename = "";
+                            filename = getFileName(title);
+                            privtoken = "";
+                            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false);
+                            lasttitle = title;
+                        }
+                    },
+                    cancel: {
+                        label: 'Overwrite',
+                        callback: function() {
+                            console.log("cancel callback");
+                            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false);
+                            lasttitle = title;
+                        }
+                    }
+                }
+            });
+        } else {
+            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false);
+        }
+
         $('#dropdownSave').dropdown('hide');
+
         return false;
     });
     menubar.find('.menuSaveArticle').click(function () {
@@ -169,7 +207,7 @@ $(document).ready(function () {
         if (lockedOutline && wasLocked) {
             alert("This file is currently locked for editing.");
         } else {
-            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, opOutlineToXml(ownerName, ownerEmail), undefined, true);
+            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, true);
         }
         $('#dropdownSave').dropdown('hide');
         return false;
@@ -626,6 +664,17 @@ $(document).ready(function () {
         }
     });
 
+    //Toggle private outline
+    chkTogglePrivate.click(function () {
+        if ($(this).parent().hasClass('active')) {
+            $(this).parent().removeClass('active');
+            privateOutline = false;
+        } else {
+            $(this).parent().addClass('active');
+            privateOutline = true;
+        }
+    });
+
     //Toolbox buttons
     menubar.find('.menuAddLink').click(function () {
         editorToolAddLink();
@@ -740,47 +789,8 @@ $(document).ready(function () {
         //Save the file
         saveArchive(atitle, afilename, type, '', false, false, xmlArchive, arcplaceholder);
     });
-    menubar.find('.menuGenerateMorse').click(function () {
-        if (audioOut == true) {
-            nextStep = stopTone();
-            return false;
-        }
-
-        var morsestring = getSelected();
-        if (morsestring == "" || morsestring == "...") {
-            morsestring = opGetLineText();
-        } else {
-            morsestring = new String(morsestring);
-        }
-
-        morsestring = stripTags(morsestring);
-        morsestring.replace(/[^a-zA-Z 0-9?.]+/g, '');
-        morsestring = morsestring.toLowerCase().split("");
-
-        //Initialize values according to current speed
-        cDit = (dit / speed) / 1000;
-        cDot = (dit / speed) / 1000;
-        cDash = (cDot * 3);
-        clGap = cDash + cDot;
-        cwGap = (cDot * 7);
-
-        initAudio();
-        nextStep = startTone(700);
-
-
-        morsestring.forEach(function (letter) {
-            //console.log("STarting letter: [" + letter + "]");
-            if (letter !== " ") nextStep += clGap;
-            if (letter === " ") {
-                nextStep += cwGap;
-            } else {
-                var md = convertLetterToMorseData(letter);
-                nextStep = outputLetter(md, nextStep);
-            }
-        });
-
-        nextStep = stopTone(nextStep + 1);
-        return false;
+    menubar.find('.menuUnarchiveNodes').click(function() {
+        alert("Work on this feature is in progress.")
     });
     menubar.find('.menuChangeTimestamp').click(function () {
         var oldcreated = opGetOneAtt('created');
@@ -869,7 +879,7 @@ $(document).ready(function () {
     });
 
     //Load the outline content
-    if (!isBlank(url) && type != 2 && !versionRequest) {
+    if (!isBlank(url) && type != 2 && !versionRequest && !privateOutline) {
         if (url.indexOf("ipfs://") == 0) {
             actionurl = '/cgi/out/get.ipfs.json';
         } else {
@@ -909,27 +919,15 @@ $(document).ready(function () {
                 }
                 //Set the title of the html document
                 document.title = title + " - FC";
+                lasttitle = title;
 
                 //Set up the root node type correctly
                 getRootNodeType();
 
-                //Set the menu bar info
-                //updateOutlineInfo(url, data.html, redirect);
+                setToggleStates();
 
-                //Set the default toggle states
-                if (includeDisqus) {
-                    chkDisqusInclude.parent().addClass('active');
-                }
-                if (wysiwygOn) {
-                    outliner.concord().op.setRenderMode(true);
-                    chkToggleRender.parent().addClass('active');
-                }
-                if (watchedOutline) {
-                    chkToggleWatch.parent().addClass('active');
-                }
-                if (lockedOutline) {
-                    chkToggleLock.parent().addClass('active');
-                }
+                opClearChanged();
+
                 loading.hide();
             }
         });
@@ -943,7 +941,11 @@ $(document).ready(function () {
         elTitle.val(title);
         //Set the title of the html document
         document.title = title + " - FC";
+        lasttitle = title;
 
+        setToggleStates();
+
+        opClearChanged();
     }
     title = opGetTitle();
 
@@ -1044,16 +1046,23 @@ $(document).ready(function () {
     $('#divEditorEnclosures').offset({top: 0, left: 0}).offset($('#divEditOutline').offset());
 
     //Save a file
-    function saveFile(ftitle, fname, ftype, fredirect, fdisqus, fwysiwyg, fwatched, flocked, fopml, foldname, asarticle, jumptourl) {
+    function saveFile(ftitle, fname, ftype, fredirect, fdisqus, fwysiwyg, fwatched, flocked, fprivate, fprivtoken, fopml, foldname, asarticle, jumptourl) {
         var _foldname = (typeof foldname === "undefined") ? "" : foldname;
         var _asarticle = (typeof asarticle === "undefined") ? false : asarticle;
         var _jumptourl = (typeof jumptourl === "undefined") ? false : jumptourl;
+        var _privtoken = (typeof fprivtoken === "undefined") ? "" : fprivtoken;
         var menubar = $('#menubarEditor');
 
         //Render the title and byline?
         var rendertitle = true;
         if (!$('.rendertitle').is(':checked')) {
             rendertitle = false;
+        }
+
+        //If outline is not private clear the token
+        if(!privateOutline) {
+            privtoken = "";
+            _privtoken = "";
         }
 
         //Make the ajax call
@@ -1070,6 +1079,8 @@ $(document).ready(function () {
                 "wysiwyg": fwysiwyg,
                 "watched": fwatched,
                 "locked": flocked,
+                "private": fprivate,
+                "privtoken": _privtoken,
                 "title": ftitle,
                 "rendertitle": rendertitle,
                 "aid": aid,
@@ -1080,17 +1091,24 @@ $(document).ready(function () {
                 //Disable the save button and show a spinner
                 menubar.find('.saves').attr('disabled', true);
                 menubar.find('#dropdownSave').html('<i class="fa fa-spinner"></i> Saving...');
+
+                //Reset the global change state to false
+                opClearChanged();
             },
             success: function (data) {
                 //Show returned info and re-enable the save button
                 url = data.url;
                 htmlurl = data.html;
 
+                privtoken = data.privtoken;
+
                 if (data.status === "true") {
                     updateOutlineInfo(url, data, redirect);
                     showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
                 } else {
                     showMessage(data.description, data.status, 8);
+                    //If save failed keep the outline in a changed state
+                    opMarkChanged();
                 }
                 menubar.find('#dropdownSave').html('Save');
                 menubar.find('.saves').attr('disabled', false);
@@ -1110,6 +1128,7 @@ $(document).ready(function () {
     }
 
     //Save an archive
+    //TODO: fail on trying to archive a private OPML file
     function saveArchive(ftitle, fname, ftype, fredirect, fdisqus, fwysiwyg, fopml, arcurlstamp) {
         //Make the ajax call
         $.ajax({
@@ -1296,7 +1315,12 @@ $(document).ready(function () {
 
         elOutlineinfo.html('');
         if (url != "") {
-            elOutlineinfo.html('<li><a target="_blank" title="Link to opml source of this outline." href="' + url + '">OPML</a></li>');
+            if( !privateOutline ) {
+                elOutlineinfo.html('<li><a target="_blank" title="Link to opml source of this outline." href="' + url + '">OPML</a></li>');
+            }
+            if (privateOutline && !isEmpty(privtoken)) {
+                htmlurl = "/evex?pt=" + privtoken;
+            } else
             if (data.html == "" || data.html === undefined) {
                 htmlurl = url.replace("/opml/", "/html/");
                 htmlurl = htmlurl.substr(0, htmlurl.lastIndexOf(".")) + ".html";
@@ -1874,12 +1898,16 @@ $(document).ready(function () {
             },
             success: function (data) {
                 //Iterate
-                data.versions.map(function (item) {
-                    var df = new Date(0);
-                    df.setUTCSeconds(item.time);
-                    nodeVersionHistory.append('<li><a href="/editor?url='+item.url+'&versionid='+item.id+'" class="menuTypeSelection version" title="' + item.title + '" data-type="' + item.type + '">' + dateFormat(df, "m/d/yy @ h:MM:ss TT") + ' ('+bytesToSize(item.size, 2)+')</a></li>');
-                });
-                if (data.versions.length < 1) {
+                if( typeof data.versions !== "undefined" ) {
+                    data.versions.map(function (item) {
+                        var df = new Date(0);
+                        df.setUTCSeconds(item.time);
+                        nodeVersionHistory.append('<li><a href="/editor?url='+item.url+'&versionid='+item.id+'" class="menuTypeSelection version" title="' + item.title + '" data-type="' + item.type + '">' + dateFormat(df, "m/d/yy @ h:MM:ss TT") + ' ('+bytesToSize(item.size, 2)+')</a></li>');
+                    });
+                    if (data.versions.length < 1) {
+                        nodeVersionHistory.append('<li><a href="#" class="menuTypeSelection message">No history...</a></li>');
+                    }
+                } else {
                     nodeVersionHistory.append('<li><a href="#" class="menuTypeSelection message">No history...</a></li>');
                 }
             },
@@ -1887,5 +1915,71 @@ $(document).ready(function () {
                 nodeVersionHistory.append('<li><a href="#" class="menuTypeSelection message">Error getting history.</a></li>');
             }
         });
+    }
+
+    //Generate a random string
+    //__via: https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+    function makeid(len)
+    {
+        var text = "";
+        var possible = "BCDFGHJKLMNPQRSTVWXZbcdfghjklmnpqrstvwxz0123456789";
+
+        for( var i=0; i < len; i++ ) {
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+
+        return text;
+    }
+
+    //Hook the page exit event if the outline is changed
+    window.onbeforeunload = function (e) {
+        var message = "Your outline has changed. Are you sure you want to leave the page without saving?",
+            e = e || window.event;
+
+        if(opHasChanged()) {
+            // For IE and Firefox
+            if (e) {
+                e.returnValue = message;
+            }
+
+            // For Safari
+            return message;
+
+        } else {
+            return null;
+        }
+    };
+
+    function setToggleStates() {
+        //Set the default toggle states
+        if (includeDisqus) {
+            chkDisqusInclude.parent().addClass('active');
+        }
+        if (wysiwygOn) {
+            outliner.concord().op.setRenderMode(true);
+            chkToggleRender.parent().addClass('active');
+        }
+        if (watchedOutline) {
+            chkToggleWatch.parent().addClass('active');
+        }
+        if (lockedOutline) {
+            chkToggleLock.parent().addClass('active');
+        }
+        if (privateOutline) {
+            chkTogglePrivate.parent().addClass('active');
+        }
+
+        return true;
+    }
+
+    function getFileName(ouTitle) {
+
+        if (ouTitle != "") {
+            newFilename = ouTitle.replace(/\W/g, '').substring(0, 20) + '-' + makeid(30) + '.opml';
+        } else {
+            newFilename = bufilename;
+        }
+
+        return newFilename;
     }
 });

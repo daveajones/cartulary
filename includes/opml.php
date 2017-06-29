@@ -2991,7 +2991,7 @@ function get_watched_files($max = NULL)
 }
 
 
-//Return a list of files recently edited by this user in the editor
+//Return a file by its url
 function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 {
     //Check parameters
@@ -3012,9 +3012,9 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 
     //Do the query
     if ($blob) {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, articleid, ipfshash, outline FROM $table_recentfiles WHERE userid=? AND url=?";
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, articleid, ipfshash, private, privtoken, outline FROM $table_recentfiles WHERE userid=? AND url=?";
     } else {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, articleid, ipfshash FROM $table_recentfiles WHERE userid=? AND url=?";
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, articleid, ipfshash, private, privtoken FROM $table_recentfiles WHERE userid=? AND url=?";
     }
 
 
@@ -3033,9 +3033,9 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
     }
 
     if ($blob) {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $farticleid, $ipfshash, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $farticleid, $ipfshash, $fprivate, $fprivtoken, $foutline) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $farticleid, $ipfshash) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $farticleid, $ipfshash, $fprivate, $fprivtoken) or loggit(2, "MySql error: " . $dbh->error);
     }
 
 
@@ -3052,7 +3052,9 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
             'type' => $ftype,
             'locked' => $flocked,
             'articleid' => $farticleid,
-            'ipfshash' => $ipfshash
+            'ipfshash' => $ipfshash,
+            'private' => $fprivate,
+            'privtoken' => $fprivtoken
         );
         if ($blob) {
             $files[$count]['content'] = $foutline;
@@ -3063,7 +3065,83 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
     loggit(1, "Returning: [$count] files for user: [$uid]");
-    return ($files);
+    return ($files[0]);
+}
+
+
+//Return a file by its private token
+function get_recent_file_by_privtoken($privtoken = NULL, $blob = FALSE)
+{
+    //Check parameters
+    if (empty($privtoken)) {
+        loggit(2, "The private token value given is corrupt or blank: [$privtoken]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    if ($blob) {
+        $sqltxt = "SELECT id, userid, title, url, time, disqus, wysiwyg, watched, type, locked, articleid, ipfshash, private, privtoken, outline FROM $table_recentfiles WHERE privtoken=?";
+    } else {
+        $sqltxt = "SELECT id, userid, title, url, time, disqus, wysiwyg, watched, type, locked, articleid, ipfshash, private, privtoken FROM $table_recentfiles WHERE privtoken=?";
+    }
+
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $privtoken) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files returned
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No files returned for: [$privtoken] with the given criteria.");
+        return (array());
+    }
+
+    if ($blob) {
+        $sql->bind_result($fid, $fuid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $farticleid, $ipfshash, $fprivate, $fprivtoken, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+    } else {
+        $sql->bind_result($fid, $fuid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $farticleid, $ipfshash, $fprivate, $fprivtoken) or loggit(2, "MySql error: " . $dbh->error);
+    }
+
+
+    $files = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $files[$count] = array(
+            'id' => $fid,
+            'uid' => $fuid,
+            'title' => $ftitle,
+            'url' => $furl,
+            'time' => $ftime,
+            'disqus' => $fdisqus,
+            'wysiwyg' => $fwysiwyg,
+            'watched' => $fwatched,
+            'type' => $ftype,
+            'locked' => $flocked,
+            'articleid' => $farticleid,
+            'ipfshash' => $ipfshash,
+            'private' => $fprivate,
+            'privtoken' => $fprivtoken
+        );
+        if ($blob) {
+            $files[$count]['content'] = $foutline;
+        }
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning: [$count] files for private token: [$privtoken]");
+    return ($files[0]);
 }
 
 
@@ -3088,12 +3166,12 @@ function get_recent_file_versions_by_url($uid = NULL, $url = NULL, $blob = FALSE
 
     //Do the query
     if ($blob) {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash, outline, CHAR_LENGTH(outline) 
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash, private, privtoken, outline, CHAR_LENGTH(outline) 
                    FROM $table_recentfilesversions 
                    WHERE userid=? AND url=?
                    ORDER BY time DESC";
     } else {
-        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash, CHAR_LENGTH(outline)
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash, private, privtoken, CHAR_LENGTH(outline)
                    FROM $table_recentfilesversions 
                    WHERE userid=? AND url=?
                    ORDER BY time DESC";
@@ -3115,9 +3193,9 @@ function get_recent_file_versions_by_url($uid = NULL, $url = NULL, $blob = FALSE
     }
 
     if ($blob) {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash, $foutline, $fsize) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash, $fprivate, $fprivtoken, $foutline, $fsize) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash, $fsize) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash, $fprivate, $fprivtoken, $fsize) or loggit(2, "MySql error: " . $dbh->error);
     }
 
 
@@ -3134,7 +3212,9 @@ function get_recent_file_versions_by_url($uid = NULL, $url = NULL, $blob = FALSE
             'type' => $ftype,
             'locked' => $flocked,
             'ipfshash' => $ipfshash,
-            'size' => $fsize
+            'size' => $fsize,
+            'private' => $fprivate,
+            'privtoken' => $fprivtoken
         );
         if ($blob) {
             $files[$count]['content'] = $foutline;
@@ -3174,7 +3254,7 @@ function get_recent_file_version_by_url($uid = NULL, $url = NULL, $vid = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Do the query
-    $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash, outline 
+    $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, ipfshash, private, privtoken, outline 
                FROM $table_recentfilesversions 
                WHERE userid=? AND url=? AND id=?
                ORDER BY time DESC";
@@ -3193,7 +3273,7 @@ function get_recent_file_version_by_url($uid = NULL, $url = NULL, $vid = NULL)
         return (array());
     }
 
-    $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $ipfshash, $fprivate, $fprivtoken, $foutline) or loggit(2, "MySql error: " . $dbh->error);
 
     $files = array();
     $count = 0;
@@ -3207,7 +3287,9 @@ function get_recent_file_version_by_url($uid = NULL, $url = NULL, $vid = NULL)
             'watched' => $fwatched,
             'type' => $ftype,
             'locked' => $flocked,
-            'ipfshash' => $ipfshash
+            'ipfshash' => $ipfshash,
+            'private' => $fprivate,
+            'privtoken' => $fprivtoken
         );
         $files[$count]['content'] = $foutline;
         $count++;
@@ -3221,7 +3303,7 @@ function get_recent_file_version_by_url($uid = NULL, $url = NULL, $vid = NULL)
 
 
 //Update a file into the recent files table
-function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $type = 0, $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE, $articleid = NULL, $locked = FALSE, $ipfshash = "")
+function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = "", $type = 0, $oldurl = "", $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE, $articleid = NULL, $locked = FALSE, $ipfshash = "", $private = FALSE, $privtoken = "")
 {
     //Check parameters
     if (empty($uid)) {
@@ -3258,6 +3340,15 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     }
     if (empty($ipfshash)) {
         $ipfshash = "";
+    }
+    if (!$private) {
+        $private = 0;
+    } else {
+        $private = 1;
+        if(empty($privtoken)) {
+            loggit(2, "Private was enabled but no token given: [$privtoken]");
+            return (FALSE);
+        }
     }
 
 
@@ -3272,17 +3363,70 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
 
     //Insert recent file entry
     if (empty($oldurl)) {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type, ipfshash)
-                                         VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?,        ?)
-                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?, ipfshash=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type, ipfshash, private, privtoken)
+                                         VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?,        ?,       ?,         ?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?, ipfshash=?, private=?, privtoken=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssddddsddssdsdddsds", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $ipfshash, $title, $time, $outline, $disqus, $wysiwyg, $watched, $articleid, $locked, $ipfshash) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsddsdssdsdddsdsds",
+            $uid,
+            $url,
+            $title,
+            $outline,
+            $time,
+            $disqus,
+            $wysiwyg,
+            $watched,
+            $articleid,
+            $locked,
+            $type,
+            $ipfshash,
+            $private,
+            $privtoken,
+            $title,
+            $time,
+            $outline,
+            $disqus,
+            $wysiwyg,
+            $watched,
+            $articleid,
+            $locked,
+            $ipfshash,
+            $private,
+            $privtoken
+        ) or loggit(2, "MySql error: " . $dbh->error);
     } else {
-        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type, ipfshash)
-                                         VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?,        ?)
-                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?, ipfshash=?";
+        $stmt = "INSERT INTO $table_recentfiles (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type, ipfshash, private, privtoken)
+                                         VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?,        ?,       ?,         ?)
+                 ON DUPLICATE KEY UPDATE title=?, time=?, outline=?, url=?, disqus=?, wysiwyg=?, watched=?, articleid=?, locked=?, ipfshash=?, private=?, privtoken=?";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-        $sql->bind_param("ssssddddsddssdssdddsds", $uid, $oldurl, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $ipfshash, $title, $time, $outline, $url, $disqus, $wysiwyg, $watched, $articleid, $locked, $ipfshash) or loggit(2, "MySql error: " . $dbh->error);
+        $sql->bind_param("ssssddddsddsdssdssdddsdsds",
+            $uid,
+            $oldurl,
+            $title,
+            $outline,
+            $time,
+            $disqus,
+            $wysiwyg,
+            $watched,
+            $articleid,
+            $locked,
+            $type,
+            $ipfshash,
+            $private,
+            $privtoken,
+            $title,
+            $time,
+            $outline,
+            $url,
+            $disqus,
+            $wysiwyg,
+            $watched,
+            $articleid,
+            $locked,
+            $ipfshash,
+            $private,
+            $privtoken
+        ) or loggit(2, "MySql error: " . $dbh->error);
         loggit(3, "User: [$uid] changed old url: [$oldurl] to new url: [$url].");
     }
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -3296,7 +3440,7 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
 
 
 //Add a version history entry for an editor file
-function add_recent_file_version($uid = NULL, $url = NULL, $title = NULL, $outline = "", $type = 0, $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE, $articleid = NULL, $locked = FALSE, $ipfshash = "")
+function add_recent_file_version($uid = NULL, $url = NULL, $title = NULL, $outline = "", $type = 0, $disqus = FALSE, $wysiwyg = FALSE, $watched = FALSE, $articleid = NULL, $locked = FALSE, $ipfshash = "", $private = FALSE, $privtoken = "")
 {
     //Check parameters
     if (empty($uid)) {
@@ -3334,6 +3478,15 @@ function add_recent_file_version($uid = NULL, $url = NULL, $title = NULL, $outli
     if (empty($ipfshash)) {
         $ipfshash = "";
     }
+    if (!$private) {
+        $private = 0;
+    } else {
+        $private = 1;
+        if(empty($privtoken)) {
+            loggit(2, "Private was enabled but no token given: [$privtoken]");
+            return (FALSE);
+        }
+    }
 
 
     //Timestamp
@@ -3346,10 +3499,10 @@ function add_recent_file_version($uid = NULL, $url = NULL, $title = NULL, $outli
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Insert recent file entry
-    $stmt = "INSERT INTO $table_recentfilesversions (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type, ipfshash)
-                                             VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?,        ?)";
+    $stmt = "INSERT INTO $table_recentfilesversions (userid, url, title, outline, time, disqus, wysiwyg, watched, articleid, locked, type, ipfshash, private, privtoken)
+                                             VALUES (     ?,   ?,     ?,       ?,    ?,      ?,       ?,       ?,         ?,      ?,    ?,        ?,       ?,         ?)";
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("ssssddddsdds", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $ipfshash)
+    $sql->bind_param("ssssddddsddsds", $uid, $url, $title, $outline, $time, $disqus, $wysiwyg, $watched, $articleid, $locked, $type, $ipfshash, $private, $privtoken)
            or loggit(2, "MySql error: " . $dbh->error);
 
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);

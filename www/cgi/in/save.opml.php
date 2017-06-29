@@ -92,6 +92,24 @@ if ( isset($_REQUEST['locked']) && $_REQUEST['locked'] == "true" ) {
     $locked = TRUE;
 }
 
+//Get private bool
+$private = FALSE;
+if ( isset($_REQUEST['private']) && $_REQUEST['private'] == "true" ) {
+    $private = TRUE;
+}
+
+//Get private token
+$privtoken = "";
+if ( isset($_REQUEST['privtoken']) && !empty($_REQUEST['privtoken']) ) {
+    $privtoken = $_REQUEST['privtoken'];
+}
+
+
+//If the outline is private make sure we have a token
+if( $private && empty($privtoken) ) {
+    $privtoken = time().random_gen(64);
+}
+
 //Make sure we have a filename to use
 if ( isset($_REQUEST['filename']) ) {
     $filename = $_REQUEST['filename'];
@@ -125,18 +143,25 @@ if ( isset($_REQUEST['opml']) ) {
 
 //Put the opml file in S3
 $s3info = get_s3_info($uid);
-$s3res = putInS3($opml, $filename, $s3info['bucket']."/opml", $s3info['key'], $s3info['secret'], "text/xml");
-if(!$s3res) {
-    loggit(2, "Could not create S3 file: [$filename] for user: [$uid].");
-    loggit(3, "Could not create S3 file: [$filename] for user: [$uid].");
-    //Log it
-    $jsondata['status'] = "false";
-    $jsondata['description'] = "Error writing to S3.";
-    echo json_encode($jsondata);
-    exit(1);
+if(!$private) {
+    $s3res = putInS3($opml, $filename, $s3info['bucket']."/opml", $s3info['key'], $s3info['secret'], "text/xml", $private);
+    if(!$s3res) {
+        loggit(2, "Could not create S3 file: [$filename] for user: [$uid].");
+        loggit(3, "Could not create S3 file: [$filename] for user: [$uid].");
+        //Log it
+        $jsondata['status'] = "false";
+        $jsondata['description'] = "Error writing to S3.";
+        echo json_encode($jsondata);
+        exit(1);
+    } else {
+        $s3url = get_s3_url($uid, "/opml/", $filename);
+        loggit(1, "Wrote opml to S3 at url: [$s3url].");
+    }
 } else {
+    //Delete the opml file from S3 if the outline is marked private since it's not even usable
+    loggit(3, "Deleting private outline OPML in S3: [".$s3info['bucket']."/opml"." | ".$filename."]");
+    $s3res = deleteFromS3($filename, $s3info['bucket']."/opml", $s3info['key'], $s3info['secret']);
     $s3url = get_s3_url($uid, "/opml/", $filename);
-    loggit(1, "Wrote opml to S3 at url: [$s3url].");
 }
 
 //Put the opml content in IPFS
@@ -151,9 +176,10 @@ if ( !empty($oldfilename) ) {
 
 //Put the html file in S3
 $htmlfilename = str_replace('.opml', '.html', $filename);
+$s3htmlauthurl = "";
 $s3htmlurl = get_s3_url($uid, "/html/", $htmlfilename);
 $htmldata = process_opml_to_html($opml, $title, $uid, $disqus, $s3url, $rendertitle, $s3htmlurl);
-$s3res = putInS3($htmldata, $htmlfilename, $s3info['bucket']."/html", $s3info['key'], $s3info['secret'], "text/html");
+$s3res = putInS3($htmldata, $htmlfilename, $s3info['bucket']."/html", $s3info['key'], $s3info['secret'], "text/html", $private);
 if(!$s3res) {
     loggit(2, "Could not create S3 file: [$htmlfilename] for user: [$uid].");
     loggit(3, "Could not create S3 file: [$htmlfilename] for user: [$uid].");
@@ -165,6 +191,12 @@ if(!$s3res) {
 } else {
     $s3html = get_s3_url($uid, "/html/", $htmlfilename);
     loggit(1, "Wrote html to S3 at url: [$s3html].");
+
+    //If the HTML file was private we need to create an authenticated url for accessing it that lasts for the maximum time of 7 days
+    if($private) {
+        //$s3htmlauthurl = get_s3_authenticated_url($s3info['key'], $s3info['secret'], $s3info['bucket'], "html/$htmlfilename", 10080);
+    }
+
 }
 
 
@@ -196,7 +228,7 @@ if( $type == 1 ) {
         echo json_encode($jsondata);
         exit(1);
     }
-    $s3res = putInS3($rssdata, $rssfilename, $s3info['bucket']."/rss", $s3info['key'], $s3info['secret'], "application/rss+xml");
+    $s3res = putInS3($rssdata, $rssfilename, $s3info['bucket']."/rss", $s3info['key'], $s3info['secret'], "application/rss+xml", $private);
     if(!$s3res) {
         loggit(2, "Could not create S3 file: [$rssfilename] for user: [$uid].");
         loggit(3, "Could not create S3 file: [$rssfilename] for user: [$uid].");
@@ -216,10 +248,8 @@ if( $type == 1 ) {
 //Get the current file details
 if( $s3oldurl != $s3url && !empty($s3oldurl) && !empty($s3url) ) {
     $cfile = get_recent_file_by_url($uid, $s3oldurl, TRUE);
-    $cfile = $cfile[0];
 } else {
     $cfile = get_recent_file_by_url($uid, $s3url, TRUE);
-    $cfile = $cfile[0];
 }
 
 //Update the recent file version table
@@ -227,14 +257,14 @@ $temp_opml = preg_replace('/\<dateModified\>.*\<\/dateModified\>/', '', $opml);
 $temp_prevopml = preg_replace('/\<dateModified\>.*\<\/dateModified\>/', '', $cfile['content']);
 if( $temp_opml != $temp_prevopml && !empty($cfile['content']) && !empty($opml) && !empty($temp_opml) && !empty($temp_prevopml) ) {
     loggit(3, "DEBUG: Editor file content changed. Saving old version in version table.");
-    add_recent_file_version($uid, $s3url, $cfile['title'], $cfile['content'], $cfile['type'], $cfile['disqus'], $cfile['wysiwyg'], $cfile['watched'], $cfile['articleid'], $cfile['locked'], $cfile['ipfshash']);
+    add_recent_file_version($uid, $s3url, $cfile['title'], $cfile['content'], $cfile['type'], $cfile['disqus'], $cfile['wysiwyg'], $cfile['watched'], $cfile['articleid'], $cfile['locked'], $cfile['ipfshash'], $private);
 } else {
     loggit(3, "DEBUG: Editor file content not changed.");
 }
 
 
 //Update recent file table
-$rid = update_recent_file($uid, $s3url, $title, $opml, $type, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked, $opmlhash);
+$rid = update_recent_file($uid, $s3url, $title, $opml, $type, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked, $opmlhash, $private, $privtoken);
 loggit(3, "DEBUG: Recent file id is [$rid].");
 
 //Was this an edited article content request
@@ -246,6 +276,7 @@ if( $articleoverwrite && !empty($aid) ) {
 //Go ahead and put in the urls we saved
 $jsondata['url'] = $s3url;
 $jsondata['html'] = $s3html;
+$jsondata['htmlauth'] = $s3htmlauthurl;
 if(!empty($opmlhash)) {
     $jsondata['ipfs']['opml'] = $opmlhash;
 }
@@ -265,7 +296,6 @@ if($watched) {
 }
 
 //Update the redirector table
-
 if( !empty($rhost) ) {
     //Let's not clobber existing redirects
     $erurl = get_redirection_url_by_host_name($rhost);
@@ -344,6 +374,7 @@ loggit(3,"Saved: [$filename] to S3 for user: [$uid]. ");
 
 //Give feedback that all went well
 $jsondata['status'] = "true";
+$jsondata['privtoken'] = $privtoken;
 $jsondata['description'] = "File saved to S3.";
 echo json_encode($jsondata);
 

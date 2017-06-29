@@ -1007,10 +1007,10 @@ CGDB0215;
 
 //Version 70 to 71 -----------------------------------------------------------------------------------------------
 $cg_database_updates[71][] = <<<CGDB0216
-  ALTER TABLE `recentfiles` ADD UNIQUE (`privtoken`)
+  ALTER TABLE `recentfiles` ADD INDEX (`privtoken`)
 CGDB0216;
 $cg_database_updates[71][] = <<<CGDB0217
-  ALTER TABLE `recentfiles_versions` ADD UNIQUE (`privtoken`)
+  ALTER TABLE `recentfiles_versions` ADD INDEX (`privtoken`)
 CGDB0217;
 $cg_database_updates[71][] = <<<CGDB0218
  INSERT INTO `dbversion` ( `version` ) VALUES ( '72' )

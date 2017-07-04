@@ -796,10 +796,6 @@ $(document).ready(function () {
 
         console.log(selnodes);
 
-        // for( var i = 0 ; i < selnodes.length ; i++ ) {
-        //     $(selnodes[i]).removeClass('concord-cursor');
-        // }
-
         for( var i = 0 ; i < selnodes.length ; i++ ) {
             var ntype = selnodes[i].attributes.getOne('type');
             var nurl = selnodes[i].attributes.getOne('url');
@@ -816,6 +812,7 @@ $(document).ready(function () {
                             loading.show();
                         },
                         success: function (data) {
+                            nodeforinsert.deleteSubs();
                             nodeforinsert.insertXml(data.data, right);
                             loading.hide();
                             nodeforinsert.attributes.removeOne('icon');

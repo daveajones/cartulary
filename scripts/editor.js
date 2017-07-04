@@ -790,7 +790,49 @@ $(document).ready(function () {
         saveArchive(atitle, afilename, type, '', false, false, xmlArchive, arcplaceholder);
     });
     menubar.find('.menuUnarchiveNodes').click(function() {
-        alert("Work on this feature is in progress.")
+        //Iterate over every node and check if its an include node
+        //if it is, import the outline referenced and remove type=include
+        var selnodes = opGetSelectedNodes();
+
+        console.log(selnodes);
+
+        // for( var i = 0 ; i < selnodes.length ; i++ ) {
+        //     $(selnodes[i]).removeClass('concord-cursor');
+        // }
+
+        for( var i = 0 ; i < selnodes.length ; i++ ) {
+            var ntype = selnodes[i].attributes.getOne('type');
+            var nurl = selnodes[i].attributes.getOne('url');
+
+            if(typeof ntype !== "undefined" && typeof nurl !== "undefined") {
+                (function() {
+                    var nodeforinsert = selnodes[i];
+                    $.ajax({
+                        type: 'POST',
+                        url: '/cgi/out/get.url.json?url=' + nurl,
+                        dataType: "json",
+                        beforeSend: function () {
+                            nodeforinsert.setCursorContext();
+                            loading.show();
+                        },
+                        success: function (data) {
+                            nodeforinsert.insertXml(data.data, right);
+                            loading.hide();
+                            nodeforinsert.attributes.removeOne('icon');
+                            nodeforinsert.attributes.setOne('icon', 'caret-right');
+                            nodeforinsert.attributes.removeOne('type');
+                            nodeforinsert.attributes.removeOne('url');
+                        },
+                        error: function () {
+                            showMessage("Error loading import url.", false, 5);
+                            loading.hide();
+                        }
+                    });
+                })();
+
+            }
+        }
+
     });
     menubar.find('.menuChangeTimestamp').click(function () {
         var oldcreated = opGetOneAtt('created');
@@ -816,6 +858,7 @@ $(document).ready(function () {
 
         //Iterate over every node, doing the replacement
         opVisitAll(function (op) {
+            //console.log(op);
             var ltext = op.getLineText();
             if (ltext.indexOf(search) != -1) {
                 var r = new RegExp(search, 'g');

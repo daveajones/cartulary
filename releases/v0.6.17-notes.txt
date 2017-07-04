@@ -1,0 +1,29 @@
+#Release Notes - Freedom Controller v0.6.17
+
+
+
+- Bug Fixes (the notable ones)
+    - We should have been checking HTTP status code when adding enclosures to RSS feeds in the editor.  If the enclosure
+      url HEAD check returns a greater than 399 status code then error out.
+    - Change domain refs in blank RSS outline template to point to a subdomain we own to prevent hijacking in the future.
+
+- New Feature: Editor - private outlines
+    - There is now an option in the editor toolbar to make an outline private. Default is always "public" in the S3 bucket.
+    - Just click on the circle with the slash through it and then save the outline.  The OPML will be marked private in S3 and the HTML
+      will be removed from S3.
+    - The HTML link will then be replaced with a server-referenced url with a 75 character random token.  This can be shared
+      for private viewing.
+
+- New Feature Editor - Unarchive nodes
+    - If you have an "include" type node selected, you can click the unarchive button on the toolbar to suck the included outlines
+      nodes back into this outline and remove the include reference.
+    - If you have multiple include nodes selected they will all be sucked back in.
+    - This is very useful if you produce a search outline with the 'OPML:' search keyword and want to turn it into a single large
+      outline without all the includes.
+
+
+- Improvements:
+    - Editor now prompts if you want to "save as..." when you save after changing the title of an outline.
+    - Editor prompts if you're sure you want to leave the page if you have unsaved changes.
+    - Updated Font-awesome to latest version.
+    - Removed morse code tool from editor.

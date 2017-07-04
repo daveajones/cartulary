@@ -2145,6 +2145,83 @@ function putInS3old($content, $filename, $bucket, $key, $secret, $headers = NULL
 
 
 //Put a string of data into an S3 file
+function deleteFromS3($filename, $bucket, $key, $secret)
+{
+
+    //Check parameters
+    if (empty($filename)) {
+        loggit(2, "Filename missing from S3 put call: [$filename].");
+        return (FALSE);
+    }
+    if (empty($bucket)) {
+        loggit(2, "Bucket missing from S3 put call: [$bucket].");
+        return (FALSE);
+    }
+    if (empty($key)) {
+        loggit(2, "Key missing from S3 put call: [$key].");
+        return (FALSE);
+    }
+    if (empty($secret)) {
+        loggit(2, "Secret missing from S3 put call: [$secret].");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+    //Set up
+    require_once "$confroot/$libraries/aws/aws-autoloader.php";
+
+    $s3 = new \Aws\S3\S3MultiRegionClient([
+        'version' => 'latest',
+        'signature' => 'v4',
+        'credentials' => array(
+            'key' => $key,
+            'secret' => $secret
+        )
+    ]);
+
+
+    //Construct bucket subfolder path, if any
+    $s3bucket = $bucket;
+    if (stripos($s3bucket, '/', 1) === FALSE) {
+        $subpath = "";
+    } else {
+        $spstart = stripos($s3bucket, '/', 1);
+        $bucket = str_replace('/', '', substr($s3bucket, 0, stripos($s3bucket, '/', 1)));
+        $subpath = rtrim(substr($s3bucket, $spstart + 1), '/') . "/";
+    }
+    $keyname = $subpath.$filename;
+
+    //Assemble object to delete
+    $s3object = array(
+        'Bucket' => $bucket,
+        'Key'    => $keyname
+    );
+
+    try {
+        $s3res = $s3->deleteObject($s3object);
+
+        // Log some stuff
+        loggit(3, "Deleted file from S3: [".print_r($s3res, TRUE)."].");
+    } catch (S3Exception $e) {
+        loggit(2, "S3 Error: [".$e->getMessage()."].");
+        loggit(2, "Could not delete S3 file: [$bucket/$keyname].");
+        return (FALSE);
+    }
+
+    if (!$s3res) {
+        loggit(2, "Could not delete S3 file: [$bucket/$subpath$filename].");
+        return (FALSE);
+    } else {
+        $s3url = "http://s3.amazonaws.com/$bucket/$subpath$filename";
+        loggit(1, "Deleted file from S3: [$s3url].");
+    }
+
+    return (TRUE);
+}
+
+
+//Put a string of data into an S3 file
 function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $private = FALSE)
 {
 
@@ -2369,6 +2446,62 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
     }
 
     return (TRUE);
+}
+
+
+//Get an access url for a private file in an s3 bucket
+function get_s3_authenticated_url($key, $secret, $bucket, $filekey, $minutes = 20)
+{
+    //Check parameters
+    if (empty($key)) {
+        loggit(2, "Key missing from S3 call: [$key].");
+        return (FALSE);
+    }
+    if (empty($secret)) {
+        loggit(2, "Secret missing from S3 call: [$secret].");
+        return (FALSE);
+    }
+    if (empty($bucket)) {
+        loggit(2, "Bucket missing from S3 call: [$bucket].");
+        return (FALSE);
+    }
+    if (empty($filekey)) {
+        loggit(2, "File missing from S3 call: [$filekey].");
+        return (FALSE);
+    }
+    if( empty($minutes) || !is_numeric($minutes) || $minutes > 10080 || $minutes < 1 ) {
+        $minutes = 20;
+    }
+
+    $s3 = new \Aws\S3\S3MultiRegionClient([
+        'version' => 'latest',
+        'signature' => 'v4',
+        'credentials' => array(
+            'key' => $key,
+            'secret' => $secret
+        )
+    ]);
+
+    //Get an authenticated url
+    try {
+        $cmd = $s3->getCommand('GetObject', [
+            'Bucket' => $bucket,
+            'Key' => $filekey
+        ]);
+
+        $request = $s3->createPresignedRequest($cmd, "+$minutes minutes");
+
+        // Get the actual presigned-url
+        $s3authurl = (string) $request->getUri();
+
+    } catch (S3Exception $e) {
+        loggit(3, "Error getting authenticated url: " . $e->getMessage());
+        return (FALSE);
+    }
+
+    //Give back the result
+    loggit(3, "S3 Got authenticated url: [$s3authurl]");
+    return($s3authurl);
 }
 
 

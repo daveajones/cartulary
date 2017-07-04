@@ -151,6 +151,9 @@ var defaultUtilsOutliner = "#outliner";
 	function opXmlToOutline (xmltext) {
 		return ($(defaultUtilsOutliner).concord ().op.xmlToOutline (xmltext));
 		}
+	function opJsonToOutline (xmltext) {
+		return ($(defaultUtilsOutliner).concord ().op.jsonToOutline (xmltext));
+	}
 	function opInsertXml (xmltext, dir) { 
 		return ($(defaultUtilsOutliner).concord ().op.insertXml (xmltext, dir));
 		}
@@ -184,6 +187,10 @@ var defaultUtilsOutliner = "#outliner";
 	function opWipe () { //9/14/13 by DW
 		return ($(defaultUtilsOutliner).concord ().op.wipe ());
 		}
+	function opGetSelectedNodes () {
+        return ($(defaultUtilsOutliner).concord ().op.getSelectedNodes ());
+
+	}
 //readText
 	var readHttpUrl = "http://trex.smallpicture.com/ajax/httpReadUrl";
 	

@@ -11,6 +11,7 @@ $url = "";
 $redirect = "";
 $aid = "";
 $rhost = "";
+$privateOutline = FALSE;
 $ipfs = FALSE;
 
 if (isset($_REQUEST['aid'])) {
@@ -50,9 +51,15 @@ if (!empty($aid)) {
             if(isset($versionid) && !empty($versionid)) {
                 $seenfile = get_recent_file_version_by_url($g_uid, $url, $versionid);
                 $opmldata = $seenfile['content'];
-                //loggit(3, print_r($seenfile,TRUE));
             }
             $seenfile = get_recent_file_by_url($g_uid, $url);
+
+            if($seenfile['private'] == 1) {
+                $privateOutline = TRUE;
+                $seenfile = get_recent_file_by_url($g_uid, $url, TRUE);
+                $opmldata = $seenfile['content'];
+                loggit(3, "DEBUG(private): ".print_r($seenfile, TRUE));
+            }
 
             //Set the redirect host for this document
             loggit(3, "DEBUG: Url to open - [" . $url . "]");
@@ -93,7 +100,7 @@ $tree_location = "Edit Outline";
     <script>
         //Globals
         <?loggit(3, "DEBUG: seenfile = ".print_r(isset($seenfile), TRUE));?>
-        var type = <?if     (isset($seenfile[0]['type'])) { echo $seenfile[0]['type']; }
+        var type = <?if     (isset($seenfile['type'])) { echo $seenfile['type']; }
                  else if (isset($_REQUEST['type']) && is_numeric($_REQUEST['type'])) { echo $_REQUEST['type']; }
                  else { echo "0"; }
                ?>;
@@ -112,22 +119,21 @@ $tree_location = "Edit Outline";
         var oldfilename = "";
         var bufilename = '<?echo time()."-".$default_opml_export_file_name;?>';
         var badurl = false;
-        <?if( isset($opmldata) && !empty($aid) ) {?>
-        var initialOpmlText = '<?echo $opmldata?>';
-        <?} else if( isset($opmldata) && !empty($versionid) ) {?>
-        var versionRequest = true;
+        <?if( isset($opmldata) && !empty($opmldata) ) {?>
         var initialOpmlText = '<?echo $opmldata?>';
         <?} else {?>
-        var versionRequest = false;
         var initialOpmlText = initialOpmltext;
         <?}?>
+        var versionRequest = <?if(empty($versionid)) { echo "false"; } else { echo "true"; }?>;
         var initialRssOpmlText = '<?echo $cg_rsseditoropmltemplate?>';
-        var includeDisqus = <?if(!isset($seenfile) || $seenfile[0]['disqus'] == 0) { echo "false"; } else { echo "true"; }?>;
-        var wysiwygOn = <?if(!isset($seenfile) || $seenfile[0]['wysiwyg'] == 0) { echo "false"; } else { echo "true"; }?>;
-        var watchedOutline = <?if(!isset($seenfile) || $seenfile[0]['watched'] == 0) { echo "false"; } else { echo "true"; }?>;
-        var lockedOutline = <?if(!isset($seenfile) || $seenfile[0]['locked'] == 0) { echo "false"; } else { echo "true"; }?>;
-        var wasLocked = <?if(!isset($seenfile) || $seenfile[0]['locked'] == 0) { echo "false"; } else { echo "true"; }?>;
-        var ipfsHash = '<?if(!isset($seenfile) || $seenfile[0]['ipfshash'] == "") { echo ""; } else { echo $seenfile[0]['ipfshash']; }?>';
+        var includeDisqus = <?if(!isset($seenfile) || $seenfile['disqus'] == 0) { echo "false"; } else { echo "true"; }?>;
+        var wysiwygOn = <?if(!isset($seenfile) || $seenfile['wysiwyg'] == 0) { echo "false"; } else { echo "true"; }?>;
+        var watchedOutline = <?if(!isset($seenfile) || $seenfile['watched'] == 0) { echo "false"; } else { echo "true"; }?>;
+        var lockedOutline = <?if(!isset($seenfile) || $seenfile['locked'] == 0) { echo "false"; } else { echo "true"; }?>;
+        var privateOutline = <?if(!isset($seenfile) || $seenfile['private'] == 0) { echo "false"; } else { echo "true"; }?>;
+        var wasLocked = <?if(!isset($seenfile) || $seenfile['locked'] == 0) { echo "false"; } else { echo "true"; }?>;
+        var ipfsHash = '<?if(!isset($seenfile) || $seenfile['ipfshash'] == "") { echo ""; } else { echo $seenfile['ipfshash']; }?>';
+        var privtoken = '<?if(!isset($seenfile) || $seenfile['privtoken'] == "") { echo ""; } else { echo $seenfile['privtoken']; }?>';
         var redirectHits = <?if(empty($rhost)) { echo 0; } else { echo get_redirection_hit_count_by_host($rhost); }?>;
         <?if( isset($badurl) ) {?>
         badurl = true;

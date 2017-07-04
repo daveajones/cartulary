@@ -121,6 +121,8 @@
                 <?if(!empty($myprefs['disqus_shortname'])) { ?><li><a class="menuDisqusToggle" href="#" title="Include Disqus comments in rendered version?"><i class="fa fa-comments"></i></a></li><?}?>
                 <?if(imap_is_enabled($myuid) && smtp_is_enabled($myuid)) { ?><li><a class="menuWatchToggle" href="#" title="Get notified if linked-to pages in this outline change?"><i class="fa fa-eye"></i></a></li><?}?>
                 <li><a class="menuLockToggle" href="#" title="Lock this outline to prevent changes."><i class="fa fa-lock"></i></a></li>
+                <li><a class="menuPrivateToggle" href="#" title="Make this outline private."><i class="fa fa-ban"></i></a></li>
+                <li class="divider-vertical34"></li>
                 <li class="dropdown menuType" title="What type of node is this?">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Type <b class="caret"></b></a>
                     <ul class="dropdown-menu" data-container="body">
@@ -148,7 +150,7 @@
                 <li><a class="menuImportOutline" href="#" title="Import an outline into this node."><i class="fa fa-sign-in"></i></a></li>
                 <li><a class="menuInsertFiles" href="#" title="Insert files into this outline."><i class="fa fa-paperclip"></i></a></li>
                 <li><a class="menuArchiveNodes" href="#" title="Archive selected nodes."><i class="fa fa-archive"></i></a></li>
-                <li><a class="menuGenerateMorse" href="#" title="Generate morse tones for this article."><i class="fa fa-tty"></i></a></li>
+                <li><a class="menuUnarchiveNodes" href="#" title="Un-archive selected nodes."><i class="fa fa-window-restore"></i></a></li>
                 <li><a class="menuChangeTimestamp" href="#" title="Change timestamp for this node."><i class="fa fa-clock-o"></i></a></li>
                 <li class="divider-vertical34"></li>
 

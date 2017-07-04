@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 69;
+$cg_database_version = 72;
 $cg_database_updates = array();
 
 
@@ -981,6 +981,41 @@ $cg_database_updates[68][] = <<<CGDB0209
 CGDB0209;
 //----------------------------------------------------------------------------------------------------------------
 
+//Version 69 to 70 -----------------------------------------------------------------------------------------------
+$cg_database_updates[69][] = <<<CGDB0210
+ ALTER TABLE `recentfiles` ADD `private` TINYINT NOT NULL AFTER `ipfshash`
+CGDB0210;
+$cg_database_updates[69][] = <<<CGDB0211
+ ALTER TABLE `recentfiles_versions` ADD `private` TINYINT NOT NULL AFTER `ipfshash`
+CGDB0211;
+$cg_database_updates[69][] = <<<CGDB0212
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '70' )
+CGDB0212;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 70 to 71 -----------------------------------------------------------------------------------------------
+$cg_database_updates[70][] = <<<CGDB0213
+ ALTER TABLE `recentfiles` ADD `privtoken` VARCHAR( 80 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'token for private access'
+CGDB0213;
+$cg_database_updates[70][] = <<<CGDB0214
+ ALTER TABLE `recentfiles_versions` ADD `privtoken` VARCHAR( 80 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'token for private access'
+CGDB0214;
+$cg_database_updates[70][] = <<<CGDB0215
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '71' )
+CGDB0215;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 70 to 71 -----------------------------------------------------------------------------------------------
+$cg_database_updates[71][] = <<<CGDB0216
+  ALTER TABLE `recentfiles` ADD INDEX (`privtoken`)
+CGDB0216;
+$cg_database_updates[71][] = <<<CGDB0217
+  ALTER TABLE `recentfiles_versions` ADD INDEX (`privtoken`)
+CGDB0217;
+$cg_database_updates[71][] = <<<CGDB0218
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '72' )
+CGDB0218;
+//----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 
 

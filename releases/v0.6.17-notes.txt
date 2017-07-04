@@ -23,5 +23,7 @@
 
 
 - Improvements:
+    - Editor now prompts if you want to "save as..." when you save after changing the title of an outline.
+    - Editor prompts if you're sure you want to leave the page if you have unsaved changes.
     - Updated Font-awesome to latest version.
     - Removed morse code tool from editor.

@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 72;
+$cg_database_version = 73;
 $cg_database_updates = array();
 
 
@@ -1005,7 +1005,7 @@ $cg_database_updates[70][] = <<<CGDB0215
 CGDB0215;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 70 to 71 -----------------------------------------------------------------------------------------------
+//Version 71 to 72 -----------------------------------------------------------------------------------------------
 $cg_database_updates[71][] = <<<CGDB0216
   ALTER TABLE `recentfiles` ADD INDEX (`privtoken`)
 CGDB0216;
@@ -1015,6 +1015,18 @@ CGDB0217;
 $cg_database_updates[71][] = <<<CGDB0218
  INSERT INTO `dbversion` ( `version` ) VALUES ( '72' )
 CGDB0218;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 72 to 73 -----------------------------------------------------------------------------------------------
+$cg_database_updates[72][] = <<<CGDB0219
+ ALTER TABLE `newsfeeds` ADD `lasthttpstatus` INT NOT NULL
+CGDB0219;
+$cg_database_updates[72][] = <<<CGDB0220
+ ALTER TABLE `newsfeeds` ADD INDEX (`lasthttpstatus`)
+CGDB0220;
+$cg_database_updates[72][] = <<<CGDB0221
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '73' )
+CGDB0221;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

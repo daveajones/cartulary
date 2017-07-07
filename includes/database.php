@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 73;
+$cg_database_version = 74;
 $cg_database_updates = array();
 
 
@@ -1027,6 +1027,15 @@ CGDB0220;
 $cg_database_updates[72][] = <<<CGDB0221
  INSERT INTO `dbversion` ( `version` ) VALUES ( '73' )
 CGDB0221;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 73 to 74 -----------------------------------------------------------------------------------------------
+$cg_database_updates[73][] = <<<CGDB0222
+ ALTER TABLE `newsfeeds` ADD `lastgoodhttpstatus` INT NOT NULL
+CGDB0222;
+$cg_database_updates[73][] = <<<CGDB0223
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '74' )
+CGDB0223;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

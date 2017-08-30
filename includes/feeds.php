@@ -86,7 +86,7 @@ function feed_is_valid($content = NULL)
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
     //Load the content into a simplexml object
-    libxml_use_internal_errors(true);
+    //libxml_use_internal_errors(true);
     $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
     libxml_clear_errors();
 
@@ -104,12 +104,12 @@ function feed_is_valid($content = NULL)
 
     //See if it's JSONfeed
     if (is_jsonfeed($content)) {
-        loggit(3, "This content is JSON. Assuming it's a JSONfeed.");
+        loggit(1, "This content is JSON. Assuming it's a JSONfeed.");
         return (TRUE);
     }
 
     //None of the tests passed so return FALSE
-    loggit(1, "The content tested was not a valid feed.");
+    loggit(2, "The content tested was not a valid feed.");
     return (FALSE);
 }
 
@@ -486,7 +486,9 @@ function get_feed_info($id = NULL)
                     $table_newsfeed.errors,
                     $table_newsfeed.avatarurl,
 		            $table_newsfeed.id,
-		            $table_newsfeed.type
+		            $table_newsfeed.type,
+		            $table_newsfeed.lasthttpstatus,
+		            $table_newsfeed.lastgoodhttpstatus
            FROM $table_newsfeed
            WHERE $table_newsfeed.id=?";
 
@@ -504,7 +506,8 @@ function get_feed_info($id = NULL)
     $feed = array();
     $sql->bind_result($feed['url'], $feed['title'], $feed['content'], $feed['lastcheck'], $feed['lastupdate'],
         $feed['lastmod'], $feed['createdon'], $feed['link'], $feed['updated'], $feed['lastitemid'], $feed['oid'],
-        $feed['pubdate'], $feed['errors'], $feed['avatarurl'], $feed['id'], $feed['type']) or loggit(2, "MySql error: " . $dbh->error);
+        $feed['pubdate'], $feed['errors'], $feed['avatarurl'], $feed['id'], $feed['type'], $feed['lasthttpstatus'],
+        $feed['lastgoodhttpstatus']) or loggit(2, "MySql error: " . $dbh->error);
     $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close();
 
@@ -1138,7 +1141,8 @@ function unmark_feed_as_updated($fid = NULL)
     $stmt = "UPDATE $table_newsfeed SET updated=0 WHERE id=?";
     $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
     $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+
+    $sql->execute();// or loggit(2, "MySql error: " . $dbh->error);
     $updcount = $sql->affected_rows;
     $sql->close();
 
@@ -1721,6 +1725,11 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     $fstart = time();
     $url = $feed['url'];
 
+    //Fix up content issues before run
+    $feed['content'] = trim($feed['content']);
+    $invalid_characters = '/[^\x9\xa\x20-\xD7FF\xE000-\xFFFD]/';
+    $feed['content'] = preg_replace($invalid_characters, '', $feed['content'] );
+
     //Only get the first few entries if this is a new feed
     if (empty($feed['lastcheck'])) {
         $max = $default_new_subscription_item_count;
@@ -1952,7 +1961,12 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
     $feeds = array();
     $count = 0;
     while ($sql->fetch()) {
-        $feeds[$count] = array('id' => $fid, 'title' => $ftitle, 'url' => $furl, 'createdon' => $fcreatedon);
+        $feeds[$count] = array(
+            'id' => $fid,
+            'title' => $ftitle,
+            'url' => $furl,
+            'createdon' => $fcreatedon
+        );
         $count++;
     }
 
@@ -6461,6 +6475,7 @@ function convert_jsonfeed_to_rss($content = NULL, $max = NULL)
     if(isset($jf['home_page_url'])) $xmlFeed->channel->link = $jf['home_page_url'];
 
     //Items
+    $count = 0;
     foreach( $jf['items'] as $item ) {
         loggit(1, "DEBUG: ".print_r($item, TRUE));
 
@@ -6482,6 +6497,8 @@ function convert_jsonfeed_to_rss($content = NULL, $max = NULL)
                 $enclosure['length'] = $attachment['size_in_bytes'];
             }
         }
+
+        $count++;
     }
 
     //Log and leave

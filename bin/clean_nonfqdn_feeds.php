@@ -71,6 +71,11 @@ foreach($allfeeds as $feed) {
         }
         echo "\n";
         $count++;
+    } else {
+
+        //If feed has more than 4000 errors and lastnewitem is over 1 month old delete the feed
+
+
     }
 }
 

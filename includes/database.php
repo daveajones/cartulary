@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 74;
+$cg_database_version = 75;
 $cg_database_updates = array();
 
 
@@ -1036,6 +1036,15 @@ CGDB0222;
 $cg_database_updates[73][] = <<<CGDB0223
  INSERT INTO `dbversion` ( `version` ) VALUES ( '74' )
 CGDB0223;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 74 to 75 (does a reset on the newsfeed table to trigger refreshes on all error'd feeds) ----------------
+$cg_database_updates[74][] = <<<CGDB0224
+ UPDATE `newsfeeds` SET lastmod=0,errors=0
+CGDB0224;
+$cg_database_updates[74][] = <<<CGDB0225
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '75' )
+CGDB0225;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

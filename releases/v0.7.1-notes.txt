@@ -1,0 +1,10 @@
+#Release Notes - Freedom Controller v0.7.1
+
+
+
+- Bug Fixes (the notable ones)
+    - Many bug fixes in the aggrivate.js aggregator.
+
+- Improvements:
+    - The aggregator now purges feeds that have more than 1000 errors AND haven't had a good HTTP status code in over 30 days.
+    - For social outline connected feeds, the dead feeds are just flagged as such in the newsfeeds table

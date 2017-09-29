@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 75;
+$cg_database_version = 76;
 $cg_database_updates = array();
 
 
@@ -1045,6 +1045,15 @@ CGDB0224;
 $cg_database_updates[74][] = <<<CGDB0225
  INSERT INTO `dbversion` ( `version` ) VALUES ( '75' )
 CGDB0225;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 75 to 76 (need a way to denote dead SOPML feeds so they don't get removed by the cleaner) --------------
+$cg_database_updates[75][] = <<<CGDB0226
+ ALTER TABLE `newsfeeds` ADD `dead` TINYINT NOT NULL
+CGDB0226;
+$cg_database_updates[75][] = <<<CGDB0227
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '76' )
+CGDB0227;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

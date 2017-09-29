@@ -48,9 +48,9 @@ connection.connect();
 var monthago = (Date.now() / 1000) - (28 * 86400);
 
 //Assemble query
-var query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE updated=0 AND errors < 100 OR (lastupdate > '+monthago+' OR lastcheck = 0 OR lastmod = 0) ORDER by lastcheck ASC';
+var query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE (errors < 100 OR (lastupdate > '+monthago+' OR lastcheck = 0 OR lastmod = 0)) AND dead=0 ORDER by lastcheck ASC';
 if(checkall) {
-    query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE updated=0 ORDER by lastcheck ASC';
+    query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE dead=0 ORDER by lastcheck ASC';
 }
 if(checkone) {
     query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE url="' + ckoneurl + '" ORDER by lastcheck ASC';

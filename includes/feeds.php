@@ -608,6 +608,7 @@ function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL, $type = 0
         $sql->close();
     } else {
         $existed = TRUE;
+        unmark_feed_as_dead($fid);
         $id = $fid;
     }
 
@@ -1139,6 +1140,65 @@ function unmark_feed_as_updated($fid = NULL)
 
     //Now that we have a good id, put the article into the database
     $stmt = "UPDATE $table_newsfeed SET updated=0 WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
+    $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
+
+    $sql->execute();// or loggit(2, "MySql error: " . $dbh->error);
+    $updcount = $sql->affected_rows;
+    $sql->close();
+
+    //Log and return
+    //loggit(3,"Cleared update flag on feed: [$fid].");
+    return ($updcount);
+}
+
+
+//Flip the flag on a newsfeed to make it known that it is dead and should never be checked
+function mark_feed_as_dead($fid = NULL)
+{
+    //Check parameters
+    if ($fid == NULL) {
+        loggit(2, "The feed id is blank or corrupt: [$fid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Now that we have a good id, put the article into the database
+    $stmt = "UPDATE $table_newsfeed SET dead=1 WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
+    $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $updcount = $sql->affected_rows;
+    $sql->close();
+
+    //Log and return
+    loggit(1, "Flagged feed: [$fid] as dead.");
+    return ($updcount);
+}
+
+
+//Flip the flag on a newsfeed to make it known that it is not dead and should be checked
+function unmark_feed_as_dead($fid = NULL)
+{
+    //Check parameters
+    if ($fid == NULL) {
+        loggit(2, "The feed id is blank or corrupt: [$fid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Now that we have a good id, put the article into the database
+    $stmt = "UPDATE $table_newsfeed SET dead=0 WHERE id=?";
     $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
     $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
 
@@ -1910,7 +1970,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
 
 //Retrieve a list of all the feeds in the database
-function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
+function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE, $withdead = FALSE)
 {
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
@@ -1934,6 +1994,11 @@ function get_all_feeds($max = NULL, $witherrors = FALSE, $withold = FALSE)
     //Include old feeds?
     if ($withold == FALSE) {
         $sqltxt .= " AND (lastupdate > $monthago OR lastcheck = 0)";
+    }
+
+    //Include dead feeds?
+    if ($withdead == FALSE) {
+        $sqltxt .= " AND dead=0";
     }
 
     //Sort by last check time

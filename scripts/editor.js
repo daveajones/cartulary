@@ -178,8 +178,10 @@ $(document).ready(function () {
                 }
             });
         } else {
-            filename = getFileName(title);
-            oldfilename = filename;
+            if(filename == "") {
+                filename = getFileName(title);
+                oldfilename = filename;
+            }
             saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false);
         }
 

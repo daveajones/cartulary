@@ -143,7 +143,7 @@ $(document).ready(function () {
         opSetTitle(title);
 
         //Check for conditions that would force a "save as..."
-        if ( (lockedOutline && wasLocked) || title.toLowerCase() == "untitled" || title == "") {
+        if ( (lockedOutline && wasLocked) || title.toLowerCase() == "untitled" || title == "" ) {
             menubar.find('.menuSaveAs').trigger('click');
             $('#dropdownSave').dropdown('hide');
             return false;
@@ -178,6 +178,8 @@ $(document).ready(function () {
                 }
             });
         } else {
+            filename = getFileName(title);
+            oldfilename = filename;
             saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false);
         }
 

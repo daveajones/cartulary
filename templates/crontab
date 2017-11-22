@@ -9,13 +9,10 @@ MAILTO=""
 ##: The main feed aggregator (hard timeout after t-1 minutes)
 */8 * * * * root timeout 420 php [$CONF_ROOT]/bin/feedscan.php
 #0,20,40 * * * * root timeout 1100 php [$CONF_ROOT]/bin/feedpull.php
-*/11 * * * * root cd /opt/cartulary/aggrivate && timeout 600 node aggrivate
+*/11 * * * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node aggrivate
 
 ##: Only scan high error feeds every 6 hours
-9  */6 * * * root timeout 480 php [$CONF_ROOT]/bin/feedpull.php error
-
-##: Only scan old feeds every 6 hours
-39 */6 * * * root timeout 480 php [$CONF_ROOT]/bin/feedpull.php old
+9  */6 * * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node aggrivate checkall
 
 ##: The outline and list aggregator
 17   * * * * root php [$CONF_ROOT]/bin/outlinescan.php
@@ -25,8 +22,9 @@ MAILTO=""
 
 ##: Server maint
 */15 * * * * root php [$CONF_ROOT]/bin/clean.php
-50   3 * * * root php [$CONF_ROOT]/bin/clean_nonfqdn_feeds.php
-53   3 * * * root php [$CONF_ROOT]/bin/clean_duplicate_feeds.php
+10   3 * * * root php [$CONF_ROOT]/bin/clean_nonfqdn_feeds.php
+30   3 * * * root php [$CONF_ROOT]/bin/clean_duplicate_feeds.php
+50   3 * * * root php [$CONF_ROOT]/bin/clean_bad_feeds.php
 
 ##: Build main user rivers
 */5  * * * * root php [$CONF_ROOT]/bin/buildrivers.php

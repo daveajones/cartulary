@@ -55,6 +55,9 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
         $ccount++;
 
+        //Remove the updated flag
+        unmark_feed_as_updated($feed);
+
         echo "      It took " . (time() - $fstart) . " seconds to scan this feed.\n";
         loggit(1, "It took [" . (time() - $fstart) . "] seconds to scan this feed.");
         echo "\n";

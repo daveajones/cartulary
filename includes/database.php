@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 72;
+$cg_database_version = 76;
 $cg_database_updates = array();
 
 
@@ -1005,7 +1005,7 @@ $cg_database_updates[70][] = <<<CGDB0215
 CGDB0215;
 //----------------------------------------------------------------------------------------------------------------
 
-//Version 70 to 71 -----------------------------------------------------------------------------------------------
+//Version 71 to 72 -----------------------------------------------------------------------------------------------
 $cg_database_updates[71][] = <<<CGDB0216
   ALTER TABLE `recentfiles` ADD INDEX (`privtoken`)
 CGDB0216;
@@ -1015,6 +1015,45 @@ CGDB0217;
 $cg_database_updates[71][] = <<<CGDB0218
  INSERT INTO `dbversion` ( `version` ) VALUES ( '72' )
 CGDB0218;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 72 to 73 -----------------------------------------------------------------------------------------------
+$cg_database_updates[72][] = <<<CGDB0219
+ ALTER TABLE `newsfeeds` ADD `lasthttpstatus` INT NOT NULL
+CGDB0219;
+$cg_database_updates[72][] = <<<CGDB0220
+ ALTER TABLE `newsfeeds` ADD INDEX (`lasthttpstatus`)
+CGDB0220;
+$cg_database_updates[72][] = <<<CGDB0221
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '73' )
+CGDB0221;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 73 to 74 -----------------------------------------------------------------------------------------------
+$cg_database_updates[73][] = <<<CGDB0222
+ ALTER TABLE `newsfeeds` ADD `lastgoodhttpstatus` INT NOT NULL
+CGDB0222;
+$cg_database_updates[73][] = <<<CGDB0223
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '74' )
+CGDB0223;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 74 to 75 (does a reset on the newsfeed table to trigger refreshes on all error'd feeds) ----------------
+$cg_database_updates[74][] = <<<CGDB0224
+ UPDATE `newsfeeds` SET lastmod=0,errors=0
+CGDB0224;
+$cg_database_updates[74][] = <<<CGDB0225
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '75' )
+CGDB0225;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 75 to 76 (need a way to denote dead SOPML feeds so they don't get removed by the cleaner) --------------
+$cg_database_updates[75][] = <<<CGDB0226
+ ALTER TABLE `newsfeeds` ADD `dead` TINYINT NOT NULL
+CGDB0226;
+$cg_database_updates[75][] = <<<CGDB0227
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '76' )
+CGDB0227;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

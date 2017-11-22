@@ -1,9 +1,12 @@
 #Release Notes - Freedom Controller v0.7.1
 
 
+This release is mainly focused on the aggregator and how it handles dead feeds.
+
 
 - Bug Fixes (the notable ones)
     - Many bug fixes in the aggrivate.js aggregator.
+    - Fixed a title logic error when setting filename for a new outline
 
 - Improvements:
     - The aggregator now purges feeds that have more than 1000 errors AND haven't had a good HTTP status code in over 30 days.

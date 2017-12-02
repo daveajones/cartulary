@@ -1,0 +1,4 @@
+#Release Notes - Freedom Controller v0.7.2
+
+This release just ups the Twitter posting max character limit to 280.  Should have been
+in the last release.  [doh!]

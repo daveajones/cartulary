@@ -13,6 +13,8 @@ var gPlatformMenubarTopOffset = <?if( $g_platform == "mobile" ) {?>30<?}else{?>8
 var gStartPage = '<?echo $startpage?>';
 var gDefaultBlogPostMaxCharacters = <?echo $default_blog_post_max_chars?>;
 var msgtimer;
+var cgTwitterCharacterLimit = '<?echo $cg_twitter_character_limit?>';
+var cgMastodonCharacterLimit = '<?echo $cg_mastodon_character_limit?>';
 
 //User globals
 var cuTwitterIsEnabled = <?if( twitter_is_enabled($g_uid) ) {?>true<?}else{?>false<?}?>;

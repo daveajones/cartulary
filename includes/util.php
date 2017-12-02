@@ -577,7 +577,7 @@ function tweet($uid = NULL, $content = NULL, $link = "", $media_id = "")
     //loggit(3, "Twitter secret: [".$prefs['twittersecret']."]");
     //loggit(3, "Twitter user token: [".$prefs['twittertoken']."]");
     //loggit(3, "Twitter user secret: [".$prefs['twittertokensecret']."]");
-    $charcount = 138;
+    $charcount = $cg_twitter_character_limit;
 
     //Connect to twitter using oAuth
     $connection = new tmhOAuth(array(
@@ -1323,7 +1323,7 @@ function toot($uid = NULL, $content = NULL, $link = "", $media_id = "")
 
     //Globals
     $prefs = get_user_prefs($uid);
-    $charcount = 498;
+    $charcount = $cg_mastodon_character_limit;
 
     if (!empty($link)) {
         $charcount -= 22;

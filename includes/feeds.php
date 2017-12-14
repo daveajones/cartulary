@@ -4568,8 +4568,8 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
             if ($ffulltext == 1) {
                 $itembody = $description;
             } else
-                if (strlen($description) > 300) {
-                    $itembody = truncate_text($description, 300) . "...";
+                if (strlen($description) > $cg_default_max_river_item_body_length) {
+                    $itembody = truncate_text($description, $cg_default_max_river_item_body_length) . "...";
                 } else {
                     $itembody = $description;
                 }
@@ -5885,8 +5885,8 @@ function get_sticky_feed_items($uid = NULL, $max = 100)
             if ($lffulltext == 1) {
                 $itembody = $ldescription;
             } else
-                if (strlen($ldescription) > 300) {
-                    $itembody = truncate_text($ldescription, 300) . "...";
+                if (strlen($ldescription) > $cg_default_max_river_item_body_length) {
+                    $itembody = truncate_text($ldescription, $cg_default_max_river_item_body_length) . "...";
                 } else {
                     $itembody = $ldescription;
                 }

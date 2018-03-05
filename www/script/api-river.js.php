@@ -620,7 +620,7 @@ freedomController.v1.river.methods = (function () {
                         $(pathToForm + ' .tootcheck').prop("checked", false);
                     }
                 });
-            }            
+            }
 
             //Submit buttons go in the div and we'll trigger form submission from outside
             $(pathToForm).append('<a class="btn btn-success mbsubmit ' + postId + '" href="#">Post</a> <a class="btn btn-error mbcancel ' + postId + '" href="#">Cancel</a>');
@@ -706,7 +706,7 @@ freedomController.v1.river.methods = (function () {
                 $(pathToForm + ' .tootbox .tooticon').toggleClass('icon-mastodon');
                 $(pathToForm + ' .tootbox .tooticon').toggleClass('icon-nomastodon');
                 $(pathToForm + ' .tootbox .mbdescription').trigger('keyup');
-            });            
+            });
 
             return false;
         });

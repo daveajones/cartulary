@@ -2541,9 +2541,11 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
             }
             //loggit(3, "ATOM LINK: $linkurl");
 
-            //Some feeds only use id for the link
-            if ( isset($item->id) && ( stripos($item->id, 'http:') !== FALSE || stripos($item->id, 'https:') !== FALSE) ) {
-                $linkurl = trim($item->id);
+            //Some feeds only use id for the link, so if no valid linkurl exists yet, try the id element
+            if ( stripos($linkurl, 'http:') === FALSE && stripos($linkurl, 'https:') ) {
+                if ( isset($item->id) && ( stripos($item->id, 'http:') !== FALSE || stripos($item->id, 'https:') !== FALSE) ) {
+                    $linkurl = trim($item->id);
+                }
             }
 
             //Enclosures are links also
@@ -5790,7 +5792,7 @@ function get_feed_items_with_enclosures2($uid = NULL, $tstart = NULL, $max = NUL
 }
 
 
-//Retrieve the feed items that are sticky
+//Retrieve the feed items that are sticky for a users river
 function get_sticky_feed_items($uid = NULL, $max = 100)
 {
     //Check parameters
@@ -5959,7 +5961,7 @@ function get_sticky_feed_items($uid = NULL, $max = 100)
 }
 
 
-//Retrieve the feed items that are sticky
+//Retrieve the feed items for a users river
 function get_river_feed_items($uid = NULL, $max = 100)
 {
     //Check parameters
@@ -6011,7 +6013,7 @@ function get_river_feed_items($uid = NULL, $max = 100)
              WHERE $table_nfcatalog.userid=?
              AND $table_nfitem.timeadded > ?
              AND $table_nfitem.`old` = 0";
-    $sqltxt .= " ORDER BY $table_nfitem.timeadded DESC LIMIT ?";
+    $sqltxt .= " ORDER BY $table_nfitem.timeadded ASC LIMIT ?";
 
     //loggit(3, "[$sqltxt]");
     $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
@@ -6048,6 +6050,16 @@ function get_river_feed_items($uid = NULL, $max = 100)
             $itembody = $ldescription;
         }
 
+        //Check if we have a feed defined timestamp greater than 1/1/1990 and
+        //use it if so.  This is a quick and dirty sanity check.  Otherwise use
+        //timeadded since we know that is always sane
+        $litemtime = 0;
+        if( $ltimestamp > 631152000 ) {
+            $litemtime = $ltimestamp;
+        } else {
+            $litemtime = $ltimeadded;
+        }
+
         //Construct the item array
         $items[$count] = array('author' => $lauthor,
             'avatarUrl' => $lavatarurl,
@@ -6059,7 +6071,7 @@ function get_river_feed_items($uid = NULL, $max = 100)
             'origin' => $lorigin,
             'enclosure' => unserialize($lenclosure),
             'permaLink' => $lurl,
-            'pubDate' => date("D, d M Y H:i:s O", $ltimeadded),
+            'pubDate' => date("D, d M Y H:i:s O", $litemtime),
             'sourcetitle' => $lsourcetitle,
             'sourceurl' => $lsourceurl,
             'sticky' => 1,

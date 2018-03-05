@@ -2542,7 +2542,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
             //loggit(3, "ATOM LINK: $linkurl");
 
             //Some feeds only use id for the link, so if no valid linkurl exists yet, try the id element
-            if ( stripos($linkurl, 'http:') === FALSE && stripos($linkurl, 'https:') ) {
+            if ( stripos($linkurl, 'http:') === FALSE && stripos($linkurl, 'https:') === FALSE ) {
                 if ( isset($item->id) && ( stripos($item->id, 'http:') !== FALSE || stripos($item->id, 'https:') !== FALSE) ) {
                     $linkurl = trim($item->id);
                 }

@@ -119,6 +119,24 @@ if (preg_match('/^https?\:\/\/(www\.)?reddit\.com/i', $url)) {
     } else {
         loggit(2, "Couldn't extract Reddit link.");
     }
+
+//Memeorandum
+} else if (preg_match('/memeorandum\.com/i', $url)) {
+    loggit(3, "Converting memeorandum.com link to span ref.");
+    //Get the code from the link
+    $posLastSlash = strripos($url, '/');
+    $posPoundA = stripos($url, '#a', $posLastSlash);
+    $code = substr($url, $posPoundA + 2);
+
+    if (preg_match("/\<span.*pml=\"$code\".*url=\"(.*)\".*head=\"(.*)\"/iU", $html, $matches)) {
+        $url = get_final_url($matches[1]);
+        $title = $matches[2];
+        loggit(3, "Memeorandum link-through url: [" . $url . "]");
+        $response = fetchUrlExtra($url);
+        $html = $response['body'];
+    } else {
+        loggit(2, "Couldn't extract Memeorandum link.");
+    }
 }
 
 //Is this a PDF?

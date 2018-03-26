@@ -77,7 +77,7 @@ function is_jsonfeed($content = NULL)
 function feed_is_valid($content = NULL)
 {
     //Check parameters
-    if ($content == NULL) {
+    if (empty($content)) {
         loggit(2, "The content to test is blank or corrupt: [$content]");
         return (FALSE);
     }
@@ -86,7 +86,7 @@ function feed_is_valid($content = NULL)
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
     //Load the content into a simplexml object
-    //libxml_use_internal_errors(true);
+    libxml_use_internal_errors(true);
     $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
     libxml_clear_errors();
 
@@ -234,6 +234,7 @@ function get_feed_link($content = NULL)
 
 
 //Does the feed contain a source:avatar or sopml:avatar?
+//TODO: this function needs some serious updating
 function get_feed_avatar($x = NULL)
 {
     //Check parameters
@@ -252,7 +253,7 @@ function get_feed_avatar($x = NULL)
     if (!isset($namespaces['source'])) {
         //None of the tests passed so return FALSE
         loggit(1, "No microblog namespace defined for this feed.");
-        return (FALSE);
+        return ("");
     }
 
     //Search for an avatar
@@ -283,7 +284,7 @@ function get_feed_avatar($x = NULL)
 
     //None of the tests passed so return FALSE
     loggit(1, "Could not find an avatar for this feed.");
-    return (FALSE);
+    return ("");
 }
 
 
@@ -917,11 +918,15 @@ function update_feed_lastupdate($fid = NULL, $time = NULL)
 
 
 //Increment the error count on this feed
-function increment_feed_error_count($fid = NULL)
+function increment_feed_error_count($fid = NULL, $amount = 1)
 {
     //Check parameters
     if (empty($fid)) {
         loggit(2, "The feed id is blank or corrupt: [$fid]");
+        return (FALSE);
+    }
+    if ($amount < 1) {
+        loggit(2, "You can't increment the feed error count by a non-positive number: [$amount]");
         return (FALSE);
     }
 
@@ -932,9 +937,9 @@ function increment_feed_error_count($fid = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Now that we have a good id, put the article into the database
-    $stmt = "UPDATE $table_newsfeed SET errors=errors+1 WHERE id=?";
+    $stmt = "UPDATE $table_newsfeed SET errors=errors+? WHERE id=?";
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ds", $amount, $fid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close();
 
@@ -1795,18 +1800,21 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         $max = $default_new_subscription_item_count;
     }
 
+    //Set the last check time in the stats
+    $stats['checktime'] += (time() - $fstart);
+    set_feed_stats($fid, $stats);
+
     //Pull the latest content blob from the database
     if( empty($feed['content']) ) {
         loggit(2, "Feed: [$fid] has no content.");
-        $stats['checktime'] += (time() - $fstart);
-        set_feed_stats($fid, $stats);
+        increment_feed_error_count($fid);
         return (-1);
     }
 
     //Is the feed any good?
-    if (!feed_is_valid($feed['content'])) {
-        loggit(2, "Feed: [$fid] doesn't seem to be a known feed format. Skipping it.");
-        set_feed_error_count($fid, 100);
+    if (!feed_is_valid($feed['content']) && !is_feed($feed['content'])) {
+        loggit(2, "Feed: [".$url."] doesn't seem to be a known feed format. Skipping it.");
+        increment_feed_error_count($fid,5);
         return (-1);
     }
 
@@ -1827,59 +1835,104 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         libxml_clear_errors();
         if (!$x) {
             loggit(1, "Error parsing feed XML for feed: [$fid].  Incrementing error count and skipping feed: [$fid].");
-            $stats['checktime'] += (time() - $fstart);
-            set_feed_stats($fid, $stats);
-            increment_feed_error_count($fid);
+            increment_feed_error_count($fid, 5);
             return (-1);
         }
     }
 
-    //Look for some kind of publish date
-    if (!empty($x->channel->pubDate)) {
-        $pubdate = $x->channel->pubDate;
-    } else
-    if (!empty($x->channel->lastBuildDate)) {
-        $pubdate = $x->channel->lastBuildDate;
-    } else
-    if (!empty($x->updated)) {
-        $pubdate = $x->updated;
-    } else {
-        $pubdate = time();
-    }
-    loggit(1, "DEBUG: Pubdate: [$pubdate]");
-    if ($feed['pubdate'] == $pubdate && !empty($pubdate) && $force == FALSE) {
-        //The feed says that it hasn't been updated
-        loggit(1, "The pubdate in the feed has not changed.");
-        $stats['checktime'] += (time() - $fstart);
-        set_feed_stats($fid, $stats);
-        //return (-3);
-    }
-    update_feed_pubdate($fid, $pubdate);
-
-    //Freshen feed title
-    if (isset($x->channel->title)) {
-        $ftitle = $x->channel->title;
-    } else {
-        $ftitle = $x->title;
-    }
-    update_feed_title($fid, $ftitle);
-
-    //Freshen feed link
-    if (isset($x->channel->link)) {
-        $flink = $x->channel->link;
-    } else {
-        $flink = (string)$x->link->attributes()->href;
-    }
-    update_feed_link($fid, $flink);
-
-    //Freshen feed avatar
-    update_feed_avatar($fid, get_feed_avatar($x));
-
     //Pass any namespaces to the item add routine
     $namespaces = $x->getDocNamespaces(TRUE);
 
+    //Look for some kind of publish date
+    $pubdate = time();
+    $pubdatesource = "fallback to time()";
+    if (isset($x->channel->pubDate) && !empty((string)$x->channel->pubDate)) {
+        //Channel date for rss2 feed
+        $pubdate = (string)$x->channel->pubDate;
+        $pubdatesource = "RSS2.0 Channel <pubDate> value";
+    } else
+    if (isset($x->channel->lastBuildDate) && !empty($x->channel->lastBuildDate)) {
+        //Channel build date for rss2 feed
+        $pubdate = (string)$x->channel->lastBuildDate;
+        $pubdatesource = "RSS2.0 Channel <lastBuildDate> value";
+    } else
+    if (isset($namespaces['dc']) && isset($x->children($namespaces['dc'])->date) && !empty($x->children($namespaces['dc'])->date)) {
+        //Channel date for RDF(rss1) feed
+        $pubdate = (string)$x->children($namespaces['dc'])->date;
+        $pubdatesource = "RSS1/RDF feed level <dc:date> value";
+    } else
+    if (isset($x->updated) && !empty($x->updated)) {
+        //Channel date for atom feed
+        $pubdate = (string)$x->updated;
+        $pubdatesource = "ATOM feed level <updated> value";
+    } else {
+        //We didn't get a feed level date, so dig into the items for dates
+        if(isset($x->channel->item[0]) && isset($x->channel->item[0]->pubDate) && !empty($x->channel->item[0]->pubDate)) {
+            //First item in rss2 feed
+            $pubdate = (string)$x->channel->item[0]->pubDate;
+            $pubdatesource = "RSS2.0 first item <pubDate> value";
+        } else
+        if(isset($x->item[0]) && isset($namespaces['dc']) && isset($x->item[0]->children($namespaces['dc'])->date) && !empty($x->item[0]->children($namespaces['dc'])->date)) {
+            //First item in RDF(rss1) feed
+            $pubdate = (string)$x->item[0]->children($namespaces['dc'])->date;
+            $pubdatesource = "RSS1/RDF first item <dc:date> value";
+        } else
+        if(isset($x->item[0]) && isset($x->item[0]->date) && !empty($x->item[0]->date)) {
+            //First item in RDF(rss1) feeds that dont follow spec
+            $pubdate = (string)$x->item[0]->date;
+            $pubdatesource = "RSS1/RDF first item <date> value";
+        } else
+        if(isset($x->entry[0]) && isset($x->entry[0]->updated) && !empty($x->entry[0]->updated)) {
+            //First item in atom feed
+            $pubdate = (string)$x->entry[0]->updated;
+            $pubdatesource = "ATOM first item <updated> value";
+        }
+    }
+    $pubdate = trim($pubdate);
+    //loggit(3, "DEBUG: Pubdate: [$pubdate]");
+    if (trim($feed['pubdate']) == $pubdate && !empty($pubdate) && $force == FALSE) {
+        //The feed says that it hasn't been updated
+        loggit(3, "  PUBDATE: [$pubdate | ".$feed['pubdate']."] Source: [$pubdatesource] not changed.");
+        return (-3);
+    }
+    loggit(3, "  PUBDATE: [$pubdate | ".$feed['pubdate']."] Source: [$pubdatesource] changed.");
+    update_feed_pubdate($fid, $pubdate);
+
+    //Freshen feed title
+    $ftitle = parse_url($url, PHP_URL_HOST);
+    if (isset($x->channel) && isset($x->channel->title)) {
+        $ftitle = $x->channel->title;
+    }
+    if (isset($x->title)) {
+        $ftitle = $x->title;
+    }
+    if( $ftitle != $feed['title'] ) {
+        update_feed_title($fid, trim($ftitle));
+    }
+
+    //Freshen feed link
+    $flink = parse_url($url, PHP_URL_HOST);
+    if (isset($x->channel) && isset($x->channel->link)) {
+        $flink = $x->channel->link;
+    }
+    if (isset($x->link) && isset($x->link->attributes()->href)) {
+        $flink = (string)$x->link->attributes()->href;
+    }
+    if( $flink != $feed['link'] ) {
+        update_feed_link($fid, trim($flink));
+    }
+
+    //Freshen feed avatar
+    $avatarurl = get_feed_avatar($x);
+    if($avatarurl != $feed['avatarurl']) {
+        update_feed_avatar($fid, trim($avatarurl));
+    }
+
     //Mark all of this feed's items as purge
     mark_all_feed_items_to_purge($fid);
+
+    //Get all of the feed item guids
+    $guids = get_feed_item_guids_by_feed_id($fid);
 
     //Put all of the items in an array
     $tstart = time();
@@ -1891,7 +1944,8 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         loggit(3, "RDF Feed: ".$ftitle);
         foreach ($x->item as $entry) {
             $items[$count] = $entry;
-            if (!feed_item_exists($fid, get_unique_id_for_rdf_feed_item($entry, $namespaces))) {
+            $guid = get_unique_id_for_rdf_feed_item($entry, $namespaces);
+            if (array_search($guid, $guids) === FALSE) {
                 update_feed_lastupdate($fid, time());
                 add_feed_item($fid, $entry, "rss", $namespaces);
                 $newcount++;
@@ -1908,7 +1962,8 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         //This is an atom feed
         foreach ($x->entry as $entry) {
             $items[$count] = $entry;
-            if (!feed_item_exists($fid, $entry->id)) { //testing
+            $guid = $entry->id;
+            if (array_search($guid, $guids) === FALSE) { //testing
                 update_feed_lastupdate($fid, time());
                 add_feed_item($fid, $entry, "atom", $namespaces);
                 $newcount++;
@@ -1924,7 +1979,8 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         //This is an rss feed
         foreach ($x->channel->item as $entry) {
             $items[$count] = $entry;
-            if (!feed_item_exists($fid, get_unique_id_for_feed_item($entry))) {
+            $guid = get_unique_id_for_feed_item($entry);
+            if (array_search($guid, $guids) === FALSE) {
                 update_feed_lastupdate($fid, time());
                 add_feed_item($fid, $entry, "rss", $namespaces);
                 $newcount++;
@@ -1945,9 +2001,6 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Delete old items
     delete_old_feed_items($fid);
 
-    //Evidently the scan was successful so reset the error counter
-    reset_feed_error_count($fid);
-
     //Calculate new stats for this feed
     $stats['checktime'] += (time() - $fstart);
     $stats['avgchecktime'] = ($stats['checktime'] / $stats['checkcount']);
@@ -1960,8 +2013,12 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Is the feed empty?
     if ($count == 0) {
         loggit(3, "Scan: There were no items in this feed: [$url].");
+        increment_feed_error_count($fid, 5);
         return (-2);
     }
+
+    //Evidently the scan was successful so reset the error counter
+    reset_feed_error_count($fid);
 
     //Log and leave
     loggit(1, "Scan: [$newcount] out of: [$count] items from feed: [$url] were new.");
@@ -2185,6 +2242,53 @@ function get_nfitems($ids = NULL)
 
     loggit(1, "Returning feed item: [$id].");
     return ($items[0]);
+}
+
+
+//Retrieve a list of all the feed items in the database
+function get_feed_item_guids_by_feed_id($fid = NULL, $max = 0)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Get all feed items up to max
+    $sqltxt = "SELECT guid FROM $table_nfitem WHERE feedid=?";
+
+    //Max given?
+    if ( $max > 0 && is_numeric($max) ) {
+        $sqltxt .= " LIMIT $max";
+    }
+
+    //Run the query
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any feed items returned
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "There are no feed items stored for feed: [$fid].");
+        return (array());
+    }
+
+    $sql->bind_result($guid) or loggit(2, "MySql error: " . $dbh->error);
+
+    $items = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $items[] = $guid;
+        $count++;
+    }
+
+    $sql->close();
+
+    loggit(1, "Returning: [$count] feed items for feed: [$fid].");
+    return ($items);
 }
 
 
@@ -2786,7 +2890,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 
         //Does this item have an origin?
         $origin = "";
-        if (isset($namespaces['feedburder'])) {
+        if (isset($namespaces['feedburner'])) {
             $feedburner = $item->children($namespaces['feedburner']);
             if (isset($feedburner->origLink)) {
                 $origin = (string)trim($feedburner->origLink);
@@ -2889,8 +2993,7 @@ function feed_item_exists($fid = NULL, $guid = NULL)
     //See if any rows came back
     $rowcount = $sql->num_rows();
     if ($rowcount < 1) {
-        $sql->close()
-        or loggit(2, "MySql error: " . $dbh->error);
+        $sql->close() or loggit(2, "MySql error: " . $dbh->error);
         //loggit(3,"The feed item with guid: [$guid] does not exist for feed: [$fid]. Row count: [$rowcount].");
         return (FALSE);
     }

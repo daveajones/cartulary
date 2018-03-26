@@ -208,6 +208,24 @@ function get_system_message($id = NULL, $type = NULL)
 }
 
 
+//Test database accessibility
+function can_connect_to_database()
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
+    if ($dbh->connect_error) {
+        loggit(2, 'Connect Error (' . $mysqli->connect_errno . ') '. $mysqli->connect_error);
+        return(FALSE);
+    }
+
+    $dbh->close();
+    return(TRUE);
+}
+
+
 //Search an array with a regular expression
 function array_ereg_search($val, $array)
 {
@@ -765,6 +783,7 @@ function twitter_search_to_rss($query = NULL)
     ));
 
     //Make an API call to get the information in JSON format
+    loggit(3, "DEBUG: twitter_search_to_rss(): making GET call to Twitter API...");
     $code = $connection->request('GET',
         $connection->url('1.1/search/tweets'),
         array('q' => $query)
@@ -796,6 +815,7 @@ function twitter_search_to_rss($query = NULL)
             $item->addChild('link', 'http://twitter.com/' . $tweet['user']['screen_name'] . '/status/' . $tweet['id_str']);
         }
 
+        loggit(3, "Returning twitter results for search: [$query]");
         return ($xml);
     } else {
         $twresponse = $connection->response['response'];
@@ -835,6 +855,7 @@ function twitter_timeline_to_rss($user = NULL)
     ));
 
     //Make an API call to get the information in JSON format
+    loggit(3, "DEBUG: twitter_search_to_rss(): making GET call to Twitter API...");
     $code = $connection->request('GET',
         $connection->url('1.1/statuses/user_timeline'),
         array('screen_name' => $user)
@@ -864,6 +885,7 @@ function twitter_timeline_to_rss($user = NULL)
             $item->addChild('link', 'http://twitter.com/' . $tweet['user']['screen_name'] . '/status/' . $tweet['id_str']);
         }
 
+        loggit(3, "Returning twitter results for user: [$user]");
         return ($xml);
     } else {
         $twresponse = $connection->response['response'];
@@ -3936,7 +3958,11 @@ class cronHelper
 
     private static function isrunning()
     {
+        //Includes
+        include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
         $pids = explode(PHP_EOL, `ps -e | awk '{print $1}'`);
+        //loggit(3, "DEBUG: cronHelper::isRunning() -> [".self::$pid."]");
         if (in_array(self::$pid, $pids))
             return TRUE;
         return FALSE;
@@ -3955,8 +3981,9 @@ class cronHelper
             //return FALSE;
 
             // Is running?
+            sleep(2);
             self::$pid = file_get_contents($lock_file);
-            if (self::isrunning()) {
+            if (self::isrunning() && !empty(self::$pid) && !empty(filesize($lock_file))) {
                 loggit(2, "==" . self::$pid . "== Already in progress...");
                 return FALSE;
             } else {

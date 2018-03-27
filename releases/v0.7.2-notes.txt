@@ -1,0 +1,22 @@
+#Release Notes - Freedom Controller v0.7.2
+
+
+This release is again focused on the aggregator, but with some significant cartulizing improvements also.
+
+
+- Bug Fixes (the notable ones)
+    - Aggregator wasn't handling gzip compression correctly
+    - Updated Twitter to use 280 characters
+    - Shortened the enclosure check timeout when building rss feed from editor
+    - Better defense on cron job lock checking
+
+- Improvements:
+    - The river page now pulls directly from the live database instead of pre-built river.js files
+    - Switched the cartulize engine from FiveFilters to Readability ported from Mozilla
+    - The aggregator is now much more efficient with feed change detection, using a cascading date change detection.
+
+- Readability Cart Engine:
+    - The heart and soul of this system is the Cartulizing engine that saves articles as you read them in your news river.  There
+      were plenty of times that this article saving ("cartulizing") would fail.  I began testing the php port of Mozilla's Readability
+      library and it works well on some articles that the FiveFilters engine fails on.  Instead of simply replacing one with the other
+      it now tries Readability first and, if that fails, redirects to FiveFilters.  We now get two full shots at grabbing the article.

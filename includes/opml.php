@@ -4624,6 +4624,8 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
     loggit(3, "Got [$pcount] rss item nodes from the outline.");
     try {
         $xxp = $podcast->xml(TRUE);
+        //Put a blank line between items for easier reading
+        $xxp = str_replace('<item>', "\n    <item>", $xxp);
     } catch (Exception $e) {
         loggit(3, 'Caught exception: ' . $e->getMessage());
         return (-3);

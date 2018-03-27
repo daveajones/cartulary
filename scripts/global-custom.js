@@ -252,16 +252,19 @@ function newMicroblogPostWindow(item, opmlsource, type) {
         $(modal + ' .tooticon').toggleClass('icon-mastodon');
         $(modal + ' .tooticon').toggleClass('icon-nomastodon');
         $(modal + ' .bpdescription textarea').trigger('keyup');
-    });    
-    
+    });
+
     //Track text length
     $(modal + ' .mbcharcount').text($(modal + ' .bpdescription textarea').val().length);
     $(modal + ' .bpdescription textarea').bind('keyup', function () {
         var cc = $(modal + ' .bpdescription textarea').val().length;
         $(modal + ' .mbcharcount').text(cc);
-        if ($(modal + ' .tweeticon').hasClass('icon-twitter') && cc > 138) {
+        if ($(modal + ' .tweeticon').hasClass('icon-twitter') && cc > cgTwitterCharacterLimit) {
             $(modal + ' .mbcharcount').addClass('msgwarn');
             $(modal + ' .mbcharcount').text(cc + ' - Twitter will truncate this message.');
+        } else if ($(modal + ' .tooticon').hasClass('icon-mastodon') && cc > cgMastodonCharacterLimit) {
+            $(modal + ' .mbcharcount').addClass('msgwarn');
+            $(modal + ' .mbcharcount').text(cc + ' - Mastodon will truncate this message.');
         } else {
             $(modal + ' .mbcharcount').removeClass('msgwarn');
         }

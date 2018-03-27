@@ -45,7 +45,7 @@ class Item extends Podcast {
         return(TRUE);
     }
 
-    public function addEnclosure( $url = "", $length = "", $type = "audio/mpeg" ) {
+    public function addEnclosure( $url = "", $length = "", $type = "audio/mpeg", $timeout = 5 ) {
         if(empty($url)) return FALSE;
 
         //Try to get a file size if none given
@@ -56,6 +56,8 @@ class Item extends Podcast {
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HEADER, true);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+            curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
             $data = curl_exec($ch);
             $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
             $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

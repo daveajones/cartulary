@@ -783,7 +783,7 @@ function twitter_search_to_rss($query = NULL)
     ));
 
     //Make an API call to get the information in JSON format
-    loggit(3, "DEBUG: twitter_search_to_rss(): making GET call to Twitter API...");
+    loggit(1, "DEBUG: twitter_search_to_rss(): making GET call to Twitter API...");
     $code = $connection->request('GET',
         $connection->url('1.1/search/tweets'),
         array('q' => $query)
@@ -793,7 +793,7 @@ function twitter_search_to_rss($query = NULL)
     if ($code == 200) {
         $twresponse = $connection->response['response'];
         $twrcode = $connection->response['code'];
-        loggit(3, "Twitter search for [$query] returned code: [$twrcode].");
+        loggit(1, "Twitter search for [$query] returned code: [$twrcode].");
 
         $twr = json_decode($twresponse, TRUE);
 
@@ -855,7 +855,7 @@ function twitter_timeline_to_rss($user = NULL)
     ));
 
     //Make an API call to get the information in JSON format
-    loggit(3, "DEBUG: twitter_search_to_rss(): making GET call to Twitter API...");
+    loggit(1, "DEBUG: twitter_search_to_rss(): making GET call to Twitter API...");
     $code = $connection->request('GET',
         $connection->url('1.1/statuses/user_timeline'),
         array('screen_name' => $user)
@@ -865,7 +865,7 @@ function twitter_timeline_to_rss($user = NULL)
     if ($code == 200) {
         $twresponse = $connection->response['response'];
         $twrcode = $connection->response['code'];
-        loggit(3, "Twitter search for [$user] returned code: [$twrcode].");
+        loggit(1, "Twitter search for [$user] returned code: [$twrcode].");
 
         $twr = json_decode($twresponse, TRUE);
 
@@ -1087,7 +1087,7 @@ function get_final_url($url, $timeout = 5, $count = 0)
 {
     $count++;
     $url = clean_url($url);
-    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
 
     if($count > 5) {
         loggit(2, "Error: Too many redirects for url: [$url]. Abandoning...");
@@ -1165,7 +1165,7 @@ function get_final_url_with_cookie($url, $timeout = 5, $count = 0, $cookie = "")
         return ("");
     }
     $url = clean_url($url);
-    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
 
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
@@ -1219,7 +1219,7 @@ function fetchUrl($url, $timeout = 30)
     $url = clean_url($url);
 
     $curl = curl_init();
-    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_COOKIEFILE, "");
@@ -1254,7 +1254,7 @@ function fetchUrlSafe($url, $timeout = 30)
     $url = clean_url($url);
 
     $curl = curl_init();
-    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_COOKIEFILE, "");
@@ -1295,7 +1295,7 @@ function getMastodonTimeline($hosturl, $token, $timeout = 30)
     $url = clean_url($url);
 
     $curl = curl_init();
-    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_COOKIEFILE, "");
@@ -1503,7 +1503,7 @@ function fetchFeedUrl($url, $subcount = 0, $sysver = '', $timeout = 30)
 {
     //Assemble a User-agent string that will report stats to the
     //feed owner if possible
-    $ua = "FreedomController-Cartulary/" . $sysver;
+    $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     $uadetails = "";
     if ($subcount > 0) {
         $uadetails .= $subcount . " subscribers; ";
@@ -1547,7 +1547,7 @@ function fetchUrlExtra($url, $timeout = 30)
     $url = clean_url($url);
 
     $curl = curl_init();
-    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -1582,7 +1582,7 @@ function postUrlExtra($url, $post_parameters = array(), $post_headers = array(),
     $url = clean_url($url);
 
     $curl = curl_init();
-    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -1636,7 +1636,7 @@ function httpUploadFile($url, $post_parameters = array(), $post_headers = array(
     $url = clean_url($url);
 
     $curl = curl_init();
-    $ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0';
+    $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);

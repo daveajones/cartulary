@@ -1087,6 +1087,7 @@ function get_final_url($url, $timeout = 5, $count = 0)
 {
     $count++;
     $url = clean_url($url);
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
 
     if($count > 5) {
@@ -1165,6 +1166,7 @@ function get_final_url_with_cookie($url, $timeout = 5, $count = 0, $cookie = "")
         return ("");
     }
     $url = clean_url($url);
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
 
     $curl = curl_init();
@@ -1219,6 +1221,7 @@ function fetchUrl($url, $timeout = 30)
     $url = clean_url($url);
 
     $curl = curl_init();
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -1254,6 +1257,7 @@ function fetchUrlSafe($url, $timeout = 30)
     $url = clean_url($url);
 
     $curl = curl_init();
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -1295,6 +1299,7 @@ function getMastodonTimeline($hosturl, $token, $timeout = 30)
     $url = clean_url($url);
 
     $curl = curl_init();
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -1498,11 +1503,13 @@ function micropub_post($uid = NULL, $content = NULL, $link = "", $media_id = "")
     }
 }
 
+
 //Gets a feed from a URL
 function fetchFeedUrl($url, $subcount = 0, $sysver = '', $timeout = 30)
 {
     //Assemble a User-agent string that will report stats to the
     //feed owner if possible
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     $uadetails = "";
     if ($subcount > 0) {
@@ -1547,6 +1554,7 @@ function fetchUrlExtra($url, $timeout = 30)
     $url = clean_url($url);
 
     $curl = curl_init();
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -1582,6 +1590,7 @@ function postUrlExtra($url, $post_parameters = array(), $post_headers = array(),
     $url = clean_url($url);
 
     $curl = curl_init();
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -1636,6 +1645,7 @@ function httpUploadFile($url, $post_parameters = array(), $post_headers = array(
     $url = clean_url($url);
 
     $curl = curl_init();
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);

@@ -13,6 +13,8 @@ var query = 0;
 var checkall = false;
 var checkone = false;
 var ckoneurl = '';
+var netwait = 30;
+var feedcount = 0;
 
 //Get command line args
 process.argv.forEach((val, index, array) => {
@@ -42,7 +44,12 @@ var connection = mysql.createConnection({
     password:   config.database.dbpass,
     database:   config.database.dbname
 });
-connection.connect();
+connection.connect(function(err) {
+    if (err) {
+        console.error('Error connecting to mysql: ' + err.stack);
+        process.exit(1);
+    }
+});
 
 //Timestamp for one month ago
 var monthago = (Date.now() / 1000) - (28 * 86400);
@@ -64,6 +71,7 @@ connection.query(query, function(err,rows,fields) {
 
     for (var row in rows) {
         var feed = rows[row];
+        feedcount++;
 
         //Ignore feeds that dont start with http scheme
 
@@ -80,9 +88,14 @@ connection.query(query, function(err,rows,fields) {
         (function(f) {
             netcalls++;
             var lastmod = 0;
+            var redirectCodes = [];
             var opt = {
                 uri: f.url,
-                followRedirect: true,
+                followRedirect: function (resp) {
+                    redirectCodes.push(resp.statusCode);
+                    return true;
+                },
+                gzip: true,
                 strictSSL: false,
                 encoding: null
             };
@@ -95,10 +108,9 @@ connection.query(query, function(err,rows,fields) {
             f.lastmodPretty = lastmod;
             opt.headers = {
                 'If-Modified-Since': lastmod,
-                'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:18.0) Gecko/20100101 Firefox/18.0'
+                'User-Agent': 'FreedomController-Cartulary/' + config.main.cg_sys_version
             };
 
-            //loggit(3, "LastMod: " + lastmod + "(" + f.lastmod + ")");
             console.log("LastMod: " + lastmod + "(" + f.lastmod + ")");
 
             request(opt, function(err, response, body) {
@@ -140,6 +152,22 @@ connection.query(query, function(err,rows,fields) {
                         if(err.code == 'EAI_AGAIN') {
                             dbcalls++;
                             connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=903 WHERE id=?', [f.id], function (err, result) {
+                                if (err) throw err;
+                                if (result.affectedRows === 0) console.log("Error updating feed content in database.");
+                                dbcalls--;
+                            });
+                        } else
+                        if(err.code == 'ECONNREFUSED') {
+                            dbcalls++;
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+10,lasthttpstatus=905 WHERE id=?', [f.id], function (err, result) {
+                                if (err) throw err;
+                                if (result.affectedRows === 0) console.log("Error updating feed content in database.");
+                                dbcalls--;
+                            });
+                        } else
+                        if(err.code == 'EHOSTUNREACH') {
+                            dbcalls++;
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=906 WHERE id=?', [f.id], function (err, result) {
                                 if (err) throw err;
                                 if (result.affectedRows === 0) console.log("Error updating feed content in database.");
                                 dbcalls--;
@@ -198,20 +226,21 @@ connection.query(query, function(err,rows,fields) {
                     //Log some basic info
                     console.log("  " + f.title + " : (" + f.lastmodPretty + ") " + f.url + " : " + response.statusCode);
 
+                    if( typeof response.headers['Last-Modified'] !== "undefined" ) {
+                        newmod = Math.floor(Date.parse(response.headers['Last-Modified']) / 1000);
+                    } else {
+                        newmod = Math.floor(Date.now() / 1000);
+                    }
+                    loggit(3, "Feed: ["+f.url+"] LastMod: ["+f.lastmod+" | "+newmod+"] Response: ["+response.statusCode+"]");
+
                     //2xx response
                     if(response.statusCode / 100 === 2) {
-                        if( typeof response.headers['Last-Modified'] !== "undefined" ) {
-                            newmod = Date.parse(response.headers['Last-Modified']) / 1000;
-                        } else {
-                            newmod = Date.now() / 1000;
-                        }
-
-                        if(xml.length > 1040000) {
+                        if(xml.length > 3040000) {
                             console.log("  Error:  Feed content is too large.");
                         } else {
                             dbcalls++;
 
-                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content=?,lastcheck=UNIX_TIMESTAMP(now()),lastmod=?,updated=1,errors=0,lasthttpstatus=?,lastgoodhttpstatus=UNIX_TIMESTAMP(now()) WHERE id=?', [xml, newmod, response.statusCode, f.id], function (err, result) {
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content=?,lastcheck=UNIX_TIMESTAMP(now()),lastmod=?,updated=1,lasthttpstatus=?,lastgoodhttpstatus=UNIX_TIMESTAMP(now()) WHERE id=?', [xml, newmod, response.statusCode, f.id], function (err, result) {
                                 if (err) throw err;
                                 if (result.affectedRows === 0) {
                                     console.log("  Error updating feed content in database.");
@@ -279,6 +308,33 @@ connection.query(query, function(err,rows,fields) {
                         });
                     }
 
+                    //Handle redirections, where the final url is different than the original one requested
+                    if(response.hasOwnProperty(request) && response.request.hasOwnProperty(uri) && response.request.uri.href.indexOf("http") == 0 && response.request.uri.href !== f.url && typeof redirectCodes[0] !== "undefined") {
+                        console.log("  Redirected from: ["+f.url+"] to: ["+response.request.uri.href+" | "+redirectCodes[0]+" | "+response.statusCode+"]");
+                        loggit(3, "Aggrivate: Feed url redirect from: ["+f.url+"] to: ["+response.request.uri.href+" | "+redirectCodes[0]+" -> "+response.statusCode+"].");
+                        if(redirectCodes[0] === 301) {
+                            dbcalls++;
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET url=?,lasthttpstatus=301,lastgoodhttpstatus=UNIX_TIMESTAMP(now()) WHERE id=?', [response.request.uri.href, f.id], function (err, result) {
+                                if (err) {
+                                    console.log("Error updating feed url location in database. Err: [" + err.code + "]");
+                                    loggit(2, "Error updating feed url location in database. Err: [" + err.code + "]");
+                                }
+                                //if (result.affectedRows === 0) console.log("Error updating feed content in database.");
+                                dbcalls--;
+                            });
+                        } else if(redirectCodes[0] === 308) {
+                            dbcalls++;
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET url=?,lasthttpstatus=308,lastgoodhttpstatus=UNIX_TIMESTAMP(now()) WHERE id=?', [response.request.uri.href, f.id], function (err, result) {
+                                if (err) {
+                                    console.log("Error updating feed url location in database. Err: [" + err.code + "]");
+                                    loggit(2, "Error updating feed url location in database. Err: [" + err.code + "]");
+                                }
+                                //if (result.affectedRows === 0) console.log("Error updating feed content in database.");
+                                dbcalls--;
+                            });
+                        }
+                    }
+
                 } else {
                     //If neterr is set then we already handled this in the error handler section so skip
                     if(!neterr) {
@@ -301,13 +357,6 @@ connection.query(query, function(err,rows,fields) {
 });
 dbcalls--;
 
-dbcheck = setInterval(function() {
-    console.log("--- Still: [" + dbcalls + "] database calls and: ["+ netcalls +"] network requests outstanding.")
-    if( dbcalls === 0 && netcalls === 0) {
-        connection.end();
-        process.exit(0);
-    }
-}, 5000);
 
 function loggit(lognum, message) {
     //Timestamp for this log
@@ -336,3 +385,18 @@ function loggit(lognum, message) {
     //Return
     return true;
 }
+
+dbcheck = setInterval(function() {
+    console.log("--- Still: [" + dbcalls + "] database calls and: ["+ netcalls +"] network requests. Feed count: ["+feedcount+"]. Netwait: ["+netwait+"].")
+    if( dbcalls === 0 && (netcalls === 0 || netwait === 0)) {
+        connection.end();
+        loggit(3, "DEBUG: Aggrivate finished running.");
+        process.exit(0);
+    }
+    if( dbcalls === 0 ) {
+        netwait--;
+    }
+    if( dbcalls > 0) {
+        netwait = 30;
+    }
+}, 5000);

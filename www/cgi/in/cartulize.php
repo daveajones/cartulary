@@ -42,6 +42,7 @@ if (isset($_REQUEST['json'])) {
 $html_only = true;
 $ispdf = FALSE;
 $linkonly = FALSE;
+$querystring = $_SERVER['QUERY_STRING'];
 
 // Get a start time
 $tstart = time();
@@ -291,7 +292,7 @@ if ($linkonly == FALSE) {
         $slimcontent = $content;
 
     //Is this a wordpress post?
-    } else if (preg_match('/\<div.*class.*post-content\>/i', $html)) {
+    } else if (preg_match('/\<div.*class.*post-content.*\>/i', $html)) {
         loggit(2, "DEBUG: ----------------------> Getting a wordpress post.");
 
         $dom = new DomDocument();
@@ -306,7 +307,25 @@ if ($linkonly == FALSE) {
         $content .= trim($tmp_dom->saveHTML());
 
         $analysis = "";
-        $slimcontent = $content;
+        $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE);
+
+    //Is this a blogger post?
+    } else if (preg_match('/\<div.*class.*post-body.*\>/i', $html)) {
+        loggit(3, "DEBUG: ----------------------> Getting a blogger post.");
+
+        $dom = new DomDocument();
+        $dom->loadHTML($html);
+        $classname = 'post-body';
+        $finder = new DomXPath($dom);
+        $nodes = $finder->query("//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+        $tmp_dom = new DOMDocument();
+        foreach ($nodes as $node) {
+            $tmp_dom->appendChild($tmp_dom->importNode($node, true));
+        }
+        $content .= trim($tmp_dom->saveHTML());
+
+        $analysis = "";
+        $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE);
 
     //Is this a PDF?
     } else if ($ispdf) {
@@ -335,9 +354,14 @@ if ($linkonly == FALSE) {
             $readability->parse($html);
             $content = $readability->getContent();
             $title = $readability->getTitle();
-        } catch (ParseException $e) {
+            if(!empty($title)) {
+                loggit(3, "Got article: [$title] with Readability.");
+            }
+        } catch (\andreskrey\Readability\ParseException $e) {
             loggit(3, "DEBUG: New cart process failed.");
-            $content = sprintf('Error processing text: %s', $e->getMessage);
+            header("Location: /cgi/in/cartulize2?".$querystring);
+            exit(0);
+            //$content = sprintf('Error processing text: %s', $e->getMessage);
         }
 
         //Do textual analysis and save it in the database

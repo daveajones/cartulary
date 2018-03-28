@@ -3,6 +3,34 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## [v1.2.0](https://github.com/andreskrey/readability.php/releases/tag/v1.2.0)
+
+- Merged PR#49 (Missing object when calling `->getContent()`)
+- Imported all changes from Readability.js as of 2 March 2018 ([8525c6a](https://github.com/mozilla/readability/commit/8525c6af36d3badbe27c4672a6f2dd99ddb4097f)):
+    - Check for `<base>` elements before converting URLs to absolute.
+    - Clean `<link>` tags on `prepArticle()`
+    - Attempt to return at least some text if all the algorithm runs fail (Check PR [#423](https://github.com/mozilla/readability/pull/423) on JS version)
+    - Add new test cases for the previous changes
+    - And all other changes reflected [in this diff](https://github.com/mozilla/readability/compare/c3ff1a2d2c94c1db257b2c9aa88a4b8fbeb221c5...8525c6af36d3badbe27c4672a6f2dd99ddb4097f)
+
+## [v1.1.1](https://github.com/andreskrey/readability.php/releases/tag/v1.1.1)
+
+- Switched from assertEquals to assertSame on unit testing to avoid weak comparisons. 
+- Added a safe check to avoid sending the DOMDocument as a node when scanning for node ancestors.
+- Fix issue #45: Small mistake in documentation
+- Fix issue #46: Added `data-src` as a image source path
+- Fixed bug when extracting all the image of the article (Was extracting images from the original DOM instead of the parsed one)
+- Added the `->getDOMDocument()` getter to retrieve the fully parsed DOMDocument
+- Merged PR #48 that allows passing an array as configuration (@topotru)
+
+## [v1.1.0](https://github.com/andreskrey/readability.php/releases/tag/v1.1.0)
+
+- Added 'data-orig' as an URL source for images
+- Removed 'modal' as a negative property from classes
+- Added option to inject a logger
+- Removed all references to the `data-readability` tags that don't apply anymore to the new structure
+- Merged PR #38 (Missing DOMEntityReference)
+
 ## [v1.0.0](https://github.com/andreskrey/readability.php/releases/tag/v1.0.0)
 
 - Node encapsulation is gone. Pre v1 all nodes where encapsulated in a Readability class, which created lots of trouble with dependencies, responsibilities, and properties. Now all the encapsulation is gone: all the DOMNodes inside the Readability class are extensions of the original DOM classes, which allows the system to take advantage of the functions and properties of DOMDocument.

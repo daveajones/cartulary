@@ -304,12 +304,12 @@ if ($linkonly == FALSE) {
         $slimcontent = $content;
 
     //Is this a wordpress post?
-    } else if (preg_match('/\<div.*class.*post-content.*\>/i', $html)) {
+    } else if (preg_match('/\<div.*class.*entry-content.*\>/i', $html)) {
         loggit(2, "DEBUG: ----------------------> Getting a wordpress post.");
 
         $dom = new DomDocument();
         $dom->loadHTML($html);
-        $classname = 'post-content';
+        $classname = 'entry-content';
         $finder = new DomXPath($dom);
         $nodes = $finder->query("//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
         $tmp_dom = new DOMDocument();

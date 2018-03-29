@@ -1,0 +1,7 @@
+#Release Notes - Freedom Controller v0.7.3
+
+
+This is a bugfix release for a problem with the news river page.  This reverts the real-time pulling and puts
+it back to river.js/jsonp for now until I can work out what the problem is.
+
+This release also includes some tweaks to cartulizing to improve extraction.

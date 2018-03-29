@@ -1,5 +1,5 @@
 # Readability.php
-[![Latest Stable Version](https://poser.pugx.org/andreskrey/readability.php/v/stable)](https://packagist.org/packages/andreskrey/readability.php) [![StyleCI](https://styleci.io/repos/71042668/shield?branch=master)](https://styleci.io/repos/71042668) [![Build Status](https://travis-ci.org/andreskrey/readability.php.svg?branch=master)](https://travis-ci.org/andreskrey/readability.php) [![Total Downloads](https://poser.pugx.org/andreskrey/readability.php/downloads)](https://packagist.org/packages/andreskrey/readability.php) [![Monthly Downloads](https://poser.pugx.org/andreskrey/readability.php/d/monthly)](https://packagist.org/packages/andreskrey/readability.php)
+[![Latest Stable Version](https://poser.pugx.org/andreskrey/readability.php/v/stable)](https://packagist.org/packages/andreskrey/readability.php) [![Build Status](https://travis-ci.org/andreskrey/readability.php.svg?branch=master)](https://travis-ci.org/andreskrey/readability.php) [![Coverage Status](https://coveralls.io/repos/github/andreskrey/readability.php/badge.svg?branch=master)](https://coveralls.io/github/andreskrey/readability.php/?branch=master) [![StyleCI](https://styleci.io/repos/71042668/shield?branch=master)](https://styleci.io/repos/71042668) [![Total Downloads](https://poser.pugx.org/andreskrey/readability.php/downloads)](https://packagist.org/packages/andreskrey/readability.php) [![Monthly Downloads](https://poser.pugx.org/andreskrey/readability.php/d/monthly)](https://packagist.org/packages/andreskrey/readability.php)
 
 PHP port of *Mozilla's* **[Readability.js](https://github.com/mozilla/readability)**. Parses html text (usually news and other articles) and returns **title**, **author**, **main image** and **text content** without nav bars, ads, footers, or anything that isn't the main body of the text. Analyzes each node, gives them a score, and determines what's relevant and what can be discarded.
 
@@ -7,13 +7,13 @@ PHP port of *Mozilla's* **[Readability.js](https://github.com/mozilla/readabilit
 
 The project aim is to be a 1 to 1 port of Mozilla's version and to follow closely all changes introduced there, but there are some major differences on the structure. Most of the code is a 1:1 copy –even the comments were imported– but some functions and structures were adapted to suit better the PHP language.
 
+**Lead Developer**: Andres Rey
+
 ## Requirements
 
 PHP 5.6+, ext-dom, ext-xml, and ext-mbstring. To install all this dependencies (in the rare case your system does not have them already), you could try something like this in *nix like environments:
 
 `$ sudo apt-get install php7.1-xml php7.1-mbstring`
-
-**Lead Developer**: Andres Rey
 
 ## How to use it
 
@@ -24,7 +24,7 @@ First you have to require the library using composer:
 Then, create a Readability class and pass a Configuration class, feed the `parse()` function with your HTML and echo the variable:
 
 ```php 
-use andreskrey\Readability\HTMLParser;
+use andreskrey\Readability\Readability;
 use andreskrey\Readability\Configuration;
 
 $readability = new Readability(new Configuration());
@@ -35,7 +35,7 @@ try {
     $readability->parse($html);
     echo $readability;
 } catch (ParseException $e) {
-    echo sprintf('Error processing text: %s', $e->getMessage);
+    echo sprintf('Error processing text: %s', $e->getMessage());
 }
 ```
 
@@ -60,17 +60,29 @@ Here's a list of the available properties:
 - Author: `->getAuthor();`
 - Text direction (ltr or rtl): `->getDirection();`
 
+If you need to tweak the final HTML you can get the DOMDocument of the result by calling `->getDOMDocument()`.
+
 ## Options
 
 You can change the behaviour of Readability via the Configuration object. For example, if you want to fix relative URLs and declare the original URL, you could set up the configuration like this:
 
 ```php
 $configuration = new Configuration();
-$configuration->setFixRelativeURLs(true)
+$configuration
+    ->setFixRelativeURLs(true)
     ->setOriginalURL('http://my.newspaper.url/article/something-interesting-to-read.html');
 ```
+Also you can pass an array of configuration parameters to the constructor:
+```php
+$configuration = new Configuration([
+    'fixRelativeURLs' => true,
+    'originalURL'     => 'http://my.newspaper.url/article/something-interesting-to-read.html',
+    // other parameters ... listing below
+]);
+```
 
-Then you pass this Configuration object to Readability. The following options are available. Remember to prepend `set` when calling them.
+
+Then you pass this Configuration object to Readability. The following options are available. Remember to prepend `set` when calling them using native setters.
 
 - **MaxTopCandidates**: default value `5`, max amount of top level candidates.
 - **WordThreshold**: default value `500`, minimum amount of characters to consider that the article was parsed successful.
@@ -78,12 +90,26 @@ Then you pass this Configuration object to Readability. The following options ar
 - **StripUnlikelyCandidates**: default value `true`, remove nodes that are unlikely to have relevant information. Useful for debugging or parsing complex or non-standard articles. 
 - **CleanConditionally**: default value `true`, remove certain nodes after parsing to return a cleaner result. 
 - **WeightClasses**: default value `true`, weight classes during the rating phase. 
-- **RemoveReadabilityTags**: default value `true`, remove the data-readability tags inside the nodes that are added during the rating phase. 
 - **FixRelativeURLs**: default value `false`, convert relative URLs to absolute. Like `/test` to `http://host/test`. 
 - **SubstituteEntities**: default value `false`, disables the `substituteEntities` flag of libxml. Will avoid substituting HTML entities. Like `&aacute;` to á.
 - **NormalizeEntities**: default value `false`, converts UTF-8 characters to its HTML Entity equivalent. Useful to parse HTML with mixed encoding.
 - **OriginalURL**: default value `http://fakehost`, original URL from the article used to fix relative URLs.
 - **SummonCthulhu**: default value `false`, remove all `<script>` nodes via regex. This is not ideal as it might break things, but might be the only solution to [libxml problems with unescaped javascript](https://github.com/andreskrey/readability.php#known-issues). If you're not parsing Javascript tutorials, it's recommended to always set this option as `true`.
+
+### Debug log
+
+Logging is optional and you will have to inject your own logger to save all the debugging messages. To do so, use a logger that implements the [PSR-3 logging interface](https://github.com/php-fig/log) and pass it to the configuration object. For example:
+
+```
+// Using monolog
+
+$log = new Logger('Readability');
+$log->pushHandler(new StreamHandler('path/to/my/log.txt'));
+
+$configuration->setLogger($log);
+```
+
+In the log you will find information about the parsed nodes, why they were removed, and why they were considered relevant to the final article.
 
 ## Limitations
 
@@ -126,7 +152,7 @@ Self closing tags like `<br />` get automatically expanded to `<br></br`. No way
 
 ## Dependencies
 
-Readability.php has no dependencies to other libraries.
+Readability.php uses the [PSR Log](https://github.com/php-fig/log) interface to define the allowed type of loggers. [Monolog](https://github.com/Seldaek/monolog) is only required on development installations. (`--dev` option during `composer install`).
 
 ## To-do
 
@@ -139,7 +165,7 @@ Readability parses all the text with DOMDocument, scans the text nodes and gives
 
 ## Code porting
 
-Up to date with readability.js as of [16 Oct 2017](https://github.com/mozilla/readability/commit/c3ff1a2d2c94c1db257b2c9aa88a4b8fbeb221c5).
+Up to date with readability.js as of [2 Mar 2018](https://github.com/mozilla/readability/commit/8525c6af36d3badbe27c4672a6f2dd99ddb4097f).
  
 ## License
 

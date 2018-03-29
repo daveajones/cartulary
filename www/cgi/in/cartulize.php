@@ -15,6 +15,8 @@ include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMComment.php";
 include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMDocumentFragment.php";
 include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMDocumentType.php";
 include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMElement.php";
+include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMEntity.php";
+include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMEntityReference.php";
 include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMNode.php";
 include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMNotation.php";
 include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMProcessingInstruction.php";
@@ -43,6 +45,7 @@ $html_only = true;
 $ispdf = FALSE;
 $linkonly = FALSE;
 $querystring = $_SERVER['QUERY_STRING'];
+$referer = "";
 
 // Get a start time
 $tstart = time();
@@ -86,10 +89,19 @@ if (preg_match('/feedproxy\.google\.com/i', $url)) {
     $url = get_final_url($oldurl);
     loggit(3, "Converting feedproxy url: [$oldurl] to [$url].");
 }
+if (preg_match('/wsj\.com\/articles/i', $url)) {
+    $oldurl = $url;
+    $url = str_replace("wsj.com/articles/", "wsj.com/amp/articles/", $url);
+    loggit(3, "Converting wsj url: [$oldurl] to [$url].");
+}
+if (preg_match('/ft\.com\//i', $url)) {
+    $referer = "https://www.google.com";
+    loggit(3, "Setting referer to: [$referer].");
+}
 //##: ------- END PRE-PROCESS of URL -----------------------------------------------------------------------------
 
 
-$response = fetchUrlExtra($url);
+$response = fetchUrlExtra($url, 30, $referer);
 //loggit(3, "DEBUG: ".print_r($response, TRUE));
 $mret = preg_match('|http-equiv.*refresh.*content="\s*\d+\s*;\s*url=\'?(.*?)\'?\s*"|i', $response['body'], $mrmatches);
 if (($mret > 0) && !empty($mrmatches[1])) {
@@ -410,7 +422,7 @@ if (isset($_REQUEST['stitle'])) {
 // ---------- BEGIN TITLE HANDLING ----------
 //Was a title specified in the request?  If so, set that as the title instead of the extracted one
 if (isset($_REQUEST['title'])) {
-    if (!empty($_REQUEST['title'])) {
+    if (!empty($_REQUEST['title']) && stripos($_REQUEST['title'], "Subscribe to read") === FALSE ) {
         $title = $_REQUEST['title'];
         if (strpos($sourceurl, 'twitter.com') !== FALSE) {
             $title = '@' . $title;

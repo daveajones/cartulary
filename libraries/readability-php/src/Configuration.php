@@ -2,55 +2,130 @@
 
 namespace andreskrey\Readability;
 
+//use Psr\Log\LoggerAwareTrait;
+//use Psr\Log\LoggerInterface;
+//use Psr\Log\NullLogger;
+
 /**
  * Class Configuration.
  */
 class Configuration
 {
+//    use LoggerAwareTrait;
+
     /**
      * @var int
      */
     protected $maxTopCandidates = 5;
+
     /**
      * @var int
      */
     protected $wordThreshold = 500;
+
     /**
      * @var bool
      */
     protected $articleByLine = false;
+
     /**
      * @var bool
      */
     protected $stripUnlikelyCandidates = true;
+
     /**
      * @var bool
      */
     protected $cleanConditionally = true;
+
     /**
      * @var bool
      */
     protected $weightClasses = true;
-    /**
-     * @var bool
-     */
-    protected $removeReadabilityTags = true;
+
     /**
      * @var bool
      */
     protected $fixRelativeURLs = false;
+
     /**
      * @var bool
      */
     protected $substituteEntities = false;
+
     /**
      * @var bool
      */
     protected $normalizeEntities = false;
+
+    /**
+     * @var bool
+     */
+    protected $summonCthulhu = false;
+
     /**
      * @var string
      */
     protected $originalURL = 'http://fakehost';
+
+    /**
+     * Configuration constructor.
+     *
+     * @param array $params
+     */
+    public function __construct(array $params = [])
+    {
+        foreach ($params as $key => $value) {
+            $setter = sprintf('set%s', $key);
+            if (method_exists($this, $setter)) {
+                call_user_func([$this, $setter], $value);
+            }
+        }
+    }
+
+    /**
+     * Returns an array-representation of configuration.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $out = [];
+        foreach ($this as $key => $value) {
+            $getter = sprintf('get%s', $key);
+            if (!is_object($value) && method_exists($this, $getter)) {
+                $out[$key] = call_user_func([$this, $getter]);
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    public function getLogger()
+    {
+        // If no logger has been set, just return a null logger
+//        if ($this->logger === null) {
+//            return new NullLogger();
+//        } else {
+//            return $this->logger;
+//        }
+        return null;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     *
+     * @return Configuration
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
 
     /**
      * @return int
@@ -175,26 +250,6 @@ class Configuration
     /**
      * @return bool
      */
-    public function getRemoveReadabilityTags()
-    {
-        return $this->removeReadabilityTags;
-    }
-
-    /**
-     * @param bool $removeReadabilityTags
-     *
-     * @return $this
-     */
-    public function setRemoveReadabilityTags($removeReadabilityTags)
-    {
-        $this->removeReadabilityTags = $removeReadabilityTags;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
     public function getFixRelativeURLs()
     {
         return $this->fixRelativeURLs;
@@ -291,9 +346,4 @@ class Configuration
 
         return $this;
     }
-
-    /**
-     * @var bool
-     */
-    protected $summonCthulhu = false;
 }

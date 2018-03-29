@@ -1169,101 +1169,7 @@ freedomController.v1.river.methods = (function () {
             data = JSON.parse(lsdata);
         }
 
-        $.each(data.data.items, function (i, item) {
-            //Add an index
-            item.index = i;
-
-            if (item.hidden != 1) {
-                //Add each discovered feed to the active feed sidebar
-                if (item.feed.linkedOutlineType === 'sopml') {
-                    freedomController.v1.river.methods.addActiveFeed(item.feed.linkedOutlineId, item.feed.ownerName, item.feed.linkedOutlineUrl, item.feed.avatarUrl, "person", 'top');
-                } else {
-                    freedomController.v1.river.methods.addActiveFeed(item.feed.feedId, item.feed.feedTitle, item.feed.feedUrl, item.feed.websiteUrl, "feed", 'bottom');
-                }
-
-                //Check if the item exists already
-                if ($(pathToStreamItem + '#' + item.id).length > 0) {
-                    $(pathToStreamItem + '#' + item.id).prependTo('#stream .col' + col + ' .stream-list');
-                    _makePostSticky(pathToStreamItem + '#' + item.id, item.id, item.index, item.feed.feedId);
-
-                } else {
-                    //Check if the origin exists already
-                    if (item.origin != "" && $(pathToStreamItem + '[data-origin="' + item.origin + '"]').length > 0) {
-                        //Add as sub-item
-                        $('#template-subitem').tmpl(item).appendTo(pathToStreamItem + '[data-origin="' + item.origin + '"]');
-                        console.log('append subitem to: ' + pathToStreamItem + '#' + item.id);
-                    } else {
-                        //Add as item
-                        $('#template').tmpl(item).prependTo('#stream .col' + col + ' .stream-list');
-
-                        //Increment column counter
-                        if (col == cols) {
-                            col = 1;
-                        } else {
-                            col++;
-                        }
-                    }
-                }
-
-                //Add a swipe handler for mobile
-                if (platform == "mobile") {
-                    (function () {
-                        $(pathToStreamItem + '#' + item.id + ' div.header h3 a').on('press', function () {
-                            $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
-                        });
-                        $(pathToStreamItem + '#' + item.id).on('flick', function (e) {
-                            //A LtoR flick triggers un-sticky call
-                            if (e.orientation === 'horizontal' && e.direction === 1) {
-                                $(pathToStreamItem + '#' + item.id).hide();
-                                //$(pathToStreamItem + '#' + item.id + ' .aUnSticky').trigger('click', {source: "swipe"});
-                            }
-                            //If article cart'd already, then RtoL flick prompts for title change
-                            if (e.orientation === 'horizontal' && e.direction === -1 && $(pathToStreamItem + '#' + item.id).hasClass('cartulized')) {
-                                var articleid = $(pathToStreamItem + '#' + item.id).data('articleid');
-                                var newtitle = prompt("Enter new title...", item.title);
-                                if (newtitle != null) {
-                                    //Make the call
-                                    $.ajax({
-                                        url: '/cgi/in/setarticletitle?id=' + articleid + '&title=' + newtitle,
-                                        type: "GET",
-                                        timeout: 20000,
-                                        dataType: 'json',
-                                        success: function (data) {
-                                            if (data.status == "false") {
-                                                showMessage(data.description, data.status, 5);
-                                            } else {
-                                                $(pathToStreamItem + '#' + item.id + ' div.header h3 a').empty().append(newtitle);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                            //If article not cart'd already, then RtoL flick carts it
-                            if (e.orientation === 'horizontal' && e.direction === -1 && !$(pathToStreamItem + '#' + item.id).hasClass('cartulized')) {
-                                $(pathToStreamItem + '#' + item.id + ' .cartlink').trigger('click');
-                            }
-                        })
-                    })();
-                }
-            }
-
-        });
-
-        return false;
-    }
-
-
-    function _populateGridOld(cols, data) {
-        var col = 1;
-
-        //Get data out of local storage
-        var lsdata = sessionStorage.getItem(lsRiverDataKey);
-        if (lsdata !== null) {
-            data = JSON.parse(lsdata);
-        }
-
-        //$.each(data.updatedFeeds.updatedFeed, function (f, feed) {
-        $.each(data.data.items, function (f, feed) {
+        $.each(data.updatedFeeds.updatedFeed, function (f, feed) {
             //Add each discovered feed to the active feed sidebar
             if (feed.linkedOutlineType === 'sopml') {
                 freedomController.v1.river.methods.addActiveFeed(feed.linkedOutlineId, feed.ownerName, feed.linkedOutlineUrl, feed.avatarUrl, "person", 'top');
@@ -1371,8 +1277,6 @@ freedomController.v1.river.methods = (function () {
 
 
     function _getRiverItems(cached) {
-        var timestamp = Math.round(new Date().getTime() / 1000);
-
         if (cached == true) {
             _populateGrid(_calculateColumnCount());
             return true;
@@ -1380,11 +1284,9 @@ freedomController.v1.river.methods = (function () {
 
         //Get the river json data and parse it
         return $.ajax({
-            //url: riverJsonUrl + '?callback=?',
-            //jsonpCallback: 'onGetRiverStream',
-            //dataType: "jsonp",
-            url: '/cgi/out/list.river?flat&ts=' + timestamp,
-            dataType: "json",
+            url: riverJsonUrl + '?callback=?',
+            jsonpCallback: 'onGetRiverStream',
+            dataType: "jsonp",
             success: function (data) {
                 //console.log('store data: ' + data);
                 sessionStorage.setItem(lsRiverDataKey, JSON.stringify(data));
@@ -1466,7 +1368,7 @@ freedomController.v1.river.methods = (function () {
                             $('#videoBox').removeClass('in').addClass('out');
                             $('#videoBox').css('bottom','0');
 
-                        //This means the video is entirely within the viewing area
+                            //This means the video is entirely within the viewing area
                         } else if ( (viewporttop - 200 < boxtop) && ( viewportbottom + 200 > boxbottom) ) {
                             $('#videoBox').css('bottom','-500px');
                             $('#videoBox').removeClass('out').addClass('in');

@@ -1549,7 +1549,7 @@ function fetchFeedUrl($url, $subcount = 0, $sysver = '', $timeout = 30)
 
 
 //Gets the data from a URL along with extra info returned */
-function fetchUrlExtra($url, $timeout = 30)
+function fetchUrlExtra($url, $timeout = 30, $referer = "")
 {
     $url = clean_url($url);
 
@@ -1567,6 +1567,10 @@ function fetchUrlExtra($url, $timeout = 30)
     curl_setopt($curl, CURLOPT_ENCODING, "");
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+
+    if(!empty($referer)) {
+        curl_setopt($curl, CURLOPT_REFERER, $referer);
+    }
 
     $data = curl_exec($curl);
     $response = curl_getinfo($curl);

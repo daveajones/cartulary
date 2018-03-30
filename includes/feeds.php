@@ -2679,7 +2679,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                         $esize = check_head_size($esrc);
                     }
                     //If it's not duplicate, add it
-                    if (!in_array_r($esrc, $enclosures)) {
+                    if (!in_array_r($esrc, $enclosures) && !empty($esrc)) {
                         $enclosures[] = array('url' => $esrc,
                             'length' => 0 + $esize,
                             'type' => make_mime_type($esrc, $etype)
@@ -2711,7 +2711,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                 if ($mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video') {
                     $esize = check_head_size($mediatag['src']);
                 }
-                if ((empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures)) {
+                if ((empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) && !empty($mediatag['src'])) {
                     $enclosures[] = array('url' => $mediatag['src'],
                                           'length' => 0 + $esize,
                                           'type' => make_mime_type($mediatag['src'], $mediatag['type']),
@@ -2766,12 +2766,14 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         $mcount = count($item->enclosure);
         $enclosures = array();
         for ($i = 0; $i < $mcount; $i++) {
-            if (!in_array_r((string)$item->enclosure[$i]->attributes()->url, $enclosures)) {
-                $enclosures[$i] = array('url' => (string)$item->enclosure[$i]->attributes()->url,
-                    'length' => 0 + (string)$item->enclosure[$i]->attributes()->length,
-                    'type' => make_mime_type((string)$item->enclosure[$i]->attributes()->url, (string)$item->enclosure[$i]->attributes()->type)
-                );
-                $media = 1;
+            if(!empty((string)$item->enclosure[$i]->attributes()->url)) {
+                if (!in_array_r((string)$item->enclosure[$i]->attributes()->url, $enclosures)) {
+                    $enclosures[$i] = array('url' => (string)$item->enclosure[$i]->attributes()->url,
+                        'length' => 0 + (string)$item->enclosure[$i]->attributes()->length,
+                        'type' => make_mime_type((string)$item->enclosure[$i]->attributes()->url, (string)$item->enclosure[$i]->attributes()->type)
+                    );
+                    $media = 1;
+                }
             }
         }
 
@@ -2785,7 +2787,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
             $kcount = count($kids);
             $ecount = count($enclosures);
             for ($i = 0; $i < $kcount; $i++) {
-                if (isset($kids[$i]->attributes()->url)) {
+                if (isset($kids[$i]->attributes()->url) && !empty((string)$kids[$i]->attributes()->url)) {
                     $murl = (string)$kids[$i]->attributes()->url;
                     if (!in_array_r($murl, $enclosures)) {
                         $enclosures[$ecount] = array('url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => make_mime_type((string)$kids[$i]->attributes()->url));
@@ -2799,7 +2801,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
             $kcount = count($kids);
             $ecount = count($enclosures);
             for ($i = 0; $i < $kcount; $i++) {
-                if (isset($kids[$i]->attributes()->url)) {
+                if (isset($kids[$i]->attributes()->url) && !empty((string)$kids[$i]->attributes()->url)) {
                     $murl = (string)$kids[$i]->attributes()->url;
                     if (!in_array_r($murl, $enclosures)) {
                         $enclosures[$ecount] = array('url' => (string)$kids[$i]->attributes()->url, 'length' => 0, 'type' => make_mime_type((string)$kids[$i]->attributes()->url));
@@ -2869,7 +2871,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                 if ($mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video') {
                     $esize = check_head_size($mediatag['src']);
                 }
-                if ((empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures)) {
+                if ((empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) && !empty($mediatag['src'])) {
                     $enclosures[] = array('url' => $mediatag['src'],
                                           'length' => 0 + $esize,
                                           'type' => make_mime_type($mediatag['src'], $mediatag['type']),

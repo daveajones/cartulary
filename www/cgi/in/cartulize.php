@@ -99,8 +99,7 @@ if (preg_match('/ft\.com\//i', $url)) {
     loggit(3, "Setting referer to: [$referer].");
 }
 //##: ------- END PRE-PROCESS of URL -----------------------------------------------------------------------------
-
-
+$referer = "https://www.google.com";
 $response = fetchUrlExtra($url, 30, $referer);
 //loggit(3, "DEBUG: ".print_r($response, TRUE));
 $mret = preg_match('|http-equiv.*refresh.*content="\s*\d+\s*;\s*url=\'?(.*?)\'?\s*"|i', $response['body'], $mrmatches);
@@ -303,23 +302,45 @@ if ($linkonly == FALSE) {
         $analysis = "";
         $slimcontent = $content;
 
-    //Is this a wordpress post?
-    } else if (preg_match('/\<div.*class.*entry-content.*\>/i', $html)) {
-        loggit(2, "DEBUG: ----------------------> Getting a wordpress post.");
+    //Askwoody?
+    } else if (preg_match('/^http.*askwoody\.com.*/i', $url)) {
+        loggit(2, "DEBUG: ----------------------> Askwoody.com post.");
 
         $dom = new DomDocument();
         $dom->loadHTML($html);
-        $classname = 'entry-content';
+        $classname = 'paddings';
         $finder = new DomXPath($dom);
-        $nodes = $finder->query("//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+        $nodes = $finder->query("(//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]//ul/li)[1]/*[self::p or self::blockquote or self::img]");
         $tmp_dom = new DOMDocument();
         foreach ($nodes as $node) {
             $tmp_dom->appendChild($tmp_dom->importNode($node, true));
         }
-        $content .= trim($tmp_dom->saveHTML());
+        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE);
 
         $analysis = "";
-        $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE);
+        $slimcontent = $content;
+
+    //Is this a wordpress post?
+//    } else if (preg_match('/\<div.*class.*entry-content.*\>/i', $html)) {
+//        loggit(2, "DEBUG: ----------------------> Getting a wordpress post.");
+//
+//        $dom = new DomDocument();
+//        $dom->loadHTML($html);
+//        $classname = 'entry-content';
+//        $finder = new DomXPath($dom);
+//        $nodes = $finder->query("//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+//        $tmp_dom = new DOMDocument();
+//        foreach ($nodes as $node) {
+//            $tmp_dom->appendChild($tmp_dom->importNode($node, true));
+//        }
+//
+//        //Get rid of all the wordpress sharing crap
+//        $content = preg_replace('/\<div.*class.*sharedaddy.*</div>/i', '', $content);
+//
+//        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE);
+//
+//        $analysis = "";
+//        $slimcontent = $content;
 
     //Is this a blogger post?
     } else if (preg_match('/\<div.*class.*post-body.*\>/i', $html)) {
@@ -334,10 +355,10 @@ if ($linkonly == FALSE) {
         foreach ($nodes as $node) {
             $tmp_dom->appendChild($tmp_dom->importNode($node, true));
         }
-        $content .= trim($tmp_dom->saveHTML());
+        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE);
 
         $analysis = "";
-        $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE);
+        $slimcontent = $content;
 
     //Is this a PDF?
     } else if ($ispdf) {
@@ -353,11 +374,13 @@ if ($linkonly == FALSE) {
         //Do textual analysis and save it in the database
         $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
         //Reduce all that whitespace
-        $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE);
+        $slimcontent = clean_article_content($content, 0, FALSE, FALSE);
 
     //Normal web page
     } else {
-        loggit(3, "Cartulizing html.");
+        loggit(3, "Cartulizing article: [$url] with Readability.");
+
+        //Debugging loggit(3, print_r($html, TRUE));
 
         //Set up an extraction
         $readability = new Readability(new Configuration());
@@ -380,9 +403,8 @@ if ($linkonly == FALSE) {
         $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
 
         //Reduce all that whitespace
-        //$slimcontent = preg_replace('~>\s+<~', '><', $content);
-        $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE);
-
+        $content = clean_article_content($content, 0, FALSE, FALSE);
+        $slimcontent = $content;
     }
 
     //Calculate how long it took to cartulize this article

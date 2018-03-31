@@ -524,15 +524,28 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
         $media_tags = extract_media($content);
     }
 
+    //Replace continuous whitespace with just one space
+    $content = preg_replace("/(\ \ |[\r\n])+/i", ' ', $content);
+
+    //Strip tab codes
+    $content = preg_replace('/\t+/', '', $content);
+
+    //Strip out all the html tags except for the ones that control textual layout
+    if($withmedia) {
+        $content = strip_tags($content, '<p><h1><h2><h3><h4><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a>');
+    } else {
+        $content = strip_tags($content, '<p><h1><h2><h3><h4><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a><img><audio><video>');
+    }
+
     //Strip all line breaks since breakage is controlled by the markup
-    $content = preg_replace("/[\r\n]+/", "", $content);
+    //$content = preg_replace("/[\r\n]+/", "", $content);
 
     //Replace encoded html with real html
     $content = str_replace('&amp;', '&', $content);
     $content = str_replace(array('&lt;', '&gt;', '&nbsp;'), array('<', '>', ' '), $content);
 
-    //Strip out all the html tags except for the ones that control textual layout
-    $content = strip_tags($content, '<p><h1><h2><h3><h4><ul><ol><li><table><thead><tbody><tr><td><th><a><img><blockquote><i><em><b><span>');
+    //Replace isolated br divs with double br's
+    $content = preg_replace('/\<div\>\s*<br\ *\/*\>\s*\<\/div\>/iU', "<br><br>", $content);
 
     //Pad the clean span tags with spaces to retain formatting
     $content = str_replace(array('<span>', '</span>'), array(' <span>', '</span> '), $content);
@@ -540,11 +553,17 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
     //Strip the attributes from remaining tags
     $content = stripAttributes($content, array('href', 'src'));
 
-    //Replace continuous whitespace with just one space
-    $content = preg_replace("/\ \ +/", ' ', $content);
+    //Remove extra spaces within the guts of a tag
+    $content = preg_replace('/\<(a|img|p)(\ \ +)/i', "<$1 ", $content);
 
-    //Strip tab codes
-    $content = preg_replace('/\t+/', '', $content);
+    //Add a line brake between adjacent paragraph tags
+    $content = preg_replace('/\<\/p\>\ *\<p\>/i', "</p>\n<p>", $content);
+
+    //Replace empty anchor tags. WTF?
+    $content = preg_replace('/(<a(?!\/)[^>]+>)+(<\/[^>]+>)+/i', "", $content);
+
+    //Replace strings of more than two br's with just two
+    $content = preg_replace('/(\<br\>){3,}/i', "<br><br>", $content);
 
     //If a length was requested, chop it
     if ($length > 0) {
@@ -1548,18 +1567,29 @@ function fetchFeedUrl($url, $subcount = 0, $sysver = '', $timeout = 30)
 }
 
 
+//Handle headers from a curl request
+function curlHandleHeaderLine( $curl, $header_line ) {
+    echo "<br>YEAH: ".$header_line; // or do whatever
+    return strlen($header_line);
+}
+
+
 //Gets the data from a URL along with extra info returned */
-function fetchUrlExtra($url, $timeout = 30, $referer = "")
+function fetchUrlExtra($url, $timeout = 30, $referer = "", $useragent = "")
 {
     $url = clean_url($url);
 
     $curl = curl_init();
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
+    if(!empty($useragent)) {
+        $ua = $useragent;
+    }
+    $headers=[];
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($curl, CURLOPT_HEADER, 1);
+    //curl_setopt($curl, CURLOPT_HEADER, 1);
     curl_setopt($curl, CURLOPT_COOKIEFILE, "");
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
@@ -1567,6 +1597,23 @@ function fetchUrlExtra($url, $timeout = 30, $referer = "")
     curl_setopt($curl, CURLOPT_ENCODING, "");
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+    curl_setopt($ch, CURLOPT_HEADERFUNCTION,
+        function($curl, $header) use (&$headers)
+        {
+            $len = strlen($header);
+            $header = explode(':', $header, 2);
+            if (count($header) < 2) // ignore invalid headers
+                return $len;
+
+            $name = strtolower(trim($header[0]));
+            if (!array_key_exists($name, $headers))
+                $headers[$name] = [trim($header[1])];
+            else
+                $headers[$name][] = trim($header[1]);
+
+            return $len;
+        }
+    );
 
     if(!empty($referer)) {
         curl_setopt($curl, CURLOPT_REFERER, $referer);
@@ -1575,14 +1622,16 @@ function fetchUrlExtra($url, $timeout = 30, $referer = "")
     $data = curl_exec($curl);
     $response = curl_getinfo($curl);
 
-    list($response['headers'], $response['body']) = explode("\r\n\r\n", $data, 2);
-
+    $response['headers'] = $headers;
+    $response['body'] = $data;
     $response['effective_url'] = $url;
     $response['status_code'] = $response['http_code'];
 
     curl_close($curl);
 
-    //loggit(3, "DEBUG: [" . substr($response['body'], 0, 10) . "]");
+
+    //loggit(3, "DEBUG: [" . print_r($response, TRUE). "]");
+
 
     return $response;
 }

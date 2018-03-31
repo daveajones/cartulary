@@ -97,6 +97,14 @@
 .pageContentWrapper.River #stream #stream-items .stream-list .article .enclosureview {
 	text-align:center;
 }
+.pageContentWrapper.River .stream .stream-items .stream-list > .article.cartulized .enclosureview {
+    text-align:center;
+    clear:both;
+    border-top: dashed grey 1px;
+}
+.pageContentWrapper.River .stream .stream-items .stream-list > .article.cartulized .enclosureview * {
+    margin-bottom:20px;
+}
 .pageContentWrapper.River #stream #stream-items .stream-list .article .encobj {
 	max-width:100%;
 }

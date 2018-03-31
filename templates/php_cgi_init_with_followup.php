@@ -27,6 +27,12 @@
     exit(0);
   }
 
+  //Is this request using a token for auth?
+  //For now we're only allowing this with cartulizing articles
+  if(isset($_REQUEST['token']) && $_REQUEST['token'] ) {
+    loggit(3, "DEBUG(token): ".$_SERVER['REQUEST_URI']);
+  }
+
   // Valid session?  If not, get lost
   if(!is_logged_in()) {
     //Hold on to the previous requested URI for post-login redirect

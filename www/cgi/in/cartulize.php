@@ -40,6 +40,18 @@ if (isset($_REQUEST['json'])) {
     $json = FALSE;
 }
 
+//Was a title specified in the request?  If so, set that as the title instead of the extracted one
+$reqtitle = "";
+if (isset($_REQUEST['title'])) {
+    if (!empty($_REQUEST['title']) && stripos($_REQUEST['title'], "Subscribe to read") === FALSE ) {
+        $title = $_REQUEST['title'];
+        if (strpos($sourceurl, 'twitter.com') !== FALSE) {
+            $title = '@' . $title;
+        }
+        $reqtitle = trim($title);
+    }
+}
+
 //Globals
 $html_only = true;
 $ispdf = FALSE;
@@ -315,7 +327,7 @@ if ($linkonly == FALSE) {
         foreach ($nodes as $node) {
             $tmp_dom->appendChild($tmp_dom->importNode($node, true));
         }
-        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE);
+        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle);
 
         $analysis = "";
         $slimcontent = $content;
@@ -355,7 +367,7 @@ if ($linkonly == FALSE) {
         foreach ($nodes as $node) {
             $tmp_dom->appendChild($tmp_dom->importNode($node, true));
         }
-        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE);
+        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle);
 
         $analysis = "";
         $slimcontent = $content;
@@ -374,7 +386,7 @@ if ($linkonly == FALSE) {
         //Do textual analysis and save it in the database
         $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
         //Reduce all that whitespace
-        $slimcontent = clean_article_content($content, 0, FALSE, FALSE);
+        $slimcontent = clean_article_content($content, 0, FALSE, FALSE, $reqtitle);
 
     //Normal web page
     } else {
@@ -403,7 +415,7 @@ if ($linkonly == FALSE) {
         $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
 
         //Reduce all that whitespace
-        $content = clean_article_content($content, 0, FALSE, FALSE);
+        $content = clean_article_content($content, 0, FALSE, FALSE, $reqtitle);
         $slimcontent = $content;
     }
 
@@ -442,16 +454,9 @@ if (isset($_REQUEST['stitle'])) {
 
 
 // ---------- BEGIN TITLE HANDLING ----------
-//Was a title specified in the request?  If so, set that as the title instead of the extracted one
-if (isset($_REQUEST['title'])) {
-    if (!empty($_REQUEST['title']) && stripos($_REQUEST['title'], "Subscribe to read") === FALSE ) {
-        $title = $_REQUEST['title'];
-        if (strpos($sourceurl, 'twitter.com') !== FALSE) {
-            $title = '@' . $title;
-        }
-    }
+if(!empty($reqtitle)) {
+    $title = $reqtitle;
 }
-$title = trim($title);
 // ---------- END TITLE HANDLING ----------
 
 

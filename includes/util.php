@@ -501,7 +501,7 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
 
 
 //Take the html of an article and clean it up
-function clean_article_content($content = "", $length = 0, $asarray = FALSE, $withmedia = TRUE)
+function clean_article_content($content = "", $length = 0, $asarray = FALSE, $withmedia = TRUE, $title = "")
 {
     if (empty($content)) {
         if ($asarray == TRUE) {
@@ -530,25 +530,31 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
     //Strip tab codes
     $content = preg_replace('/\t+/', '', $content);
 
+    //Add a line brake between small and div since that's often a byline
+    $content = preg_replace('/\<\/small\>\s*\<div/i', '</small><br><br><div', $content);
+
+    //Convert span tags into paragraphs if they fall outside a paragraph
+    $content = preg_replace('/\<\/p\>\s*\<span[^>]*\>(.*)\<\/span\>/iU', "</p><p>$1</p>", $content);
+
     //Strip out all the html tags except for the ones that control textual layout
     if($withmedia) {
-        $content = strip_tags($content, '<p><h1><h2><h3><h4><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a>');
+        $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a>');
     } else {
-        $content = strip_tags($content, '<p><h1><h2><h3><h4><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a><img><audio><video>');
+        $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a><img><audio><video>');
     }
 
     //Strip all line breaks since breakage is controlled by the markup
     //$content = preg_replace("/[\r\n]+/", "", $content);
 
     //Replace encoded html with real html
-    $content = str_replace('&amp;', '&', $content);
-    $content = str_replace(array('&lt;', '&gt;', '&nbsp;'), array('<', '>', ' '), $content);
+    $content = str_ireplace('&amp;', '&', $content);
+    $content = str_ireplace(array('&lt;', '&gt;', '&nbsp;'), array('<', '>', ' '), $content);
 
     //Replace isolated br divs with double br's
     $content = preg_replace('/\<div\>\s*<br\ *\/*\>\s*\<\/div\>/iU', "<br><br>", $content);
 
     //Pad the clean span tags with spaces to retain formatting
-    $content = str_replace(array('<span>', '</span>'), array(' <span>', '</span> '), $content);
+    $content = str_ireplace(array('<span>', '</span>'), array(' <span>', '</span> '), $content);
 
     //Strip the attributes from remaining tags
     $content = stripAttributes($content, array('href', 'src'));
@@ -565,11 +571,20 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
     //Replace strings of more than two br's with just two
     $content = preg_replace('/(\<br\>){3,}/i', "<br><br>", $content);
 
+    //Attempt to de-duplicate the title from the body of the article
+    if(!empty($title)) {
+        loggit(3, "Deduplicating article title: [$title].");
+        $content = str_ireplace("<h1>$title</h1>", "", $content);
+        $content = str_ireplace("<h2>$title</h2>", "", $content);
+        $content = str_ireplace("<h3>$title</h3>", "", $content);
+        $content = str_ireplace("<h4>$title</h4>", "", $content);
+        $content = str_ireplace("<h5>$title</h5>", "", $content);
+    }
+
     //If a length was requested, chop it
     if ($length > 0) {
         $content = truncate_html($content, $length);
     }
-
 
     //Return the clean content and the media tags in an array
     if ($asarray == TRUE) {

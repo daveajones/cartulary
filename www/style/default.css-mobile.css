@@ -715,7 +715,7 @@ div.searchbar p.result-msg {
   line-height: 20px;
   margin-bottom: 20px;
 }
-.pageContentWrapper.Articles #divPageArticle #article #content img {  max-width:250px;  }
+.pageContentWrapper.Articles #divPageArticle #article #content img { max-width:500px; float:left; padding: 8px 20px 10px 3px; }
 .pageContentWrapper.Articles #divPageArticle #article #content iframe {  max-width:250px;  }
 .pageContentWrapper.Articles #divPageArticle #article #content object {  max-width:250px;  }
 .pageContentWrapper.Articles #divPageArticle #article #content embed {  max-width:250px;  }

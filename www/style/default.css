@@ -261,6 +261,18 @@ li.menubar-search-container { display:none; }
     float:left;
     margin:8px 18px 8px 3px;
 }
+.pageContentWrapper.River .stream .stream-items .stream-list > .article.cartulized .description h2 {
+    font-size:20px;
+}
+.pageContentWrapper.River .stream .stream-items .stream-list > .article.cartulized .description h3 {
+    font-size:18px;
+}
+.pageContentWrapper.River .stream .stream-items .stream-list > .article.cartulized .description h4 {
+    font-size:16px;
+}
+.pageContentWrapper.River .stream .stream-items .stream-list > .article.cartulized .description h5 {
+    font-size:16px;
+}
 .pageContentWrapper.River .stream .stream-items .stream-list > .article.activeItem {
     -webkit-box-shadow: 0px 0px 10px rgba(255, 155, 0, 0.5);
        -moz-box-shadow: 0px 0px 10px rgba(255, 155, 0, 0.5);
@@ -848,7 +860,7 @@ div.searchbar p.result-msg {
           border-radius: 0px;
 }
 .pageContentWrapper.Articles #divPageArticle #article {
-  font-family: "CreteRoundRegular", Georgia, serif;
+  font-family: Georgia, serif;
   font-size: 130%;
   line-height: 150%;
   background-color: #FBF0D9;
@@ -866,7 +878,7 @@ div.searchbar p.result-msg {
   margin-bottom:20px;
 }
 .pageContentWrapper.Articles #divPageArticle #article #content p {
-  font-family: "CreteRoundRegular", Georgia, serif;
+  font-family: Georgia, serif;
   font-size: 18px;
   line-height: 22px;
   margin-bottom: 20px;
@@ -875,6 +887,12 @@ div.searchbar p.result-msg {
 .pageContentWrapper.Articles #divPageArticle #article #content iframe {  max-width:500px;  }
 .pageContentWrapper.Articles #divPageArticle #article #content object {  max-width:500px;  }
 .pageContentWrapper.Articles #divPageArticle #article #content embed {  max-width:500px;  }
+.pageContentWrapper.Articles #divPageArticle #article #content pre { white-space: pre-line; }
+.pageContentWrapper.Articles #divPageArticle #article #content h1 { padding-top:20px; font-size:120%; line-height:150%; }
+.pageContentWrapper.Articles #divPageArticle #article #content h2 { padding-top:20px; font-size:110%; line-height:140%; }
+.pageContentWrapper.Articles #divPageArticle #article #content h3 { padding-top:20px; font-size:100%; line-height:140%; }
+.pageContentWrapper.Articles #divPageArticle #article #content h4 { padding-top:20px; font-size:100%; line-height:140%; }
+.pageContentWrapper.Articles #divPageArticle #article #content h5 { padding-top:20px; font-size:100%; line-height:140%; }
 .pageContentWrapper.Articles #divPageArticle #article #content .bodyvid {
   display:block;
   max-width:500px;

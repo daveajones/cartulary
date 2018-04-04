@@ -525,7 +525,7 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
     }
 
     //Replace continuous whitespace with just one space
-    $content = preg_replace("/(\ \ |[\r\n])+/i", ' ', $content);
+    //$content = preg_replace("/(\ \ |[\r\n])+/i", ' ', $content);
 
     //Strip tab codes
     $content = preg_replace('/\t+/', '', $content);
@@ -571,14 +571,13 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
     //Replace strings of more than two br's with just two
     $content = preg_replace('/(\<br\>){3,}/i', "<br><br>", $content);
 
+    //Remove "continue reading" sections
+    $content = preg_replace('/\<a\s+href=.*\#story-continues[^>]*\>.*\<\/a\>/iU', '', $content);
+
     //Attempt to de-duplicate the title from the body of the article
     if(!empty($title)) {
         loggit(3, "Deduplicating article title: [$title].");
-        $content = str_ireplace("<h1>$title</h1>", "", $content);
-        $content = str_ireplace("<h2>$title</h2>", "", $content);
-        $content = str_ireplace("<h3>$title</h3>", "", $content);
-        $content = str_ireplace("<h4>$title</h4>", "", $content);
-        $content = str_ireplace("<h5>$title</h5>", "", $content);
+        $content = preg_replace("/\<h[1-9][^>]*\>\s*".preg_quote($title,"/")."\s*\<\/h[1-9]\>/iU", '', $content);
     }
 
     //If a length was requested, chop it
@@ -1612,7 +1611,7 @@ function fetchUrlExtra($url, $timeout = 30, $referer = "", $useragent = "")
     curl_setopt($curl, CURLOPT_ENCODING, "");
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
-    curl_setopt($ch, CURLOPT_HEADERFUNCTION,
+    curl_setopt($curl, CURLOPT_HEADERFUNCTION,
         function($curl, $header) use (&$headers)
         {
             $len = strlen($header);

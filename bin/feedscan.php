@@ -27,6 +27,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     $totaltime = $totalfeeds * 5;
     $scancount = $totalfeeds;
     $feedcount = $totalfeeds;
+    $errorfeeds = [];
 
     loggit(3, " ----- Start scan of [$scancount] of [$totalfeeds] feeds.");
     echo "Scanning [$scancount] of [$totalfeeds] feeds.\n\n";
@@ -43,14 +44,15 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         $fstart = time();
 
         //Parse the feed and add new items to the database
-        loggit(3, "Checking feed: [ $feedcount | " . $feed['title'] . " | " . $feed['url'] . "].");
+        //loggit(3, "Checking feed: [ $feedcount | " . $feed['title'] . " | " . $feed['url'] . "].");
         $result = get_feed_items($feed['id']);
 
         if ($result == -1) {
-            loggit(1, "Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]");
+            loggit(2, "Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]");
             echo "    Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]\n";
+            $errorfeeds[] = $feed['url'];
         } else if ($result == -2) {
-            loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] has no items.");
+            loggit(2, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] has no items.");
             echo "    Feed is empty.\n";
         } else if ($result == -3) {
             loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] is current.");
@@ -87,6 +89,11 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         loggit(3, "Rebuilding search word counts.");
         calculate_map_word_counts();
         calculate_map_word_today_counts();
+    }
+
+    //For debugging
+    if(!empty($errorfeeds)) {
+        //add_admin_log_item("<p>".implode("<br>", $errorfeeds)."</p>", "Feedscan Errors");
     }
 
     //Calculate time took to scan the river

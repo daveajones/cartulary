@@ -172,7 +172,7 @@ if (substr($response['body'], 0, 4) == "%PDF") {
 
 // ---------- BEGIN ARTICLE EXISTENCE CHECK ----------
 //Is this URL already in the database?
-loggit(3, "Received request for article at: [$url].");
+loggit(3, "Received request for article at: [$url] with title: [$reqtitle].");
 $aid = article_exists($url);
 if ($aid) {
     loggit(3, "Article: [$url] already exists as: [$aid].");
@@ -234,11 +234,8 @@ if ($linkonly == FALSE) {
 
         // Convert non-standard elements to divs
 
-        //$html = preg_replace("/<article[^>]+\>/i", "<div>", $html);
-        //$html = preg_replace("/<\/article[^>]+\>/i", "</div>", $html);
-        //$html = preg_replace("/<br[^>]*\>/i", "<br><br>", $html);
-        $html = preg_replace("/<ul class=\"outline\"><li class=\"ou outline\">(.*)<\/li><\/ul>/i", "<div>$1</div>", $html);
-
+        //FC Editor conversion
+        $html = preg_replace("/\<ul\ class=\"outline[^>]*\"\>\<li\ class=\"ou\ outline[^>]*\"\>(.*)\<\/li>\<\/ul\>/iU", "<p>$1</p>", $html);
 
         // Convert encoding
         $html = convert_to_utf8($html, $response['headers']);
@@ -322,12 +319,12 @@ if ($linkonly == FALSE) {
         $dom->loadHTML($html);
         $classname = 'paddings';
         $finder = new DomXPath($dom);
-        $nodes = $finder->query("(//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]//ul/li)[1]/*[self::p or self::blockquote or self::img]");
+        $nodes = $finder->query("(//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]//ul/li)[1]/*[self::p or self::blockquote or self::img or self::ul or self::ol or self::li or self::a]");
         $tmp_dom = new DOMDocument();
         foreach ($nodes as $node) {
             $tmp_dom->appendChild($tmp_dom->importNode($node, true));
         }
-        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle);
+        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle, $effective_url);
 
         $analysis = "";
         $slimcontent = $content;
@@ -355,8 +352,8 @@ if ($linkonly == FALSE) {
 //        $slimcontent = $content;
 
     //Is this a blogger post?
-    } else if (preg_match('/\<div.*class.*post-body.*\>/i', $html)) {
-        loggit(3, "DEBUG: ----------------------> Getting a blogger post.");
+    } else if (preg_match('/^http.*blogspot\.com.*/i', $url)) {
+        loggit(3, "DEBUG: ----------------------> Getting a blogger.com post.");
 
         $dom = new DomDocument();
         $dom->loadHTML($html);
@@ -367,7 +364,7 @@ if ($linkonly == FALSE) {
         foreach ($nodes as $node) {
             $tmp_dom->appendChild($tmp_dom->importNode($node, true));
         }
-        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle);
+        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle, $effective_url);
 
         $analysis = "";
         $slimcontent = $content;
@@ -415,7 +412,7 @@ if ($linkonly == FALSE) {
         $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
 
         //Reduce all that whitespace
-        $content = clean_article_content($content, 0, FALSE, FALSE, $reqtitle);
+        $content = clean_article_content($content, 0, FALSE, FALSE, $reqtitle, $effective_url);
         $slimcontent = $content;
     }
 

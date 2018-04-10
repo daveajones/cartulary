@@ -44,3 +44,5 @@ MAILTO=""
 ##: Backup
 58   2 * * * root php [$CONF_ROOT]/bin/backup.php
 
+##: Check for upgrades
+58   1 * * * root php [$CONF_ROOT]/bin/getversion.php checknew

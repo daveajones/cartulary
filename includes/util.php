@@ -559,9 +559,9 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
 
     //Strip out all the html tags except for the ones that control textual layout
     if($withmedia) {
-        $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a>');
+        $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a><strong>');
     } else {
-        $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a><img><audio><video>');
+        $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a><strong><img><audio><video>');
     }
 
     //Strip all consecutive line breaks
@@ -1232,7 +1232,7 @@ function get_final_url($url, $timeout = 5, $count = 0)
     }
 
     //Meta-refresh redirect
-    if (preg_match("/meta.*refresh.*URL=.*(http[^'\"]*)/i", $content, $value)) {
+    if (preg_match("/meta[^>]*http\-equiv\=\"refresh\"[^>]*url\=.*(http[^'\"]*)/i", $content, $value)) {
         loggit(3, "DEBUG: This was a meta-refresh redirect.");
         if (strpos($value[1], "http") !== FALSE) {
             return get_final_url($value[1], NULL, $count);

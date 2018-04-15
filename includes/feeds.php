@@ -19,11 +19,12 @@ function is_feed($content = NULL)
     //Load the content into a simplexml object
     libxml_use_internal_errors(true);
     $x = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
-    libxml_clear_errors();
     if ($x === FALSE) {
-        loggit(1, "The content didn't parse correctly.");
+        loggit(2, "The content didn't parse correctly: [".libxml_get_last_error()->message."]");
+        libxml_clear_errors();
         return (FALSE);
     }
+    libxml_clear_errors();
 
     //Look for opml nodes
     if ((string)$x->getName() == "rss") {
@@ -996,7 +997,7 @@ function reset_feed_error_count($fid = NULL)
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-    //Now that we have a good id, put the article into the database
+    //Run the query
     $stmt = "UPDATE $table_newsfeed SET errors=0 WHERE id=?";
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
     $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
@@ -1173,7 +1174,7 @@ function mark_feed_as_dead($fid = NULL)
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-    //Now that we have a good id, put the article into the database
+    //Run the query
     $stmt = "UPDATE $table_newsfeed SET dead=1 WHERE id=?";
     $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
     $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
@@ -1202,7 +1203,7 @@ function unmark_feed_as_dead($fid = NULL)
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-    //Now that we have a good id, put the article into the database
+    //Run the query
     $stmt = "UPDATE $table_newsfeed SET dead=0 WHERE id=?";
     $sql = $dbh->prepare($stmt) or loggit(3, $dbh->error);
     $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
@@ -1791,9 +1792,50 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     $url = $feed['url'];
 
     //Fix up content issues before run
+    loggit(1, "Fixing up common structural problems in feed: [$url]");
     $feed['content'] = trim($feed['content']);
     $invalid_characters = '/[^\x9\xa\x20-\xD7FF\xE000-\xFFFD]/';
     $feed['content'] = preg_replace($invalid_characters, '', $feed['content'] );
+
+    //Remove content before the <?xml declaration
+    $elPos = stripos(substr($feed['content'], 0, 255), '<?xml');
+    if($elPos > 0) {
+        loggit(3, "Removing stuff before the <?xml header in: [$url]");
+        $feed['content'] = substr($feed['content'], $elPos);
+    }
+
+    //Remove stuff after the closing xml root tags
+    $elPos = stripos($feed['content'], '</rss>');
+    if($elPos !== FALSE) {
+        $feed['content'] = substr($feed['content'], 0, $elPos + 6);
+    }
+    $elPos = stripos($feed['content'], '</feed>');
+    if($elPos !== FALSE) {
+        $feed['content'] = substr($feed['content'], 0, $elPos + 7);
+    }
+
+    //Fix feeds that don't have a correct <?xml prefix at the beginning
+    if(stripos(substr($feed['content'], 0, 255), '<?xml') === FALSE) {
+        loggit(3, "Missing <?xml> header in feed: [$url]. Let's dig deeper...");
+
+        $elPos = stripos(substr($feed['content'], 0, 255), '<rss');
+        if($elPos !== FALSE) {
+            loggit(3, "Fixing missing <?xml> header in RSS feed: [$url]");
+            $feed['content'] = "<?xml version=\"1.0\"?>\n".substr($feed['content'], $elPos);
+        }
+        $elPos = stripos(substr($feed['content'], 0, 255), '<feed');
+        if($elPos !== FALSE) {
+            loggit(3, "Fixing missing <?xml> header in RSS feed: [$url]");
+            $feed['content'] = "<?xml version=\"1.0\"?>\n".substr($feed['content'], $elPos);
+        }
+    }
+    if((time() - $fstart) > 5) {
+        loggit(3, "Fixed feed: [$url] in [".(time() - $fstart)."] seconds.");
+    }
+
+
+    //Debug
+    //loggit(3, "DEBUG: [".$feed['content']."]");
 
     //Only get the first few entries if this is a new feed
     if (empty($feed['lastcheck'])) {
@@ -1806,39 +1848,51 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Pull the latest content blob from the database
     if( empty($feed['content']) ) {
-        loggit(2, "Feed: [$fid] has no content.");
+        loggit(2, "Feed: [$url] has no content: [".$feed['content']."]");
         increment_feed_error_count($fid);
         return (-1);
     }
 
     //Is the feed any good?
     if (!feed_is_valid($feed['content']) && !is_feed($feed['content'])) {
-        loggit(2, "Feed: [".$url."] doesn't seem to be a known feed format. Skipping it.");
-        increment_feed_error_count($fid,5);
-        return (-1);
+        if( stripos($feed['content'], 'encoding="utf-8"') && mb_detect_encoding($feed['content'], 'UTF-8', true) === FALSE ) {
+            $feed['content'] = utf8_encode($feed['content']);
+            if(!feed_is_valid($feed['content']) && !is_feed($feed['content'])) {
+                loggit(2, "Feed: [" . $url . "] doesn't seem to be a known feed format. Skipping it.");
+                increment_feed_error_count($fid, 5);
+                return (-1);
+            }
+        } else {
+            loggit(2, "Feed: [" . $url . "] doesn't seem to be a known feed format. Skipping it.");
+            increment_feed_error_count($fid, 5);
+            return (-1);
+        }
     }
 
     //Parse it
     $tstart = time();
     libxml_use_internal_errors(true);
     $x = simplexml_load_string($feed['content'], 'SimpleXMLElement', LIBXML_NOCDATA);
-    libxml_clear_errors();
     //loggit(3, "FEED SCAN: SimpleXML parse load took [".(time() - $tstart)."] seconds.");
 
     //Was there a fatal error during parsing?
     if (!$x) {
-        loggit(1, "Failed to parse XML for feed: [$fid].  Let's run it through Tidy() and try again.");
+        loggit(3, "Error parsing feed: [$url] Error: [".libxml_get_last_error()->message."]");
+        loggit(1, "Failed to parse XML for feed: [$url].  Let's run it through Tidy() and try again.");
+        libxml_clear_errors();
         $tidy = new tidy();
         $xr = $tidy->repairString($feed['content'], array('output-xml' => true, 'input-xml' => true));
         libxml_use_internal_errors(true);
         $x = simplexml_load_string($xr, 'SimpleXMLElement', LIBXML_NOCDATA);
-        libxml_clear_errors();
         if (!$x) {
-            loggit(1, "Error parsing feed XML for feed: [$fid].  Incrementing error count and skipping feed: [$fid].");
+            loggit(2, "Error parsing feed XML for feed: [$url].  Error: [".libxml_get_last_error()->message."]");
+            libxml_clear_errors();
             increment_feed_error_count($fid, 5);
             return (-1);
         }
+        libxml_clear_errors();
     }
+    libxml_clear_errors();
 
     //Pass any namespaces to the item add routine
     $namespaces = $x->getDocNamespaces(TRUE);
@@ -1892,7 +1946,9 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //loggit(3, "DEBUG: Pubdate: [$pubdate]");
     if (trim($feed['pubdate']) == $pubdate && !empty($pubdate) && $force == FALSE) {
         //The feed says that it hasn't been updated
-        loggit(3, "  PUBDATE: [$pubdate | ".$feed['pubdate']."] Source: [$pubdatesource] not changed.");
+        //loggit(3, "  PUBDATE: [$pubdate | ".$feed['pubdate']."] Source: [$pubdatesource] not changed.");
+        reset_feed_error_count($fid);
+        unmark_feed_as_dead($fid);
         return (-3);
     }
     loggit(3, "  PUBDATE: [$pubdate | ".$feed['pubdate']."] Source: [$pubdatesource] changed.");
@@ -1993,7 +2049,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
             $count++;
         }
     }
-    //loggit(3, "FEED SCAN: Feed item storage took [".(time() - $tstart)."] seconds.");
+    loggit(3, "FEED SCAN: Feed item storage took [".(time() - $tstart)."] seconds.");
 
     //Flip the purge flags to old
     flip_purge_to_old($fid);
@@ -2013,15 +2069,16 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Is the feed empty?
     if ($count == 0) {
         loggit(3, "Scan: There were no items in this feed: [$url].");
-        increment_feed_error_count($fid, 5);
+        //increment_feed_error_count($fid, 1);
         return (-2);
     }
 
     //Evidently the scan was successful so reset the error counter
     reset_feed_error_count($fid);
+    unmark_feed_as_dead($fid);
 
     //Log and leave
-    loggit(1, "Scan: [$newcount] out of: [$count] items from feed: [$url] were new.");
+    loggit(3, "Scan: [$newcount] out of: [$count] items from feed: [$url] were new.");
     return ($newcount);
 }
 
@@ -2526,7 +2583,7 @@ function get_updated_feeds($max = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Look for the
-    $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed WHERE updated=1";
+    $sqltxt = "SELECT id,title,url,createdon FROM $table_newsfeed WHERE updated=1 ORDER BY lastcheck ASC";
 
     if ( !empty($max) && is_numeric($max) ) {
         $sqltxt .= " LIMIT $max";
@@ -2815,7 +2872,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         //Does this item have a content namespace?
         if (isset($namespaces['content'])) {
             $content = $item->children($namespaces['content']);
-            if (isset($content->encoded)) {
+            if (isset($content->encoded) && stripos((string)trim($content->encoded), 'fb:article_style') === FALSE) {
                 $description = (string)trim($content->encoded);
                 loggit(1, "Content:encoded found: " . print_r($content, TRUE));
             }

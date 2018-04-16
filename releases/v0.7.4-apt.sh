@@ -41,7 +41,7 @@ apt-get install -y nodejs
 cd $CARTROOT/aggrivate
 sudo npm -g install npm@latest
 sudo npm -g install npm@latest
-npm install
+sudo npm install --unsafe-perm=true --allow-root
 
 echo Correcting feed database prior to upgrade...
 echo "  This could take a while.  Please wait..."

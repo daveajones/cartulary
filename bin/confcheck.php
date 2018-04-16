@@ -322,7 +322,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     }
 
     //Preserve paypal button id
-    $template = str_replace('cg_paypal_button_id=""', 'cg_paypal_button_id="'.$l_cg_paypal_button_id.'"', $template);
+    $template = str_replace('cg_paypal_button_id=""', 'cg_paypal_button_id="' . $l_cg_paypal_button_id . '"', $template);
 
     //Search v2 enabled?
     if ($l_cg_search_v2_enable == TRUE) {
@@ -366,4 +366,3 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
 // Log and leave
 return (TRUE);
-?>

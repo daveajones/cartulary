@@ -17,7 +17,7 @@ class NodeUtility
      * @var array
      */
     public static $regexps = [
-        'unlikelyCandidates' => '/banner|breadcrumbs|combx|comment|community|cover-wrap|disqus|extra|foot|header|legends|menu|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote/i',
+        'unlikelyCandidates' => '/banner|breadcrumbs|combx|comment|action|community|cover-wrap|disqus|extra|foot|header|legends|menu|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote/i',
         'okMaybeItsACandidate' => '/and|article|body|column|main|shadow/i',
         'extraneous' => '/print|archive|comment|discuss|e[\-]?mail|share|reply|all|login|sign|single|utility/i',
         'byline' => '/byline|author|dateline|writtenby|p-author/i',

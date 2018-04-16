@@ -12,6 +12,18 @@ if (isset($_REQUEST['json'])) {
     $json = FALSE;
 }
 
+//Was a title specified in the request?  If so, set that as the title instead of the extracted one
+$reqtitle = "";
+if (isset($_REQUEST['title'])) {
+    if (!empty($_REQUEST['title']) && stripos($_REQUEST['title'], "Subscribe to read") === FALSE ) {
+        $title = $_REQUEST['title'];
+        if (strpos($sourceurl, 'twitter.com') !== FALSE) {
+            $title = '@' . $title;
+        }
+        $reqtitle = trim($title);
+    }
+}
+
 //Globals
 $html_only = true;
 $ispdf = FALSE;
@@ -132,9 +144,9 @@ if (preg_match('/^https?\:\/\/(www\.)?reddit\.com/i', $url)) {
     loggit(3, "Reddit title: $title");
     libxml_use_internal_errors($luie);
 
-    if( preg_match("/\<p.*class=\"title.*\<a.*class=\"title.*href=\"(.*)\"/iU", $html, $matches) ) {
+    if (preg_match("/\<p.*class=\"title.*\<a.*class=\"title.*href=\"(.*)\"/iU", $html, $matches)) {
         $url = get_final_url($matches[1]);
-        loggit(3, "Reddit link: [".$url."]");
+        loggit(3, "Reddit link: [" . $url . "]");
         $response = fetchUrlExtra($url);
         $html = $response['body'];
     } else {
@@ -143,7 +155,7 @@ if (preg_match('/^https?\:\/\/(www\.)?reddit\.com/i', $url)) {
 }
 
 //Is this a PDF?
-if( substr($response['body'], 0, 4) == "%PDF" ) {
+if (substr($response['body'], 0, 4) == "%PDF") {
     $ispdf = TRUE;
     $pdfbody = $response['body'];
     loggit(3, "The url: [$url] is a PDF document.");
@@ -151,7 +163,7 @@ if( substr($response['body'], 0, 4) == "%PDF" ) {
 
 // ---------- BEGIN ARTICLE EXISTENCE CHECK ----------
 //Is this URL already in the database?
-loggit(3, "Received request for article at: [$url].");
+loggit(3, "Received request for article at: [$url] with title: [$reqtitle].");
 $aid = article_exists($url);
 if ($aid) {
     loggit(3, "Article: [$url] already exists as: [$aid].");
@@ -248,7 +260,7 @@ if ($linkonly == FALSE) {
             $html = $response['body'];
 
             //loggit(3, "ARTICLE: [$html]");
-            if( empty($html) ) {
+            if (empty($html)) {
                 loggit(3, "DEBUG: Blank content returned for html.");
                 //loggit(3, "DEBUG: ".print_r($response, TRUE));
             }
@@ -300,162 +312,162 @@ if ($linkonly == FALSE) {
 
         } else
 
-            //Is this an image
-            if (url_is_a_picture($url)) {
-                loggit(3, "Getting an image.");
-                loggit(3, "Image source: [" . $url . "]");
-                $content = '<br/><img style="width:600px;" src="' . $url . '"></img>';
-                $analysis = "";
-                $slimcontent = $content;
-            } else
+        //Is this an image
+        if (url_is_a_picture($url)) {
+            loggit(3, "Getting an image.");
+            loggit(3, "Image source: [" . $url . "]");
+            $content = '<br/><img style="width:600px;" src="' . $url . '"></img>';
+            $analysis = "";
+            $slimcontent = $content;
+        } else
 
-                //Is this audio
-                if (url_is_audio($url)) {
-                    loggit(3, "Getting an audio url.");
-                    loggit(3, "Audio source: [" . $url . "]");
-                    $mt = make_mime_type($url);
-                    $content = '<br/><audio style="width:400px" controls="true"><source src="' . $url . '" type="' . $mt . '"></audio>';
-                    $analysis = "";
-                    $slimcontent = $content;
-                } else
+        //Is this audio
+        if (url_is_audio($url)) {
+            loggit(3, "Getting an audio url.");
+            loggit(3, "Audio source: [" . $url . "]");
+            $mt = make_mime_type($url);
+            $content = '<br/><audio style="width:400px" controls="true"><source src="' . $url . '" type="' . $mt . '"></audio>';
+            $analysis = "";
+            $slimcontent = $content;
+        } else
 
-                    //Is this video
-                    if (url_is_video($url)) {
-                        loggit(3, "Getting a video url.");
-                        loggit(3, "Video source: [" . $url . "]");
-                        $mt = make_mime_type($url);
-                        $content = '<br/><video style="width:95%;margin:0 auto;display:block;" controls="true"><source src="' . $url . '" type="' . $mt . '"></video>';
-                        $analysis = "";
-                        $slimcontent = $content;
-                    } else
+        //Is this video
+        if (url_is_video($url)) {
+            loggit(3, "Getting a video url.");
+            loggit(3, "Video source: [" . $url . "]");
+            $mt = make_mime_type($url);
+            $content = '<br/><video style="width:95%;margin:0 auto;display:block;" controls="true"><source src="' . $url . '" type="' . $mt . '"></video>';
+            $analysis = "";
+            $slimcontent = $content;
+        } else
 
-                        //Is this an imgur link?
-                        if (preg_match('/imgur\.com/i', $url)) {
-                            loggit(3, "Getting an image file as a full article.");
-                            if (preg_match("/\<link.*rel=\"image_src.*href=\"(.*)\"/iU", $html, $matches)) {
-                                $url = $matches[1];
-                                loggit(3, "Imgur image source: [" . $url . "]");
-                                $content = '<br/><img class="bodyvid" src="' . $matches[1] . '"></img>';
-                            } else {
-                                loggit(2, "Couldn't extract Imgur image: [" . $matches[1] . "]");
-                            }
-                            $analysis = "";
-                            $slimcontent = $content;
-                        } else
+        //Is this an imgur link?
+        if (preg_match('/imgur\.com/i', $url)) {
+            loggit(3, "Getting an image file as a full article.");
+            if (preg_match("/\<link.*rel=\"image_src.*href=\"(.*)\"/iU", $html, $matches)) {
+                $url = $matches[1];
+                loggit(3, "Imgur image source: [" . $url . "]");
+                $content = '<br/><img class="bodyvid" src="' . $matches[1] . '"></img>';
+            } else {
+                loggit(2, "Couldn't extract Imgur image: [" . $matches[1] . "]");
+            }
+            $analysis = "";
+            $slimcontent = $content;
+        } else
 
-                            //Is this a wordpress post?
-                            if (preg_match('/\<div.*class.*post-content\>/i', $html)) {
-                                loggit(2, "DEBUG: ----------------------> Getting a wordpress post.");
+        //Is this a wordpress post?
+        if (preg_match('/\<div.*class.*post-content\>/i', $html)) {
+            loggit(2, "DEBUG: ----------------------> Getting a wordpress post.");
 
-                                $dom = new DomDocument();
-                                $dom->loadHTML($html);
-                                $classname = 'post-content';
-                                $finder = new DomXPath($dom);
-                                $nodes = $finder->query("//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
-                                $tmp_dom = new DOMDocument();
-                                foreach ($nodes as $node)
-                                {
-                                    $tmp_dom->appendChild($tmp_dom->importNode($node,true));
-                                }
-                                $content.=trim($tmp_dom->saveHTML());
+            $dom = new DomDocument();
+            $dom->loadHTML($html);
+            $classname = 'post-content';
+            $finder = new DomXPath($dom);
+            $nodes = $finder->query("//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+            $tmp_dom = new DOMDocument();
+            foreach ($nodes as $node) {
+                $tmp_dom->appendChild($tmp_dom->importNode($node, true));
+            }
+            $content .= trim($tmp_dom->saveHTML());
 
-                                $analysis = "";
-                                $slimcontent = $content;
+            $analysis = "";
+            $slimcontent = $content;
 
-                                //Is this a PDF?
-                            } else
-                                if ( $ispdf ) {
-                                    loggit(3, "Cartulizing a PDF.");
-                                    $content = '';
-                                    include "$confroot/$libraries/PDFParser/vendor/autoload.php";
-                                    $parser = new \Smalot\PdfParser\Parser();
-                                    $pdf    = $parser->parseContent($pdfbody);
-                                    foreach ($pdf->getPages() as $page) {
-                                        $content .= "<p>".$page->getText()."</p>";
-                                    }
-                                    //$content = $pdf->getText();
-                                    //Do textual analysis and save it in the database
-                                    $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
-                                    //Reduce all that whitespace
-                                    $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE);
+        } else
 
-                                    //Normal web page
-                                } else {
-                                    loggit(3, "Cartulizing html.");
-                                    //Set up an extraction
-                                    if ($auto_extract) {
-                                        $extract_result = $extractor->process($html, $effective_url);
-                                        if (!$extract_result) {
-                                            if ($json == TRUE) {
-                                                //Give feedback that all was not well
-                                                $jsondata['status'] = "false";
-                                                $jsondata['article'] = array('id' => 'error',
-                                                    'title' => '',
-                                                    'body' => '<center><p>Extraction failed.  Click <a href="' . $url . '">here</a> to link out to the full source article.</p></center>',
-                                                    'url' => $url,
-                                                    'shorturl' => '',
-                                                    'sourceurl' => '',
-                                                    'sourcetitle' => ''
-                                                );
-                                                echo json_encode($jsondata);
-                                                return (0);
-                                            } else {
-                                                //echo "<html><head><meta http-equiv=\"refresh\" content=\"2;URL='$url'\"></head><body><p>Extraction failed. Forwarding to original url in 2 seconds.</p><p>Link is below if redirect does not work:<br/><a href=\"$url\">$url</a></p></body></html>";
-                                                echo $html;
-                                                exit(1);
-                                            }
-                                        }
-                                        $readability = $extractor->readability;
-                                        $content_block = $extractor->getContent();
-                                        $title = $extractor->getTitle();
+        //Is this a PDF?
+        if ($ispdf) {
+            loggit(3, "Cartulizing a PDF.");
+            $content = '';
+            include "$confroot/$libraries/PDFParser/vendor/autoload.php";
+            $parser = new \Smalot\PdfParser\Parser();
+            $pdf = $parser->parseContent($pdfbody);
+            foreach ($pdf->getPages() as $page) {
+                $content .= "<p>" . $page->getText() . "</p>";
+            }
+            //$content = $pdf->getText();
+            //Do textual analysis and save it in the database
+            $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
+            //Reduce all that whitespace
+            $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE, $reqtitle, $effective_url);
 
-                                    } else {
-                                        $readability = new Readability($html, $effective_url);
-                                        // content block is entire document
-                                        $content_block = $readability->dom;
-                                        //TODO: get title
-                                        $title = '';
-                                    }
+        //Normal web page
+        } else {
+            loggit(3, "Cartulizing html.");
+            //Set up an extraction
+            if ($auto_extract) {
+                $extract_result = $extractor->process($html, $effective_url);
+                if (!$extract_result) {
+                    if ($json == TRUE) {
+                        //Give feedback that all was not well
+                        $jsondata['status'] = "false";
+                        $jsondata['article'] = array('id' => 'error',
+                            'title' => '',
+                            'body' => '<center><p>Extraction failed.  Click <a href="' . $url . '">here</a> to link out to the full source article.</p></center>',
+                            'url' => $url,
+                            'shorturl' => '',
+                            'sourceurl' => '',
+                            'sourcetitle' => ''
+                        );
+                        echo json_encode($jsondata);
+                        return (0);
+                    } else {
+                        //echo "<html><head><meta http-equiv=\"refresh\" content=\"2;URL='$url'\"></head><body><p>Extraction failed. Forwarding to original url in 2 seconds.</p><p>Link is below if redirect does not work:<br/><a href=\"$url\">$url</a></p></body></html>";
+                        echo $html;
+                        exit(1);
+                    }
+                }
+                $readability = $extractor->readability;
+                $content_block = $extractor->getContent();
+                $title = $extractor->getTitle();
 
-                                    //Extract the body content
-                                    if ($extract_pattern) {
-                                        $xpath = new DOMXPath($readability->dom);
-                                        $elems = @$xpath->query($extract_pattern, $content_block);
-                                        // check if our custom extraction pattern matched
-                                        if ($elems && $elems->length > 0) {
-                                            // get the first matched element
-                                            $content_block = $elems->item(0);
-                                            // clean it up
-                                            $readability->removeScripts($content_block);
-                                            $readability->prepArticle($content_block);
-                                        } else {
-                                            $content_block = $readability->dom->createElement('p', 'Sorry, could not extract content');
-                                        }
-                                    }
-                                    $readability->clean($content_block, 'select');
+            } else {
+                $readability = new Readability($html, $effective_url);
+                // content block is entire document
+                $content_block = $readability->dom;
+                //TODO: get title
+                $title = '';
+            }
 
-                                    makeAbsolute($effective_url, $content_block);
-                                    //footnotes
-                                    if ($extract_pattern) {
-                                        // get outerHTML
-                                        $content = $content_block->ownerDocument->saveXML($content_block);
-                                    } else {
-                                        if ($content_block->childNodes->length == 1 && $content_block->firstChild->nodeType === XML_ELEMENT_NODE) {
-                                            $content = $content_block->firstChild->innerHTML;
-                                        } else {
-                                            $content = $content_block->innerHTML;
-                                        }
-                                    }
-                                    unset($readability, $html);
+            //Extract the body content
+            if ($extract_pattern) {
+                $xpath = new DOMXPath($readability->dom);
+                $elems = @$xpath->query($extract_pattern, $content_block);
+                // check if our custom extraction pattern matched
+                if ($elems && $elems->length > 0) {
+                    // get the first matched element
+                    $content_block = $elems->item(0);
+                    // clean it up
+                    $readability->removeScripts($content_block);
+                    $readability->prepArticle($content_block);
+                } else {
+                    $content_block = $readability->dom->createElement('p', 'Sorry, could not extract content');
+                }
+            }
+            $readability->clean($content_block, 'select');
 
-                                    //Do textual analysis and save it in the database
-                                    $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
+            makeAbsolute($effective_url, $content_block);
+            //footnotes
+            if ($extract_pattern) {
+                // get outerHTML
+                $content = $content_block->ownerDocument->saveXML($content_block);
+            } else {
+                if ($content_block->childNodes->length == 1 && $content_block->firstChild->nodeType === XML_ELEMENT_NODE) {
+                    $content = $content_block->firstChild->innerHTML;
+                } else {
+                    $content = $content_block->innerHTML;
+                }
+            }
+            unset($readability, $html);
 
-                                    //Reduce all that whitespace
-                                    //$slimcontent = preg_replace('~>\s+<~', '><', $content);
-                                    $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE);
+            //Do textual analysis and save it in the database
+            $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
 
-                                }
+            //Reduce all that whitespace
+            //$slimcontent = preg_replace('~>\s+<~', '><', $content);
+            $slimcontent = clean_article_content(preg_replace('~>\s+<~', '><', $content), 0, FALSE, FALSE, "", $effective_url);
+
+        }
 
     }
 
@@ -494,18 +506,10 @@ if (isset($_REQUEST['stitle'])) {
 
 
 // ---------- BEGIN TITLE HANDLING ----------
-//Was a title specified in the request?  If so, set that as the title instead of the extracted one
-if (isset($_REQUEST['title'])) {
-    if (!empty($_REQUEST['title'])) {
-        $title = $_REQUEST['title'];
-        if (strpos($sourceurl, 'twitter.com') !== FALSE) {
-            $title = '@' . $title;
-        }
-    }
+if(!empty($reqtitle)) {
+    $title = $reqtitle;
 }
-$title = trim($title);
 // ---------- END TITLE HANDLING ----------
-
 
 //Put this article in the database
 if ($linkonly == FALSE) {

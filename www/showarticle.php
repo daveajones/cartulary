@@ -54,7 +54,7 @@ $tree_location = "Show Article";
         <div class="footer">
             <div class="divToolBox">
                 <a class="print" title="Printer Friendly" href="<? echo $showarticlepage . '-print?aid=' . $aid ?>"><img
-                        class="icon-print" src="/images/blank.gif" alt=""/> </a>
+                            class="icon-print" src="/images/blank.gif" alt=""/> </a>
 
                 <? $rturl = $article['url']; ?>
 
@@ -73,12 +73,13 @@ $tree_location = "Show Article";
                            echo '&shorturl=' . urlencode($article['shorturl']);
                        } ?>"><img class="icon-retweet-1" src="/images/blank.gif" alt=""/> </a>
                 <? } ?>
-                <a class="send" title="Email the article." href="mailto:?subject=Article:%20<?echo $article['title']?>&amp;body=<?echo $rturl?>"><img
+                <a class="send" title="Email the article."
+                   href="mailto:?subject=Article:%20<? echo $article['title'] ?>&amp;body=<? echo $rturl ?>"><img
                             class="icon-email-send" src="/images/blank.gif" alt=""/> </a>
                 <a class="link" title="Link to original source url." href="<? echo $article['url']; ?>"><img
-                        class="icon-hyperlink" src="/images/blank.gif" alt=""/> </a>
+                            class="icon-hyperlink" src="/images/blank.gif" alt=""/> </a>
                 <a class="edit" title="Open in the Editor" href="<? echo $editorpage . '?aid=' . $aid ?>"><img
-                        class="icon-editor" src="/images/blank.gif" alt=""/> </a>
+                            class="icon-editor" src="/images/blank.gif" alt=""/> </a>
             </div>
         </div>
     </div>

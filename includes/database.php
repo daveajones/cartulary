@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 76;
+$cg_database_version = 77;
 $cg_database_updates = array();
 
 
@@ -1054,6 +1054,15 @@ CGDB0226;
 $cg_database_updates[75][] = <<<CGDB0227
  INSERT INTO `dbversion` ( `version` ) VALUES ( '76' )
 CGDB0227;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 76 to 77 -----------------------------------------------------------------------------------------------
+$cg_database_updates[76][] = <<<CGDB0228
+ ALTER TABLE `newsfeeds` ADD `contenttype` VARCHAR( 80 ) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL COMMENT 'http response header'
+CGDB0228;
+$cg_database_updates[76][] = <<<CGDB0229
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '77' )
+CGDB0229;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

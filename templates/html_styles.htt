@@ -1,33 +1,35 @@
+<!-- Global style sheets -->
+<?$stylever = 7?>
+<link rel="stylesheet" href="/style/bootstrap-2.3.1-noicons.css?v=<?echo $stylever?>"/>
+<link rel="stylesheet" href="/style/jquery-ui.css?v=<?echo $stylever?>"/>
+<link rel="stylesheet" href="/style/style.css?v=<?echo $stylever?>"/>
+<?
+if (isset($g_prefs['stylesheet']) && !empty($g_prefs['stylesheet'])) {
+    $mainstyle = $g_prefs['stylesheet'];
+} else {
+    $mainstyle = $default_style_sheet;
+}
 
-    <!-- Global style sheets -->
-    <link rel="stylesheet" href="/style/bootstrap-2.3.1-noicons.css" />
-    <link rel="stylesheet" href="/style/jquery-ui.css" />
-    <link rel="stylesheet" href="/style/style.css" />
-    <?
-      if ( isset($g_prefs['stylesheet']) && !empty($g_prefs['stylesheet']) ) {
-        $mainstyle=$g_prefs['stylesheet'];
-      } else {
-        $mainstyle=$default_style_sheet;
-      }
-
-      if ( $platform == "tablet" ) {
-        ?>
-    <link rel="stylesheet" href="<?echo $mainstyle.'-tablet-base.css'?>" />
-    <link rel="stylesheet" href="<?echo $mainstyle.'-tablet-icons.css'?>" />
-    <link rel="stylesheet" href="<?echo $mainstyle.'-tablet.css'?>" /><?
-      } else if ( $platform == "mobile" ) {
-        ?>
-    <link rel="stylesheet" href="<?echo $mainstyle.'-mobile-base.css'?>" />
-    <link rel="stylesheet" href="<?echo $mainstyle.'-mobile-icons.css'?>" />
-    <link rel="stylesheet" href="<?echo $mainstyle.'-mobile.css'?>" /><?
-      } else {
-        ?>
-<link rel="stylesheet" href="<?echo $mainstyle.'-base.css?v=1'?>" />
-    <link rel="stylesheet" href="<?echo $mainstyle.'-icons.css?v=1'?>" />
-    <link rel="stylesheet" href="<?echo $mainstyle.'?v=1'?>" /><?
-      }
+if ($platform == "tablet") {
     ?>
-
-    <link rel="stylesheet" href="/style/bootstrap-responsive-2.3.1.min.css" />
-    <link rel="stylesheet" href="/style/font-awesome.css" />
-    <link rel="stylesheet" href="/style/concord.css" />
+    <link rel="stylesheet" href="<? echo $mainstyle . '-tablet-base.css?v='.$stylever ?>"/>
+    <link rel="stylesheet" href="<? echo $mainstyle . '-tablet-icons.css?v='.$stylever ?>"/>
+    <link rel="stylesheet" href="<? echo $mainstyle . '-tablet.css?v='.$stylever ?>" />
+    <?
+} else if ($platform == "mobile") {
+    ?>
+    <link rel="stylesheet" href="<? echo $mainstyle . '-mobile-base.css?v='.$stylever ?>"/>
+    <link rel="stylesheet" href="<? echo $mainstyle . '-mobile-icons.css?v='.$stylever ?>"/>
+    <link rel="stylesheet" href="<? echo $mainstyle . '-mobile.css?v='.$stylever ?>" />
+    <?
+} else {
+    ?>
+    <link rel="stylesheet" href="<? echo $mainstyle . '-base.css?v='.$stylever ?>"/>
+    <link rel="stylesheet" href="<? echo $mainstyle . '-icons.css?v='.$stylever ?>"/>
+    <link rel="stylesheet" href="<? echo $mainstyle . '?v='.$stylever ?>" />
+    <?
+}
+?>
+<link rel="stylesheet" href="/style/bootstrap-responsive-2.3.1.min.css?v=<?echo $stylever?>"/>
+<link rel="stylesheet" href="/style/font-awesome.css?v=<?echo $stylever?>"/>
+<link rel="stylesheet" href="/style/concord.css?v=<?echo $stylever?>"/>

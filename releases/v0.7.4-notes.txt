@@ -1,0 +1,19 @@
+#Release Notes - Freedom Controller v0.7.4
+
+
+The primary focus of this release is on improvements to article content extraction and workarounds for problem feeds
+in the aggregator.
+
+
+- Bug Fixes (the notable ones)
+    - Longstanding bug where sometimes HTTP headers would show up in the body of a carted article
+    - Big bug in redirection detection when a meta refresh tag was being used
+    - Two sql argument ordering typos in Aggrivate that kept the feed from updating correctly
+
+- Improvements:
+    - There is now an email link on the article page for easier handling of that activity
+    - Styling improvements in carted articles in the river and on article page
+    - Tons of tweaking to the way carted articles are converted after parsing
+    - Lots of improvements to article extraction
+    - The system now checks for available FC upgrades and puts a notice in the admin feed
+    - Feedscan now tries more ways to fix feeds that aren't encoded right or have invalid structure

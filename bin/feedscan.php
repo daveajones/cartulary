@@ -11,13 +11,29 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         exit(1);
     }
 
-    //Track the river scan time
+    //Track the time spent
     $tstart = time();
+
+    //Get arguments from the command line
+    $rebuild = TRUE;
+    $force = FALSE;
+    $feedurl = "";
+    if (in_array("norebuild", $argv)) {
+        $rebuild = FALSE;
+    }
+    if (in_array("force", $argv)) {
+        $force = TRUE;
+    }
+    foreach( $argv as $arg) {
+        if(stripos($arg, 'http') === 0) {
+            $feedurl = $arg;
+        }
+    }
 
     //Get the feed list
     //Checking a single feed?
-    if (isset($argv[1]) && !empty($argv[1])) {
-        $feed = get_feed_info(feed_exists($argv[1]));
+    if (!empty($feedurl)) {
+        $feed = get_feed_info(feed_exists($feedurl));
         $feeds = array($feed);
     } else {
         $feeds = get_updated_feeds();
@@ -27,6 +43,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     $totaltime = $totalfeeds * 5;
     $scancount = $totalfeeds;
     $feedcount = $totalfeeds;
+    $errorfeeds = [];
 
     loggit(3, " ----- Start scan of [$scancount] of [$totalfeeds] feeds.");
     echo "Scanning [$scancount] of [$totalfeeds] feeds.\n\n";
@@ -43,18 +60,19 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         $fstart = time();
 
         //Parse the feed and add new items to the database
-        loggit(3, "Checking feed: [ $feedcount | " . $feed['title'] . " | " . $feed['url'] . "].");
-        $result = get_feed_items($feed['id']);
+        //loggit(3, "Checking feed: [ $feedcount | " . $feed['title'] . " | " . $feed['url'] . "].");
+        $result = get_feed_items($feed['id'], NULL, $force);
 
         if ($result == -1) {
-            loggit(1, "Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]");
+            loggit(2, "Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]");
             echo "    Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]\n";
+            $errorfeeds[] = $feed['url'];
         } else if ($result == -2) {
-            loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] has no items.");
+            loggit(2, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] has no items.");
             echo "    Feed is empty.\n";
         } else if ($result == -3) {
             loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] is current.");
-            echo "    Feed is current.\n";
+            //echo "    Feed is current.\n";
         } else {
             loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] updated.");
             echo "    Feed updated.\n";
@@ -65,28 +83,36 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         $ccount++;
         $feedcount--;
 
-        echo "      It took " . (time() - $fstart) . " seconds to scan this feed.\n";
-        //loggit(1, "It took [" . (time() - $fstart) . "] seconds to scan this feed.");
+        if((time() - $fstart) > 1) {
+            echo "      It took " . (time() - $fstart) . " seconds to scan this feed.\n";
+            loggit(3, "Took [" . (time() - $fstart) . "] seconds to scan: [".$feed['url']."]");
+        }
         echo "\n";
 
-        //We stop scanning if this scan has taken longer than expected
-        if ((time() - $tstart) > $totaltime) {
-            loggit(3, "Stop scan because it took longer than the expected: [$totaltime] seconds.");
-            break;
-        }
-
-        //We stop scanning once we hit our feed count limit for this pass
-        if ($ccount >= $scancount) {
-            break;
-        }
+//        //We stop scanning if this scan has taken longer than expected
+//        if ((time() - $tstart) > $totaltime) {
+//            loggit(3, "Stop scan because it took longer than the expected: [$totaltime] seconds.");
+//            break;
+//        }
+//
+//        //We stop scanning once we hit our feed count limit for this pass
+//        if ($ccount >= $scancount) {
+//            break;
+//        }
     }
     echo "\n";
 
     //Rebuild the v2 search map counts if v2 enabled
-    if ($cg_search_v2_enable && $newitems > 0) {
+    if ($cg_search_v2_enable && $newitems > 0 && $rebuild) {
+        echo "Rebuilding search word counts\n";
         loggit(3, "Rebuilding search word counts.");
         calculate_map_word_counts();
         calculate_map_word_today_counts();
+    }
+
+    //For debugging
+    if(!empty($errorfeeds)) {
+        //add_admin_log_item("<p>".implode("<br>", $errorfeeds)."</p>", "Feedscan Errors");
     }
 
     //Calculate time took to scan the river
@@ -97,7 +123,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
 
     // Log and leave
-    loggit(3, "Feedscan finished.");
+    loggit(3, " ----- Feedscan finished.");
 
     //Remove the lock file
     cronHelper::unlock();

@@ -445,7 +445,7 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
     $media_tags = extract_media($content);
 
     //Strip all line breaks since breakage is controlled by the markup
-    $content = preg_replace("/[\r\n]+/", "", $content);
+    $content = preg_replace("/[\r\n]/i", "", $content);
 
     //Replace encoded html with real html
     $content = str_replace('&amp;', '&', $content);
@@ -470,7 +470,7 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
     //Consolidate all strings of multiple linebreaks down to just 2
     $content = preg_replace("/\ +\n\n\ +/", "\n\n", $content);
     $content = preg_replace("/\n\ +\n/", "\n\n", $content);
-    $content = preg_replace("/[\r\n]\n+/", "\n\n", $content);
+    $content = preg_replace("/\n\n+/", "\n\n", $content);
 
     //If a length was requested, chop it
     if ($length > 0) {
@@ -501,7 +501,7 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
 
 
 //Take the html of an article and clean it up
-function clean_article_content($content = "", $length = 0, $asarray = FALSE, $withmedia = TRUE, $title = "")
+function clean_article_content($content = "", $length = 0, $asarray = FALSE, $withmedia = TRUE, $title = "", $url = "")
 {
     if (empty($content)) {
         if ($asarray == TRUE) {
@@ -524,8 +524,29 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
         $media_tags = extract_media($content);
     }
 
-    //Replace continuous whitespace with just one space
-    $content = preg_replace("/(\ \ |[\r\n])+/i", ' ', $content);
+    //Replace xhtml unary tags with their normal representation
+    $content = preg_replace('/\<([a-zA-Z0-9]+)\ ?\/\>/i', "<$1>", $content);
+
+    //Remove malformed tags
+    $content = preg_replace('/\<\/br\>/i', '', $content);
+
+    //Strip carriage returns
+    $content = str_ireplace(array('&#x9;', '&#xa;', '&#xd;', '&#x20;'), array("\t", "\n", "\r", ' '), $content);
+    $content = preg_replace("/[\r\n]/i", "\n", $content);
+    //$content = preg_replace("/(\ \ |[\n])+/i", ' ', $content);
+
+    //Put a linebreak before pre tags for clarity
+    $content = preg_replace("/[^\n]\<pre/i", "\n<pre", $content);
+
+    //Treat some content inside a pre tag with special consideration
+    if (preg_match_all('/\<pre[^>]*\>(.*?)\<\/pre\>/s', $content, $matches)) {
+        foreach($matches[1] as $a) {
+            //loggit(3, "DEBUG: Found match for pre tag content: [$a]");
+            $content = str_replace($a, str_replace("\t", '&nbsp;&nbsp;&nbsp;&nbsp;', $a), $content);
+            $content = str_replace($a, str_replace(' ', '&nbsp;', $a), $content);
+            $content = str_replace($a, str_replace("\n", '<br>', $a), $content);
+        }
+    }
 
     //Strip tab codes
     $content = preg_replace('/\t+/', '', $content);
@@ -538,17 +559,17 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
 
     //Strip out all the html tags except for the ones that control textual layout
     if($withmedia) {
-        $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a>');
+        $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a><strong>');
     } else {
-        $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a><img><audio><video>');
+        $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a><strong><img><audio><video>');
     }
 
-    //Strip all line breaks since breakage is controlled by the markup
-    //$content = preg_replace("/[\r\n]+/", "", $content);
+    //Strip all consecutive line breaks
+    $content = preg_replace("/\n(\s*\n)+/i", "\n", $content);
 
     //Replace encoded html with real html
-    $content = str_ireplace('&amp;', '&', $content);
-    $content = str_ireplace(array('&lt;', '&gt;', '&nbsp;'), array('<', '>', ' '), $content);
+    //$content = str_ireplace('&amp;', '&', $content);
+    //$content = str_ireplace(array('&lt;', '&gt;', '&nbsp;'), array('<', '>', ' '), $content);
 
     //Replace isolated br divs with double br's
     $content = preg_replace('/\<div\>\s*<br\ *\/*\>\s*\<\/div\>/iU', "<br><br>", $content);
@@ -563,28 +584,72 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
     $content = preg_replace('/\<(a|img|p)(\ \ +)/i', "<$1 ", $content);
 
     //Add a line brake between adjacent paragraph tags
-    $content = preg_replace('/\<\/p\>\ *\<p\>/i', "</p>\n<p>", $content);
+    $content = preg_replace('/\s*\<p[^>]*\>/iU', "\n<p>", $content);
 
     //Replace empty anchor tags. WTF?
     $content = preg_replace('/(<a(?!\/)[^>]+>)+(<\/[^>]+>)+/i', "", $content);
 
     //Replace strings of more than two br's with just two
-    $content = preg_replace('/(\<br\>){3,}/i', "<br><br>", $content);
+    $content = preg_replace('/(\<br[^>]*\>){3,}/i', "<br><br>", $content);
+
+    //Replace leading and trailing br's within a paragraph
+    $content = preg_replace('/\<p\>(\<br\>)+/i', '<p>', $content);
+    $content = preg_replace('/(\<br\>)+\<\/p\>/i', '</p>', $content);
+
+    //Remove "continue reading" sections
+    $content = preg_replace('/\<a\s+href=.*\#story-continues[^>]*\>.*\<\/a\>/iU', '', $content);
 
     //Attempt to de-duplicate the title from the body of the article
     if(!empty($title)) {
         loggit(3, "Deduplicating article title: [$title].");
-        $content = str_ireplace("<h1>$title</h1>", "", $content);
-        $content = str_ireplace("<h2>$title</h2>", "", $content);
-        $content = str_ireplace("<h3>$title</h3>", "", $content);
-        $content = str_ireplace("<h4>$title</h4>", "", $content);
-        $content = str_ireplace("<h5>$title</h5>", "", $content);
+        $content = preg_replace("/\<h[1-9][^>]*\>\s*".preg_quote($title,"/")."\s*\<\/h[1-9]\>/iU", '', $content);
     }
 
     //If a length was requested, chop it
     if ($length > 0) {
         $content = truncate_html($content, $length);
     }
+
+    //Now fix up relative urls to be absolute
+    //Start with protocol relative since fixing that first will make path relative fixing easier
+    if(!empty($url)) {
+        $bail = FALSE;
+        $newurlpreface = "";
+        if(stripos($url, "http") === 0) {
+            $urlparts = parse_url($url);
+            if(!empty($urlparts)) {
+                if(!empty($urlparts['scheme'])) {
+                    $newurlpreface .= $urlparts['scheme']."://";
+                } else {
+                    $bail = TRUE;
+                    loggit(3, "The url: [$url] didn't have a scheme.");
+                }
+                if(!empty($urlparts['host'])) {
+                    $newurlpreface .= $urlparts['host'];
+                } else {
+                    $bail = TRUE;
+                    loggit(3, "The url: [$url] didn't have a host.");
+                }
+                if(!empty($urlparts['port'])) {
+                    $newurlpreface .= ":".$urlparts['port'];
+                } else {
+                    loggit(3, "The url: [$url] didn't have a port.");
+                }
+                $newurlpreface .= "/";
+            }
+            if(!$bail) {
+                $content = preg_replace("/(src|href)(\=[\"'])\/\/([^\"'\ >]*)/i", "$1$2".$urlparts['scheme']."://$3", $content);
+                $content = preg_replace("/(src|href)(\=[\"'])\/([^\"'\ >]*)/i", "$1$2".$newurlpreface."$3", $content);
+            } else {
+                loggit(3, "The url: [$url] wasn't well-formed. Can't fix article links.");
+            }
+
+        } else {
+            loggit(3, "The url: [$url] wasn't well-formed. Can't fix article links.");
+        }
+    }
+
+
 
     //Return the clean content and the media tags in an array
     if ($asarray == TRUE) {
@@ -1167,7 +1232,7 @@ function get_final_url($url, $timeout = 5, $count = 0)
     }
 
     //Meta-refresh redirect
-    if (preg_match("/meta.*refresh.*URL=.*(http[^'\"]*)/i", $content, $value)) {
+    if (preg_match("/meta[^>]*http\-equiv\=\"refresh\"[^>]*url\=.*(http[^'\"]*)/i", $content, $value)) {
         loggit(3, "DEBUG: This was a meta-refresh redirect.");
         if (strpos($value[1], "http") !== FALSE) {
             return get_final_url($value[1], NULL, $count);
@@ -1612,7 +1677,7 @@ function fetchUrlExtra($url, $timeout = 30, $referer = "", $useragent = "")
     curl_setopt($curl, CURLOPT_ENCODING, "");
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
-    curl_setopt($ch, CURLOPT_HEADERFUNCTION,
+    curl_setopt($curl, CURLOPT_HEADERFUNCTION,
         function($curl, $header) use (&$headers)
         {
             $len = strlen($header);

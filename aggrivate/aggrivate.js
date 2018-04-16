@@ -272,8 +272,12 @@ connection.query(query, function (err, rows, fields) {
                     var charset = getParams(response.headers['content-type'] || '').charset;
                     xml = maybeTranslate(body, charset);
 
-                    //If the content-type is not json, make sure it has an xml prefix in it
-                    if (xmlstring.indexOf('<?xml') < 0 && contentType.indexOf('json') < 0 && response.statusCode === 200) {
+                    //If the content-type is not json, make sure it has the right xml parts
+                    if (xmlstring.indexOf('<rss') < 0 &&
+                        xmlstring.indexOf('<feed') < 0 &&
+                        xmlstring.indexOf('<rdf') < 0 &&
+                        contentType.indexOf('json') < 0 &&
+                        response.statusCode === 200) {
                         //Debug
                         //writeFile(f.url.toLowerCase().substr(f.url.toLowerCase().indexOf('://') + 3).replace(/[^0-9a-zA-Z.\-_]/gi, '_') + redirectCodes.join('-'), body);
 

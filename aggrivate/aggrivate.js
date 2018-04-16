@@ -410,8 +410,8 @@ connection.query(query, function (err, rows, fields) {
                             dbcalls++;
                             connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET url=?,lasthttpstatus=301,lastgoodhttpstatus=UNIX_TIMESTAMP(now()),contenttype=? WHERE id=?', [response.request.uri.href, contype, f.id], function (err, result) {
                                 if (err) {
-                                    console.log("Error updating feed url location in database. Err: [" + err.code + "] ");
-                                    loggit(2, "Error updating feed url location in database. Err: [" + err.code + "]");
+                                    console.log("Error updating feed url location in database. Err: [" + err.code + " | "+f.url+" -> "+response.request.uri.href+"] ");
+                                    loggit(2, "Error updating feed url location in database. Err: [" + err.code + " | "+f.url+" -> "+response.request.uri.href+"] ");
                                 }
                                 //if (result.affectedRows === 0) console.log("Error updating database for feed: ["+f.url+"]");
                                 dbcalls--;
@@ -420,8 +420,8 @@ connection.query(query, function (err, rows, fields) {
                             dbcalls++;
                             connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET url=?,lasthttpstatus=308,lastgoodhttpstatus=UNIX_TIMESTAMP(now()),contenttype=? WHERE id=?', [response.request.uri.href, contype, f.id], function (err, result) {
                                 if (err) {
-                                    console.log("Error updating feed url location in database. Err: [" + err.code + "]");
-                                    loggit(2, "Error updating feed url location in database. Err: [" + err.code + "]");
+                                    console.log("Error updating feed url location in database. Err: [" + err.code + " | "+f.url+" -> "+response.request.uri.href+"] ");
+                                    loggit(2, "Error updating feed url location in database. Err: [" + err.code + " | "+f.url+" -> "+response.request.uri.href+"] ");
                                 }
                                 //if (result.affectedRows === 0) console.log("Error updating database for feed: ["+f.url+"]");
                                 dbcalls--;

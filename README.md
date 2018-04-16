@@ -34,7 +34,7 @@
 
 #### INSTALL:
   The software will run on any unix-like system with a LAMP stack fairly easily, but it 
-  installs and upgrades easiest on Unbuntu LTS 14, 16, etc.  That's what is assumed in the install
+  installs and upgrades easiest on Ubuntu LTS 14, 16, etc.  That's what is assumed in the install
   documentation.  Running on any other system will require installing by hand, which is
   not hard.
 

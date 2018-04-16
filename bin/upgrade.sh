@@ -41,6 +41,7 @@ service cron stop
 
 ##: Kill running jobs
 killall php >/dev/null 2>/dev/null
+killall node >/dev/null 2>/dev/null
 
 ##: Back up the existing install
 tar -zcf ~/cartulary-bak-$BAKDATE.tar.gz $CARTROOT
@@ -89,11 +90,11 @@ php $CARTROOT/bin/confcheck.php upgrade silent
 ##: Check the database version
 php $CARTROOT/bin/dbcheck.php
 
-##: Restart cron daemon
-service cron start
-
 ##: Run any side-scripts that were shipped with this version
 php $CARTROOT/bin/sidegrade.php
+
+##: Restart cron daemon
+service cron start
 
 service apache2 restart
 

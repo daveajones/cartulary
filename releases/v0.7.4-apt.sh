@@ -14,9 +14,6 @@ export CARTROOT=`echo "<?echo rtrim(get_cfg_var('cartulary_conf'), '/');?>" | ph
 
 echo Side-loading packages up through version 0.6.10...
 
-##: Stop aggrivate
-killall node
-
 ##: Refresh apt
 echo Updating apt-get repos...
 apt-get update -qq

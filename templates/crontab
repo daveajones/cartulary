@@ -48,3 +48,5 @@ MAILTO=""
 
 ##: Check for upgrades
 58   1 * * * root php [$CONF_ROOT]/bin/getversion.php checknew
+
+##: Must have a newline char before EOF

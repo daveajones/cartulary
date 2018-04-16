@@ -14,9 +14,7 @@ export CARTROOT=`echo "<?echo rtrim(get_cfg_var('cartulary_conf'), '/');?>" | ph
 
 echo Side-loading packages up through version 0.6.10...
 
-##: Stop cron jobs
-sudo /etc/init.d/cron stop
-killall php
+##: Stop aggrivate
 killall node
 
 ##: Refresh apt

@@ -27,6 +27,7 @@ apt-get install -y php5-imap
 apt-get install -y php-imap
 php5enmod imap
 phpenmod imap
+apt-get install build-essential
 
 echo Installing php5 xsl library...
 apt-get install -y php5-xsl

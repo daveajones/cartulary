@@ -104,6 +104,13 @@ if ( isset($_REQUEST['privtoken']) && !empty($_REQUEST['privtoken']) ) {
     $privtoken = $_REQUEST['privtoken'];
 }
 
+//Get a template name if set
+$templatename = "";
+if ( isset($_REQUEST['templatename']) && !empty($_REQUEST['templatename']) ) {
+    $templatename = $_REQUEST['templatename'];
+    loggit(3, "Template name: [$templatename]");
+}
+
 
 //If the outline is private make sure we have a token
 if( $private && empty($privtoken) ) {
@@ -257,14 +264,14 @@ $temp_opml = preg_replace('/\<dateModified\>.*\<\/dateModified\>/', '', $opml);
 $temp_prevopml = preg_replace('/\<dateModified\>.*\<\/dateModified\>/', '', $cfile['content']);
 if( $temp_opml != $temp_prevopml && !empty($cfile['content']) && !empty($opml) && !empty($temp_opml) && !empty($temp_prevopml) ) {
     loggit(3, "DEBUG: Editor file content changed. Saving old version in version table.");
-    add_recent_file_version($uid, $s3url, $cfile['title'], $cfile['content'], $cfile['type'], $cfile['disqus'], $cfile['wysiwyg'], $cfile['watched'], $cfile['articleid'], $cfile['locked'], $cfile['ipfshash'], $private);
+    add_recent_file_version($uid, $s3url, $cfile['title'], $cfile['content'], $cfile['type'], $cfile['disqus'], $cfile['wysiwyg'], $cfile['watched'], $cfile['articleid'], $cfile['locked'], $cfile['ipfshash'], $private, "", $templatename);
 } else {
     loggit(3, "DEBUG: Editor file content not changed.");
 }
 
 
 //Update recent file table
-$rid = update_recent_file($uid, $s3url, $title, $opml, $type, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked, $opmlhash, $private, $privtoken);
+$rid = update_recent_file($uid, $s3url, $title, $opml, $type, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked, $opmlhash, $private, $privtoken, $templatename);
 loggit(3, "DEBUG: Recent file id is [$rid].");
 
 //Was this an edited article content request

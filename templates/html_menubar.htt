@@ -106,16 +106,18 @@
                 </li>
 
 
-                <li><a class="menuOpen" href="#" title="Open">Open</a></li>
+                <li><a class="menuOpen" href="#" title="Opens an existing outline">Open</a></li>
                 <li class="dropdown menuSaves" title="Save your outline.">
                     <a id="dropdownSave" class="dropdown-toggle" data-toggle="dropdown">Save</a>
                     <ul class="dropdown-menu" data-container="body">
                         <li><a class="menuSave saves" title="Save">Save</a></li>
                         <li><a class="menuSaveAs saves" title="Save As">Save as...</a></li>
                         <li><a class="menuSaveArticle saves hide" title="Save Edited Article">Save Edited Article</a></li>
+                        <li><a class="menuSaveAsTemplate saves" title="Save As Template">Save as Template</a></li>
                     </ul>
                 </li>
-                <li><a class="menuPublish" href="#" title="Publish">Publish</a></li>
+                <li><a class="menuPublish" href="#" title="Posts this document to your Microblog">Publish</a></li>
+                <li><a class="menuGenerate hide" href="#" title="Generates a document from this outline template">Generate</a></li>
                 <li class="divider-vertical34"></li>
                 <li class="<?if(isset($mode) && $mode == "article"){echo "active";}?>"><a class="rendertoggle" href="#" title="Toggle html rendering"><i class="fa fa-file-code-o"></i></a></li>
                 <?if(!empty($myprefs['disqus_shortname'])) { ?><li><a class="menuDisqusToggle" href="#" title="Include Disqus comments in rendered version?"><i class="fa fa-comments"></i></a></li><?}?>

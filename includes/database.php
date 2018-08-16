@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 77;
+$cg_database_version = 79;
 $cg_database_updates = array();
 
 
@@ -1063,6 +1063,24 @@ CGDB0228;
 $cg_database_updates[76][] = <<<CGDB0229
  INSERT INTO `dbversion` ( `version` ) VALUES ( '77' )
 CGDB0229;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 77 to 78 -----------------------------------------------------------------------------------------------
+$cg_database_updates[77][] = <<<CGDB0230
+ ALTER TABLE `recentfiles` ADD `templatename` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'name of template'
+CGDB0230;
+$cg_database_updates[77][] = <<<CGDB0232
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '78' )
+CGDB0232;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 78 to 79 -----------------------------------------------------------------------------------------------
+$cg_database_updates[78][] = <<<CGDB0233
+ ALTER TABLE `recentfiles_versions` ADD `templatename` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'name of template'
+CGDB0233;
+$cg_database_updates[78][] = <<<CGDB0234
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '79' )
+CGDB0234;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

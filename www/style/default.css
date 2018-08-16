@@ -1343,6 +1343,14 @@ div.keepVidHeight {
         display: none;
     }
 
+    #bodyEditOutline div.bootbox-body div.generate-dialog {
+        padding-right:20px;
+    }
+
+    #bodyEditOutline div.bootbox-body div.generate-dialog input {
+        width: 100%
+    }
+
     /* --------------------------------------------------- */
     /* --------------------------------------------------- */
     /* ----- Feeditor Page ----- */

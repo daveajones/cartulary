@@ -119,7 +119,8 @@ $(document).ready(function () {
                     opOutlineToXml(ownerName, ownerEmail),
                     undefined,
                     undefined,
-                    true
+                    true,
+                    templatename
                 );
             }
         });
@@ -149,6 +150,14 @@ $(document).ready(function () {
             return false;
         }
 
+        //Check for conditions that would trigger a "save as template..."
+        if( type === 6 && (templatename === "undefined" || isEmpty(templatename)) ) {
+            menubar.find('.menuSaveAsTemplate').trigger('click');
+            $('#dropdownSave').dropdown('hide');
+            return false;
+        }
+
+
         //If the title of the outline changed prompt if the user wants to save
         //this as a new file or not
         if( title != lasttitle ) {
@@ -159,19 +168,27 @@ $(document).ready(function () {
                         label: 'Save as New',
                         callback: function() {
                             console.log("confirm callback");
-                            //Get a file name
-                            oldfilename = "";
-                            filename = getFileName(title);
-                            privtoken = "";
-                            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false);
-                            lasttitle = title;
+                            //Check for conditions that would trigger a "save as template..."
+                            if( type === 6 ) {
+                                setTimeout(function () {
+                                    menubar.find('.menuSaveAsTemplate').trigger('click');
+                                    $('#dropdownSave').dropdown('hide');
+                                }, 500);
+                            } else {
+                                //Get a file name
+                                oldfilename = "";
+                                filename = getFileName(title);
+                                privtoken = "";
+                                saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false, templatename);
+                                lasttitle = title;
+                            }
                         }
                     },
                     cancel: {
                         label: 'Overwrite',
                         callback: function() {
                             console.log("cancel callback");
-                            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false);
+                            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false, templatename);
                             lasttitle = title;
                         }
                     }
@@ -182,11 +199,78 @@ $(document).ready(function () {
                 filename = getFileName(title);
                 oldfilename = filename;
             }
-            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false);
+            saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false, templatename);
         }
 
         $('#dropdownSave').dropdown('hide');
 
+        return false;
+    });
+    menubar.find('.menuSaveAsTemplate').click(function () {
+        title = elTitle.val();
+
+        //Is there an existing template name?
+        if(isEmpty(templatename)) {
+            templatename = title;
+        }
+
+        if (lockedOutline) {
+            bbCaption = "This outline is locked. Type a new file name.";
+        } else {
+            bbCaption = "What do you want to name this template?";
+        }
+        bootbox.prompt(bbCaption, function (result) {
+            if (result !== null) {
+                //Grab the current title
+                title = elTitle.val();
+
+                //Set a title
+                opSetTitle(title);
+                lasttitle = title;
+
+                //Get a new filename
+                filename = getFileName(result);
+
+                if(!isEmpty(result)) {
+                    templatename = result;
+                }
+
+                //This is a new file so clear the token to make the cgi gen a new one
+                privtoken = "";
+
+                //Set the type to template
+                type = 6;
+
+                //Save the file
+                saveFile(
+                    title,
+                    filename,
+                    type,
+                    redirect,
+                    includeDisqus,
+                    wysiwygOn,
+                    watchedOutline,
+                    lockedOutline,
+                    privateOutline,
+                    privtoken,
+                    opOutlineToXml(ownerName, ownerEmail),
+                    undefined,
+                    undefined,
+                    true,
+                    templatename
+                );
+            }
+        });
+
+        //Put an existing value in the input box
+        console.log("Templatename: " + templatename);
+        if(templatename.toLowerCase() != "untitled" && templatename != "") {
+            setTimeout(function () {
+                $('input.bootbox-input').val(templatename);
+            }, 500);
+        }
+
+        $('#dropdownSave').dropdown('hide');
         return false;
     });
     menubar.find('.menuSaveArticle').click(function () {
@@ -238,6 +322,111 @@ $(document).ready(function () {
         return (false);
     });
 
+    //Generate button
+    menubar.find('.menuGenerate').click(function () {
+        if(opHasChanged()) {
+            bootbox.alert("You have unsaved template changes. Please save first before generating.");
+            return false;
+        }
+
+        var variables = getTemplateVariables();
+        var incvars = getTemplateIncrementVariables();
+        var decvars = getTemplateDecrementVariables();
+        var ttitle = opGetTitle();
+
+        var dialog = bootbox.dialog({
+            title: "Fill in Template Values",
+            message: "...",
+            buttons: {
+                confirm: {
+                    label: 'Generate',
+                    className: 'btn-success',
+                    callback: function (result) {
+                        $('div.bootbox-body div.generate-dialog input').each( function( index, element ){
+                            var rawvar = $(this).data('variable');
+                            var varname = '[[$'+rawvar+']]';
+                            var varnameinc = '[[$'+rawvar+'++]]';
+                            var varnamedec = '[[$'+rawvar+'--]]';
+                            var regexvar = escapeRegExp('[[$'+rawvar+']]');
+                            var regexvarinc = escapeRegExp('[[$'+rawvar+'++]]');
+                            var regexvardec = escapeRegExp('[[$'+rawvar+'--]]');
+                            var replacement = $(this).val();
+
+                            console.log( "["+index+"] - ["+varname+" | "+replacement+"]" );
+                            //Iterate over every node, doing the replacement
+                            opVisitAll(function (op) {
+                                //console.log(op);
+                                var ltext = op.getLineText();
+                                if (ltext.indexOf(varname) != -1) {
+                                    var r = new RegExp(regexvar, 'gm');
+                                    op.setLineText(ltext.replace(r, replacement));
+                                }
+                            });
+                            if (ttitle.indexOf(varname) != -1) {
+                                var r = new RegExp(regexvar, 'gm');
+                                ttitle = ttitle.replace(r, replacement);
+                            }
+
+
+                            if(incvars.includes(rawvar)) {
+                                var replaceinc = Number(replacement) + 1;
+                                console.log( "["+index+"] - ["+varnameinc+" | "+replaceinc+"]" );
+                                //Iterate over every node, doing the replacement
+                                opVisitAll(function (op) {
+                                    //console.log(op);
+                                    var ltext = op.getLineText();
+                                    if (ltext.indexOf(varnameinc) != -1) {
+                                        var r = new RegExp(regexvarinc, 'gm');
+                                        op.setLineText(ltext.replace(r, replaceinc));
+                                    }
+                                });
+                                if (ttitle.indexOf(varnameinc) != -1) {
+                                    var r = new RegExp(regexvarinc, 'gm');
+                                    ttitle = ttitle.replace(r, replaceinc);
+                                }
+                            }
+
+                            if(decvars.includes(rawvar)) {
+                                var replacedec = Number(replacement) - 1;
+                                console.log( "["+index+"] - ["+varnamedec+" | "+replacedec+"]" );
+                                //Iterate over every node, doing the replacement
+                                opVisitAll(function (op) {
+                                    //console.log(op);
+                                    var ltext = op.getLineText();
+                                    if (ltext.indexOf(varnamedec) != -1) {
+                                        var r = new RegExp(regexvardec, 'gm');
+                                        op.setLineText(ltext.replace(r, replacedec));
+                                    }
+                                });
+                                if (ttitle.indexOf(varnamedec) != -1) {
+                                    var r = new RegExp(regexvardec, 'gm');
+                                    ttitle = ttitle.replace(r, replacedec);
+                                }
+                            }
+                        });
+
+                        //Set the new title
+                        opSetTitle(ttitle);
+
+                        //Save the new file
+                        saveGeneratedFile(opGetTitle(), getFileName(opGetTitle()), 0, "", includeDisqus, wysiwygOn, opOutlineToXml());
+                    }
+                },
+                cancel: {
+                    label: 'Cancel'
+                }
+            }
+        });
+        dialog.init(function(){
+            var bbBody = $('div.bootbox-body');
+            bbBody.empty().append('<div class="generate-dialog"></div>');
+            var bbContent = bbBody.find('div.generate-dialog');
+            variables.forEach(function(variable) {
+                bbContent.append('<input placeholder="'+variable+'" data-variable="'+variable+'" type="text" value="" /><br>');
+            });
+        });
+    });
+
     //Open button
     menubar.find('.menuOpen').click(function () {
         if (sheetopen.hasClass('open')) {
@@ -258,6 +447,7 @@ $(document).ready(function () {
                 $.each(data.files, function (i, item) {
                     var re = /\.$/;
                     var newtitle = item.title.replace(re, "").toLowerCase();
+
                     var rfLocked = "";
                     if (item.locked === 1) {
                         rfLocked = ' <i class="fa fa-lock"></i> ';
@@ -269,7 +459,14 @@ $(document).ready(function () {
                     var rfType = "";
                     if (item.type === 1) {
                         rfType = ' <i class="fa fa-rss"></i> ';
+                    } else if (item.type === 6) {
+                        rfType = ' <i class="fa fa-file-code-o"></i> ';
                     }
+
+                    if(item.type === 6) {
+                        newtitle = item.templatename.replace(re, "").toLowerCase();
+                    }
+
                     $('.recentfilesopen').append('<li><a style="text-transform: capitalize;" href="/editor?url=' + item.url + '">' + newtitle + '</a> ' + prettyDate(item.time * 1000).toLowerCase() + '. ' + rfType + rfLocked + rfEye + '</li>');
                 });
 
@@ -1005,6 +1202,10 @@ $(document).ready(function () {
     } else {
         buildNodeTypeMenu(nodeTypeMenuStandard);
     }
+    menubar.find('.menuGenerate').hide();
+    if (type === 6) {
+        menubar.find('.menuGenerate').show();
+    }
 
 
     //Hot keys
@@ -1090,7 +1291,7 @@ $(document).ready(function () {
     $('#divEditorEnclosures').offset({top: 0, left: 0}).offset($('#divEditOutline').offset());
 
     //Save a file
-    function saveFile(ftitle, fname, ftype, fredirect, fdisqus, fwysiwyg, fwatched, flocked, fprivate, fprivtoken, fopml, foldname, asarticle, jumptourl) {
+    function saveFile(ftitle, fname, ftype, fredirect, fdisqus, fwysiwyg, fwatched, flocked, fprivate, fprivtoken, fopml, foldname, asarticle, jumptourl, ftemplatename) {
         var _foldname = (typeof foldname === "undefined") ? "" : foldname;
         var _asarticle = (typeof asarticle === "undefined") ? false : asarticle;
         var _jumptourl = (typeof jumptourl === "undefined") ? false : jumptourl;
@@ -1128,7 +1329,8 @@ $(document).ready(function () {
                 "title": ftitle,
                 "rendertitle": rendertitle,
                 "aid": aid,
-                "articleoverwrite": _asarticle
+                "articleoverwrite": _asarticle,
+                "templatename": ftemplatename
             },
             dataType: "json",
             beforeSend: function () {
@@ -1203,6 +1405,38 @@ $(document).ready(function () {
                         }
                     }
                 });
+            }
+        });
+
+        return true;
+    }
+
+    //Save a file generated from a template
+    function saveGeneratedFile(ftitle, fname, ftype, fredirect, fdisqus, fwysiwyg, fopml) {
+        //Make the ajax call
+        $.ajax({
+            type: 'POST',
+            url: '/cgi/in/save.opml',
+            data: {
+                "opml": fopml,
+                "type": ftype,
+                "oldfilename": "",
+                "filename": fname,
+                "redirect": fredirect,
+                "disqus": fdisqus,
+                "wysiwyg": fwysiwyg,
+                "title": ftitle,
+                "rendertitle": true
+            },
+            dataType: "json",
+            beforeSend: function() {
+                menubar.find('a.menuGenerate').html('<i class="fa fa-spinner"></i> Generating...');
+            },
+            success: function (data) {
+                menubar.find('a.menuGenerate').html('Generate');
+
+                //Open the new file in a new tab
+                window.location = "/editor?url="+data.url;
             }
         });
 
@@ -2025,5 +2259,66 @@ $(document).ready(function () {
         }
 
         return newFilename;
+    }
+
+    function getTemplateVariables() {
+        var content = [];
+        var re = /\[\[\$(((?!\+\+)(?!\-\-)[^\]])*)\]\]/g;
+        var s = opOutlineToXml();
+        var m;
+
+        do {
+            m = re.exec(s);
+            if (m) {
+                console.log(m[1]);
+                if(content.indexOf(m[1]) < 0) {
+                    content.push(m[1]);
+                }
+            }
+        } while (m);
+
+        return content;
+    }
+
+    function getTemplateIncrementVariables() {
+        var content = [];
+        var re = /\[\[\$([^\]]*)\+\+\]\]/g;
+        var s = opOutlineToXml(ownerName, ownerEmail);
+        var m;
+
+        do {
+            m = re.exec(s);
+            if (m) {
+                console.log(m[1]);
+                if(content.indexOf(m[1]) < 0) {
+                    content.push(m[1]);
+                }
+            }
+        } while (m);
+
+        return content;
+    }
+
+    function getTemplateDecrementVariables() {
+        var content = [];
+        var re = /\[\[\$([^\]]*)\-\-\]\]/g;
+        var s = opOutlineToXml(ownerName, ownerEmail);
+        var m;
+
+        do {
+            m = re.exec(s);
+            if (m) {
+                console.log(m[1]);
+                if(content.indexOf(m[1]) < 0) {
+                    content.push(m[1]);
+                }
+            }
+        } while (m);
+
+        return content;
+    }
+
+    function escapeRegExp(s){
+        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     }
 });

@@ -104,7 +104,8 @@ if ($content == FALSE) {
 }
 
 //Strip blank lines from top of this file
-$content = ltrim($content);
+$rawcontent = ltrim($content);
+$content = fix_xml_feed_structure($rawcontent, $url);
 
 //Is this an opml outline?
 if (is_outline($content)) {
@@ -280,7 +281,7 @@ if (feed_is_linked_by_url($url, $uid)) {
 }
 
 //Add the feed for this user
-if(is_jsonfeed($content)) {
+if(is_jsonfeed($rawcontent)) {
     $fid = add_feed($url, $uid, FALSE, NULL, 1);
 } else {
     $fid = add_feed($url, $uid, FALSE, NULL);

@@ -330,6 +330,7 @@ $(document).ready(function () {
         }
 
         var variables = getTemplateVariables();
+        var varvals = [];
         var incvars = getTemplateIncrementVariables();
         var decvars = getTemplateDecrementVariables();
         var ttitle = opGetTitle();
@@ -353,6 +354,14 @@ $(document).ready(function () {
                             var replacement = $(this).val();
 
                             console.log( "["+index+"] - ["+varname+" | "+replacement+"]" );
+
+                            //Keep an array of variable names and their replacement values for sending to the server
+                            //to save
+                            varvals.push({
+                                name: rawvar,
+                                value: replacement
+                            });
+
                             //Iterate over every node, doing the replacement
                             opVisitAll(function (op) {
                                 //console.log(op);
@@ -409,7 +418,7 @@ $(document).ready(function () {
                         opSetTitle(ttitle);
 
                         //Save the new file
-                        saveGeneratedFile(opGetTitle(), getFileName(opGetTitle()), 0, "", includeDisqus, wysiwygOn, opOutlineToXml());
+                        saveGeneratedFile(opGetTitle(), getFileName(opGetTitle()), 0, "", includeDisqus, wysiwygOn, opOutlineToXml(), varvals, templateid);
                     }
                 },
                 cancel: {
@@ -422,8 +431,16 @@ $(document).ready(function () {
             bbBody.empty().append('<div class="generate-dialog"></div>');
             var bbContent = bbBody.find('div.generate-dialog');
             variables.forEach(function(variable) {
-                bbContent.append('<input placeholder="'+variable+'" data-variable="'+variable+'" type="text" value="" /><br>');
+                var oldval = "";
+                let obj = templatevariables.find(o => o.name === variable);
+                if(typeof obj !== "undefined") {
+                    oldval = obj.value;
+                }
+                bbContent.append('<input placeholder="'+variable+'" data-variable="'+variable+'" type="text" value="'+oldval+'" title="'+variable+'"/><br>');
             });
+            if(variables.length < 1) {
+                bbContent.append('<h2>No variables present.</h2></h1><br>');
+            }
         });
     });
 
@@ -1348,6 +1365,8 @@ $(document).ready(function () {
 
                 privtoken = data.privtoken;
 
+                templateid = data.templateid;
+
                 if (data.status === "true") {
                     updateOutlineInfo(url, data, redirect);
                     showMessage(data.description + ' ' + '<a href="' + data.url + '">Link</a>', data.status, 2);
@@ -1412,7 +1431,7 @@ $(document).ready(function () {
     }
 
     //Save a file generated from a template
-    function saveGeneratedFile(ftitle, fname, ftype, fredirect, fdisqus, fwysiwyg, fopml) {
+    function saveGeneratedFile(ftitle, fname, ftype, fredirect, fdisqus, fwysiwyg, fopml, variables, templateid) {
         //Make the ajax call
         $.ajax({
             type: 'POST',
@@ -1426,7 +1445,9 @@ $(document).ready(function () {
                 "disqus": fdisqus,
                 "wysiwyg": fwysiwyg,
                 "title": ftitle,
-                "rendertitle": true
+                "rendertitle": true,
+                "variables": variables,
+                "templateid": templateid
             },
             dataType: "json",
             beforeSend: function() {

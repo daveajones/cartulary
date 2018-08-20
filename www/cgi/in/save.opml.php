@@ -104,6 +104,18 @@ if ( isset($_REQUEST['privtoken']) && !empty($_REQUEST['privtoken']) ) {
     $privtoken = $_REQUEST['privtoken'];
 }
 
+//Get variables if any
+$variables = [];
+if ( isset($_REQUEST['variables']) && !empty($_REQUEST['variables'])) {
+    $variables = $_REQUEST['variables'];
+    loggit(3, print_r($variables, TRUE));
+}
+$templateid = "";
+if ( isset($_REQUEST['templateid']) && !empty($_REQUEST['templateid'])) {
+    $templateid = $_REQUEST['templateid'];
+    loggit(3, "Template id: [$templateid]");
+}
+
 //Get a template name if set
 $templatename = "";
 if ( isset($_REQUEST['templatename']) && !empty($_REQUEST['templatename']) ) {
@@ -269,6 +281,10 @@ if( $temp_opml != $temp_prevopml && !empty($cfile['content']) && !empty($opml) &
     loggit(3, "DEBUG: Editor file content not changed.");
 }
 
+//Update timestamp on source template when generating a new file from it so that it doesn't get pushed way down
+if( !empty($templateid) ) {
+    touch_recent_file_by_id($templateid);
+}
 
 //Update recent file table
 $rid = update_recent_file($uid, $s3url, $title, $opml, $type, $s3oldurl, $disqus, $wysiwyg, $watched, $aid, $locked, $opmlhash, $private, $privtoken, $templatename);
@@ -376,11 +392,22 @@ if( !empty($rhost) ) {
     remove_redirection_by_url($s3html, $uid);
 }
 
+//If variables were present, save them
+if( $type == 6 && empty($templateid) && !empty($rid) ) {
+    $templateid = $rid;
+}
+if( !empty($variables) && !empty($templateid) ) {
+    foreach( $variables as $variable) {
+        update_recent_file_variable($uid, $templateid, $variable['name'], $variable['value']);
+    }
+}
+
 //Log it
 loggit(3,"Saved: [$filename] to S3 for user: [$uid]. ");
 
 //Give feedback that all went well
 $jsondata['status'] = "true";
+$jsondata['templateid'] = $templateid;
 $jsondata['privtoken'] = $privtoken;
 $jsondata['description'] = "File saved to S3.";
 echo json_encode($jsondata);

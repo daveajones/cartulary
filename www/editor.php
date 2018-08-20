@@ -76,6 +76,14 @@ if (!empty($aid)) {
     }
 }
 
+//Need vars for this template?
+$variables = [];
+if($seenfile['type'] == 6) {
+    $variables = get_recent_file_variables($g_uid, $seenfile['id']);
+    loggit(3, print_r($seenfile, TRUE));
+}
+loggit(3, print_r($variables, TRUE));
+
 //Clean opml
 if (!empty($opmldata)) {
     $opmldata = preg_replace("/\ +\n\n\ +/", "\n\n", $opmldata);
@@ -134,11 +142,24 @@ $tree_location = "Edit Outline";
         var wasLocked = <?if(!isset($seenfile) || $seenfile['locked'] == 0) { echo "false"; } else { echo "true"; }?>;
         var ipfsHash = '<?if(!isset($seenfile) || $seenfile['ipfshash'] == "") { echo ""; } else { echo $seenfile['ipfshash']; }?>';
         var privtoken = '<?if(!isset($seenfile) || $seenfile['privtoken'] == "") { echo ""; } else { echo $seenfile['privtoken']; }?>';
+        var templatename = '<?if(!isset($seenfile) || $seenfile['templatename'] == "") { echo ""; } else { echo $seenfile['templatename']; }?>';
+        <?if( isset($variables) && !empty($variables) ) {?>
+        var templatevariables = <?echo json_encode($variables)?>;
+        <?} else {?>
+        var templatevariables = [];
+        <?}?>
+        <?if( isset($seenfile['type']) && $seenfile['type'] == 6 ) {?>
+        var templateid = <?echo $seenfile['id']?>;
+        <?} else {?>
+        var templateid = "";
+        <?}?>
         var redirectHits = <?if(empty($rhost)) { echo 0; } else { echo get_redirection_hit_count_by_host($rhost); }?>;
         <?if( isset($badurl) ) {?>
         badurl = true;
         <?}?>
         <?include "$confroot/$scripts/editor.js"?>
+
+        console.log("Templatename: " + templatename);
     </script>
 </head>
 <? include "$confroot/$templates/$template_html_posthead" ?>

@@ -3071,6 +3071,86 @@ function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 }
 
 
+//Return a file by its id
+function get_recent_file_by_id($uid = NULL, $fileid = NULL, $blob = FALSE)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+    if (empty($fileid)) {
+        loggit(2, "The file id given is corrupt or blank: [$fileid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    if ($blob) {
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, articleid, ipfshash, private, privtoken, templatename, outline FROM $table_recentfiles WHERE userid=? AND id=?";
+    } else {
+        $sqltxt = "SELECT id, title, url, time, disqus, wysiwyg, watched, type, locked, articleid, ipfshash, private, privtoken, templatename FROM $table_recentfiles WHERE userid=? AND id=?";
+    }
+
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sd", $uid, $fileid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No files returned for: [$uid | $fileid] with the given criteria.");
+        return (array());
+    }
+
+    if ($blob) {
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $farticleid, $ipfshash, $fprivate, $fprivtoken, $ftemplatename, $foutline) or loggit(2, "MySql error: " . $dbh->error);
+    } else {
+        $sql->bind_result($fid, $ftitle, $furl, $ftime, $fdisqus, $fwysiwyg, $fwatched, $ftype, $flocked, $farticleid, $ipfshash, $fprivate, $fprivtoken, $ftemplatename) or loggit(2, "MySql error: " . $dbh->error);
+    }
+
+
+    $files = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $files[$count] = array(
+            'id' => $fid,
+            'title' => $ftitle,
+            'url' => $furl,
+            'time' => $ftime,
+            'disqus' => $fdisqus,
+            'wysiwyg' => $fwysiwyg,
+            'watched' => $fwatched,
+            'type' => $ftype,
+            'locked' => $flocked,
+            'articleid' => $farticleid,
+            'ipfshash' => $ipfshash,
+            'private' => $fprivate,
+            'privtoken' => $fprivtoken,
+            'templatename' => $ftemplatename
+        );
+        if ($blob) {
+            $files[$count]['content'] = $foutline;
+        }
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning: [$count] files for user: [$uid]");
+    return ($files[0]);
+}
+
+
 //Return a file by its private token
 function get_recent_file_by_privtoken($privtoken = NULL, $blob = FALSE)
 {
@@ -3445,6 +3525,165 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
     //Log and return
     loggit(3, "User: [$uid] edited a file: [$title] at: [$url]. Article: [$articleid]. Template name: [$templatename]");
     return ($rid);
+}
+
+
+//Update the timestamp of a recent file
+function touch_recent_file_by_id($fid = NULL)
+{
+    //Check parameters
+    if (empty($fid)) {
+        loggit(2, "The file id is blank or corrupt: [$fid]");
+        return (FALSE);
+    }
+
+
+    //Timestamp
+    $time = time();
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Update the timestamp
+    $stmt = "UPDATE $table_recentfiles SET time=? WHERE id=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("dd",
+        $time,
+        $fid
+    ) or loggit(2, "MySql error: " . $dbh->error);
+
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "File: [$fid] was touched at: [$time]");
+    return (TRUE);
+}
+
+
+
+//Update a variable value for a recent file
+function update_recent_file_variable($uid = NULL, $fid = NULL, $varname = NULL, $varvalue = NULL, $increment = FALSE)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+    if (empty($fid)) {
+        loggit(2, "The file id is blank or corrupt: [$fid]");
+        return (FALSE);
+    }
+    if (empty($varname)) {
+        loggit(2, "The variable name is blank or corrupt: [$varname]");
+        return (FALSE);
+    }
+    if (empty($varvalue)) {
+        loggit(2, "The variable value is blank or corrupt: [$varvalue]");
+        return (FALSE);
+    }
+    if ($increment === TRUE) {
+        $increment = 1;
+    } else {
+        $increment = 0;
+    }
+
+    //Check if this file belongs to this user id and balk if not
+    if(empty(get_recent_file_by_id($uid, $fid))) {
+        //Log and return
+        loggit(3, "User: [$uid] is not the owner of file: [$fid] so variables cannot be saved for it.");
+        return (FALSE);
+    }
+
+    //Timestamp
+    $time = time();
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Insert variable value
+    $stmt = "INSERT INTO $table_recentfilesvariables (id, variable, value, increment)
+                                               VALUES ( ?,        ?,     ?,         ?)
+                                             ON DUPLICATE KEY UPDATE value=?, increment=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("dssdsd",
+        $fid,
+        $varname,
+            $varvalue,
+            $increment,
+            $varvalue,
+            $increment
+    ) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "Updated a variable: [$varname] for user: [$uid] for recent file: [$fid].");
+    return (TRUE);
+}
+
+
+//Get all the variable for a recent file
+function get_recent_file_variables($uid = NULL, $fid = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+    if (empty($fid)) {
+        loggit(2, "The file id given is corrupt or blank: [$fid]");
+        return (FALSE);
+    }
+
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT variable, value, increment FROM $table_recentfilesvariables WHERE id=?";
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("d", $fid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Check for return conditions
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No variables returned for file: [$fid].");
+        return (array());
+    }
+
+    $sql->bind_result($fvariable, $fvalue, $fincrement) or loggit(2, "MySql error: " . $dbh->error);
+
+    $variables = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $variables[$count] = array(
+            'id' => $fid,
+            'name' => $fvariable,
+            'value' => $fvalue,
+            'increment' => $fincrement
+        );
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning: [$count] variables for file: [$fid].");
+    return ($variables);
 }
 
 

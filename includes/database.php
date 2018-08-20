@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 79;
+$cg_database_version = 81;
 $cg_database_updates = array();
 
 
@@ -1082,6 +1082,38 @@ $cg_database_updates[78][] = <<<CGDB0234
  INSERT INTO `dbversion` ( `version` ) VALUES ( '79' )
 CGDB0234;
 //----------------------------------------------------------------------------------------------------------------
+
+//Version 79 to 80 -----------------------------------------------------------------------------------------------
+$cg_database_updates[79][] = <<<CGDB0235
+ CREATE TABLE IF NOT EXISTS `recentfiles_variables` ( 
+  `id` BIGINT NOT NULL , 
+  `variable` VARCHAR(255) NOT NULL , 
+  `value` TEXT NOT NULL , 
+  `increment` TINYINT NOT NULL DEFAULT '0' , 
+  PRIMARY KEY (`id`), 
+  INDEX (`variable`)
+) ENGINE = InnoDB COMMENT = 'A history of previously used variables'
+CGDB0235;
+$cg_database_updates[79][] = <<<CGDB0236
+ ALTER TABLE `recentfiles_variables` ADD CONSTRAINT `id` FOREIGN KEY (`id`) REFERENCES `recentfiles`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+CGDB0236;
+$cg_database_updates[79][] = <<<CGDB0237
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '80' )
+CGDB0237;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 80 to 81 -----------------------------------------------------------------------------------------------
+$cg_database_updates[80][] = <<<CGDB0238
+ ALTER TABLE `recentfiles_variables` DROP PRIMARY KEY, ADD INDEX (`id`) USING BTREE
+CGDB0238;
+$cg_database_updates[80][] = <<<CGDB0239
+ ALTER TABLE `recentfiles_variables` ADD PRIMARY KEY (`id`, `variable`) USING BTREE
+CGDB0239;
+$cg_database_updates[80][] = <<<CGDB0240
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '81' )
+CGDB0240;
+//----------------------------------------------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------------------------------------------
 
 

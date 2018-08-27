@@ -400,7 +400,7 @@ function add_article($url = NULL, $title = NULL, $content = NULL, $analysis = NU
     //Now that we have a good id, put the article into the database
     $stmt = "INSERT INTO $table_article (id,url,title,content,analysis,createdon,shorturl,sourceurl,sourcetitle) VALUES (?,?,?,?,?,?,?,?,?)";
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("sssssssss", $id, $url, $title, $content, $analysis, $createdon, $shorturl, $sourceurl, $sourcetitle) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sssssdsss", $id, $url, $title, $content, $analysis, $createdon, $shorturl, $sourceurl, $sourcetitle) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
@@ -494,7 +494,7 @@ function user_can_view_article($aid = NULL, $uid = NULL)
 }
 
 
-//Retrieve an article from the repository
+//Retrieve articles from repository as a batch
 function get_articles($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE)
 {
     //Check parameters
@@ -572,6 +572,107 @@ function get_articles($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE)
             'staticurl' => get_article_static_url($aid, $uid),
             'createdon' => $acreatedon,
             'content' => $acontent,
+            'linkedon' => $clinkedon,
+            'sourceurl' => $asourceurl,
+            'sourcetitle' => $asourcetitle);
+        $count++;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning: [$count] articles for user: [$uid]");
+    return ($articles);
+}
+
+
+//Retrieve list of articles for a user without the content
+function get_article_list($uid = NULL, $max = NULL, $pub = FALSE, $archive = FALSE, $since = NULL)
+{
+    //Check parameters
+    if ($uid == NULL) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+
+    //Is this a request for a certain month's worth of posts?
+    if ($archive != FALSE) {
+        $mfirst = mktime(0, 0, 0);
+        //loggit(3, "Timestamp of start of day: [".$mfirst."]");
+        $mlast = mktime(23, 59, 00);
+        //loggit(3, "Timestamp of end of day: [".$mlast."]");
+    }
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the sid in the session table
+    $sqltxt = "SELECT $table_article.id,
+                    $table_article.title,
+                    $table_article.url,
+                    $table_article.shorturl,
+                    $table_article.createdon,
+                    $table_catalog.linkedon,
+		    $table_article.sourceurl,
+	            $table_article.sourcetitle
+	     FROM $table_article,$table_catalog
+	     WHERE $table_catalog.userid=?
+             AND ($table_catalog.articleid=$table_article.id)";
+
+    if ($pub == TRUE) {
+        $sqltxt .= " AND ($table_catalog.articleid=$table_article.id OR $table_catalog.public=1)";
+    }
+
+    if (empty($since)) {
+        if ($archive != FALSE) {
+            $sqltxt .= " AND $table_catalog.linkedon > $mfirst AND $table_catalog.linkedon < $mlast";
+        }
+
+        $sqltxt .= " ORDER BY $table_catalog.linkedon DESC";
+    } else {
+        $sqltxt .= " AND $table_catalog.linkedon > ?";
+
+        $sqltxt .= " ORDER BY $table_catalog.linkedon DESC";
+    }
+
+    if (empty($max) || !is_numeric($max)) {
+        $max = $default_max_opml_items;
+    }
+    $sqltxt .= " LIMIT ?";
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    if(empty($since)) {
+        $sql->bind_param("sd", $uid, $max) or loggit(2, "MySql error: " . $dbh->error);
+    } else {
+        $sql->bind_param("sdd", $uid, $since, $max) or loggit(2, "MySql error: " . $dbh->error);
+    }
+
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any articles for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No articles returned for user: [$uid] with given criteria.");
+        return (array());
+    }
+
+    $sql->bind_result($aid, $atitle, $aurl, $ashorturl, $acreatedon, $clinkedon, $asourceurl, $asourcetitle) or loggit(2, "MySql error: " . $dbh->error);
+
+    $articles = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $articles[$count] = array('id' => $aid,
+            'title' => $atitle,
+            'url' => $aurl,
+            'shorturl' => $ashorturl,
+            'staticurl' => get_article_static_url($aid, $uid),
+            'createdon' => $acreatedon,
             'linkedon' => $clinkedon,
             'sourceurl' => $asourceurl,
             'sourcetitle' => $asourcetitle);
@@ -1388,5 +1489,57 @@ function set_article_title($aid = NULL, $title = NULL)
 
     //Log and return
     loggit(1, "Set title for article:[$aid] to: [$title].");
+    return (TRUE);
+}
+
+
+//Get the time of the last article import
+function get_last_article_import_time($uid = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "User id given is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Get user prefs
+    $prefs = get_user_prefs($uid);
+
+    //At least one pref was bad
+    return ($prefs['lastarticleimporttime']);
+}
+
+
+//Set the last article import time for a user
+function set_last_article_import_time($uid = NULL, $time = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id was corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+    if (empty($time)) {
+        loggit(2, "The time given was corrupt or blank: [$time]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the uid in the session table
+    $stmt = "UPDATE $table_prefs SET lastarticleimporttime=? WHERE uid=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ds", $time, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Return
+    loggit(1, "Set last article import time to: [$time] for user: [$uid].");
     return (TRUE);
 }

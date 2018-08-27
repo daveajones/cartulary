@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 81;
+$cg_database_version = 83;
 $cg_database_updates = array();
 
 
@@ -1114,6 +1114,26 @@ $cg_database_updates[80][] = <<<CGDB0240
 CGDB0240;
 //----------------------------------------------------------------------------------------------------------------
 
+//Version 81 to 82 -----------------------------------------------------------------------------------------------
+$cg_database_updates[81][] = <<<CGDB0241
+ ALTER TABLE `cartulary`.`recentfiles` ADD UNIQUE (`id`, `userid`)
+CGDB0241;
+$cg_database_updates[81][] = <<<CGDB0242
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '82' )
+CGDB0242;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 82 to 83 -----------------------------------------------------------------------------------------------
+$cg_database_updates[82][] = <<<CGDB0243
+ ALTER TABLE `articles` MODIFY createdon INT NOT NULL
+CGDB0243;
+$cg_database_updates[82][] = <<<CGDB0244
+ ALTER TABLE `prefs` ADD `lastarticleimporttime` INT NOT NULL AFTER `mastodon_access_token`
+CGDB0244;
+$cg_database_updates[82][] = <<<CGDB0245
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '83' )
+CGDB0245;
+//----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 
 

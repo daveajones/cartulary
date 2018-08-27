@@ -70,5 +70,3 @@ $jsondata['description'] = "Articles exported.";
 echo json_encode($jsondata);
 
 return(0);
-
-?>

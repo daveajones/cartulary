@@ -160,6 +160,22 @@ if ( isset($_REQUEST['opml']) ) {
 };
 
 
+//We're going to need the S3 url of this file to continue
+$s3url = get_s3_url($uid, "/opml/", $filename);
+
+//Before we do anything we need to confirm that this user id has permissions to update this file.  If its a new
+//file, we need to allow for that
+if( !empty($templateid) ) {
+    if( !user_can_edit_recent_file_by_id($uid, $templateid) ) {
+        //Log it
+        loggit(2,"User: [$uid] tried to save variables for a template id they don't own.");
+        $jsondata['status'] = "false";
+        $jsondata['description'] = "You don't have permission to work with this template.";
+        echo json_encode($jsondata);
+        exit(1);
+    }
+}
+
 //Put the opml file in S3
 $s3info = get_s3_info($uid);
 if(!$private) {
@@ -173,14 +189,12 @@ if(!$private) {
         echo json_encode($jsondata);
         exit(1);
     } else {
-        $s3url = get_s3_url($uid, "/opml/", $filename);
         loggit(1, "Wrote opml to S3 at url: [$s3url].");
     }
 } else {
     //Delete the opml file from S3 if the outline is marked private since it's not even usable
     loggit(3, "Deleting private outline OPML in S3: [".$s3info['bucket']."/opml"." | ".$filename."]");
     $s3res = deleteFromS3($filename, $s3info['bucket']."/opml", $s3info['key'], $s3info['secret']);
-    $s3url = get_s3_url($uid, "/opml/", $filename);
 }
 
 //Put the opml content in IPFS

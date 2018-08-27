@@ -1351,6 +1351,10 @@ div.keepVidHeight {
         width: 100%
     }
 
+    #bodyEditOutline div.bootbox-body div.import-articles ul {
+        list-style: none;
+    }
+
     /* --------------------------------------------------- */
     /* --------------------------------------------------- */
     /* ----- Feeditor Page ----- */

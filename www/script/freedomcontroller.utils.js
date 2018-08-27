@@ -538,6 +538,7 @@ dateFormat.masks = {
     isoTime: "HH:MM:ss", // 17:46:21
     isoDateTime: "yyyy-mm-dd'T'HH:MM:ss", // 2007-06-09T17:46:21
     isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'", // 2007-06-09T22:46:21Z
+    friendly: "mmm dd @ h:MM TT", // Jun 09 at 5:46 PM
 
     timeDate: "dd mmm; h:MM TT" // 09 Jun; 5:46:21 PM
 };

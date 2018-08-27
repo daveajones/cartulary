@@ -24,7 +24,7 @@ $(document).ready(function () {
     var audioAnimate;
     var fileMultiDrop = false;
     var uploaddatestamp = new Date().valueOf() / 1000;
-
+    var filterArticleImport = 'menuArticleRangeSinceLastImport';
 
 
     //Node type menu sets
@@ -127,7 +127,7 @@ $(document).ready(function () {
 
         //Put an existing value in the input box
         console.log(title);
-        if(title.toLowerCase() != "untitled" && title != "") {
+        if (title.toLowerCase() != "untitled" && title != "") {
             setTimeout(function () {
                 $('input.bootbox-input').val(title);
             }, 500);
@@ -144,14 +144,14 @@ $(document).ready(function () {
         opSetTitle(title);
 
         //Check for conditions that would force a "save as..."
-        if ( (lockedOutline && wasLocked) || title.toLowerCase() == "untitled" || title == "" ) {
+        if ((lockedOutline && wasLocked) || title.toLowerCase() == "untitled" || title == "") {
             menubar.find('.menuSaveAs').trigger('click');
             $('#dropdownSave').dropdown('hide');
             return false;
         }
 
         //Check for conditions that would trigger a "save as template..."
-        if( type === 6 && (templatename === "undefined" || isEmpty(templatename)) ) {
+        if (type === 6 && (templatename === "undefined" || isEmpty(templatename))) {
             menubar.find('.menuSaveAsTemplate').trigger('click');
             $('#dropdownSave').dropdown('hide');
             return false;
@@ -160,16 +160,16 @@ $(document).ready(function () {
 
         //If the title of the outline changed prompt if the user wants to save
         //this as a new file or not
-        if( title != lasttitle ) {
+        if (title != lasttitle) {
             bootbox.dialog({
                 message: "You changed the title of this outline. Do you want to save it as a new file or overwrite the current file?",
                 buttons: {
                     confirm: {
                         label: 'Save as New',
-                        callback: function() {
+                        callback: function () {
                             console.log("confirm callback");
                             //Check for conditions that would trigger a "save as template..."
-                            if( type === 6 ) {
+                            if (type === 6) {
                                 setTimeout(function () {
                                     menubar.find('.menuSaveAsTemplate').trigger('click');
                                     $('#dropdownSave').dropdown('hide');
@@ -186,7 +186,7 @@ $(document).ready(function () {
                     },
                     cancel: {
                         label: 'Overwrite',
-                        callback: function() {
+                        callback: function () {
                             console.log("cancel callback");
                             saveFile(title, filename, type, redirect, includeDisqus, wysiwygOn, watchedOutline, lockedOutline, privateOutline, privtoken, opOutlineToXml(ownerName, ownerEmail), undefined, undefined, false, templatename);
                             lasttitle = title;
@@ -195,7 +195,7 @@ $(document).ready(function () {
                 }
             });
         } else {
-            if(filename == "") {
+            if (filename == "") {
                 filename = getFileName(title);
                 oldfilename = filename;
             }
@@ -210,7 +210,7 @@ $(document).ready(function () {
         title = elTitle.val();
 
         //Is there an existing template name?
-        if(isEmpty(templatename)) {
+        if (isEmpty(templatename)) {
             templatename = title;
         }
 
@@ -231,7 +231,7 @@ $(document).ready(function () {
                 //Get a new filename
                 filename = getFileName(result);
 
-                if(!isEmpty(result)) {
+                if (!isEmpty(result)) {
                     templatename = result;
                 }
 
@@ -264,7 +264,7 @@ $(document).ready(function () {
 
         //Put an existing value in the input box
         console.log("Templatename: " + templatename);
-        if(templatename.toLowerCase() != "untitled" && templatename != "") {
+        if (templatename.toLowerCase() != "untitled" && templatename != "") {
             setTimeout(function () {
                 $('input.bootbox-input').val(templatename);
             }, 500);
@@ -324,7 +324,7 @@ $(document).ready(function () {
 
     //Generate button
     menubar.find('.menuGenerate').click(function () {
-        if(opHasChanged()) {
+        if (opHasChanged()) {
             bootbox.alert("You have unsaved template changes. Please save first before generating.");
             return false;
         }
@@ -336,24 +336,24 @@ $(document).ready(function () {
         var ttitle = opGetTitle();
 
         var dialog = bootbox.dialog({
-            title: "Fill in Template Values",
+            title: "Fill in template values...",
             message: "...",
             buttons: {
                 confirm: {
                     label: 'Generate',
                     className: 'btn-success',
                     callback: function (result) {
-                        $('div.bootbox-body div.generate-dialog input').each( function( index, element ){
+                        $('div.bootbox-body div.generate-dialog input').each(function (index, element) {
                             var rawvar = $(this).data('variable');
-                            var varname = '[[$'+rawvar+']]';
-                            var varnameinc = '[[$'+rawvar+'++]]';
-                            var varnamedec = '[[$'+rawvar+'--]]';
-                            var regexvar = escapeRegExp('[[$'+rawvar+']]');
-                            var regexvarinc = escapeRegExp('[[$'+rawvar+'++]]');
-                            var regexvardec = escapeRegExp('[[$'+rawvar+'--]]');
+                            var varname = '[[$' + rawvar + ']]';
+                            var varnameinc = '[[$' + rawvar + '++]]';
+                            var varnamedec = '[[$' + rawvar + '--]]';
+                            var regexvar = escapeRegExp('[[$' + rawvar + ']]');
+                            var regexvarinc = escapeRegExp('[[$' + rawvar + '++]]');
+                            var regexvardec = escapeRegExp('[[$' + rawvar + '--]]');
                             var replacement = $(this).val();
 
-                            console.log( "["+index+"] - ["+varname+" | "+replacement+"]" );
+                            console.log("[" + index + "] - [" + varname + " | " + replacement + "]");
 
                             //Keep an array of variable names and their replacement values for sending to the server
                             //to save
@@ -377,9 +377,9 @@ $(document).ready(function () {
                             }
 
 
-                            if(incvars.includes(rawvar)) {
+                            if (incvars.includes(rawvar)) {
                                 var replaceinc = Number(replacement) + 1;
-                                console.log( "["+index+"] - ["+varnameinc+" | "+replaceinc+"]" );
+                                console.log("[" + index + "] - [" + varnameinc + " | " + replaceinc + "]");
                                 //Iterate over every node, doing the replacement
                                 opVisitAll(function (op) {
                                     //console.log(op);
@@ -395,9 +395,9 @@ $(document).ready(function () {
                                 }
                             }
 
-                            if(decvars.includes(rawvar)) {
+                            if (decvars.includes(rawvar)) {
                                 var replacedec = Number(replacement) - 1;
-                                console.log( "["+index+"] - ["+varnamedec+" | "+replacedec+"]" );
+                                console.log("[" + index + "] - [" + varnamedec + " | " + replacedec + "]");
                                 //Iterate over every node, doing the replacement
                                 opVisitAll(function (op) {
                                     //console.log(op);
@@ -426,19 +426,19 @@ $(document).ready(function () {
                 }
             }
         });
-        dialog.init(function(){
+        dialog.init(function () {
             var bbBody = $('div.bootbox-body');
             bbBody.empty().append('<div class="generate-dialog"></div>');
             var bbContent = bbBody.find('div.generate-dialog');
-            variables.forEach(function(variable) {
+            variables.forEach(function (variable) {
                 var oldval = "";
                 let obj = templatevariables.find(o => o.name === variable);
-                if(typeof obj !== "undefined") {
+                if (typeof obj !== "undefined") {
                     oldval = obj.value;
                 }
-                bbContent.append('<input placeholder="'+variable+'" data-variable="'+variable+'" type="text" value="'+oldval+'" title="'+variable+'"/><br>');
+                bbContent.append('<input placeholder="' + variable + '" data-variable="' + variable + '" type="text" value="' + oldval + '" title="' + variable + '"/><br>');
             });
-            if(variables.length < 1) {
+            if (variables.length < 1) {
                 bbContent.append('<h2>No variables present.</h2></h1><br>');
             }
         });
@@ -480,7 +480,7 @@ $(document).ready(function () {
                         rfType = ' <i class="fa fa-file-code-o"></i> ';
                     }
 
-                    if(item.type === 6) {
+                    if (item.type === 6) {
                         newtitle = item.templatename.replace(re, "").toLowerCase();
                     }
 
@@ -955,6 +955,138 @@ $(document).ready(function () {
             }
         });
     });
+    menubar.find('.menuImportArticles').click(function () {
+        var dialog = bootbox.dialog({
+            title: "Choose articles to import...",
+            message: "<i class=\"fa fa-spinner fa-spin\"></i> Getting article list...",
+            buttons: {
+                confirm: {
+                    label: 'Import',
+                    className: 'btn-success',
+                    callback: function (result) {
+                        var bbForm = $('div.bootbox-body div.import-articles form');
+                        //Ajaxify the article list form
+                        $('div.bootbox-body div.import-articles form').ajaxForm({
+                            dataType: 'json',
+                            cache: false,
+                            clearForm: true,
+                            resetForm: true,
+                            timeout: 60000,
+                            beforeSubmit: function () {
+                                showMessage("<i class='fa fa-spinner fa-spin'></i> Retrieving articles. Please wait...", "warning", 99);
+                                loading.show();
+                            },
+                            success: function (data) {
+                                if (data.status == "false") {
+                                    showMessage(data.description, data.status, 5);
+                                } else {
+                                    showMessage("Import Successful!", data.status, 5);
+                                    lastArticleImportTime = data.time;
+                                    opInsertXml(data.opml, down);
+                                    opCut();
+                                    loading.hide();
+                                }
+                            },
+                            error: function (x, t, m) {
+                                showMessage("Error importing articles.", false, 5);
+                                loading.hide();
+                            }
+                        });
+                        bbForm.submit();
+                    }
+                },
+                cancel: {
+                    label: 'Cancel'
+                }
+            }
+        });
+
+        //Set up the time range filter and put in the url
+        var epoch = Math.round((new Date()).getTime() / 1000) - 604800;
+        var epoch1 = Math.round((new Date()).getTime() / 1000) - 604800;
+        var epoch2 = Math.round((new Date()).getTime() / 1000) - 86400;
+        var epoch3 = Math.round((new Date()).getTime() / 1000) - 3600;
+        var listarticlesurl = '/cgi/out/list.articles';
+        if(filterArticleImport == 'menuArticleRangeSinceLastImport') {
+            if(lastArticleImportTime > 0) {
+                epoch = lastArticleImportTime;
+                listarticlesurl = '/cgi/out/list.articles?since='+epoch;
+            } else {
+                epoch = Math.round((new Date()).getTime() / 1000) - 604800;
+                listarticlesurl = '/cgi/out/list.articles?since='+epoch;
+            }
+        }
+        if(filterArticleImport == 'menuArticleRangePastWeek') {
+            listarticlesurl = '/cgi/out/list.articles?since='+epoch1;
+        }
+        if(filterArticleImport == 'menuArticleRangePastDay') {
+            listarticlesurl = '/cgi/out/list.articles?since='+epoch2;
+        }
+        if(filterArticleImport == 'menuArticleRangePastHour') {
+            listarticlesurl = '/cgi/out/list.articles?since='+epoch3;
+        }
+        console.log(listarticlesurl);
+
+        //Make the ajax call to get the recent file list
+        $.ajax({
+            type: 'POST',
+            url: listarticlesurl,
+            dataType: "json",
+            beforeSend: function() {
+
+            },
+            success: function (dialog, data) {
+                var articles = data.articles;
+
+                dialog.init(function () {
+                    var bbBody = $('div.bootbox-body');
+                    bbBody.empty().append('<div style="clear:both" class="import-articles"><form name="import-articles" method="POST" action="/cgi/out/get.articles"><ul class="article-list"></ul></form></div>');
+                    var bbContent = bbBody.find('div.import-articles');
+                    var bbArticleList = bbContent.find('ul');
+                    articles.forEach(function (article) {
+                        bbArticleList.append('<li><input name="articles[]" type="checkbox" value="'+article.id+'"> '+article.title+'</li><br>');
+                    });
+                    if (articles.length < 1) {
+                        bbContent.append('<h3>No articles found for selected period.</h3></h1><br>');
+                    }
+                    $('div.bootbox div.modal-header .modal-title').after('<input title="Select All" class="selectall" type="checkbox">');
+                    $('div.bootbox div.modal-header .modal-title').css("display", "inline-block");
+                    $('div.bootbox div.modal-header input.selectall').css("display", "inline-block").css("margin-top", "-7px").css("margin-left", "20px");
+                    //Set up time range filter selectors
+                    $('div.bootbox div.modal-footer').prepend('<a id="dropdownArticleRange" class="dropdown-toggle pull-left" data-toggle="dropdown"></a><ul class="dropdown-menu" role="menu">' +
+                        '                        <li><a class="menuArticleRangeSinceLastImport" title="'+friendlyDateTime(epoch)+'">Since the last import</a></li>' +
+                        '                        <li><a class="menuArticleRangePastWeek" title="'+friendlyDateTime(epoch1)+'">The last 7 days</a></li>' +
+                        '                        <li><a class="menuArticleRangePastDay" title="'+friendlyDateTime(epoch2)+'">The last 24 hours</a></li>' +
+                        '                        <li><a class="menuArticleRangePastHour" title="'+friendlyDateTime(epoch3)+'">The last hour</a></li>' +
+                        '                    </ul>');
+                    $('div.bootbox div.modal-footer a#dropdownArticleRange').html( $('div.bootbox div.modal-footer a.'+filterArticleImport).html() );
+                    $('div.bootbox div.modal-footer a#dropdownArticleRange').attr('title', $('div.bootbox div.modal-footer a.'+filterArticleImport).attr('title'));
+                    //Set up a handler for shift-selecting ranges of checkboxes
+                    var lastChecked = null;
+                    var $chkboxes = bbArticleList.find('input');
+                    $chkboxes.click(function (event) {
+                        if (!lastChecked) {
+                            lastChecked = this;
+                            return;
+                        }
+
+                        if (event.shiftKey) {
+                            var start = $chkboxes.index(this);
+                            var end = $chkboxes.index(lastChecked);
+
+                            $chkboxes.slice(Math.min(start, end), Math.max(start, end) + 1).attr('checked', lastChecked.checked);
+                        }
+
+                        lastChecked = this;
+                    });
+                    $(document).on('change', 'div.bootbox div.modal-header input.selectall', function() {
+                        $('div.bootbox  ul li input').prop('checked', $(this).prop('checked'));
+                        return false;
+                    });
+                });
+            }.bind(window, dialog)
+        });
+    });
     menubar.find('.menuInsertFiles').click(function () {
         showEditorFileDropZone();
         $('#uploadifive-editor_upload > input[type=file]:last-child').trigger('click');
@@ -1007,19 +1139,19 @@ $(document).ready(function () {
         //Save the file
         saveArchive(atitle, afilename, type, '', false, false, xmlArchive, arcplaceholder);
     });
-    menubar.find('.menuUnarchiveNodes').click(function() {
+    menubar.find('.menuUnarchiveNodes').click(function () {
         //Iterate over every node and check if its an include node
         //if it is, import the outline referenced and remove type=include
         var selnodes = opGetSelectedNodes();
 
         console.log(selnodes);
 
-        for( var i = 0 ; i < selnodes.length ; i++ ) {
+        for (var i = 0; i < selnodes.length; i++) {
             var ntype = selnodes[i].attributes.getOne('type');
             var nurl = selnodes[i].attributes.getOne('url');
 
-            if(typeof ntype !== "undefined" && typeof nurl !== "undefined") {
-                (function() {
+            if (typeof ntype !== "undefined" && typeof nurl !== "undefined") {
+                (function () {
                     var nodeforinsert = selnodes[i];
                     $.ajax({
                         type: 'POST',
@@ -1088,6 +1220,28 @@ $(document).ready(function () {
             srmodal.find('.spinner').hide();
             srmodal.find('form.srpostform').show();
         }, 2000);
+    });
+
+    //Article Import filtering functions
+    $(document).on('click', 'a.menuArticleRangeSinceLastImport', function () {
+        bootbox.hideAll();
+        filterArticleImport = 'menuArticleRangeSinceLastImport';
+        menubar.find('.menuImportArticles').trigger('click');
+    });
+    $(document).on('click', 'a.menuArticleRangePastWeek', function () {
+        bootbox.hideAll();
+        filterArticleImport = 'menuArticleRangePastWeek';
+        menubar.find('.menuImportArticles').trigger('click');
+    });
+    $(document).on('click', 'a.menuArticleRangePastDay', function () {
+        bootbox.hideAll();
+        filterArticleImport = 'menuArticleRangePastDay';
+        menubar.find('.menuImportArticles').trigger('click');
+    });
+    $(document).on('click', 'a.menuArticleRangePastHour', function () {
+        bootbox.hideAll();
+        filterArticleImport = 'menuArticleRangePastHour';
+        menubar.find('.menuImportArticles').trigger('click');
     });
 
     //Handle opacity on focus change
@@ -1160,7 +1314,7 @@ $(document).ready(function () {
                 //htmlurl = data.html;
 
                 //Load the outline body data
-                if( data.type == 'json' ) {
+                if (data.type == 'json') {
                     console.log("DEBUG: calling opJsonToOutline()");
                     opJsonToOutline(data.data);
                 } else {
@@ -1322,7 +1476,7 @@ $(document).ready(function () {
         }
 
         //If outline is not private clear the token
-        if(!privateOutline) {
+        if (!privateOutline) {
             privtoken = "";
             _privtoken = "";
         }
@@ -1353,7 +1507,7 @@ $(document).ready(function () {
             beforeSend: function () {
                 //Disable the save button and show a spinner
                 menubar.find('.saves').attr('disabled', true);
-                menubar.find('#dropdownSave').html('<i class="fa fa-spinner"></i> Saving...');
+                menubar.find('#dropdownSave').html('<i class="fa fa-spinner fa-spin"></i> Saving...');
 
                 //Reset the global change state to false
                 opClearChanged();
@@ -1382,7 +1536,7 @@ $(document).ready(function () {
                 //Set the title of the html document
                 document.title = ftitle + " - FC";
 
-                if(_jumptourl) {
+                if (_jumptourl) {
                     //alert(_jumptourl + " | " + url);
                     window.location = '/editor?url=' + url;
                 }
@@ -1450,8 +1604,8 @@ $(document).ready(function () {
                 "templateid": templateid
             },
             dataType: "json",
-            beforeSend: function() {
-                menubar.find('a.menuGenerate').html('<i class="fa fa-spinner"></i> Generating...');
+            beforeSend: function () {
+                menubar.find('a.menuGenerate').html('<i class="fa fa-spinner fa-spin"></i> Generating...');
             },
             success: function (data) {
                 menubar.find('a.menuGenerate').html('Generate');
@@ -1614,13 +1768,12 @@ $(document).ready(function () {
 
         elOutlineinfo.html('');
         if (url != "") {
-            if( !privateOutline ) {
+            if (!privateOutline) {
                 elOutlineinfo.html('<li><a target="_blank" title="Link to opml source of this outline." href="' + url + '">OPML</a></li>');
             }
             if (privateOutline && !isEmpty(privtoken)) {
                 htmlurl = "/evex?pt=" + privtoken;
-            } else
-            if (data.html == "" || data.html === undefined) {
+            } else if (data.html == "" || data.html === undefined) {
                 htmlurl = url.replace("/opml/", "/html/");
                 htmlurl = htmlurl.substr(0, htmlurl.lastIndexOf(".")) + ".html";
             } else {
@@ -1887,7 +2040,7 @@ $(document).ready(function () {
                     fileMultiDrop = false;
                 },
                 'onDrop': function (file, fileDropCount) {
-                    if(fileDropCount > 1) {
+                    if (fileDropCount > 1) {
                         fileMultiDrop = true;
                     } else {
                         fileMultiDrop = false;
@@ -1902,12 +2055,12 @@ $(document).ready(function () {
                             opSetOneAtt('icon', 'image');
                             opSetOneAtt('url', jdata.url);
                         } else if (isVideo(jdata.url) && !fileMultiDrop) {
-                            opInsert('<video style="width:95%;margin:0 auto;display:block;" controls="true"><source src="'+jdata.url+'" type="'+jdata.type+'"></video>', down);
+                            opInsert('<video style="width:95%;margin:0 auto;display:block;" controls="true"><source src="' + jdata.url + '" type="' + jdata.type + '"></video>', down);
                             opSetOneAtt('type', 'video');
                             opSetOneAtt('icon', 'video-camera');
                             opSetOneAtt('url', jdata.url);
                         } else if (isAudio(jdata.url) && !fileMultiDrop) {
-                            opInsert('<audio style="width:400px" controls="true"><source src="'+jdata.url+'" type="'+jdata.type+'"></audio>', down);
+                            opInsert('<audio style="width:400px" controls="true"><source src="' + jdata.url + '" type="' + jdata.type + '"></audio>', down);
                             opSetOneAtt('type', 'audio');
                             opSetOneAtt('icon', 'volume-up');
                             opSetOneAtt('url', jdata.url);
@@ -2190,18 +2343,18 @@ $(document).ready(function () {
             type: 'GET',
             url: '/cgi/out/get.recentfile.versions?url=' + fileurl,
             dataType: "json",
-            beforeSend: function() {
+            beforeSend: function () {
                 //Clear the table for new data
                 nodeVersionHistory.empty();
                 //nodeVersionHistory.append('<li><a>Version History</a></li><li role="separator" class="divider"></li>');
             },
             success: function (data) {
                 //Iterate
-                if( typeof data.versions !== "undefined" ) {
+                if (typeof data.versions !== "undefined") {
                     data.versions.map(function (item) {
                         var df = new Date(0);
                         df.setUTCSeconds(item.time);
-                        nodeVersionHistory.append('<li><a href="/editor?url='+item.url+'&versionid='+item.id+'" class="menuTypeSelection version" title="' + item.title + '" data-type="' + item.type + '">' + dateFormat(df, "m/d/yy @ h:MM:ss TT") + ' ('+bytesToSize(item.size, 2)+')</a></li>');
+                        nodeVersionHistory.append('<li><a href="/editor?url=' + item.url + '&versionid=' + item.id + '" class="menuTypeSelection version" title="' + item.title + '" data-type="' + item.type + '">' + dateFormat(df, "m/d/yy @ h:MM:ss TT") + ' (' + bytesToSize(item.size, 2) + ')</a></li>');
                     });
                     if (data.versions.length < 1) {
                         nodeVersionHistory.append('<li><a href="#" class="menuTypeSelection message">No history...</a></li>');
@@ -2210,7 +2363,7 @@ $(document).ready(function () {
                     nodeVersionHistory.append('<li><a href="#" class="menuTypeSelection message">No history...</a></li>');
                 }
             },
-            error: function(data) {
+            error: function (data) {
                 nodeVersionHistory.append('<li><a href="#" class="menuTypeSelection message">Error getting history.</a></li>');
             }
         });
@@ -2218,12 +2371,11 @@ $(document).ready(function () {
 
     //Generate a random string
     //__via: https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
-    function makeid(len)
-    {
+    function makeid(len) {
         var text = "";
         var possible = "BCDFGHJKLMNPQRSTVWXZbcdfghjklmnpqrstvwxz0123456789";
 
-        for( var i=0; i < len; i++ ) {
+        for (var i = 0; i < len; i++) {
             text += possible.charAt(Math.floor(Math.random() * possible.length));
         }
 
@@ -2235,7 +2387,7 @@ $(document).ready(function () {
         var message = "Your outline has changed. Are you sure you want to leave the page without saving?",
             e = e || window.event;
 
-        if(opHasChanged()) {
+        if (opHasChanged()) {
             // For IE and Firefox
             if (e) {
                 e.returnValue = message;
@@ -2292,7 +2444,7 @@ $(document).ready(function () {
             m = re.exec(s);
             if (m) {
                 console.log(m[1]);
-                if(content.indexOf(m[1]) < 0) {
+                if (content.indexOf(m[1]) < 0) {
                     content.push(m[1]);
                 }
             }
@@ -2311,7 +2463,7 @@ $(document).ready(function () {
             m = re.exec(s);
             if (m) {
                 console.log(m[1]);
-                if(content.indexOf(m[1]) < 0) {
+                if (content.indexOf(m[1]) < 0) {
                     content.push(m[1]);
                 }
             }
@@ -2330,7 +2482,7 @@ $(document).ready(function () {
             m = re.exec(s);
             if (m) {
                 console.log(m[1]);
-                if(content.indexOf(m[1]) < 0) {
+                if (content.indexOf(m[1]) < 0) {
                     content.push(m[1]);
                 }
             }
@@ -2339,7 +2491,11 @@ $(document).ready(function () {
         return content;
     }
 
-    function escapeRegExp(s){
+    function escapeRegExp(s) {
         return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    }
+
+    function friendlyDateTime(epoch) {
+        return dateFormat(epoch * 1000, 'friendly');
     }
 });

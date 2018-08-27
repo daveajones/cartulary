@@ -132,6 +132,7 @@ $tree_location = "Edit Outline";
         <?} else {?>
         var initialOpmlText = initialOpmltext;
         <?}?>
+        var lastArticleImportTime = <?echo get_last_article_import_time($g_uid)?>;
         var versionRequest = <?if(empty($versionid)) { echo "false"; } else { echo "true"; }?>;
         var initialRssOpmlText = '<?echo $cg_rsseditoropmltemplate?>';
         var includeDisqus = <?if(!isset($seenfile) || $seenfile['disqus'] == 0) { echo "false"; } else { echo "true"; }?>;

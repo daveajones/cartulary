@@ -2992,6 +2992,97 @@ function get_watched_files($max = NULL)
 }
 
 
+//Get the file id that corresponds to a file url
+function get_recent_file_id_from_url($uid = NULL, $url = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+    if (empty($url)) {
+        loggit(2, "The url given is corrupt or blank: [$url]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT id FROM $table_recentfiles WHERE userid=? AND url=?";
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss", $uid, $url) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    if ($sql->num_rows() < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "No file id returned for: [$uid | $url] with the given criteria.");
+        return (-1);
+    }
+
+    $sql->bind_result($fid) or loggit(2, "MySql error: " . $dbh->error);
+    while ($sql->fetch()) {
+        $fileid = $fid;
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning: [$fileid] for requested file: [$uid | $url]");
+    return ($fileid);
+}
+
+
+//See if a user has permission to handle this file
+function user_can_edit_recent_file_by_id($uid = NULL, $fid = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id given is corrupt or blank: [$uid]");
+        return (FALSE);
+    }
+    if (empty($fid)) {
+        loggit(2, "The file id given is corrupt or blank: [$fid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the query
+    $sqltxt = "SELECT id FROM $table_recentfiles WHERE id=? AND userid=?";
+
+    loggit(1, "[$sqltxt]");
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ds", $fid, $uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any files for this user
+    $rows = $sql->num_rows();
+    if ($rows != 1) {
+        $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+        loggit(1, "[$rows] records returned for: [$uid | $fid] access check. Only 1 should be returned.");
+        return (FALSE);
+    }
+
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "User: [$uid] is the owner of file: [$fid].");
+    return (TRUE);
+}
+
+
 //Return a file by its url
 function get_recent_file_by_url($uid = NULL, $url = NULL, $blob = FALSE)
 {
@@ -3529,9 +3620,13 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
 
 
 //Update the timestamp of a recent file
-function touch_recent_file_by_id($fid = NULL)
+function touch_recent_file_by_id($uid = NULL, $fid = NULL)
 {
     //Check parameters
+    if (empty($uid)) {
+        loggit(2, "The user id is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
     if (empty($fid)) {
         loggit(2, "The file id is blank or corrupt: [$fid]");
         return (FALSE);
@@ -3548,13 +3643,13 @@ function touch_recent_file_by_id($fid = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Update the timestamp
-    $stmt = "UPDATE $table_recentfiles SET time=? WHERE id=?";
+    $stmt = "UPDATE $table_recentfiles SET time=? WHERE id=? and userid=?";
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dd",
+    $sql->bind_param("dds",
         $time,
-        $fid
+        $fid,
+        $userid
     ) or loggit(2, "MySql error: " . $dbh->error);
-
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close() or loggit(2, "MySql error: " . $dbh->error);
 
@@ -3562,7 +3657,6 @@ function touch_recent_file_by_id($fid = NULL)
     loggit(3, "File: [$fid] was touched at: [$time]");
     return (TRUE);
 }
-
 
 
 //Update a variable value for a recent file

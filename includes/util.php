@@ -432,6 +432,8 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
         return ('');
     }
 
+    $tstart = time();
+
     //Let's not waste time if this is not html
     if (!this_is_html($content)) {
         //loggit(3, "DEBUG: No html found in item body.");
@@ -495,6 +497,8 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
             $content .= $tag['raw'];
         }
     }
+
+    loggit(3, "    TIMER: clean_feed_item_content() took: [".(time() - $tstart)."] seconds.");
 
     return ($content);
 }
@@ -4788,4 +4792,53 @@ function makeAbsoluteAttr($base, $e, $attr)
             }
         }
     }
+}
+
+
+//This function fixes common structural errors in xml feeds
+function fix_xml_feed_structure($content, $url) {
+    //Fix up content issues before run
+    loggit(1, "Fixing up common structural problems in feed: [$url]");
+    $content = trim($content);
+    $invalid_characters = '/[^\x9\xa\x20-\xD7FF\xE000-\xFFFD]/';
+    $content = preg_replace($invalid_characters, '', $content );
+
+    //Remove content before the <?xml declaration
+    $elPos = stripos(substr($content, 0, 255), '<?xml');
+    if($elPos > 0) {
+        loggit(3, "  Removing stuff before the <?xml header in: [$url]");
+        $content = substr($content, $elPos);
+    }
+
+    //Remove stuff after the closing xml root tags
+    $elPos = stripos($content, '</rss>');
+    if($elPos !== FALSE) {
+        $content = substr($content, 0, $elPos + 6);
+    }
+    $elPos = stripos($content, '</feed>');
+    if($elPos !== FALSE) {
+        $content = substr($content, 0, $elPos + 7);
+    }
+
+    //Fix feeds that don't have a correct <?xml prefix at the beginning
+    $tstart = time();
+    if(stripos(substr($content, 0, 255), '<?xml') === FALSE) {
+        loggit(3, "  Missing <?xml> header in feed: [$url]. Let's dig deeper...");
+
+        $elPos = stripos(substr($content, 0, 255), '<rss');
+        if($elPos !== FALSE) {
+            loggit(3, "    Fixing missing <?xml> header in RSS feed: [$url]");
+            $content = "<?xml version=\"1.0\"?>\n".substr($content, $elPos);
+        }
+        $elPos = stripos(substr($content, 0, 255), '<feed');
+        if($elPos !== FALSE) {
+            loggit(3, "    Fixing missing <?xml> header in RSS feed: [$url]");
+            $content = "<?xml version=\"1.0\"?>\n".substr($content, $elPos);
+        }
+    }
+    if((time() - $tstart) > 5) {
+        loggit(3, "Fixed feed: [$url] in [".(time() - $tstart)."] seconds.");
+    }
+    
+    return $content;
 }

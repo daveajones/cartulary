@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 83;
+$cg_database_version = 84;
 $cg_database_updates = array();
 
 
@@ -1133,6 +1133,16 @@ CGDB0244;
 $cg_database_updates[82][] = <<<CGDB0245
  INSERT INTO `dbversion` ( `version` ) VALUES ( '83' )
 CGDB0245;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 83 to 84 -----------------------------------------------------------------------------------------------
+$cg_database_updates[83][] = <<<CGDB0246
+ ALTER TABLE `nfitem_map` ADD `added` DATETIME NOT NULL COMMENT 'Date the word was first discovered',
+ ADD INDEX ( `added` )
+CGDB0246;
+$cg_database_updates[83][] = <<<CGDB0247
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '84' )
+CGDB0247;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

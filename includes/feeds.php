@@ -1791,6 +1791,8 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     $fstart = time();
     $url = $feed['url'];
 
+    loggit(3, "FEEDSCAN: Scanning feed: [$url].");
+
     //Fix up content issues before run
     loggit(1, "Fixing up common structural problems in feed: [$url]");
     $feed['content'] = trim($feed['content']);
@@ -1800,7 +1802,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Remove content before the <?xml declaration
     $elPos = stripos(substr($feed['content'], 0, 255), '<?xml');
     if($elPos > 0) {
-        loggit(3, "Removing stuff before the <?xml header in: [$url]");
+        loggit(3, "  Removing stuff before the <?xml header in: [$url]");
         $feed['content'] = substr($feed['content'], $elPos);
     }
 
@@ -1815,22 +1817,23 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     }
 
     //Fix feeds that don't have a correct <?xml prefix at the beginning
+    $tstart = time();
     if(stripos(substr($feed['content'], 0, 255), '<?xml') === FALSE) {
-        loggit(3, "Missing <?xml> header in feed: [$url]. Let's dig deeper...");
+        loggit(3, "  Missing <?xml> header in feed: [$url]. Let's dig deeper...");
 
         $elPos = stripos(substr($feed['content'], 0, 255), '<rss');
         if($elPos !== FALSE) {
-            loggit(3, "Fixing missing <?xml> header in RSS feed: [$url]");
+            loggit(3, "    Fixing missing <?xml> header in RSS feed: [$url]");
             $feed['content'] = "<?xml version=\"1.0\"?>\n".substr($feed['content'], $elPos);
         }
         $elPos = stripos(substr($feed['content'], 0, 255), '<feed');
         if($elPos !== FALSE) {
-            loggit(3, "Fixing missing <?xml> header in RSS feed: [$url]");
+            loggit(3, "    Fixing missing <?xml> header in RSS feed: [$url]");
             $feed['content'] = "<?xml version=\"1.0\"?>\n".substr($feed['content'], $elPos);
         }
     }
-    if((time() - $fstart) > 5) {
-        loggit(3, "Fixed feed: [$url] in [".(time() - $fstart)."] seconds.");
+    if((time() - $tstart) > 5) {
+        loggit(3, "Fixed feed: [$url] in [".(time() - $tstart)."] seconds.");
     }
 
 
@@ -1848,7 +1851,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Pull the latest content blob from the database
     if( empty($feed['content']) ) {
-        loggit(2, "Feed: [$url] has no content: [".$feed['content']."]");
+        loggit(2, "  Feed: [$url] has no content: [".$feed['content']."]");
         increment_feed_error_count($fid);
         return (-1);
     }
@@ -1858,12 +1861,12 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         if( stripos($feed['content'], 'encoding="utf-8"') && mb_detect_encoding($feed['content'], 'UTF-8', true) === FALSE ) {
             $feed['content'] = utf8_encode($feed['content']);
             if(!feed_is_valid($feed['content']) && !is_feed($feed['content'])) {
-                loggit(2, "Feed: [" . $url . "] doesn't seem to be a known feed format. Skipping it.");
+                loggit(2, "  Feed: [" . $url . "] doesn't seem to be a known feed format. Skipping it.");
                 increment_feed_error_count($fid, 5);
                 return (-1);
             }
         } else {
-            loggit(2, "Feed: [" . $url . "] doesn't seem to be a known feed format. Skipping it.");
+            loggit(2, "  Feed: [" . $url . "] doesn't seem to be a known feed format. Skipping it.");
             increment_feed_error_count($fid, 5);
             return (-1);
         }
@@ -1877,15 +1880,15 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Was there a fatal error during parsing?
     if (!$x) {
-        loggit(3, "Error parsing feed: [$url] Error: [".libxml_get_last_error()->message."]");
-        loggit(1, "Failed to parse XML for feed: [$url].  Let's run it through Tidy() and try again.");
+        loggit(3, "  Error parsing feed: [$url] Error: [".libxml_get_last_error()->message."]");
+        loggit(1, "  Failed to parse XML for feed: [$url].  Let's run it through Tidy() and try again.");
         libxml_clear_errors();
         $tidy = new tidy();
         $xr = $tidy->repairString($feed['content'], array('output-xml' => true, 'input-xml' => true));
         libxml_use_internal_errors(true);
         $x = simplexml_load_string($xr, 'SimpleXMLElement', LIBXML_NOCDATA);
         if (!$x) {
-            loggit(2, "Error parsing feed XML for feed: [$url].  Error: [".libxml_get_last_error()->message."]");
+            loggit(2, "  Error parsing feed XML for feed: [$url].  Error: [".libxml_get_last_error()->message."]");
             libxml_clear_errors();
             increment_feed_error_count($fid, 5);
             return (-1);
@@ -2049,7 +2052,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
             $count++;
         }
     }
-    loggit(3, "FEED SCAN: Feed item storage took [".(time() - $tstart)."] seconds.");
+    loggit(3, "  Feed item storage took [".(time() - $tstart)."] seconds.");
 
     //Flip the purge flags to old
     flip_purge_to_old($fid);
@@ -2068,7 +2071,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Is the feed empty?
     if ($count == 0) {
-        loggit(3, "Scan: There were no items in this feed: [$url].");
+        loggit(3, "  DONE: There were no items in this feed: [$url].");
         //increment_feed_error_count($fid, 1);
         return (-2);
     }
@@ -2078,7 +2081,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     unmark_feed_as_dead($fid);
 
     //Log and leave
-    loggit(3, "Scan: [$newcount] out of: [$count] items from feed: [$url] were new.");
+    loggit(3, "  DONE: [$newcount] out of: [$count] items from feed: [$url] were new.");
     return ($newcount);
 }
 
@@ -2642,6 +2645,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
 
     //Timestamp
     $timeadded = time();
+    $tstart = time();
 
     //Contains media?
     $media = 0;
@@ -2903,7 +2907,7 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
             $author = strip_tags((string)$item->author);
         }
 
-        //We need a guid, so if the item doesn't have a guid, then build a uniqe id by hashing the whole item
+        //We need a guid, so if the item doesn't have a guid, then build a unique id by hashing the whole item
         if(isset($namespaces['rdf'])) {
             $uniq = get_unique_id_for_rdf_feed_item($item, $namespaces);
         } else {
@@ -3017,6 +3021,8 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         }
     }
 
+    loggit(3, "  TIMER: add_feed_item() took: [".(time() - $tstart)."] seconds.");
+
     //Log and return
     loggit(1, "New feed item for feed: [$fid].");
     return ($id);
@@ -3104,7 +3110,7 @@ function map_feed_item($iid = NULL, $content = NULL)
 
             if( $wordid < 0 ) {
                 //Insert each word into the map table
-                $stmt = "INSERT INTO $table_nfitem_map (word) VALUES (?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), dummy=NOT dummy";
+                $stmt = "INSERT INTO $table_nfitem_map (word,added) VALUES (?,NOW()) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), dummy=NOT dummy";
                 $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
                 $sql->bind_param("s", $word) or loggit(2, "MySql error: " . $dbh->error);
                 $sql->execute() or loggit(2, "MySql error: " . $dbh->error);

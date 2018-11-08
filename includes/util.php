@@ -2850,7 +2850,7 @@ function safe_html($content = NULL, $tags = array())
 
     $content = str_replace("\n", '<br/>', $content);
 
-    $content = xmlentities($content);
+    $content = htmlentities($content);  //xmlentities()??
 
     $content = str_replace('&lt;br/&gt;', '<br/>', $content);
 

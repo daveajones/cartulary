@@ -27,6 +27,10 @@ if ! lsb_release -r | grep -i "1[4-9]\.[0-9][0-9]"; then
         exit 1
 fi
 
+function pause(){
+   read -p "Press [Enter] to continue..."
+}
+
 ##: 0. Warning.
 clear
 echo 'This install script assumes it is being run on a virgin install of Ubuntu server LTS v12 and up.'
@@ -51,10 +55,22 @@ if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
 elif lsb_release -r | grep -i "18\.[0-9][0-9]"; then
   add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
   apt-get update
-  apt-get -y install apache2 php php-cli libapache2-mod-php php-curl php-tidy php-gd php-mbstring ccze cstream ntp php-xsl nodejs
+  apt-get -y install apache2
+  pause
+  apt-get -y install php php-cli
+  pause
+  apt-get -y install libapache2-mod-php
+  pause
+  apt-get -y install php-curl php-tidy php-gd php-mbstring php-xsl
+  pause
+  apt-get -y install ccze cstream ntp nodejs
+  pause
   apt-get -y install gcc g++ make autoconf libc-dev pkg-config
+  pause
   apt-get -y install php7.2-dev
+  pause
   apt-get -y install libmcrypt-dev
+  pause
   yes '' | pecl install mcrypt-1.0.1
   phpenmod imap
 else

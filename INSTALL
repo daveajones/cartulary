@@ -11,6 +11,7 @@
 
 ##: This script needs to be run with sudo
 SOURCEROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SOURCEBASE=`basename $SOURCEROOT`
 INSTALLDIR="/opt/cartulary"
 ROOT_UID="0"
 
@@ -102,8 +103,8 @@ if lsb_release -r | grep -i "1[6-8]\.[0-9][0-9]"; then
     echo "sql_mode='NO_ENGINE_SUBSTITUTION'" >> /etc/mysql/conf.d/mysql.cnf
 fi
 /etc/init.d/mysql restart
-mysql -u root -p < cartulary-master/templates/newdb.sql >>/tmp/cartinstall.log 2>&1
-mysql -ucartulary -pcartulary cartulary < cartulary-master/templates/cartulary.sql >>/tmp/cartinstall.log 2>&1
+mysql -u root -p < $SOURCEBASE/templates/newdb.sql >>/tmp/cartinstall.log 2>&1
+mysql -ucartulary -pcartulary cartulary < $SOURCEBASE/templates/cartulary.sql >>/tmp/cartinstall.log 2>&1
 
 ##: 4. Configure PHP
 echo
@@ -163,7 +164,7 @@ echo '##                                                   '
 echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
-mv cartulary-master $INSTALLDIR >>/tmp/cartinstall.log 2>&1
+mv $SOURCEBASE $INSTALLDIR >>/tmp/cartinstall.log 2>&1
 
 
 ##: 6. Configure Apache

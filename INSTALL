@@ -50,11 +50,12 @@ if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
   phpenmod imap
 elif lsb_release -r | grep -i "18\.[0-9][0-9]"; then
   add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
-  apt-get install -y apache2 php php-cli libapache2-mod-php php-curl php-tidy php-gd php-mbstring ccze cstream ntp php-xsl nodejs
+  apt-get update
+  apt-get -y install apache2 php php-cli libapache2-mod-php php-curl php-tidy php-gd php-mbstring ccze cstream ntp php-xsl nodejs
   apt-get -y install gcc g++ make autoconf libc-dev pkg-config
   apt-get -y install php7.2-dev
   apt-get -y install libmcrypt-dev
-  pecl install mcrypt-1.0.1
+  yes '' | pecl install mcrypt-1.0.1
   phpenmod imap
 else
   apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-imap php5-tidy php5-gd ccze cstream ntp php5-xsl nodejs
@@ -74,7 +75,7 @@ echo 'Give MySQL a root password and write it down.'
 if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
   apt-get install -y mysql-server php7.0-mysql
 elif lsb_release -r | grep -i "18\.[0-9][0-9]"; then
-  apt-get install -y mysql-server php-mysql
+  apt-get -y install mysql-server php-mysql
 else
   apt-get install -y mysql-server php5-mysql
 fi

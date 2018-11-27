@@ -1,6 +1,6 @@
 #!/bin/bash
 
-##: Server Setup on Ubuntu LTS 12.x, 14.x, etc.
+##: Server Setup on Ubuntu LTS 14.x and up.
 ##:
 ##:   This install script can be run as-is on a virgin system. If you're installing on an existing box
 ##:   it'd be better to walk through it first and adjust things
@@ -21,8 +21,8 @@ if [ "$UID" -ne "$ROOT_UID" ] ; then
 fi
 
 #Check that we're on Ubuntu
-if ! lsb_release -r | grep -i "1[2-9]\.[0-9][0-9]"; then
-        echo "This script only works on Ubuntu LTS 12 and up."
+if ! lsb_release -r | grep -i "1[4-9]\.[0-9][0-9]"; then
+        echo "This script only works on Ubuntu LTS 14 and up."
         exit 1
 fi
 
@@ -42,10 +42,18 @@ read -p "This is your last chance to back out.  Are you really, really sure this
 ##: 1. Install Apache and PHP5
 clear
 echo 'Installing Apache, PHP and some modules.'
-curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 apt-get update
 if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
   apt-get install -y apache2 php7.0 php7.0-cli libapache2-mod-php7.0 php7.0-mcrypt php7.0-curl php7.0-imap php7.0-tidy php7.0-gd php7.0-mbstring ccze cstream ntp php7.0-xsl nodejs
+  phpenmod imap
+elif lsb_release -r | grep -i "18\.[0-9][0-9]"; then
+  add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
+  apt-get install -y apache2 php php-cli libapache2-mod-php php-curl php-tidy php-gd php-mbstring ccze cstream ntp php-xsl nodejs
+  apt-get -y install gcc g++ make autoconf libc-dev pkg-config
+  apt-get -y install php7.2-dev
+  apt-get -y install libmcrypt-dev
+  pecl install mcrypt-1.0.1
   phpenmod imap
 else
   apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-imap php5-tidy php5-gd ccze cstream ntp php5-xsl nodejs
@@ -64,6 +72,8 @@ clear
 echo 'Give MySQL a root password and write it down.'
 if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
   apt-get install -y mysql-server php7.0-mysql
+elif lsb_release -r | grep -i "18\.[0-9][0-9]"; then
+  apt-get install -y mysql-server php-mysql
 else
   apt-get install -y mysql-server php5-mysql
 fi
@@ -83,7 +93,7 @@ echo '##---------------------------------------------------'
 echo '#####################################################'
 echo
 echo "Configuring MySQL. Please wait..."
-if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
+if lsb_release -r | grep -i "1[6-8]\.[0-9][0-9]"; then
     echo  >> /etc/mysql/conf.d/mysql.cnf
     echo '[mysqld]' >> /etc/mysql/conf.d/mysql.cnf
     echo "sql_mode='NO_ENGINE_SUBSTITUTION'" >> /etc/mysql/conf.d/mysql.cnf
@@ -117,6 +127,18 @@ if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
     echo '[cartulary]' >> /etc/php/7.0/cli/php.ini
     echo "cartulary_conf=$INSTALLDIR" >> /etc/php/7.0/cli/php.ini
     echo "short_open_tag=On" >> /etc/php/7.0/cli/php.ini
+elif lsb_release -r | grep -i "18\.[0-9][0-9]"; then
+    echo  >> /etc/php/7.2/apache2/php.ini
+    echo '[cartulary]' >> /etc/php/7.2/apache2/php.ini
+    echo "cartulary_conf=$INSTALLDIR" >> /etc/php/7.2/apache2/php.ini
+    echo 'post_max_size=300M' >> /etc/php/7.2/apache2/php.ini
+    echo 'upload_max_filesize=300M' >> /etc/php/7.2/apache2/php.ini
+    echo 'max_execution_time=90' >> /etc/php/7.2/apache2/php.ini
+    echo 'short_open_tag=On' >> /etc/php/7.2/apache2/php.ini
+    echo  >> /etc/php/7.2/cli/php.ini
+    echo '[cartulary]' >> /etc/php/7.2/cli/php.ini
+    echo "cartulary_conf=$INSTALLDIR" >> /etc/php/7.2/cli/php.ini
+    echo "short_open_tag=On" >> /etc/php/7.2/cli/php.ini
 else
     echo  >> /etc/php5/apache2/php.ini
     echo '[cartulary]' >> /etc/php5/apache2/php.ini

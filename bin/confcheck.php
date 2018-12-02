@@ -5,6 +5,8 @@
 if (($pid = cronHelper::lock()) !== FALSE) {
 
     //If this is being run as an upgrade
+    $minimal = FALSE;
+    $silent = FALSE;
     $action = "";
     if (in_array("upgrade", $argv)) {
         $action = "upgrade";
@@ -12,6 +14,9 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     $silent = FALSE;
     if (in_array("silent", $argv) && $action == "upgrade") {
         $silent = TRUE;
+    }
+    if (in_array("minimal", $argv)) {
+        $minimal = TRUE;
     }
 
     $cfname = "$confroot/conf/cartulary.conf";
@@ -127,22 +132,22 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
     //Replace the tags
     $response = "";
-    if ($silent == FALSE) {
+    if ( !$silent || !$minimal ) {
         echo "What is your mysql username? [$l_dbusername]: ";
         $response = get_user_response();
     }
-    if (empty($response) || $silent == TRUE) {
+    if (empty($response) || $silent || $minimal) {
         $response = $l_dbusername;
     }
     $template = str_replace('dbusernamegoeshere', $response, $template);
 
 
     $response = "";
-    if ($silent == FALSE) {
+    if ( !$silent || !$minimal ) {
         echo "What is your mysql password? [$l_dbpassword]: ";
         $response = get_user_response();
     }
-    if (empty($response) || $silent == TRUE) {
+    if (empty($response) || $silent || $minimal) {
         $response = $l_dbpassword;
     }
     $template = str_replace('dbpasswordgoeshere', $response, $template);
@@ -194,11 +199,11 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
 
     $response = "";
-    if ($silent == FALSE) {
+    if ($silent == FALSE || !$minimal) {
         echo "Do you have a dns CNAME pointed to this bucket? If so, what is it? [$l_s3cname]: ";
         $response = get_user_response();
     }
-    if (empty($response)) {
+    if (empty($response) || !$minimal) {
         $response = $l_s3cname;
     }
     $template = str_replace('s3cnamevalue', $response, $template);
@@ -216,66 +221,66 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
 
     $response = "";
-    if ($silent == FALSE) {
+    if ($silent == FALSE  || !$minimal) {
         echo "Do you have a bucket that will server as an external redirector to your server? [$l_s3redirectbucket]: ";
         $response = get_user_response();
     }
-    if (empty($response)) {
+    if (empty($response) || !$minimal) {
         $response = $l_s3redirectbucket;
     }
     $template = str_replace('s3redirectbucket', $response, $template);
 
 
     $response = "";
-    if ($silent == FALSE) {
+    if ($silent == FALSE || !$minimal) {
         echo "What url do you want to use as an external ip reflector service? [$l_ipreflectorurl]: ";
         $response = get_user_response();
     }
-    if (empty($response)) {
+    if (empty($response) || !$minimal) {
         $response = $l_ipreflectorurl;
     }
     $template = str_replace('http://checkip.dyndns.com', $response, $template);
 
 
     $response = "";
-    if ($silent == FALSE) {
+    if ($silent == FALSE || !$minimal) {
         echo "Do you want a server-wide river? If so, what S3 bucket should we use? [$l_s3riverbucket]: ";
         $response = get_user_response();
     }
-    if (empty($response)) {
+    if (empty($response) || !$minimal) {
         $response = $l_s3riverbucket;
     }
     $template = str_replace('s3riverbucketvalue', $response, $template);
 
 
     $response = "";
-    if ($silent == FALSE) {
+    if ($silent == FALSE || !$minimal) {
         echo "Does the server-wide river bucket have a dns CNAME pointed to it?  If so, what is it? [$l_s3rivercname]: ";
         $response = get_user_response();
     }
-    if (empty($response)) {
+    if (empty($response) || !$minimal) {
         $response = $l_s3rivercname;
     }
     $template = str_replace('s3rivercnamevalue', $response, $template);
 
 
     $response = "";
-    if ($silent == FALSE) {
+    if ($silent == FALSE || !$minimal) {
         echo "What filename do you use for the server-wide river html file? [$l_s3riverfile]: ";
         $response = get_user_response();
     }
-    if (empty($response)) {
+    if (empty($response) || !$minimal) {
         $response = $l_s3riverfile;
     }
     $template = str_replace('s3riverfilevalue', $response, $template);
 
 
     $response = "";
-    if ($silent == FALSE) {
+    if ($silent == FALSE || !$minimal) {
         echo "What do you want the title of the server-wide river to be? [$l_s3rivertitle]: ";
         $response = get_user_response();
     }
-    if (empty($response)) {
+    if (empty($response) || !$minimal) {
         $response = $l_s3rivertitle;
     }
     $template = str_replace('s3rivertitlevalue', $response, $template);

@@ -46,7 +46,7 @@ read -p "This is your last chance to back out.  Are you really, really sure this
 
 ##: 1. Install Apache and PHP5
 clear
-echo 'Installing Apache, PHP and some modules.'
+echo 'Installing Apache, PHP and some modules...'
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 apt-get update
 if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
@@ -137,17 +137,17 @@ if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
     echo "cartulary_conf=$INSTALLDIR" >> /etc/php/7.0/cli/php.ini
     echo "short_open_tag=On" >> /etc/php/7.0/cli/php.ini
 elif lsb_release -r | grep -i "18\.[0-9][0-9]"; then
-    echo  >> /etc/php/7.2/apache2/php.ini
-    echo '[cartulary]' >> /etc/php/7.2/apache2/php.ini
-    echo "cartulary_conf=$INSTALLDIR" >> /etc/php/7.2/apache2/php.ini
-    echo 'post_max_size=300M' >> /etc/php/7.2/apache2/php.ini
-    echo 'upload_max_filesize=300M' >> /etc/php/7.2/apache2/php.ini
-    echo 'max_execution_time=90' >> /etc/php/7.2/apache2/php.ini
-    echo 'short_open_tag=On' >> /etc/php/7.2/apache2/php.ini
-    echo  >> /etc/php/7.2/cli/php.ini
-    echo '[cartulary]' >> /etc/php/7.2/cli/php.ini
-    echo "cartulary_conf=$INSTALLDIR" >> /etc/php/7.2/cli/php.ini
-    echo "short_open_tag=On" >> /etc/php/7.2/cli/php.ini
+    echo  >> /etc/php/7.0/apache2/php.ini
+    echo '[cartulary]' >> /etc/php/7.0/apache2/php.ini
+    echo "cartulary_conf=$INSTALLDIR" >> /etc/php/7.0/apache2/php.ini
+    echo 'post_max_size=300M' >> /etc/php/7.0/apache2/php.ini
+    echo 'upload_max_filesize=300M' >> /etc/php/7.0/apache2/php.ini
+    echo 'max_execution_time=90' >> /etc/php/7.0/apache2/php.ini
+    echo 'short_open_tag=On' >> /etc/php/7.0/apache2/php.ini
+    echo  >> /etc/php/7.0/cli/php.ini
+    echo '[cartulary]' >> /etc/php/7.0/cli/php.ini
+    echo "cartulary_conf=$INSTALLDIR" >> /etc/php/7.0/cli/php.ini
+    echo "short_open_tag=On" >> /etc/php/7.0/cli/php.ini
 else
     echo  >> /etc/php5/apache2/php.ini
     echo '[cartulary]' >> /etc/php5/apache2/php.ini

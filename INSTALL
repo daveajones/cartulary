@@ -57,7 +57,7 @@ elif lsb_release -r | grep -i "18\.[0-9][0-9]"; then
   add-apt-repository -y ppa:ondrej/php
   apt-get update
   apt-get upgrade -y
-  apt-get install -y apache2 php7.0 php7.0-cli libapache2-mod-php7.0 php7.0-mcrypt php7.0-curl php7.0-imap php7.0-tidy php7.0-gd php7.0-mbstring ccze cstream ntp php7.0-xsl nodejs
+  apt-get install -y apache2 php7.0 php7.0-cli libapache2-mod-php7.0 php7.0-mcrypt php7.0-curl php7.0-imap php7.0-tidy php7.0-gd php7.0-mbstring ccze cstream ntp php7.0-xsl nodejs npm
   phpenmod imap
 else
   apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-imap php5-tidy php5-gd ccze cstream ntp php5-xsl nodejs
@@ -67,7 +67,9 @@ fi
 #sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
 cd $SOURCEROOT/aggrivate
 sudo npm -g install npm@latest
-sudo npm -g install npm@latest
+sudo npm cache clean --force
+sudo npm i -g npm
+rm -rf node_modules
 npm install
 cd -
 

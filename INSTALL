@@ -50,17 +50,19 @@ echo 'Installing Apache, PHP and some modules...'
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 apt-get update
 if lsb_release -r | grep -i "16\.[0-9][0-9]"; then
-  apt-get install -y apache2 php7.0 php7.0-cli libapache2-mod-php7.0 php7.0-mcrypt php7.0-curl php7.0-imap php7.0-tidy php7.0-gd php7.0-mbstring ccze cstream ntp php7.0-xsl nodejs
+  apt-get install -y apache2 php7.0 php7.0-cli libapache2-mod-php7.0 php7.0-mcrypt php7.0-curl php7.0-imap php7.0-tidy php7.0-gd php7.0-mbstring ccze cstream ntp php7.0-xsl nodejs build-essential
   phpenmod imap
 elif lsb_release -r | grep -i "18\.[0-9][0-9]"; then
   add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) main multiverse restricted universe"
   add-apt-repository -y ppa:ondrej/php
   apt-get update
   apt-get upgrade -y
-  apt-get install -y apache2 php7.0 php7.0-cli libapache2-mod-php7.0 php7.0-mcrypt php7.0-curl php7.0-imap php7.0-tidy php7.0-gd php7.0-mbstring ccze cstream ntp php7.0-xsl nodejs
+  apt-get install -y apache2 php7.0 php7.0-cli libapache2-mod-php7.0 php7.0-mcrypt php7.0-curl php7.0-imap php7.0-tidy php7.0-gd php7.0-mbstring php7.0-xsl
+  apt-get install -y ccze cstream ntp nodejs
+  apt-get install -y build-essential
   phpenmod imap
 else
-  apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-imap php5-tidy php5-gd ccze cstream ntp php5-xsl nodejs
+  apt-get install -y apache2 php5 php5-cli libapache2-mod-php5 php5-mcrypt php5-curl php5-imap php5-tidy php5-gd ccze cstream ntp php5-xsl nodejs  build-essential
   php5enmod imap
 fi
 
@@ -70,7 +72,7 @@ sudo npm -g install npm@latest
 sudo npm cache clean --force
 sudo npm i -g npm
 rm -rf node_modules
-npm install
+sudo --user=$LOGNAME npm install
 cd -
 
 ##: 2. Install MySql

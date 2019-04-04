@@ -27,6 +27,6 @@
               <outline type="rss" text="A List Apart: The Full Feed" xmlUrl="http://feeds.feedburner.com/alistapart/main" htmlUrl="https://alistapart.com/" />
               <outline type="rss" text="Hacker News" xmlUrl="https://news.ycombinator.com/rss" htmlUrl="https://news.ycombinator.com/" />
               <outline type="rss" text="Adam Curry's MicroBlog" xmlUrl="http://adam.curry.com/linkblog.xml" htmlUrl="http://adam.curry.com/linkblog.html" />
-              <outline type="rss" text="Dvorak Uncensored xmlUrl="http://www.dvorak.org/blog/feed/" htmlUrl="http://www.dvorak.org/blog/" />
+              <outline type="rss" text="Dvorak Uncensored" xmlUrl="http://www.dvorak.org/blog/feed/" htmlUrl="http://www.dvorak.org/blog/" />
       </body>
 </opml>

@@ -2480,6 +2480,16 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
             loggit(2, "Could not create S3 file: [$bucket/$keyname].");
             //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
             return (FALSE);
+        } catch (Awsxception $e) {
+            loggit(2, "S3 Error: [".$e->getAwsErrorCode()."].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
+        } catch (Exception $e) {
+            loggit(2, "S3 Error: [".$e->getMessage()."].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
         }
     } else {
         try {
@@ -2491,6 +2501,16 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
             // Print the URL to the object.
             loggit(3, "Wrote file to S3: [".$s3res['ObjectURL']."].");
         } catch (S3Exception $e) {
+            loggit(2, "S3 Error: [".$e->getMessage()."].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
+        } catch (Awsxception $e) {
+            loggit(2, "S3 Error: [".$e->getAwsErrorCode()."].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
+        } catch (Exception $e) {
             loggit(2, "S3 Error: [".$e->getMessage()."].");
             loggit(2, "Could not create S3 file: [$bucket/$keyname].");
             //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");

@@ -14,8 +14,16 @@ SOURCEROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SOURCEBASE=`basename $SOURCEROOT`
 INSTALLDIR="/opt/cartulary"
 ROOT_UID="0"
+CURRENTLY=`pwd`
 
-echo "Installing from: [$SOURCEROOT -> $SOURCEBASE]";
+#echo "Installing from: [$SOURCEROOT -> $SOURCEBASE]";
+
+#We need to be one level up from the source code folder so we can move it into the install folder
+if [ "$CURRENTLY" == "$SOURCEROOT" ]; then
+    echo "Jumping up..."
+    cd ..
+fi
+pwd
 
 #Check if run as root
 if [ "$UID" -ne "$ROOT_UID" ] ; then
@@ -114,11 +122,11 @@ if lsb_release -r | grep -i "1[6-8]\.[0-9][0-9]"; then
 fi
 /etc/init.d/mysql restart
 if lsb_release -r | grep -i "18\.[0-9][0-9]"; then
-  mysql -u root < $SOURCEBASE/templates/newdb.sql >>/tmp/cartinstall.log 2>&1
+  mysql -u root < $SOURCEROOT/templates/newdb.sql >>/tmp/cartinstall.log 2>&1
 else
-  mysql -u root -p < $SOURCEBASE/templates/newdb.sql >>/tmp/cartinstall.log 2>&1
+  mysql -u root -p < $SOURCEROOT/templates/newdb.sql >>/tmp/cartinstall.log 2>&1
 fi
-mysql -ucartulary -pcartulary cartulary < $SOURCEBASE/templates/cartulary.sql >>/tmp/cartinstall.log 2>&1
+mysql -ucartulary -pcartulary cartulary < $SOURCEROOT/templates/cartulary.sql >>/tmp/cartinstall.log 2>&1
 
 ##: 4. Configure PHP
 echo

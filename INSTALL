@@ -15,6 +15,8 @@ SOURCEBASE=`basename $SOURCEROOT`
 INSTALLDIR="/opt/cartulary"
 ROOT_UID="0"
 
+echo "Installing from: [$SOURCEROOT -> $SOURCEBASE]";
+
 #Check if run as root
 if [ "$UID" -ne "$ROOT_UID" ] ; then
         echo "You must run this script with sudo."
@@ -23,7 +25,7 @@ fi
 
 #Check that we're on Ubuntu
 if ! lsb_release -r | grep -i "1[4-9]\.[0-9][0-9]"; then
-        echo "This script only works on Ubuntu LTS 14 and up."
+        echo "This script only works on Ubuntu LTS 14 and up.  Sorry."
         exit 1
 fi
 

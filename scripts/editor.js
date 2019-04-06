@@ -331,8 +331,6 @@ $(document).ready(function () {
 
         var variables = getTemplateVariables();
         var varvals = [];
-        var incvars = getTemplateIncrementVariables();
-        var decvars = getTemplateDecrementVariables();
         var ttitle = opGetTitle();
 
         var dialog = bootbox.dialog({
@@ -343,17 +341,25 @@ $(document).ready(function () {
                     label: 'Generate',
                     className: 'btn-success',
                     callback: function (result) {
-                        $('div.bootbox-body div.generate-dialog input').each(function (index, element) {
+                        $('div.bootbox-body div.generate-dialog input.generateVariableInput').each(function (index, element) {
                             var rawvar = $(this).data('variable');
-                            var varname = '[[$' + rawvar + ']]';
-                            var varnameinc = '[[$' + rawvar + '++]]';
-                            var varnamedec = '[[$' + rawvar + '--]]';
-                            var regexvar = escapeRegExp('[[$' + rawvar + ']]');
-                            var regexvarinc = escapeRegExp('[[$' + rawvar + '++]]');
-                            var regexvardec = escapeRegExp('[[$' + rawvar + '--]]');
                             var replacement = $(this).val();
 
-                            console.log("[" + index + "] - [" + varname + " | " + replacement + "]");
+                            //Merge the values from the form into the variables list from the outline
+                            variables.list.forEach(function(variable) {
+                                if( variable.name == rawvar ) {
+                                    variable.replacement = replacement;
+                                    if(variable.operator == '++') {
+                                        variable.replacement++;
+                                    } else
+                                    if(variable.operator == '--') {
+                                        variable.replacement--;
+                                    } else
+                                    if(variable.operator == 'jpg' || variable.operator == 'png' || variable.operator == 'gif' || variable.operator == 'bmp') {
+                                        variable.replacement = replacement + '_' + variable.data + '.' + variable.operator;
+                                    }
+                                }
+                            });
 
                             //Keep an array of variable names and their replacement values for sending to the server
                             //to save
@@ -362,60 +368,40 @@ $(document).ready(function () {
                                 value: replacement
                             });
 
-                            //Iterate over every node, doing the replacement
-                            opVisitAll(function (op) {
-                                //console.log(op);
-                                var ltext = op.getLineText();
-                                if (ltext.indexOf(varname) != -1) {
-                                    var r = new RegExp(regexvar, 'gm');
-                                    op.setLineText(ltext.replace(r, replacement));
-                                }
-                            });
-                            if (ttitle.indexOf(varname) != -1) {
-                                var r = new RegExp(regexvar, 'gm');
-                                ttitle = ttitle.replace(r, replacement);
-                            }
-
-
-                            if (incvars.includes(rawvar)) {
-                                var replaceinc = Number(replacement) + 1;
-                                console.log("[" + index + "] - [" + varnameinc + " | " + replaceinc + "]");
-                                //Iterate over every node, doing the replacement
-                                opVisitAll(function (op) {
-                                    //console.log(op);
-                                    var ltext = op.getLineText();
-                                    if (ltext.indexOf(varnameinc) != -1) {
-                                        var r = new RegExp(regexvarinc, 'gm');
-                                        op.setLineText(ltext.replace(r, replaceinc));
-                                    }
-                                });
-                                if (ttitle.indexOf(varnameinc) != -1) {
-                                    var r = new RegExp(regexvarinc, 'gm');
-                                    ttitle = ttitle.replace(r, replaceinc);
-                                }
-                            }
-
-                            if (decvars.includes(rawvar)) {
-                                var replacedec = Number(replacement) - 1;
-                                console.log("[" + index + "] - [" + varnamedec + " | " + replacedec + "]");
-                                //Iterate over every node, doing the replacement
-                                opVisitAll(function (op) {
-                                    //console.log(op);
-                                    var ltext = op.getLineText();
-                                    if (ltext.indexOf(varnamedec) != -1) {
-                                        var r = new RegExp(regexvardec, 'gm');
-                                        op.setLineText(ltext.replace(r, replacedec));
-                                    }
-                                });
-                                if (ttitle.indexOf(varnamedec) != -1) {
-                                    var r = new RegExp(regexvardec, 'gm');
-                                    ttitle = ttitle.replace(r, replacedec);
-                                }
-                            }
                         });
 
+                        //Make the
+                        var xmltochange = opOutlineToXml(ownerName, ownerEmail, ownerId);
+                        console.log(variables.list);
+                        //Iterate the variable details list and go to each node and do the proper replacement
+                        variables.list.forEach(function(variable) {
+                            //Set up the regular expression for replacing the var with a real value depending
+                            //on the type of operator we're dealing with
+                            var regexvar = escapeRegExp('[[$' + variable.name + ']]');
+                            if(variable.operator == '++') {
+                                regexvar = escapeRegExp('[[$' + variable.name + ']++]');
+                            } else
+                            if(variable.operator == '--') {
+                                regexvar = escapeRegExp('[[$' + variable.name + ']--]');
+                            } else
+                            if(variable.operator == 'jpg' || variable.operator == 'png' || variable.operator == 'gif' || variable.operator == 'bmp') {
+                                regexvar = escapeRegExp('[[$' + variable.name + ']' + variable.operator + variable.data + ']');
+                            }
+
+                            //Do the replacement
+                            var r = new RegExp(regexvar, 'gm');
+                            xmltochange = xmltochange.replace(r, variable.replacement);
+                            console.log(regexvar + "|" + variable.replacement);
+                        });
+
+                        //console.log(xmltochange);
+
+                        //Replace the outline
+                        opXmlToOutline(xmltochange);
+
                         //Set the new title
-                        opSetTitle(ttitle);
+                        title = opGetTitle();
+                        elTitle.val(title);
 
                         //Save the new file
                         saveGeneratedFile(opGetTitle(), getFileName(opGetTitle()), 0, "", includeDisqus, wysiwygOn, opOutlineToXml(), varvals, templateid);
@@ -430,16 +416,68 @@ $(document).ready(function () {
             var bbBody = $('div.bootbox-body');
             bbBody.empty().append('<div class="generate-dialog"></div>');
             var bbContent = bbBody.find('div.generate-dialog');
-            variables.forEach(function (variable) {
+            var counter = 0;
+            variables.content.forEach(function (variable) {
                 var oldval = "";
                 let obj = templatevariables.find(o => o.name === variable);
                 if (typeof obj !== "undefined") {
                     oldval = obj.value;
                 }
-                bbContent.append('<input placeholder="' + variable + '" data-variable="' + variable + '" type="text" value="' + oldval + '" title="' + variable + '"/><br>');
+                bbContent.append('<input class="generateVariableInput" tabindex="'+(counter+1)+'" placeholder="' + variable + '" data-order="'+counter+'" data-variable="' + variable + '" type="text" value="' + oldval + '" title="' + variable + '"/> ' +
+                    '<input class="generateVariableUpload" data-variable="' + variable + '" type="file" tabindex="-1" data-order="'+counter+'" > ' +
+                    '<div id="generateVariableQueue'+counter+'"></div>');
+
+                //Template generate dialog
+
+                $('input.generateVariableUpload[data-order=' + counter + ']').uploadifive({
+                    'auto': true,
+                    'method': 'post',
+                    'dnd': true,
+                    'multi': false,
+                    'queueID': 'generateVariableQueue'+counter,
+                    'buttonText': '',
+                    'uploadScript': '/cgi/in/upload',
+                    'simUploadLimit': 1,
+                    'removeCompleted': true,
+                    'hideButton': true,
+                    'height': 30,
+                    'width': 30,
+                    'buttonClass': 'icon-attach-small',
+                    'onAddQueueItem': function (file) {
+                        this.data('uploadifive').settings.formData = {
+                            'datestamp': (new Date().valueOf() / 1000),
+                            'element': this.data('order')
+                        };
+                        //Look for this variable name and see what sizes we need to generate
+                        var sizes = [];
+                        var varname = this.data('variable');
+                        for( const imgvar of variables.list ) {
+                            if( imgvar.name == varname ) {
+                                sizes.push({ type: imgvar.operator, size: imgvar.data });
+                            }
+                        }
+                        if(sizes.length > 0) {
+                            this.data('uploadifive').settings.formData.sizes = JSON.stringify(sizes);
+                        }
+                    },
+                    'onQueueComplete': function () {
+                        //$('#editor_upload').uploadifive('clearQueue');
+                        //fileMultiDrop = false;
+                    },
+                    'onUploadComplete': function (file, data) {
+                        var jdata = $.parseJSON(data);
+                        $('input.generateVariableInput[data-order=' + jdata.element + ']').val(jdata.url);
+                    }
+                });
+
+                counter++;
             });
             if (variables.length < 1) {
                 bbContent.append('<h2>No variables present.</h2></h1><br>');
+            } else {
+                setTimeout(function() {
+                    $('input.generateVariableInput:first-child').focus();
+                }, 1000);
             }
         });
     });
@@ -1053,13 +1091,17 @@ $(document).ready(function () {
                     $('div.bootbox div.modal-header .modal-title').css("display", "inline-block");
                     $('div.bootbox div.modal-header input.selectall').css("display", "inline-block").css("margin-top", "-7px").css("margin-left", "20px");
                     //Set up time range filter selectors
-                    $('div.bootbox div.modal-footer').prepend('<a id="dropdownArticleRange" class="dropdown-toggle pull-left" data-toggle="dropdown"></a><ul class="dropdown-menu" role="menu">' +
-                        '                        <li><a class="menuArticleRangeSinceLastImport" title="'+friendlyDateTime(epoch)+'">Since the last import</a></li>' +
-                        '                        <li><a class="menuArticleRangePastWeek" title="'+friendlyDateTime(epoch1)+'">The last 7 days</a></li>' +
-                        '                        <li><a class="menuArticleRangePastDay" title="'+friendlyDateTime(epoch2)+'">The last 24 hours</a></li>' +
-                        '                        <li><a class="menuArticleRangePastHour" title="'+friendlyDateTime(epoch3)+'">The last hour</a></li>' +
-                        '                    </ul>');
-                    $('div.bootbox div.modal-footer a#dropdownArticleRange').html( $('div.bootbox div.modal-footer a.'+filterArticleImport).html() );
+                    $('div.bootbox div.modal-footer').prepend('' +
+                        '                    <div class="dropup">' +
+                        '                        <a id="dropdownArticleRange" role="button" class="dropdown-toggle pull-left btn" data-toggle="dropdown"></a>' +
+                        '                        <ul class="dropdown-menu" role="menu">' +
+                        '                          <li><a class="menuArticleRangeSinceLastImport" title="'+friendlyDateTime(epoch)+'">Since the last import</a></li>' +
+                        '                          <li><a class="menuArticleRangePastWeek" title="'+friendlyDateTime(epoch1)+'">The last 7 days</a></li>' +
+                        '                          <li><a class="menuArticleRangePastDay" title="'+friendlyDateTime(epoch2)+'">The last 24 hours</a></li>' +
+                        '                          <li><a class="menuArticleRangePastHour" title="'+friendlyDateTime(epoch3)+'">The last hour</a></li>' +
+                        '                        </ul>' +
+                        '                    </div>');
+                    $('div.bootbox div.modal-footer a#dropdownArticleRange').html( $('div.bootbox div.modal-footer a.'+filterArticleImport).html() + "\n" + ' <b style="border-bottom:4px solid white" class="caret"></b>' );
                     $('div.bootbox div.modal-footer a#dropdownArticleRange').attr('title', $('div.bootbox div.modal-footer a.'+filterArticleImport).attr('title'));
                     //Set up a handler for shift-selecting ranges of checkboxes
                     var lastChecked = null;
@@ -1678,77 +1720,6 @@ $(document).ready(function () {
         return false;
     }
 
-    //Apply a template overlay on to this file
-    function applyTemplate(urltoget) {
-        //Call out and get the url
-        $.ajax({
-            type: 'POST',
-            url: '/cgi/out/get.url.json',
-            data: {
-                "url": urltoget
-            },
-            dataType: "json",
-            success: function (data) {
-                var inserted = false;
-
-                //First collapse everything
-                opCollapseEverything();
-
-                //Go to the very top of the outline and wrap what we have into a single node
-                opFirstSummit();
-                opInsert("[##ORIGINAL##]", "up");
-                opFirstSummit();
-                opDemote();
-                opCollapseEverything();
-
-                //Now read this collapsed everything node into an xml string
-                original = opCursorToXml();
-
-                //Blow away the outline
-                opWipe();
-
-                //Now bring in the template outline
-                opInsertXml(data.data);
-
-                //Find the template placeholder
-                opFirstSummit();
-                opVisitAll(function (op) {
-                    if (op.attributes.getOne('type') == "replace") {
-                        var cursor = op.getCursor();
-
-                        //Remove replace type
-                        op.attributes.removeOne('type');
-
-                        //Put the original xml back in
-                        op.insertXml(original, "up");
-                        op.setCursor(cursor);
-                        op.deleteLine();
-
-                        (function () {
-                            opFirstSummit();
-                            opVisitAll(function (op) {
-                                if (op.getLineText() == "[##ORIGINAL##]") {
-                                    var cursor = op.getCursor();
-                                    op.expand();
-                                    op.promote();
-                                    op.setCursor(cursor);
-                                    op.deleteLine();
-                                    opFirstSummit();
-                                    op.deleteLine();
-                                    return false;
-                                }
-                            });
-                        })();
-
-                        inserted = true;
-
-                        return false;
-                    }
-                });
-            }
-        });
-    }
-
     //Get root node type and set menu text
     function getRootNodeType() {
         var rootnodetype;
@@ -1964,6 +1935,9 @@ $(document).ready(function () {
                     break;
             }
         }
+        if (event.which == 91 || event.which == 92) {
+            event.which = 0;
+        }
     }
 
     //Move cursors within a content editable element
@@ -2008,8 +1982,9 @@ $(document).ready(function () {
         }
     }
 
-    //Uploadifive handler
+    //Uploadifive handlers
     if (gDevice != "android") {
+        //Main outline upload
         $(function () {
             $('#editor_upload').uploadifive({
                 'auto': true,
@@ -2059,8 +2034,8 @@ $(document).ready(function () {
                             opSetOneAtt('type', 'video');
                             opSetOneAtt('icon', 'video-camera');
                             opSetOneAtt('url', jdata.url);
-                        } else if (isAudio(jdata.url) && !fileMultiDrop) {
-                            opInsert('<audio style="width:400px" controls="true"><source src="' + jdata.url + '" type="' + jdata.type + '"></audio>', down);
+                        } else if (isAudio(jdata.url)) {
+                            opInsert('<audio style="width:400px; vertical-align:middle;" controls="true"><source src="' + jdata.url + '" type="' + jdata.type + '"></audio> <a class="audiocaption" style="vertical-align:middle;" href="' + jdata.url + '">' + file.name + '</a>', down);
                             opSetOneAtt('type', 'audio');
                             opSetOneAtt('icon', 'volume-up');
                             opSetOneAtt('url', jdata.url);
@@ -2087,6 +2062,7 @@ $(document).ready(function () {
             })
         });
     }
+
 
     //Show file drop zone
     function showEditorFileDropZone() {
@@ -2118,213 +2094,11 @@ $(document).ready(function () {
 
     //When a drag enters the screen, reveal the upload zone
     $('body').on('dragenter', function () {
-        return showEditorFileDropZone();
+        //Don't show drop screen when bootbox is open
+        if( $('div.bootbox-body').length == 0 ) {
+            return showEditorFileDropZone();
+        }
     });
-
-    // Create an oscillator and an amplifier.
-    function initAudio() {
-        // Use audioContext from webaudio_tools.js
-        if (audioContext) {
-            oscillator = audioContext.createOscillator();
-            fixOscillator(oscillator);
-            oscillator.frequency.value = 440;
-            amp = audioContext.createGain();
-            amp.gain.value = 0;
-
-            // Connect oscillator to amp and amp to the mixer of the audioContext.
-            // This is like connecting cables between jacks on a modular synth.
-            oscillator.connect(amp);
-            amp.connect(audioContext.destination);
-            //writeMessageToID( "soundStatus", "<p>Audio initialized.</p>");
-        }
-    }
-
-    // Set the frequency of the oscillator and start it running.
-    function startTone(frequency) {
-        audioOut = true;
-        var now = audioContext.currentTime;
-
-        oscillator.start(0);
-        oscillator.frequency.setValueAtTime(frequency, now);
-
-        audioAnimate = setInterval(function () {
-            if (menubar.find('.menuGenerateMorse').find('i.fa').hasClass('fa-tty')) {
-                menubar.find('.menuGenerateMorse').find('i.fa').removeClass('fa-tty').addClass('fa-volume-off');
-            } else if (menubar.find('.menuGenerateMorse').find('i.fa').hasClass('fa-volume-off')) {
-                menubar.find('.menuGenerateMorse').find('i.fa').removeClass('fa-volume-off').addClass('fa-volume-down');
-            } else if (menubar.find('.menuGenerateMorse').find('i.fa').hasClass('fa-volume-down')) {
-                menubar.find('.menuGenerateMorse').find('i.fa').removeClass('fa-volume-down').addClass('fa-volume-up');
-            } else if (menubar.find('.menuGenerateMorse').find('i.fa').hasClass('fa-volume-up')) {
-                menubar.find('.menuGenerateMorse').find('i.fa').removeClass('fa-volume-up').addClass('fa-volume-off');
-            }
-        }, 300);
-        // Ramp up the gain so we can hear the sound.
-        // We can ramp smoothly to the desired value.
-        // First we should cancel any previous scheduled events that might interfere.
-        amp.gain.cancelScheduledValues(now);
-        // Anchor beginning of ramp at current value.
-        amp.gain.setValueAtTime(0, now);
-        //amp.gain.setValueAtTime(amp.gain.value, now);
-        //amp.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.1);
-
-        //writeMessageToID( "soundStatus", "<p>Play tone at frequency = " + frequency  + "</p>");
-
-        return now + 1;
-    }
-
-    function stopTone(atTime) {
-        var now = audioContext.currentTime;
-        if (typeof atTime !== "undefined") {
-            now = atTime;
-        }
-        oscillator.onended = function () {
-            audioOut = false;
-            clearInterval(audioAnimate);
-            menubar.find('.menuGenerateMorse').find('i.fa').removeClass('fa-volume-up').removeClass('fa-volume-down').removeClass('fa-volume-off').addClass('fa-tty');
-        };
-        amp.gain.cancelScheduledValues(now);
-        amp.gain.setValueAtTime(amp.gain.value, now);
-        amp.gain.linearRampToValueAtTime(0.0, audioContext.currentTime + 1.0);
-        //writeMessageToID( "soundStatus", "<p>Stop tone.</p>");
-        oscillator.stop(now);
-
-        return 0;
-    }
-
-    function convertLetterToMorseData(letter) {
-        var dash = cDash;
-        var dot = cDot;
-        var letters = {
-            "a": function () {
-                return [dot, dash];
-            },
-            "b": function () {
-                return [dash, dot, dot, dot];
-            },
-            "c": function () {
-                return [dash, dot, dash, dot];
-            },
-            "d": function () {
-                return [dash, dot, dot];
-            },
-            "e": function () {
-                return [dot];
-            },
-            "f": function () {
-                return [dot, dot, dash, dot];
-            },
-            "g": function () {
-                return [dash, dash, dot];
-            },
-            "h": function () {
-                return [dot, dot, dot, dot];
-            },
-            "i": function () {
-                return [dot, dot];
-            },
-            "j": function () {
-                return [dot, dash, dash];
-            },
-            "k": function () {
-                return [dash, dot, dash];
-            },
-            "l": function () {
-                return [dot, dash, dot, dot];
-            },
-            "m": function () {
-                return [dash, dash];
-            },
-            "n": function () {
-                return [dash, dot];
-            },
-            "o": function () {
-                return [dash, dash, dash];
-            },
-            "p": function () {
-                return [dot, dash, dash, dot];
-            },
-            "q": function () {
-                return [dash, dash, dot, dash];
-            },
-            "r": function () {
-                return [dot, dash, dot];
-            },
-            "s": function () {
-                return [dot, dot, dot];
-            },
-            "t": function () {
-                return [dash];
-            },
-            "u": function () {
-                return [dot, dot, dash];
-            },
-            "v": function () {
-                return [dot, dot, dot, dash];
-            },
-            "w": function () {
-                return [dot, dash, dash];
-            },
-            "x": function () {
-                return [dash, dot, dot, dash];
-            },
-            "y": function () {
-                return [dash, dot, dash, dash];
-            },
-            "z": function () {
-                return [dash, dash, dot, dot];
-            },
-            "0": function () {
-                return [dash, dash, dash, dash, dash];
-            },
-            "1": function () {
-                return [dot, dash, dash, dash, dash];
-            },
-            "2": function () {
-                return [dot, dot, dash, dash, dash];
-            },
-            "3": function () {
-                return [dot, dot, dot, dash, dash];
-            },
-            "4": function () {
-                return [dot, dot, dot, dot, dash];
-            },
-            "5": function () {
-                return [dot, dot, dot, dot, dot];
-            },
-            "6": function () {
-                return [dot, dot, dot, dash, dash];
-            },
-            "7": function () {
-                return [dash, dash, dot, dot, dot];
-            },
-            "8": function () {
-                return [dash, dash, dash, dot, dot];
-            },
-            "9": function () {
-                return [dash, dash, dash, dash, dot];
-            },
-            ".": function () {
-                return [dot, dash, dot, dash, dot, dash];
-            },
-            "?": function () {
-                return [dot, dot, dash, dash, dot, dot];
-            }
-        };
-        //console.log("Letter: [" + letter + "] values: " + letters[letter]());
-        return letters[letter]();
-    }
-
-    function outputLetter(letter, nextStep) {
-
-        letter.forEach(function (value) {
-            amp.gain.setValueAtTime(0.5, nextStep);
-            nextStep += value;
-            amp.gain.setValueAtTime(0, nextStep);
-            nextStep += cDit;
-        });
-
-        return nextStep;
-    }
 
     //Takes an array of objects and builds the node type menu from it
     function buildNodeTypeMenu(menuArray) {
@@ -2434,9 +2208,12 @@ $(document).ready(function () {
         return newFilename;
     }
 
+});
+
     function getTemplateVariables() {
         var content = [];
-        var re = /\[\[\$(((?!\+\+)(?!\-\-)[^\]])*)\]\]/g;
+        var list = [];
+        var re = /\[\[\$(((?!\+\+)(?!\-\-)[^\]])*)](\+\+|\-\-|jpg|png|gif|bmp)?([0-9]*)]/g;
         var s = opOutlineToXml();
         var m;
 
@@ -2447,48 +2224,15 @@ $(document).ready(function () {
                 if (content.indexOf(m[1]) < 0) {
                     content.push(m[1]);
                 }
+                list.push({
+                    name: m[1],
+                    operator: m[3] || "",
+                    data: m[4]
+                });
             }
         } while (m);
 
-        return content;
-    }
-
-    function getTemplateIncrementVariables() {
-        var content = [];
-        var re = /\[\[\$([^\]]*)\+\+\]\]/g;
-        var s = opOutlineToXml(ownerName, ownerEmail);
-        var m;
-
-        do {
-            m = re.exec(s);
-            if (m) {
-                console.log(m[1]);
-                if (content.indexOf(m[1]) < 0) {
-                    content.push(m[1]);
-                }
-            }
-        } while (m);
-
-        return content;
-    }
-
-    function getTemplateDecrementVariables() {
-        var content = [];
-        var re = /\[\[\$([^\]]*)\-\-\]\]/g;
-        var s = opOutlineToXml(ownerName, ownerEmail);
-        var m;
-
-        do {
-            m = re.exec(s);
-            if (m) {
-                console.log(m[1]);
-                if (content.indexOf(m[1]) < 0) {
-                    content.push(m[1]);
-                }
-            }
-        } while (m);
-
-        return content;
+        return { content, list };
     }
 
     function escapeRegExp(s) {
@@ -2498,4 +2242,3 @@ $(document).ready(function () {
     function friendlyDateTime(epoch) {
         return dateFormat(epoch * 1000, 'friendly');
     }
-});

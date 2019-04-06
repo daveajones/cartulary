@@ -1,0 +1,35 @@
+#Release Notes - Freedom Controller v0.7.6
+
+
+The primary focus of this release is on editor improvement and Ubuntu 18 LTS support.
+
+
+- Bug Fixes (the notable ones)
+    - 2 critical bugs in the INSTALL script that kept new installs from working out of the gate. :-(
+    - a bug with the newuser.opml sub url that was blocking a newly created user from getting through activation
+
+- Improvement:  Ubuntu 18 LTS install support
+    - This was hard.
+    - So much has changed with PHP the last couple of years.  Especially with the packaging of php7.2.  Lots of deprecations and such to deal with.
+    - Eventually, to keep from going through the code with a fine toothed comb, I just punted and dropped back to the 7.0 repository.
+    - There were other things more important in this release, so it needed to get out the door.
+    - A future release will be focused on php 7.2 compatibility.
+    - I like to support all of the currently supported LTS releases.  So once Ubuntu 14 drops off, this will be a bit easier.
+
+- New Feature:  Editor templating
+    - Been working with Adam on this one to create a sort of templating "language" to make generating repeatable (like shownotes, blog posts, etc) outlines easier.
+    - You use placeholders (variables) in this fashion:  [[$name]modifier]
+    - So, for example you could put [[$Episode Number]] in your template, and when you generate an outline from it, it will be replaced with the number you give it.
+    - And you can use a modifier like [[$Episode Number]++] to refer to your original value plus one.
+    - For image uploading, you can use a template like [[$Image Url]jpg128] and your image (referred to by [[$Image Url]]) will be auto-resized to 128x128px;
+    - All template variable values are saved each time you generate, so that next time the value boxes are pre-filled.
+    - The variable names are all free form, so you can use any text you want.
+    - You can save any outline as a template using the Save -> Save as Template menu command.
+    - A video demo of how this works is at:  https://www.youtube.com/watch?v=kwwq_VPyRaE
+
+- New Feature:  Importing articles into an outline from the editor
+    - You can now import archived articles into the editor from within the editor.
+    - Look for the little bookmark icon on the editor toolbar
+    - On the bottom left of the import dialog is a date range selector dropdown
+    - It remembers when your last import was so you can choose "since last import" to sort of keep your place when building shownotes with article content
+    - Combined with templating, this is powerful stuff. :-)

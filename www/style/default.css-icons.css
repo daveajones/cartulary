@@ -22,6 +22,8 @@
 .icon-nomastodon { display:inline-block; background:url('/images/glyph/nomastodon_chk.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
 .icon-notwitter { display:inline-block; background:url('/images/glyph/glyphicons_391_twitter_t_invert.png') 0 0 no-repeat; width:30px; height:30px; border:none; outline:none; }
 .icon-attach { display:inline-block; background:url('/images/glyph/glyphicons_062_attach.png') 3px 3px no-repeat; width: 30px; height:30px; border:none; outline:none; }
+.icon-attach-small { display:inline-block; background:url('/images/glyph/glyphicons_halflings_141_paperclip.png') 3px 6px no-repeat; width: 20px; height:20px; border:none; outline:none; }
+.icon-attach-small:hover { display:inline-block; background:url('/images/glyph/glyphicons_halflings_141_paperclip.png') 3px 6px no-repeat; width: 20px; height:20px; border:none; outline:none; }
 .icon-folder { display:inline-block; background:url('/images/glyph/glyphicons_halflings_117_folder_open.png') 0 6px no-repeat; width: 20px; height:20px; border:none;  outline:none; }
 .icon-retweet { display:inline-block; background:url('/images/glyph/glyphicons_halflings_114_retweet.png') 0 7px no-repeat; width:20px; height:20px; border:none; outline:none; }
 .icon-retweet-1 { display:inline-block; background:url('/images/glyph/glyphicons_080_retweet.png') 3px 5px no-repeat; width:30px; height:30px; border:none; outline:none; }

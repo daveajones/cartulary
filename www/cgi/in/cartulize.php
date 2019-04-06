@@ -122,6 +122,11 @@ if (($mret > 0) && !empty($mrmatches[1])) {
 }
 $html = $response['body'];
 
+//If html body content was passed in just use it
+if( isset($_REQUEST['content']) && !empty($_REQUEST['content']) ) {
+    $html = $_REQUEST['content'];
+}
+
 //Reddit
 if (preg_match('/^https?\:\/\/(www\.)?reddit\.com/i', $url)) {
     loggit(3, "Getting a reddit link.");
@@ -329,6 +334,26 @@ if ($linkonly == FALSE) {
         $analysis = "";
         $slimcontent = $content;
 
+    //Bizjournals?
+    } else if (preg_match('/^http.*bizjournals\.com.*/i', $url)) {
+        loggit(2, "DEBUG: ----------------------> Bizjournals post.");
+
+                loggit(3, print_r($_REQUEST, TRUE));
+
+//        $dom = new DomDocument();
+//        $dom->loadHTML($html);
+//        $classname = 'paddings';
+//        $finder = new DomXPath($dom);
+//        $nodes = $finder->query("(//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]//ul/li)[1]/*[self::p or self::blockquote or self::img or self::ul or self::ol or self::li or self::a]");
+//        $tmp_dom = new DOMDocument();
+//        foreach ($nodes as $node) {
+//            $tmp_dom->appendChild($tmp_dom->importNode($node, true));
+//        }
+//        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle, $effective_url);
+//
+//        $analysis = "";
+//        $slimcontent = $content;
+
     //Is this a wordpress post?
 //    } else if (preg_match('/\<div.*class.*entry-content.*\>/i', $html)) {
 //        loggit(2, "DEBUG: ----------------------> Getting a wordpress post.");
@@ -376,6 +401,13 @@ if ($linkonly == FALSE) {
         include "$confroot/$libraries/PDFParser/vendor/autoload.php";
         $parser = new \Smalot\PdfParser\Parser();
         $pdf = $parser->parseContent($pdfbody);
+        $details = $pdf->getDetails();
+        loggit(3, print_r($details, TRUE));
+        if( empty($title) && isset($details['title']) && !empty($details['title']) ) {
+            $title = $details['title'];
+        } else if (empty($title)) {
+            $title = "Untitled PDF";
+        }
         foreach ($pdf->getPages() as $page) {
             $content .= "<p>" . $page->getText() . "</p>";
         }
@@ -522,7 +554,8 @@ loggit(3, "It took: [$took] seconds to build static files after cartulizing arti
 if (isset($_REQUEST['json'])) {
     //Give feedback that all went well
     $jsondata['status'] = "true";
-    $jsondata['article'] = array('id' => $aid,
+    $jsondata['article'] = array(
+        'id' => $aid,
         'title' => $title,
         'body' => $slimcontent,
         'url' => $url,

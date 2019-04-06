@@ -28,6 +28,11 @@ if (($pid = cronHelper::lock()) !== FALSE) {
             continue;
         }
 
+        //Skip outlines that seem damaged
+        if (!is_outline(get_outline_content($outline['id']))) {
+            continue;
+        }
+
         //Set the purge bit on all of this outline's feeds to true
         $purgecount = mark_all_outline_feeds_to_purge($outline['id']);
         echo "    Marked $purgecount feeds from outline: [" . $outline['title'] . "] to purge.\n\n";
@@ -206,11 +211,10 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         }
     }
 
+    // Log and leave
+    loggit(3, " ----- Outline scan finished.");
 
     //Remove the lock file
     cronHelper::unlock();
 }
-
-// Log and leave
-return (TRUE);
-?>
+exit(0);

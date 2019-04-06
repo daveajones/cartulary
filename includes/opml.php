@@ -2483,7 +2483,7 @@ function buildHtmlFromOpmlRecursive($x = NULL, &$html, $indent = 0, $line = 0, $
                 $htmlcontent .= str_repeat('    ', $indent) . "$nodetext\n";
             } else {
                 if (isset($child->outline)) {
-                    $expandible = "<li class=\"owedge$exco\"><span>$nodetext</span>";
+                    $expandible = "<li data-line=\"$line\" class=\"owedge$exco\"><span>$nodetext</span>";
                 } else {
                     $expandible = "";
                     $expandible = "<li class=\"ou $classes\">$nodetext";
@@ -2803,6 +2803,51 @@ OPML2HTMLCSS;
 	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script>
+	    var goToTab = "";
+	    var goToNode = "";
+		          
+	    console.log("winlochash: " + window.location.hash);
+	    
+
+            var hash = window.location.hash;
+            var comma = hash.indexOf(",");
+            if( comma > -1) {
+                goToTab = hash.substring(0,comma);
+                goToNode = hash.substring(comma+1);
+            } else {
+                goToTab = hash.substring(0);
+            }
+            console.log("goToTab string: " + goToTab);
+            console.log("goToNode string: " + goToNode);
+            
+            goToTab && $('ul.nav a[href="' + goToTab + '"]').tab('show');
+        
+            $('#myTab a').click(function (e) {
+                $(this).tab('show');
+                var scrollmem = $('body').scrollTop() || $('html').scrollTop();
+                window.location.hash = this.hash;
+                $('html,body').scrollTop(scrollmem);
+                goToTab = this.hash;  
+                console.log("setgoToTab: "+ goToTab);
+            });            
+            
+            //If there are tabs then show the first one
+            console.log("goToTab: " + goToTab);            
+            if( $('#myTab').length > 0 && window.location.hash == "" ) {
+                $('#myTab a:first').trigger('click');   
+                console.log("goToTab: " + goToTab);
+            }
+
+            if(goToNode != "") {
+                var openWedge = $('li.owedge[data-line="'+goToNode+'"]');
+                openWedge.removeClass('collapsed');
+                openWedge.parents().removeClass('collapsed');
+                console.log(openWedge);
+                if(typeof openWedge !== "undefined" && typeof openWedge.offset() !== "undefined" && typeof openWedge.offset().top !== "undefined") {
+                    $([document.documentElement, document.body]).scrollTop(openWedge.offset().top);                    
+                }
+            }
+	    
         $(document).ready(function() {
             //Dont propagate link click events up to the wedge text
             $('li.owedge a').click(function(event) {
@@ -2811,16 +2856,17 @@ OPML2HTMLCSS;
             //Toggle wedges
             $('li.owedge span').click(function() {
                 $(this).parent().toggleClass('collapsed');
+                //if( !$(this).parent().hasClass('collapsed') && $('#myTab').length > 0 ) {
+                    window.location.hash = goToTab + "," + $(this).parent().data("line");
+                //}
             });
-            //If there are tabs then show the first one
-            if( $('#myTab').length > 0 ) {
-                $('#myTab a:first').tab('show');
-            }
+
             //If this is a presentation start reveal
             if( $('div.reveal').length > 0 ) {
                 Reveal.initialize({ controls: true, progress: true, history: true, center: true, theme: 'default', transition: 'default' });
             }
         });
+
 	</script>
     $analyticscode
   </body>

@@ -104,7 +104,7 @@ $tree_location = "Edit Outline";
     <title><? echo $tree_location ?></title>
     <? include "$confroot/$templates/$template_html_styles" ?>
     <? include "$confroot/$templates/$template_html_scripts" ?>
-    <script src="/script/webaudio_tools.js"></script>
+    <!-- <script src="/script/webaudio_tools.js"></script> -->
     <script>
         //Globals
         <?loggit(3, "DEBUG: seenfile = ".print_r(isset($seenfile), TRUE));?>

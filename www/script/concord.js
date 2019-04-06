@@ -120,6 +120,7 @@ var right = "right";
 var up = "up";
 var flatup = "flatup";
 var flatdown = "flatdown";
+var straightdown = "straightdown";
 var nodirection = "nodirection";
 var XML_CHAR_MAP = {
     '<': '&lt;',
@@ -1755,6 +1756,27 @@ function ConcordOp(root, concordInstance, _cursor) {
                                 this.setCursor(cursor, multiple);
                             }
                         }
+                    }
+                }
+                break;
+            case straightdown:
+                for(var i = 0; i < count; i++) {
+                    var next = null;
+                    var cursor = concordInstance.op.getCursor();
+                    if (!cursor.hasClass("collapsed")) {
+                        var outline = cursor.children("ol");
+                        if (outline.length == 1) {
+                            var firstChild = outline.children(".concord-node:first");
+                            if (firstChild.length == 1) {
+                                next = firstChild;
+                            }
+                        }
+                    }
+                    if (!next) {
+                        next = concordInstance.op._walk_down(cursor);
+                    }
+                    if (next) {
+                        concordInstance.op.setCursor(next);
                     }
                 }
                 break;

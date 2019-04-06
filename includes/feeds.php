@@ -4664,6 +4664,9 @@ function build_river_json2($uid = NULL, $max = NULL, $force = FALSE, $mobile = F
     $lastfeedid = "";
     $pubdate = time();
     while ($sql->fetch()) {
+        //If this feed is hidden skip
+        if( $fhidden == 1 ) continue;
+
         $feed = get_feed_info($feedid);
 
         //Save the time stamp of the first item to use as a pubdate

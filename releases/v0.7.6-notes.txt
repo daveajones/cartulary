@@ -16,6 +16,12 @@ The primary focus of this release is on editor improvement and Ubuntu 18 LTS sup
     - A future release will be focused on php 7.2 compatibility.
     - I like to support all of the currently supported LTS releases.  So once Ubuntu 14 drops off, this will be a bit easier.
 
+- Improvement:  Deep linking into published outlines
+    - Now, if you click a node in an html outline it will update the url with a hash for that location
+    - You can then send that URL to someone and it will take them straight to that node
+    - This is probably still buggy since there is a lot going on in these crazy outlines like tabs and such
+    - Give me feedback.
+
 - New Feature:  Editor templating
     - Been working with Adam on this one to create a sort of templating "language" to make generating repeatable (like shownotes, blog posts, etc) outlines easier.
     - You use placeholders (variables) in this fashion:  [[$name]modifier]

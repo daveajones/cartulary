@@ -50,7 +50,7 @@ tar -zcf ~/cartulary-bak-$BAKDATE.tar.gz $CARTROOT
 cd cartulary-$BRANCH
 
 ##: Backup newuser sub list
-cp $CARTROOT/www/newuser.opml /tmp
+#cp $CARTROOT/www/newuser.opml /tmp
 
 ##: Put new files in place
 cp -R aggrivate $CARTROOT/aggrivate
@@ -75,7 +75,7 @@ chown www-data $CARTROOT/spool >>/tmp/cartinstall.log 2>&1
 chmod +x $CARTROOT/releases/v*-apt.sh
 
 ##: Restore newuser sub list
-cp /tmp/newuser.opml $CARTROOT/www
+#cp /tmp/newuser.opml $CARTROOT/www
 
 ##: Get out of the repo
 cd ..

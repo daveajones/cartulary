@@ -1522,7 +1522,7 @@ function get_all_outlines($max = NULL)
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
     //Grab all the outlines
-    $sqltxt = "SELECT id,url,title,type FROM $table_sopml_outlines";
+    $sqltxt = "SELECT id,url,title,type,lastcheck,lastupdate,lastmod FROM $table_sopml_outlines";
 
     if (!empty($max) && is_numeric($max)) {
         $sqltxt .= " LIMIT $max";
@@ -1541,12 +1541,20 @@ function get_all_outlines($max = NULL)
         return (array());
     }
 
-    $sql->bind_result($oid, $ourl, $otitle, $otype) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($oid, $ourl, $otitle, $otype, $olastcheck, $olastupdate, $olastmod) or loggit(2, "MySql error: " . $dbh->error);
 
     $outlines = array();
     $count = 0;
     while ($sql->fetch()) {
-        $outlines[$count] = array('id' => $oid, 'url' => $ourl, 'title' => $otitle, 'type' => $otype);
+        $outlines[$count] = array(
+            'id' => $oid,
+            'url' => $ourl,
+            'title' => $otitle,
+            'type' => $otype,
+            'lastcheck' => $olastcheck,
+            'lastupdate' => $olastupdate,
+            'lastmod' => $olastmod
+        );
         $count++;
     }
 

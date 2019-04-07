@@ -31,12 +31,12 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         //Skip outlines that seem damaged
         if (!is_outline(get_outline_content($outline['id']))) {
             //Get the latest outline content
-            echo "DEBUG: ".print_r($outline, TRUE);
+            //echo "DEBUG: ".print_r($outline, TRUE);
             $outline_content = fetchUrl($outline['url']);
             update_outline_content($outline['id'], $outline_content);
             update_outline_lastcheck($outline['id'], time());
 
-            echo $outline_content;
+            //echo $outline_content;
             if (empty($outline_content) || !is_outline($outline_content)) {
                 continue;
             }

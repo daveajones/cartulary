@@ -4,6 +4,7 @@
 //########################################################################################
 
 use Aws\S3\S3Client;
+use Cloutier\PhpIpfsApi\IPFS;
 
 // Logging function
 function loggit($lognum, $message)
@@ -2313,7 +2314,7 @@ function putInS3old($content, $filename, $bucket, $key, $secret, $headers = NULL
 }
 
 
-//Put a string of data into an S3 file
+//Delete a file from S3
 function deleteFromS3($filename, $bucket, $key, $secret)
 {
 
@@ -4575,7 +4576,7 @@ function add_file_to_ipfs($filepath = NULL)
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
-    require_once "$confroot/$libraries/ipfs/ipfs.class.php";
+    require_once "$confroot/$libraries/ipfs/ipfs.php";
 
     //Create an IPFS object
     $ipfs = new IPFS("localhost", "8080", "5001");
@@ -4599,14 +4600,14 @@ function add_content_to_ipfs($content = NULL)
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
-    require_once "$confroot/$libraries/ipfs/ipfs.class.php";
+    require_once "$confroot/$libraries/ipfs/ipfs.php";
 
     //Create an IPFS object
     $ipfs = new IPFS("localhost", "8080", "5001");
 
     $hash = $ipfs->add($content);
 
-    loggit(3, "Added content to IPFS with hash: [$hash].");
+    loggit(3, "Added content: [$content] to IPFS with hash: [$hash].");
     return ($hash);
 }
 
@@ -4622,7 +4623,7 @@ function get_content_from_ipfs($hash = NULL)
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
-    require_once "$confroot/$libraries/ipfs/ipfs.class.php";
+    require_once "$confroot/$libraries/ipfs/ipfs.php";
 
     //Create an IPFS object
     $ipfs = new IPFS("localhost", "8080", "5001");

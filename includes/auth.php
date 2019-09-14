@@ -2209,11 +2209,12 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                   mastodon_app_token=?,
                   mastodon_client_id=?,
                   mastodon_client_secret=?,
-                  mastodon_access_token=?
+                  mastodon_access_token=?,
+                  carttoken=?
            WHERE uid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdsddssssss",
+    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdsddsssssss",
         $prefs['publicdefault'],
         $prefs['publicrss'],
         $prefs['publicopml'],
@@ -2285,6 +2286,7 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
         $prefs['mastodon_client_id'],
         $prefs['mastodon_client_secret'],
         $prefs['mastodon_access_token'],
+        $prefs['carttoken'],
         $uid
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -2927,4 +2929,47 @@ function search_users($query = NULL, $max = NULL)
 
     loggit(1, "Returning: [$count] users that fit search.");
     return ($users);
+}
+
+
+//Get the user id that goes with this cart token
+function get_user_id_from_carttoken($token = NULL)
+{
+    //If token is blank bail
+    if (empty($token)) {
+        loggit(2, "Can't get the uid from this token: [$token]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Do the call
+    $sql = $dbh->prepare("SELECT uid FROM $table_prefs WHERE carttoken=?") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("s", $token) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Check results
+    $returned = $sql->num_rows();
+    if ($returned > 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "Bad token lookup attempt for: [$token].  Too many records returned.");
+        return (FALSE);
+    }
+    if ($returned < 1) {
+        $sql->close()
+        or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "No user exists for this token: [$token]");
+        return (NULL);
+    }
+    $sql->bind_result($uid) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning user id: [$uid] for token: [$token]");
+    return ($uid);
 }

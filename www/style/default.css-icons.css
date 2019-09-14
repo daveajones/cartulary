@@ -87,6 +87,7 @@
 .icn-nav-search { display:inline-block; background:url('/images/glyph/glyphicons_027_search.png') 4px 2px no-repeat; width:30px; height:28px; border:0; }
 .icn-nav-search.white { display:inline-block; background:url('/images/glyph/glyphicons_027_search_white.png') 4px 2px no-repeat; width:30px; height:28px; border:0; }
 
+
 /* Animated rotating icon */
 .icon-spinning {
     display: inline-block;

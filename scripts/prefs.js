@@ -194,8 +194,15 @@ $(document).ready(function () {
         }
     });
 
+    //Mastodon
     $('button#resetMastodon').bind('click', function() {
         $('form#frmPrefs').append('<input type="hidden" name="reregistermastodon" value="TRUE" />');
+        $('button.btnPrefSubmit').trigger('click');
+    });
+
+    //Cart token
+    $('button#newCartToken').bind('click', function() {
+        $('form#frmPrefs').append('<input type="hidden" name="newcarttoken" value="TRUE" />');
         $('button.btnPrefSubmit').trigger('click');
     });
 });

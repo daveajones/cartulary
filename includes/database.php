@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 84;
+$cg_database_version = 85;
 $cg_database_updates = array();
 
 
@@ -1143,6 +1143,14 @@ CGDB0246;
 $cg_database_updates[83][] = <<<CGDB0247
  INSERT INTO `dbversion` ( `version` ) VALUES ( '84' )
 CGDB0247;
+
+//Version 84 to 85 -----------------------------------------------------------------------------------------------
+$cg_database_updates[84][] = <<<CGDB0248
+ ALTER TABLE `prefs` ADD `carttoken` VARCHAR( 64 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'Personal token for saving articles'
+CGDB0248;
+$cg_database_updates[84][] = <<<CGDB0249
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '85' )
+CGDB0249;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

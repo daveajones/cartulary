@@ -84,7 +84,7 @@ $tree_location = "Preferences";
                     <div class="divPrefPane">
                         <div class="divPrefSubmit pull-right divPrefMe"><img class="imgSpinner imgSpinnerSub"
                                                                              src="/images/spinner.gif"/><span
-                                class="message"></span>
+                                    class="message"></span>
                             <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                         </div>
                         <h3>Me</h3>
@@ -139,7 +139,7 @@ $tree_location = "Preferences";
                 <div class="divPrefPane">
                     <div class="divPrefSubmit pull-right divPrefAmazon"><img class="imgSpinner imgSpinnerSub"
                                                                              src="/images/spinner.gif"/><span
-                            class="message"></span>
+                                class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                     </div>
                     <h3>Amazon S3</h3>
@@ -175,7 +175,7 @@ $tree_location = "Preferences";
                 <div class="divPrefPane">
                     <div class="divPrefSubmit pull-right divPrefRiver"><img class="imgSpinner imgSpinnerSub"
                                                                             src="/images/spinner.gif"/><span
-                            class="message"></span>
+                                class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                     </div>
                     <h3>Subscriptions</h3>
@@ -194,7 +194,7 @@ $tree_location = "Preferences";
                 <div class="divPrefPane">
                     <div class="divPrefSubmit pull-right divPrefRiver"><img class="imgSpinner imgSpinnerSub"
                                                                             src="/images/spinner.gif"/><span
-                            class="message"></span>
+                                class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                     </div>
                     <h3>River</h3>
@@ -256,7 +256,7 @@ $tree_location = "Preferences";
                 <div class="divPrefPane">
                     <div class="divPrefSubmit pull-right divPrefMicroblog"><img class="imgSpinner imgSpinnerSub"
                                                                                 src="/images/spinner.gif"/><span
-                            class="message"></span>
+                                class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                     </div>
                     <h3>Microblog</h3>
@@ -292,7 +292,7 @@ $tree_location = "Preferences";
                 <div class="divPrefPane">
                     <div class="divPrefSubmit pull-right divPrefArticles"><img class="imgSpinner imgSpinnerSub"
                                                                                src="/images/spinner.gif"/><span
-                            class="message"></span>
+                                class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                     </div>
                     <h3>Articles</h3>
@@ -305,6 +305,10 @@ $tree_location = "Preferences";
                                                                                   type="text"
                                                                                   value="<? echo $prefs['cartfilename'] ?>"/>
                         </li>
+                        <li class="privacy">My private article saving token is: <input id="carttoken" name="carttoken"
+                                                                                       type="text" disabled
+                                                                                       value="<? echo $prefs['carttoken'] ?>"/>
+                            <button id='newCartToken'>New Token</button>
                         <li><label class="checkbox inline"><input name="tweetcart"
                                                                   type="checkbox" <? if ($prefs['tweetcart'] == 1) echo "checked "; ?>/>
                                 I want the articles I save to be tweeted.</label></li>
@@ -320,13 +324,14 @@ $tree_location = "Preferences";
                         <li><label class="checkbox inline"><input name="staticarticles"
                                                                   type="checkbox" <? if ($prefs['staticarticles'] == 1) echo "checked "; ?>/>
                                 I want a static version of each article stored in S3.</label></li>
+                        </li>
                     </ul>
                 </div>
 
                 <div class="divPrefPane">
                     <div class="divPrefSubmit pull-right divPrefMicroblog"><img class="imgSpinner imgSpinnerSub"
                                                                                 src="/images/spinner.gif"/><span
-                            class="message"></span>
+                                class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                     </div>
                     <h3>Editor</h3>
@@ -343,7 +348,7 @@ $tree_location = "Preferences";
                 <div class="divPrefPane">
                     <div class="divPrefSubmit pull-right divPrefEmail"><img class="imgSpinner imgSpinnerSub"
                                                                             src="/images/spinner.gif"/><span
-                            class="message"></span>
+                                class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                     </div>
                     <h3>Email</h3>
@@ -397,13 +402,14 @@ $tree_location = "Preferences";
                 <div class="divPrefPane">
                     <div class="divPrefSubmit pull-right divPrefLinks"><img class="imgSpinner imgSpinnerSub"
                                                                             src="/images/spinner.gif"/><span
-                            class="message"></span>
+                                class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                     </div>
                     <h3>Links</h3>
                     <ul>
                         <li>I want analytics code on my pages and links:<br/><textarea name="analyticscode"
-                                                                                       style="width:600px;height:200px;font-family:monospace;" wrap="off"><?echo $prefs['analyticscode']?></textarea>
+                                                                                       style="width:600px;height:200px;font-family:monospace;"
+                                                                                       wrap="off"><? echo $prefs['analyticscode'] ?></textarea>
                         </li>
                         <li><label class="checkbox inline"><input name="sourceurlrt"
                                                                   type="checkbox" <? if ($prefs['sourceurlrt'] == 1) echo "checked "; ?>/>
@@ -417,14 +423,14 @@ $tree_location = "Preferences";
                 <div class="divPrefPane">
                     <div class="divPrefSubmit pull-right divPrefStyle"><img class="imgSpinner imgSpinnerSub"
                                                                             src="/images/spinner.gif"/><span
-                            class="message"></span>
+                                class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                     </div>
                     <h3>Style</h3>
                     <ul>
                         <div class="control-group">
                             <li>I want to override the default style with the stylesheet located at this url: <input
-                                    name="stylesheet" type="text" value="<? echo $prefs['stylesheet'] ?>"/></li>
+                                        name="stylesheet" type="text" value="<? echo $prefs['stylesheet'] ?>"/></li>
                         </div>
                         <div class="control-group">
                             <li>I want a maximum of <input name="maxlist" type="text"
@@ -443,31 +449,32 @@ $tree_location = "Preferences";
                 <div class="divPrefPane">
                     <div class="divPrefSubmit pull-right divPrefTwitter"><img class="imgSpinner imgSpinnerSub"
                                                                               src="/images/spinner.gif"/><span
-                            class="message"></span>
+                                class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success btnPrefSubmit" type="submit">Save</button>
                     </div>
                     <h3>Twitter
                         <small>(Create app <a href="https://dev.twitter.com/apps/new">here</a>. Instructions <a
-                                href="https://groups.google.com/d/msg/sopml/fbMd0cWPzRk/84mMoDM4BEsJ">here</a>.)
+                                    href="https://groups.google.com/d/msg/sopml/fbMd0cWPzRk/84mMoDM4BEsJ">here</a>.)
                         </small>
                     </h3>
                     <ul>
                         <div class="control-group">
                             <li>My Twitter oAuth consumer key is: <input name="twitterkey" type="text"
-                                                                        value="<? echo $prefs['twitterkey'] ?>"/></li>
+                                                                         value="<? echo $prefs['twitterkey'] ?>"/></li>
                         </div>
                         <div class="control-group">
                             <li>My Twitter oAuth consumer secret is: <input name="twittersecret" type="text"
-                                                                           value="<? echo $prefs['twittersecret'] ?>"/>
+                                                                            value="<? echo $prefs['twittersecret'] ?>"/>
                             </li>
                         </div>
                         <div class="control-group">
                             <li>My Twitter oAuth access token is: <input name="twittertoken" type="text"
-                                                                        value="<? echo $prefs['twittertoken'] ?>"/></li>
+                                                                         value="<? echo $prefs['twittertoken'] ?>"/>
+                            </li>
                         </div>
                         <div class="control-group">
                             <li>My Twitter oAuth access secret is: <input name="twittertokensecret" type="text"
-                                                                         value="<? echo $prefs['twittertokensecret'] ?>"/>
+                                                                          value="<? echo $prefs['twittertokensecret'] ?>"/>
                             </li>
                         </div>
                     </ul>
@@ -475,35 +482,54 @@ $tree_location = "Preferences";
                     <h3 id="mastodon">Mastodon</h3>
                     <ul>
                         <div class="control-group">
-                            <li>Instance url: <input name="mastodon_url" placeholder="<?echo $cg_mastodon_placeholder_url?>" type="text" value="<? echo $prefs['mastodon_url'] ?>"/>
+                            <li>Instance url: <input name="mastodon_url"
+                                                     placeholder="<? echo $cg_mastodon_placeholder_url ?>" type="text"
+                                                     value="<? echo $prefs['mastodon_url'] ?>"/>
                             </li>
                             <div style="margin-left:30px;">
-                                <?if( mastodon_is_enabled($uid) ) echo "<li>App token: <span style='color:#900'>".$prefs['mastodon_access_token']."</span><br><button id='resetMastodon'>Re-register</button></li>"?>
+                                <? if (mastodon_is_enabled($uid)) echo "<li>App token: <span style='color:#900'>" . $prefs['mastodon_access_token'] . "</span><br><button id='resetMastodon'>Re-register</button></li>" ?>
 
                             </div>
                         </div>
-                        <?if( !mastodon_is_enabled($uid) ) {?>
+                        <? if (!mastodon_is_enabled($uid)) { ?>
                             <div style="margin-left:30px;">
-                            <p>Just fill out the username and password you used to register on the mastodon server and click the save button.  The username
-                            and password isn't saved in the FC database.  It's just used temporarily in the registration process to get an access token.  You'll
-                            have to temporarily disable 2-factor authentication for the app registration to work.  After, you can re-enable it.</p>
-                                <input type="hidden" name="mastodon_register_app" value="TRUE" />
+                                <p>Just fill out the username and password you used to register on the mastodon server
+                                    and click the save button. The username
+                                    and password isn't saved in the FC database. It's just used temporarily in the
+                                    registration process to get an access token. You'll
+                                    have to temporarily disable 2-factor authentication for the app registration to
+                                    work. After, you can re-enable it.</p>
+                                <input type="hidden" name="mastodon_register_app" value="TRUE"/>
                                 <div class="control-group">
-                                    <li>Server email: <input name="mastodon_server_email" type="text" placeholder="john@doe.com"/></li>
+                                    <li>Server email: <input name="mastodon_server_email" type="text"
+                                                             placeholder="john@doe.com"/></li>
                                 </div>
                                 <div class="control-group">
-                                    <li>Server password: <input name="mastodon_server_password" type="text" placeholder="password"/>
+                                    <li>Server password: <input name="mastodon_server_password" type="text"
+                                                                placeholder="password"/>
                                     </li>
                                 </div>
                             </div>
-                        <?}?>
+                        <? } ?>
+                    </ul>
+
+                    <h3 id="micropub">Micropub (alpha - not working yet)</h3>
+                    <ul>
+                        <div class="control-group">
+                            <li>Hostname: <input name="micropub_url"
+                                                 placeholder="<? echo $cg_micropub_placeholder_url ?>" type="text"
+                                                 value="<? echo $prefs['micropub_url'] ?>"/></li>
+                            <li>API Token: <input name="micropub_token"
+                                                  placeholder="<? echo $cg_micropub_placeholder_url ?>" type="text"
+                                                  value="<? echo $prefs['micropub_url'] ?>"/></li>
+                        </div>
                     </ul>
                 </div>
 
                 <div class="divPrefPane">
                     <div class="divPrefSubmit pull-right divPrefShortener"><img class="imgSpinner imgSpinnerSub"
                                                                                 src="/images/spinner.gif"/><span
-                            class="message"></span>
+                                class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                     </div>
                     <h3>Url Shortener</h3>

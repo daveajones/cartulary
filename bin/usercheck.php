@@ -48,6 +48,13 @@ if (($pid = cronHelper::lock()) !== FALSE) {
             badlogin_reset(get_email_from_uid($uid));
         }
 
+        //Make sure everybody has a cart token
+        if(empty($user['carttoken'])) {
+            $uprefs = get_user_prefs($uid);
+            $uprefs['carttoken'] = random_gen(13);
+            set_user_prefs($uid, $uprefs);
+        }
+
 //        //Make sure each user is subscribed to their own pub feeds
 //        $pubfeeds = get_pub_feeds($uid);
 //        foreach ($pubfeeds as $pubfeed) {

@@ -10,6 +10,10 @@
   }
 ?>
 
+<?if( $g_platform == "mobile" ) {?>
+    <a target="_blank" class="ipinfotracker" href="https://ip.nf/<?echo $_SERVER['REMOTE_ADDR']?>.json"><?echo $_SERVER['REMOTE_ADDR']?></a>
+<?}?>
+
 <!-- Menu bar -->
 <div id="slideout">
     <div class="drawertab">
@@ -23,8 +27,9 @@
             <li <?if($section == "Microblog"){echo "class='active'";}?>>  <a href="<?echo $microblogpage?>" title="Microblog">    <i class="icn-nav-microblog"></i></a></li>
             <li <?if($section == "Articles"){echo "class='active'";}?>>   <a href="<?echo $articlespage?>"  title="Articles">     <i class="icn-nav-articles"></i></a></li>
             <li <?if($section == "Media"){echo "class='active'";}?>>      <a href="<?echo $mediapage?>"     title="Media">        <i class="icn-nav-media"></i></a></li>
-            <li <?if($section == "Radio"){echo "class='active'";}?>>      <a href="<?echo $radiopage?>"     title="Radio">      <i class="icn-nav-radio"></i></a></li>
+            <li <?if($section == "Radio"){echo "class='active'";}?>>      <a href="<?echo $radiopage?>"     title="Radio">        <i class="icn-nav-radio"></i></a></li>
             <li <?if($section == "Subscribe"){echo "class='active'";}?>>  <a href="<?echo $subscribepage?>" title="Subscribe">    <i class="icn-nav-subscribe"></i></a></li>
+            <li <?if($section == "Prefs"){echo "class='active'";}?>>      <a href="<?echo $prefspage?>"     title="Prefs">        <i class="icn-nav-prefs"></i></a></li>
         </ul>
     </div>
 </div>
@@ -47,6 +52,10 @@
                 <li class="<?if(!$myprefs['darkmode']) echo "divider-vertical"?>"></li>
                 <li <?if($section == "Admin-user"){echo "class='active'";}?>><a href="<?echo $adminpage?>.user" title="User Admin"><i class="icn-nav-admin-user <?if($myprefs['darkmode']) echo "white"?>"></i></a></li>
                 <li <?if($section == "Admin-feed"){echo "class='active'";}?>><a href="<?echo $adminpage?>.feed" title="Feed Admin"><i class="icn-nav-admin-feed <?if($myprefs['darkmode']) echo "white"?>"></i></a></li>
+            <?}?>
+
+            <?if( $g_platform != "mobile" ) {?>
+                <li><a target="_blank" href="https://ip.nf/<?echo $_SERVER['REMOTE_ADDR']?>.json"><?echo $_SERVER['REMOTE_ADDR']?></a></li>
             <?}?>
 
             <?if( $g_platform == "mobile no" ) {?>
@@ -104,7 +113,6 @@
                         <li><a href="#" class="menuNewRSS news" title="Save As">RSS Feed</a></li>
                     </ul>
                 </li>
-
 
                 <li><a class="menuOpen" href="#" title="Opens an existing outline">Open</a></li>
                 <li class="dropdown menuSaves" title="Save your outline.">

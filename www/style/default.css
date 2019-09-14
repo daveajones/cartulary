@@ -58,6 +58,7 @@ li.menubar-search-container {
     left: 0;
 }
 
+
 /* --------------------------------------------------- */
 
 /* --------------------------------------------------- */
@@ -1342,7 +1343,7 @@ div.keepVidHeight {
     .pageContentWrapper.Editor .uploadifive-button {
         display: none;
     }
-    
+
     #bodyEditOutline div.bootbox-body div.generate-dialog input.generateVariableInput {
         width: 480px;
         max-width:480px;

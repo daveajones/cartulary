@@ -1,5 +1,5 @@
 <!-- Global style sheets -->
-<?$stylever = 7?>
+<?$stylever = 9?>
 <link rel="stylesheet" href="/style/bootstrap-2.3.1-noicons.css?v=<?echo $stylever?>"/>
 <link rel="stylesheet" href="/style/jquery-ui.css?v=<?echo $stylever?>"/>
 <link rel="stylesheet" href="/style/style.css?v=<?echo $stylever?>"/>
@@ -10,13 +10,13 @@ if (isset($g_prefs['stylesheet']) && !empty($g_prefs['stylesheet'])) {
     $mainstyle = $default_style_sheet;
 }
 
-if ($platform == "tablet") {
+if ($g_platform == "tablet") {
     ?>
     <link rel="stylesheet" href="<? echo $mainstyle . '-tablet-base.css?v='.$stylever ?>"/>
     <link rel="stylesheet" href="<? echo $mainstyle . '-tablet-icons.css?v='.$stylever ?>"/>
     <link rel="stylesheet" href="<? echo $mainstyle . '-tablet.css?v='.$stylever ?>" />
     <?
-} else if ($platform == "mobile") {
+} else if ($g_platform == "mobile") {
     ?>
     <link rel="stylesheet" href="<? echo $mainstyle . '-mobile-base.css?v='.$stylever ?>"/>
     <link rel="stylesheet" href="<? echo $mainstyle . '-mobile-icons.css?v='.$stylever ?>"/>

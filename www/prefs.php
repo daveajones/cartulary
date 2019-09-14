@@ -305,9 +305,7 @@ $tree_location = "Preferences";
                                                                                   type="text"
                                                                                   value="<? echo $prefs['cartfilename'] ?>"/>
                         </li>
-                        <li class="privacy">My private article saving token is: <input id="carttoken" name="carttoken"
-                                                                                       type="text" disabled
-                                                                                       value="<? echo $prefs['carttoken'] ?>"/>
+                        <li class="privacy">My private article saving token is: <b style="color:black"><? echo $prefs['carttoken'] ?></b>
                             <button id='newCartToken'>New Token</button>
                         <li><label class="checkbox inline"><input name="tweetcart"
                                                                   type="checkbox" <? if ($prefs['tweetcart'] == 1) echo "checked "; ?>/>

@@ -80,7 +80,6 @@ if ( isset($_POST['smtp_secure']) ) { $smtp_secure = 1; } else { $smtp_secure = 
 if ( isset($_POST['smtp_port']) ) { $smtp_port = $_POST['smtp_port']; } else { $smtp_port = ""; };
 if ( isset($_POST['darkmode']) ) { $darkmode = 1; } else { $darkmode = 0; };
 if ( isset($_POST['mastodon_url']) ) { $mastodon_url = $_POST['mastodon_url']; } else { $mastodon_url = ""; };
-if ( empty($prefs['carttoken']) ) { $carttoken = random_gen(13); } else { $carttoken = $prefs['carttoken']; }
 $jsondata = array();
 $jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
@@ -867,17 +866,6 @@ if( strlen($mastodon_url) > 160 ) {
     exit(1);
 }
 $prefs['mastodon_url'] = $mastodon_url;
-
-$jsondata['prefname'] = "carttoken";
-if( strlen($carttoken) > 64 ) {
-    //Log it
-    loggit(2,"The value for cartoken was too long: [$carttoken]");
-    $jsondata['status'] = "false";
-    $jsondata['description'] = "Max carttoken length is 64 characters. That's plenty.";
-    echo json_encode($jsondata);
-    exit(1);
-}
-$prefs['carttoken'] = $carttoken;
 //--------------------------------------------------------
 //--------------------------------------------------------
 

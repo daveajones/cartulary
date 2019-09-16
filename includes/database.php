@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 85;
+$cg_database_version = 86;
 $cg_database_updates = array();
 
 
@@ -1151,6 +1151,14 @@ CGDB0248;
 $cg_database_updates[84][] = <<<CGDB0249
  INSERT INTO `dbversion` ( `version` ) VALUES ( '85' )
 CGDB0249;
+
+//Version 85 to 86 -----------------------------------------------------------------------------------------------
+$cg_database_updates[85][] = <<<CGDB0250
+ ALTER TABLE `prefs` ADD `ipinfotracker` TINYINT NOT NULL DEFAULT '0' COMMENT 'Show IP info in real-time'
+CGDB0250;
+$cg_database_updates[85][] = <<<CGDB0251
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '86' )
+CGDB0251;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

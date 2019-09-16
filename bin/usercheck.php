@@ -50,8 +50,9 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
         //Make sure everybody has a cart token
         if(empty($user['carttoken'])) {
+            //loggit(3, "User check: ".print_r($user, TRUE));
             $uprefs = get_user_prefs($uid);
-            $uprefs['carttoken'] = random_gen(13);
+            $uprefs['carttoken'] = random_gen(17);
             set_user_prefs($uid, $uprefs);
         }
 

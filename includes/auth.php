@@ -2327,6 +2327,7 @@ function get_users($max = NULL, $time = NULL, $activeonly = FALSE)
                     $table_user.username,
                     $table_user.admin,
                     $table_prefs.avatarurl,
+                    $table_prefs.carttoken,
                     MAX($table_session.lastactivity),
 		            MAX($table_river.lastbuild)
              FROM $table_user
@@ -2354,7 +2355,7 @@ function get_users($max = NULL, $time = NULL, $activeonly = FALSE)
         return (array());
     }
 
-    $sql->bind_result($uid, $uname, $uemail, $ulastlogin, $ustage, $uactive, $ubadlogins, $uusername, $uadmin, $uavatarurl, $ulastactivity, $urlastbuild) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_result($uid, $uname, $uemail, $ulastlogin, $ustage, $uactive, $ubadlogins, $uusername, $uadmin, $uavatarurl, $ucarttoken, $ulastactivity, $urlastbuild) or loggit(2, "MySql error: " . $dbh->error);
 
     $users = array();
     $count = 0;
@@ -2370,6 +2371,7 @@ function get_users($max = NULL, $time = NULL, $activeonly = FALSE)
             'sopmlurl' => get_social_outline_url($uid),
             'avatarurl' => $uavatarurl,
             'admin' => $uadmin,
+            'carttoken' => $ucarttoken,
             'lastactive' => $ulastactivity,
             'lastriverbuild' => $urlastbuild);
         $count++;

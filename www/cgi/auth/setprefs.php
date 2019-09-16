@@ -900,7 +900,7 @@ if( ($oldprefs['s3key'] != $prefs['s3key'] || $oldprefs['s3secret'] != $prefs['s
 
 //Does this user want to re-register the mastodon app
 if( isset($_POST['newcarttoken']) && !empty($_POST['newcarttoken']) ) {
-    $carttoken = random_gen(13);
+    $carttoken = random_gen(17);
     $prefs['carttoken'] = $carttoken;
     set_user_prefs($uid, $prefs);
     $jsondata['goloc'] = "/prefs?ts=".time();

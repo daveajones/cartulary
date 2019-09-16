@@ -21,6 +21,7 @@ var cuTwitterIsEnabled = <?if( twitter_is_enabled($g_uid) ) {?>true<?}else{?>fal
 var cuMastodonIsEnabled = <?if( mastodon_is_enabled($g_uid) ) {?>true<?}else{?>false<?}?>;
 var cuRiverColumnCount = <?if( isset($g_prefs['rivercolumns'])) { echo $g_prefs['rivercolumns']; } else { echo "1"; }?>;
 var cuMbReturnHome = <?if( $g_prefs['mbreturnhome'] == 1) { echo "true"; } else { echo "false"; }?>;
+var cuIpInfoTracker = <?if( $g_prefs['ipinfotracker'] == 1) { echo "true"; } else { echo "false"; }?>;
 
 //Library prefs
 $.Finger = {

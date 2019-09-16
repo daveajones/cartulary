@@ -2210,11 +2210,12 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                   mastodon_client_id=?,
                   mastodon_client_secret=?,
                   mastodon_access_token=?,
-                  carttoken=?
+                  carttoken=?,
+	              ipinfotracker=?
            WHERE uid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdsddsssssss",
+    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdsddssssssds",
         $prefs['publicdefault'],
         $prefs['publicrss'],
         $prefs['publicopml'],
@@ -2287,6 +2288,7 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
         $prefs['mastodon_client_secret'],
         $prefs['mastodon_access_token'],
         $prefs['carttoken'],
+        $prefs['ipinfotracker'],
         $uid
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);

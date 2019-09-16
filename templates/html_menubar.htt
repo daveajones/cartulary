@@ -10,8 +10,8 @@
   }
 ?>
 
-<?if( $g_platform == "mobile" ) {?>
-    <a target="_blank" class="ipinfotracker" href="https://ip.nf/<?echo $_SERVER['REMOTE_ADDR']?>.json"><?echo $_SERVER['REMOTE_ADDR']?></a>
+<?if( $g_platform == "mobile" && $myprefs['ipinfotracker'] == 1 ) {?>
+    <a class="ipinfotracker" href="#" data-url="https://ip.nf/<?echo $_SERVER['REMOTE_ADDR']?>.json"><?echo $_SERVER['REMOTE_ADDR']?></a>
 <?}?>
 
 <!-- Menu bar -->
@@ -54,8 +54,8 @@
                 <li <?if($section == "Admin-feed"){echo "class='active'";}?>><a href="<?echo $adminpage?>.feed" title="Feed Admin"><i class="icn-nav-admin-feed <?if($myprefs['darkmode']) echo "white"?>"></i></a></li>
             <?}?>
 
-            <?if( $g_platform != "mobile" ) {?>
-                <li><a target="_blank" href="https://ip.nf/<?echo $_SERVER['REMOTE_ADDR']?>.json"><?echo $_SERVER['REMOTE_ADDR']?></a></li>
+            <?if( $g_platform != "mobile" && $myprefs['ipinfotracker'] == 1 ) {?>
+                <li>    <a class="ipinfotracker" href="#" data-url="https://ip.nf/<?echo $_SERVER['REMOTE_ADDR']?>.json"><?echo $_SERVER['REMOTE_ADDR']?></a></li>
             <?}?>
 
             <?if( $g_platform == "mobile no" ) {?>

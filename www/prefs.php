@@ -118,6 +118,9 @@ $tree_location = "Preferences";
                                 <li class="privacy"><label class="checkbox inline"><input name="hideme"
                                                                                           type="checkbox" <? if ($prefs['hideme'] == 1) echo "checked "; ?>/>
                                         I don't want to be found in directory searches.</label></li>
+                                <li class="privacy"><label class="checkbox inline"><input name="ipinfotracker"
+                                                                                          type="checkbox" <? if ($prefs['ipinfotracker'] == 1) echo "checked "; ?>/>
+                                        I want to see my public IP address <a target="_blank" href="https://ip.nf/<?echo $_SERVER['REMOTE_ADDR']?>.json">geolocation data</a> in real-time.</label></li>
                                 <li class="privacy"><label class="checkbox inline"><input name="sessioncookies"
                                                                                           type="checkbox" <? if ($prefs['sessioncookies'] == 1) echo "checked "; ?>/>
                                         Re-prompt for login every time I open the browser.</label></li>

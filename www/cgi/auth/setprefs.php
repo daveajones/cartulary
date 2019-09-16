@@ -80,6 +80,7 @@ if ( isset($_POST['smtp_secure']) ) { $smtp_secure = 1; } else { $smtp_secure = 
 if ( isset($_POST['smtp_port']) ) { $smtp_port = $_POST['smtp_port']; } else { $smtp_port = ""; };
 if ( isset($_POST['darkmode']) ) { $darkmode = 1; } else { $darkmode = 0; };
 if ( isset($_POST['mastodon_url']) ) { $mastodon_url = $_POST['mastodon_url']; } else { $mastodon_url = ""; };
+if ( isset($_POST['ipinfotracker']) ) { $ipinfotracker = 1; } else { $ipinfotracker = 0; };
 $jsondata = array();
 $jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
@@ -866,6 +867,17 @@ if( strlen($mastodon_url) > 160 ) {
     exit(1);
 }
 $prefs['mastodon_url'] = $mastodon_url;
+
+$jsondata['prefname'] = "ipinfotracker";
+if( ($ipinfotracker < 0) || ($ipinfotracker > 1) ) {
+    //Log it
+    loggit(2,"The value for ipinfotracker pref was not within acceptable range: [$ipinfotracker]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Value of pref is out of range.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['ipinfotracker'] = $ipinfotracker;
 //--------------------------------------------------------
 //--------------------------------------------------------
 
@@ -1013,6 +1025,11 @@ if( empty($utps16) || ($oldprefs['usetotp'] != $prefs['usetotp']) ) {
 
 //If darkmode preference changed
 if( ($oldprefs['darkmode'] != $prefs['darkmode']) ) {
+    $jsondata['goloc'] = "/prefs?ts=".time();
+}
+
+//If ipinfotracker preference changed
+if( ($oldprefs['ipinfotracker'] != $prefs['ipinfotracker']) ) {
     $jsondata['goloc'] = "/prefs?ts=".time();
 }
 

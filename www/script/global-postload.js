@@ -106,4 +106,38 @@ $(document).ready(function () {
         return false;
     });
 
+    //ipinfo tracker trigger change
+    if( cuIpInfoTracker ) {
+        $('a.ipinfotracker').trigger('change');
+    }
+});
+
+
+//ip tracker info
+$(document).on('click', 'a.ipinfotracker', function() {
+    var ipnfurl = $(this).data('url');
+    var alertmsg = "IP Geolocation Data: \n\n";
+    $.getJSON(ipnfurl, function(data) {
+        $.each(data.ip, function(index, element) {
+            alertmsg = alertmsg + index + ': ' + element + "\n";
+        });
+
+        alert(alertmsg);
+    });
+
+    return false;
+});
+$(document).on('change', 'a.ipinfotracker', function() {
+    var ipnfurl = $(this).data('url');
+    var thisel = $(this);
+    $.getJSON(ipnfurl, function(data) {
+        if( data.ip.city !== "undefined" ) {
+            thisel.append(' - ' + data.ip.city);
+        }
+        if( data.ip.post_code !== "undefined" ) {
+            thisel.append(', ' + data.ip.post_code);
+        }
+    });
+
+    return false;
 });

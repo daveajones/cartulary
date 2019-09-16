@@ -23,6 +23,7 @@ apt-get update -qq
 
 echo Installing node.js...
 cd $CARTROOT/aggrivate
+sudo rm -rf node_modules/
 sudo npm -g install npm@latest
 sudo npm -g install npm@latest
 sudo npm install --unsafe-perm=true --allow-root

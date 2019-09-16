@@ -3673,6 +3673,36 @@ function update_recent_file($uid = NULL, $url = NULL, $title = NULL, $outline = 
 }
 
 
+//Update only a file's content in the database using the url of the file as the identifier
+function update_recent_file_content_by_url($url = NULL, $outline = "")
+{
+    //Check parameters
+    if (empty($url)) {
+        loggit(2, "The url is blank or corrupt: [$url]");
+        return (FALSE);
+    }
+
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Insert recent file entry
+    $stmt = "UPDATE $table_recentfiles SET outline=? WHERE url=?";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss",$outline, $url) or loggit(2, "MySql error: " . $dbh->error);
+
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(3, "Changed file outline content url: [$url].");
+    return ($rid);
+}
+
+
 //Update the timestamp of a recent file
 function touch_recent_file_by_id($uid = NULL, $fid = NULL)
 {

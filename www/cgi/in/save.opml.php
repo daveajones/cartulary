@@ -232,6 +232,8 @@ if(!$s3res) {
 
 }
 
+//Put the html content in ipfs
+$htmlhash = add_content_to_ipfs($htmldata);
 
 //Is this an RSS file type?
 $s3json = "";
@@ -316,6 +318,9 @@ $jsondata['html'] = $s3html;
 $jsondata['htmlauth'] = $s3htmlauthurl;
 if(!empty($opmlhash)) {
     $jsondata['ipfs']['opml'] = $opmlhash;
+}
+if(!empty($htmlhash)) {
+    $jsondata['ipfs']['html'] = $htmlhash;
 }
 
 //Extract and add watched urls if this is a watched outline

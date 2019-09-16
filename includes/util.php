@@ -4607,7 +4607,7 @@ function add_content_to_ipfs($content = NULL)
 
     $hash = $ipfs->add($content);
 
-    loggit(3, "Added content: [$content] to IPFS with hash: [$hash].");
+    loggit(3, "Added content to IPFS with hash: [$hash].");
     return ($hash);
 }
 

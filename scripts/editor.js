@@ -1761,7 +1761,7 @@ $(document).ready(function () {
                 elOutlineinfo.append('<li><a target="_blank" title="Link to the RSS feed xml of this outline." href="' + rssurl + '">RSS</a></li>');
             }
             if (typeof(data.ipfs) !== "undefined") {
-                elOutlineinfo.append('<li><a title="Show the ipfs hash of this outline." href="#" onclick="javascript:alert(\'' + data.ipfs.opml + '\');return false;">IPFS</a></li>')
+                elOutlineinfo.append('<li><a title="Show the ipfs hashes of this outline." href="#" onclick="javascript:alert(\'OPML: ' + data.ipfs.opml + '\\nHTML: ' + data.ipfs.html + '\');return false;">IPFS</a></li>')
             } else if (typeof(ipfsHash) !== "undefined" && ipfsHash !== "") {
                 elOutlineinfo.append('<li><a title="Show the ipfs hash of this outline." href="#" onclick="javascript:alert(\'' + ipfsHash + '\');return false;">IPFS</a></li>')
             }
@@ -2030,12 +2030,12 @@ $(document).ready(function () {
                             opSetOneAtt('icon', 'image');
                             opSetOneAtt('url', jdata.url);
                         } else if (isVideo(jdata.url) && !fileMultiDrop) {
-                            opInsert('<video style="width:95%;margin:0 auto;display:block;" controls="true"><source src="' + jdata.url + '" type="' + jdata.type + '"></video>', down);
+                            opInsert('<video style="width:95%;margin:0 auto;display:block;" controls="true" preload="none"><source src="' + jdata.url + '" type="' + jdata.type + '"></video>', down);
                             opSetOneAtt('type', 'video');
                             opSetOneAtt('icon', 'video-camera');
                             opSetOneAtt('url', jdata.url);
                         } else if (isAudio(jdata.url)) {
-                            opInsert('<audio style="width:400px; vertical-align:middle;" controls="true"><source src="' + jdata.url + '" type="' + jdata.type + '"></audio> <a class="audiocaption" style="vertical-align:middle;" href="' + jdata.url + '">' + file.name + '</a>', down);
+                            opInsert('<audio style="width:400px; vertical-align:middle;" controls="true" preload="none"><source src="' + jdata.url + '" type="' + jdata.type + '"></audio> <a class="audiocaption" style="vertical-align:middle;" href="' + jdata.url + '">' + file.name + '</a>', down);
                             opSetOneAtt('type', 'audio');
                             opSetOneAtt('icon', 'volume-up');
                             opSetOneAtt('url', jdata.url);

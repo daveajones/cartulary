@@ -1,0 +1,37 @@
+#Release Notes - Freedom Controller v0.7.7
+
+
+The primary focus of this release is on token support with cartulizing articles.
+
+
+- Bug Fixes (the notable ones)
+    - The crontab needed paths when calling node for the aggregator
+    - IPFS php lib needed to be updated to current
+
+- Improvement:  IP Info tracking
+    - This is disabled by default.  Turn it on at the top of your prefs page.
+    - When enabled, you will see your current IP address at the top of the page always
+    - Any time you click/tap on it, it will show you what the world knows about you from your IP
+    - This type of geolocation data is creepy
+    - Do note, that turning this on will make your site poll info from ip.nf (a google property) any time you load your page
+
+- Improvement:  IPFS in the editor
+    - The IPFS integration in the editor now creates hashes for both OPML and HTML
+    - This makes sharing easier
+    - It now supports the latest version of IPFS
+    - Remember that you can open OPML from the editor using "Open by url..." and the scheme:  ipfs://<hash>
+
+- New Feature:  Cartulizing on the web without bookmarklets (i.e. token based)
+    - You can now send a url to be cartulized by sending a POST to "your.cart.server/cgi/in/cartulize"
+    - The parameters for the post are:
+        - token:  <get this from your prefs page>
+        - url:  <full url of the article>
+        - content:  [optionally the full text of the article]
+        - json:  <set to "true">
+        - overwrite:  <set to "true" or "false">
+    - You can use this API to send articles to your server to be archived any way you want.
+    - I'm using it currently to send articles from an iPhone "Shortcut", allowing me to cart articles from apps that normally
+      hide the "Safari" option from the share sheet.
+    - Using "overwrite" is good if you notice that the browser bookmarklet didn't do well with extracting content.  You can re-cart it
+      using another method (like iPhone "Shortcut" mentioned above) and "overwrite:true" will use the new content, instead of the old
+      garbage.

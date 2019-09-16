@@ -8,13 +8,13 @@ MAILTO=""
 
 ##: The main feed aggregator (hard timeout after t-1 minutes)
 */8 * * * *  root timeout 420 php [$CONF_ROOT]/bin/feedscan.php
-*/11 * * * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node aggrivate
+*/11 * * * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node ./aggrivate.js
 
 ##: Only scan high error feeds every 6 hours
-9  */6 * * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node aggrivate checkall
+9  */6 * * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node ./aggrivate.js checkall
 
 ##: Only scan dead feeds once per month
-1   1  1 * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node aggrivate checkall checkdead
+1   1  1 * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node ./aggrivate.js checkall checkdead
 
 ##: The outline and list aggregator
 17   * * * * root php [$CONF_ROOT]/bin/outlinescan.php

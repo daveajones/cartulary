@@ -53,7 +53,9 @@ $(document).ready(function () {
         beforeSubmit: function () {
             $('.imgSpinnerSub').show();
             $('#btnPrefSubmit').attr("disabled", true);
-            showMessage("Saving preferences...", "warning", 30);
+            if(platform !== "mobile") {
+                showMessage("Saving preferences...", "warning", 30);
+            }
         },
         success: function (data) {
             $('#divPref .control-group').removeClass('error');

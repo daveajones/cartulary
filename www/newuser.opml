@@ -21,12 +21,13 @@
 	          <outline text="Recent Commits to cartulary:master" description="" xmlUrl="https://github.com/daveajones/cartulary/commits/master.atom" />
 	          <outline text="SOPML Google Group" description="" xmlUrl="http://groups.google.com/group/sopml/feed/rss_v2_0_msgs.xml" />
 	          <outline type="rss" text="Doc Searls Weblog" xmlUrl="http://blogs.harvard.edu/doc/feed/" htmlUrl="http://blogs.harvard.edu/doc" />
-	          <outline type="rss" text="Dilbert Blog" xmlUrl="http://feed.dilbert.com/dilbert/blog" htmlUrl="http://blog.dilbert.com/" />
               <outline type="rss" text="Krebs on Security" xmlUrl="http://krebsonsecurity.com/feed/" htmlUrl="https://krebsonsecurity.com/" />
               <outline type="rss" text="Slashdot" xmlUrl="http://rss.slashdot.org/Slashdot/slashdot" htmlUrl="https://slashdot.org/" />
               <outline type="rss" text="A List Apart: The Full Feed" xmlUrl="http://feeds.feedburner.com/alistapart/main" htmlUrl="https://alistapart.com/" />
               <outline type="rss" text="Hacker News" xmlUrl="https://news.ycombinator.com/rss" htmlUrl="https://news.ycombinator.com/" />
               <outline type="rss" text="Adam Curry's MicroBlog" xmlUrl="http://adam.curry.com/linkblog.xml" htmlUrl="http://adam.curry.com/linkblog.html" />
-              <outline type="rss" text="Dvorak Uncensored" xmlUrl="http://www.dvorak.org/blog/feed/" htmlUrl="http://www.dvorak.org/blog/" />
+              <outline type="rss" text="Lew Rockwell" xmlUrl="https://www.lewrockwell.com/feed/" htmlUrl="https://www.lewrockwell.com/" />
+              <outline type="rss" text="Bleeping Computer" xmlUrl="https://www.bleepingcomputer.com/feed/" htmlUrl="https://www.bleepingcomputer.com/" />
+              <outline type="rss" text="The Hacker News" xmlUrl="http://feeds.feedburner.com/TheHackersNews?format=xml" htmlUrl="https://thehackernews.com/" />
       </body>
 </opml>

@@ -20,6 +20,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     //Default values
     $l_pathtocart = $confroot;
     $l_serverguid = random_gen(64);
+    $l_dblocalhost = "127.0.0.1";
     $l_dbusername = "cartulary";
     $l_dbpassword = "cartulary";
     $l_fqdn = "localhost";
@@ -54,6 +55,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     if (file_exists($cfname)) {
         if ($action == "upgrade") {
             //Pull in the existing values
+            $l_dblocalhost = $dbhost;
             $l_dbusername = $dbuser;
             $l_dbpassword = $dbpass;
             $l_fqdn = $system_fqdn;
@@ -126,6 +128,17 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
 
     //Replace the tags
+    $response = "";
+    if ($silent == FALSE) {
+        echo "What is your mysql hostname? [$l_dblocalhost]: ";
+        $response = get_user_response();
+    }
+    if (empty($response) || $silent == TRUE) {
+        $response = $l_dblocalhost;
+    }
+    $template = str_replace('[DBLOCALHOST]', $response, $template);
+
+
     $response = "";
     if ($silent == FALSE) {
         echo "What is your mysql username? [$l_dbusername]: ";

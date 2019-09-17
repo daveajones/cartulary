@@ -1136,13 +1136,32 @@ CGDB0245;
 //----------------------------------------------------------------------------------------------------------------
 
 //Version 83 to 84 -----------------------------------------------------------------------------------------------
+$cg_database_updates[83][] = <<<CGDB0246a
+ SET @old_sql_mode := @@sql_mode
+CGDB0246a;
+$cg_database_updates[83][] = <<<CGDB0246b
+ SET @new_sql_mode := @old_sql_mode
+CGDB0246b;
+$cg_database_updates[83][] = <<<CGDB0246c
+ SET @new_sql_mode := TRIM(BOTH ',' FROM REPLACE(CONCAT(',',@new_sql_mode,','),',NO_ZERO_DATE,'  ,','))
+CGDB0246c;
+$cg_database_updates[83][] = <<<CGDB0246d
+ SET @new_sql_mode := TRIM(BOTH ',' FROM REPLACE(CONCAT(',',@new_sql_mode,','),',NO_ZERO_IN_DATE,',','))
+CGDB0246d;
+$cg_database_updates[83][] = <<<CGDB0246e
+ SET @@sql_mode := @new_sql_mode
+CGDB0246e;
 $cg_database_updates[83][] = <<<CGDB0246
  ALTER TABLE `nfitem_map` ADD `added` DATETIME NOT NULL COMMENT 'Date the word was first discovered',
  ADD INDEX ( `added` )
 CGDB0246;
+$cg_database_updates[83][] = <<<CGDB0246f
+ SET @@sql_mode := @old_sql_mode
+CGDB0246f;
 $cg_database_updates[83][] = <<<CGDB0247
  INSERT INTO `dbversion` ( `version` ) VALUES ( '84' )
 CGDB0247;
+//----------------------------------------------------------------------------------------------------------------
 
 //Version 84 to 85 -----------------------------------------------------------------------------------------------
 $cg_database_updates[84][] = <<<CGDB0248
@@ -1151,6 +1170,7 @@ CGDB0248;
 $cg_database_updates[84][] = <<<CGDB0249
  INSERT INTO `dbversion` ( `version` ) VALUES ( '85' )
 CGDB0249;
+//----------------------------------------------------------------------------------------------------------------
 
 //Version 85 to 86 -----------------------------------------------------------------------------------------------
 $cg_database_updates[85][] = <<<CGDB0250

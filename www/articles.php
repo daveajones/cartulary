@@ -94,7 +94,7 @@ $tree_location = "Articles";
                                                                                              src="/images/blank.gif"/></a>
                     <? if (imap_is_enabled($g_uid)) { ?><a id="aEmailImport" style="color:black;" href="#"
                                                            title="Import articles from email."><i
-                            class="fa fa-inbox fa-2x"></i></a><? } ?>
+                                class="fa fa-inbox fa-2x"></i></a><? } ?>
                 </div>
             </fieldset>
         </form>
@@ -112,7 +112,9 @@ $tree_location = "Articles";
                 <? $acount = 1 ?>
                 <? $lastdate = '' ?>
                 <? $today = date('D. F j, Y', time()); ?>
-                <? foreach ($articles as $article) {
+                <? foreach ($articles
+
+                as $article) {
                 $thisdate = date('D. F j, Y', $article['linkedon']);
                 if ($thisdate == $today) {
                     $thisdate = "Today, " . $thisdate;
@@ -132,16 +134,16 @@ $tree_location = "Articles";
                                     <img class="icon-remove" src="/images/blank.gif" alt=""/></a><? } ?>
                             <input class="exparticle" id="chkArticle<? echo $acount ?>" type="checkbox"
                                    name="articles[]" value="<? echo $article['id'] ?>"/> <a
-                                href='<? echo $showarticlepage . "?" . "aid=" . $article['id']; ?>'><? echo $article['title'] ?></a>
+                                    href='<? echo $showarticlepage . "?" . "aid=" . $article['id']; ?>'><? echo $article['title'] ?></a>
                             <? if ($platform != "mobile") { ?>
                                 &nbsp;
                                 <a href="<? echo $editorpage ?>?aid=<? echo $article['id'] ?>"><img
-                                        class="icon-editor-small" src="/images/blank.gif" alt=""/></a>
+                                            class="icon-editor-small" src="/images/blank.gif" alt=""/></a>
                                 <a href="<? echo $article['url'] ?>"><img class="icon-extlink-small"
                                                                           src="/images/blank.gif" alt=""/></a>
                                 <a class="aDeleteArticle"
                                    href='<? echo $deletearticlecgi . "?" . "aid=" . $article['id']; ?>'><img
-                                        class="icon-remove-small" src="/images/blank.gif" alt=""/></a>
+                                            class="icon-remove-small" src="/images/blank.gif" alt=""/></a>
 
                             <? } ?>
                         </div>
@@ -153,8 +155,11 @@ $tree_location = "Articles";
                     <input id="btnSubmitArticles" type="submit" name="btnsub" style="display:none;"/>
             </form>
         <? } else { ?>
-            <p>No articles yet. Use the <a href="<? echo sprintf($bookmarklet_url, $system_url) ?>">Cartulize</a>
-                bookmarklet save some.</p>
+            <center>
+                <p>No articles found for the selected time period.</p>
+                <p>Use the <a href="<? echo sprintf($bookmarklet_url, $system_url) ?>">Cartulize</a> bookmarklet to save
+                    some.</p>
+            </center>
         <? } ?>
     </div>
 </div>
@@ -165,4 +170,3 @@ $tree_location = "Articles";
 
 <? include "$confroot/$templates/$template_html_postbody" ?>
 </html>
-

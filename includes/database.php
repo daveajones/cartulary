@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 86;
+$cg_database_version = 87;
 $cg_database_updates = array();
 
 
@@ -1179,6 +1179,16 @@ CGDB0250;
 $cg_database_updates[85][] = <<<CGDB0251
  INSERT INTO `dbversion` ( `version` ) VALUES ( '86' )
 CGDB0251;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 86 to 87 -----------------------------------------------------------------------------------------------
+$cg_database_updates[86][] = <<<CGDB0252
+ ALTER TABLE `newsfeeds` ADD `duplicateof` VARCHAR(64) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'What feed id does this duplicate',
+ ADD INDEX (`duplicateof`)
+CGDB0252;
+$cg_database_updates[86][] = <<<CGDB0253
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '87' )
+CGDB0253;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

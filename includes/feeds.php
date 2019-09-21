@@ -461,7 +461,7 @@ function get_river_as_json($uid = NULL, $mobile = FALSE, $pretty = FALSE)
 function get_feed_info($id = NULL)
 {
     //Check parameters
-    if ($id == NULL) {
+    if (empty($id)) {
         loggit(2, "The feed id given is corrupt or blank: [$id]");
         return (FALSE);
     }
@@ -513,8 +513,12 @@ function get_feed_info($id = NULL)
     $sql->fetch() or loggit(2, "MySql error: " . $dbh->error);
     $sql->close();
 
+    $feed['subscribers'] = get_feed_subscribers($id);
+    $feed['subscribercount'] = count($feed['subscribers']);
+
     //JSONfeed
     if ($feed['type'] == 1) {
+        loggit(3, "Converting JSONfeed to RSS for feed: [".$feed['url']."]");
         $feed['content'] = convert_jsonfeed_to_rss($feed['content']);
     }
 
@@ -6725,7 +6729,7 @@ function convert_jsonfeed_to_rss($content = NULL, $max = NULL)
     //Items
     $count = 0;
     foreach( $jf['items'] as $item ) {
-        loggit(1, "DEBUG: ".print_r($item, TRUE));
+        //loggit(3, "DEBUG: ".print_r($item, TRUE));
 
         $newItem = $xmlFeed->channel->addChild('item');
 

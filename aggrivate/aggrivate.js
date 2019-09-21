@@ -13,8 +13,9 @@ var query = 0;
 var checkall = false;
 var checkone = false;
 var checkdead = false;
+var checkerror = false;
 var ckoneurl = '';
-var netwait = 30;
+var netwait = 60;
 var feedcount = 0;
 var force = false;
 
@@ -29,6 +30,11 @@ process.argv.forEach((val, index, array) => {
     if (index >= 2 && val === "checkdead") {
         console.log("Checking dead feeds.");
         checkall = true;
+    }
+
+    if (index >= 2 && val === "checkerror") {
+        console.log("Checking high error feeds.");
+        checkerror = true;
     }
 
     if (index >= 2 && val === "force") {
@@ -67,19 +73,21 @@ connection.connect(function (err) {
 var monthago = (Date.now() / 1000) - (28 * 86400);
 
 //Assemble query
-var query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE (errors < 100 OR (lastupdate > ' + monthago + ' OR lastcheck = 0 OR lastmod = 0)) AND dead=0 ORDER by lastcheck ASC';
+var query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' WHERE (errors < 100 OR lastupdate > ' + monthago + ' OR lastcheck = 0 OR lastmod = 0 OR content = "") AND dead=0 ORDER by lastcheck ASC';
 if (checkall && checkdead) {
-    query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' ORDER by lastcheck ASC';
+    query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' ORDER by lastcheck ASC';
 }
 if (checkall && !checkdead) {
-    query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE dead=0 ORDER by lastcheck ASC';
+    query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' WHERE dead=0 ORDER by lastcheck ASC';
 }
 if (!checkall && checkdead) {
-    query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE dead=1 ORDER by lastcheck ASC';
+    query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' WHERE dead=1 ORDER by lastcheck ASC';
+}
+if (checkerror) {
+    query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' WHERE dead=0 AND ( errors > 100 || content = "") ORDER by lastcheck ASC';
 }
 if (checkone) {
-    query = 'SELECT id,title,url,lastmod,createdon FROM ' + config.tables.table_newsfeed + ' WHERE url="' + ckoneurl + '"';
-    //console.log(query);
+    query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' WHERE url="' + ckoneurl + '"';
 }
 
 //Pull the feed list
@@ -134,7 +142,8 @@ connection.query(query, function (err, rows, fields) {
                 timeout: (netwait - 5) * 1000,
                 jar: true,
                 removeRefererHeader: true,
-                maxRedirects: 9
+                maxRedirects: 9,
+                ecdhCurve: 'auto'
             };
 
             if (f.lastmod === 0) {
@@ -142,7 +151,7 @@ connection.query(query, function (err, rows, fields) {
             } else {
                 lastmod = new Date(f.lastmod * 1000).toUTCString();
             }
-            if (force) {
+            if (force || checkone || checkerror || f.contenttype == 'none' || f.contenttype == '') {
                 //Set the lastmod to 1/1/1990 so we get new content for everything
                 lastmod = new Date(631152000).toUTCString();
             }
@@ -158,13 +167,14 @@ connection.query(query, function (err, rows, fields) {
             //console.log("LastMod: " + lastmod + "(" + f.lastmod + ")");
 
             request(opt, function (err, response, body) {
+                var requesterror = err;
                 var xml = '';
                 var newmod = 0;
                 var neterr = false;
                 var processbody = true;
 
                 //Error handler
-                if (err) {
+                if (err ) {
                     neterr = true;
                     console.log("  " + f.title + " : (" + f.lastmodPretty + ") " + f.url + " : error on next line");
                     console.log(err);
@@ -172,14 +182,14 @@ connection.query(query, function (err, rows, fields) {
                     if (typeof err.code !== "undefined") {
                         if (err.code == 'ETIMEDOUT') {
                             dbcalls++;
-                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=900 WHERE id=?', [f.id], function (err, result) {
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET updated=0,lasthttpstatus=900 WHERE id=?', [f.id], function (err, result) {
                                 if (err) throw err;
                                 if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
                                 dbcalls--;
                             });
                         } else if (err.code == 'ECONNRESET') {
                             dbcalls++;
-                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=901 WHERE id=?', [f.id], function (err, result) {
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=901 WHERE id=?', [f.id], function (err, result) {
                                 if (err) throw err;
                                 if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
                                 dbcalls--;
@@ -200,14 +210,21 @@ connection.query(query, function (err, rows, fields) {
                             });
                         } else if (err.code == 'ECONNREFUSED') {
                             dbcalls++;
-                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+10,lasthttpstatus=905 WHERE id=?', [f.id], function (err, result) {
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+10,lasthttpstatus=905 WHERE id=?', [f.id], function (err, result) {
                                 if (err) throw err;
                                 if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
                                 dbcalls--;
                             });
                         } else if (err.code == 'EHOSTUNREACH') {
                             dbcalls++;
-                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=906 WHERE id=?', [f.id], function (err, result) {
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=906 WHERE id=?', [f.id], function (err, result) {
+                                if (err) throw err;
+                                if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
+                                dbcalls--;
+                            });
+                        } else if (err.code == 'ESOCKETTIMEDOUT') {
+                            dbcalls++;
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=907 WHERE id=?', [f.id], function (err, result) {
                                 if (err) throw err;
                                 if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
                                 dbcalls--;
@@ -413,6 +430,10 @@ connection.query(query, function (err, rows, fields) {
                                     console.log("Error updating feed url location in database. Err: [" + err.code + " | "+f.url+" -> "+response.request.uri.href+"] ");
                                     loggit(2, "Error updating feed url location in database. Err: [" + err.code + " | "+f.url+" -> "+response.request.uri.href+"] ");
                                 }
+                                if (err && err.code == 'ER_DUP_ENTRY') {
+                                    console.log("  Result: " + result);
+                                    loggit(3, "  Result: " + result);
+                                }
                                 //if (result.affectedRows === 0) console.log("Error updating database for feed: ["+f.url+"]");
                                 dbcalls--;
                             });
@@ -436,29 +457,35 @@ connection.query(query, function (err, rows, fields) {
                     }
 
                     //There was a structural error in the feed content
-                    if (!processbody) {
-                        console.log("There was a structural error in the feed content for: [" + f.url + "] " + statCode);
-                        dbcalls++;
-                        connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content=?,lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=? WHERE id=?', [xml, statCode, f.id], function (err, result) {
-                            if (err) throw err;
-                            if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
-                            dbcalls--;
-                        });
+                    if(!requesterror) {
+                        if (!processbody) {
+                            console.log("There was a structural error in the feed content for: [" + f.url + "] " + statCode);
+                            loggit(2, "There was a structural error in the feed content for: [" + f.url + "] " + statCode);
+                            dbcalls++;
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content=?,lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=? WHERE id=?', [xml, statCode, f.id], function (err, result) {
+                                if (err) throw err;
+                                if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
+                                dbcalls--;
+                            });
 
-                        //If neterr is set then we already handled this in the error handler section so skip
-                    } else {
-                        console.log("Something went wrong with feed: [" + f.url + "] but we don't handle that error yet " + statCode);
-                        if (statCode == -1) {
-                            console.log(response);
+                            //If neterr is set then we already handled this in the error handler section so skip
+                        } else {
+                            console.log("Something went wrong with feed: [" + f.url + "] but we don't handle that error yet " + statCode);
+                            loggit(2, "Something went wrong with feed: [" + f.url + "] but we don't handle that error yet " + statCode);
+                            loggit(2, requesterror);
+                            loggit(2, response);
+                            loggit(2, body);
+                            if (statCode == -1) {
+                                console.log(response);
+                            }
+                            dbcalls++;
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,lasthttpstatus=? WHERE id=?', [statCode, f.id], function (err, result) {
+                                if (err) throw err;
+                                if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
+                                dbcalls--;
+                            });
                         }
-                        dbcalls++;
-                        connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,lasthttpstatus=? WHERE id=?', [statCode, f.id], function (err, result) {
-                            if (err) throw err;
-                            if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
-                            dbcalls--;
-                        });
                     }
-
                 }
 
                 netcalls--;

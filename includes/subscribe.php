@@ -44,7 +44,7 @@ function get_feed_outline_by_user($fid = NULL, $uid = NULL)
 }
 
 
-//See how many items are in the database for a given feed
+//See how many subscribers there are for a given feed id
 function get_feed_subscriber_count($fid = NULL)
 {
     //Check parameters
@@ -59,7 +59,7 @@ function get_feed_subscriber_count($fid = NULL)
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
 
-    //Look for the url in the feed table
+    //Do the query
     $sql = $dbh->prepare("SELECT userid FROM $table_nfcatalog WHERE feedid=?") or loggit(2, "MySql error: " . $dbh->error);
     $sql->bind_param("s", $fid) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -69,7 +69,7 @@ function get_feed_subscriber_count($fid = NULL)
     $subcount = $sql->num_rows();
     $sql->close();
 
-    //loggit(3,"The feed: [$fid] has: [$subcount] subscribers.");
+    //loggit(1,"The feed: [$fid] has: [$subcount] subscribers.");
     return ($subcount);
 }
 
@@ -112,7 +112,7 @@ function get_feed_subscribers($fid = NULL)
 
     $sql->close();
 
-    loggit(1, "The feed: [$fid] has: [$count] subscribers.");
+    //loggit(1, "The feed: [$fid] has: [$count] subscribers.");
     return ($users);
 }
 

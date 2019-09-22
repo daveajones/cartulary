@@ -7,14 +7,18 @@
 MAILTO=""
 
 ##: The main feed aggregator (hard timeout after t-1 minutes)
-*/8 * * * *  root timeout 420 php [$CONF_ROOT]/bin/feedscan.php
-*/11 * * * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node ./aggrivate.js
+40,55        2     * * * root timeout 420 php [$CONF_ROOT]/bin/feedscan_manage.php
+10,25,40,55  0,1   * * * root timeout 420 php [$CONF_ROOT]/bin/feedscan_manage.php
+10,25,40,55  3-23  * * * root timeout 420 php [$CONF_ROOT]/bin/feedscan_manage.php
+01 4-12         * * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node ./aggrivate.js
+01 14-23        * * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node ./aggrivate.js
+16,31,46      * * * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node ./aggrivate.js
 
-##: Only scan high error feeds every 6 hours
-9  */6 * * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node ./aggrivate.js checkall
+##: Only scan high error feeds every 12 hours
+01  0,13 2-31 * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node ./aggrivate.js checkerror
 
 ##: Only scan dead feeds once per month
-1   1  1 * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node ./aggrivate.js checkall checkdead
+01  0    1    * * root cd [$CONF_ROOT]/aggrivate && timeout 600 node ./aggrivate.js checkdead
 
 ##: The outline and list aggregator
 17   * * * * root php [$CONF_ROOT]/bin/outlinescan.php
@@ -24,9 +28,9 @@ MAILTO=""
 
 ##: Server maint
 */15 * * * * root php [$CONF_ROOT]/bin/clean.php
-10   3 * * * root php [$CONF_ROOT]/bin/clean_nonfqdn_feeds.php
-30   3 * * * root php [$CONF_ROOT]/bin/clean_duplicate_feeds.php
-50   3 * * * root php [$CONF_ROOT]/bin/clean_bad_feeds.php
+01   1 * * * root php [$CONF_ROOT]/bin/clean_nonfqdn_feeds.php
+06   1 * * * root php [$CONF_ROOT]/bin/clean_duplicate_feeds.php
+01   3 * * * root php [$CONF_ROOT]/bin/clean_bad_feeds.php
 
 ##: Build main user rivers
 */5  * * * * root php [$CONF_ROOT]/bin/buildrivers.php
@@ -44,7 +48,7 @@ MAILTO=""
 48   * * * * root php [$CONF_ROOT]/bin/syscheck.php
 
 ##: Backup
-58   2 * * * root php [$CONF_ROOT]/bin/backup.php
+01   2 * * * root php [$CONF_ROOT]/bin/backup.php
 
 ##: Check for upgrades
 58   1 * * * root php [$CONF_ROOT]/bin/getversion.php checknew

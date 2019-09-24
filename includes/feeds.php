@@ -26,7 +26,7 @@ function is_feed($content = NULL)
     }
     libxml_clear_errors();
 
-    //Look for opml nodes
+    //Look for xml type nodes
     if ((string)$x->getName() == "rss") {
         loggit(1, "Found a channel element. Looks like an RSS feed.");
         return ("application/rss+xml");
@@ -55,7 +55,7 @@ function is_jsonfeed($content = NULL)
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
     //Is it even json?
-    if( !is_json($content)) {
+    if( !is_json($content, FALSE)) {
         loggit(2, "This feed is not valid jsonfeed.");
         return (FALSE);
     }
@@ -315,7 +315,7 @@ function feed_exists($url = NULL)
     //See if any rows came back
     if ($sql->num_rows() < 1) {
         $sql->close();
-        loggit(1, "The feed at url: [$url] does not exist in the repository.");
+        loggit(2, "The feed at url: [$url] does not exist in the repository.");
         return (FALSE);
     }
     $sql->bind_result($feedid) or loggit(2, "MySql error: " . $dbh->error);
@@ -458,7 +458,7 @@ function get_river_as_json($uid = NULL, $mobile = FALSE, $pretty = FALSE)
 
 
 //Retrieve an array of info about the feed
-function get_feed_info($id = NULL)
+function get_feed_info($id = NULL, $convert_content = TRUE)
 {
     //Check parameters
     if (empty($id)) {
@@ -517,7 +517,7 @@ function get_feed_info($id = NULL)
     $feed['subscribercount'] = count($feed['subscribers']);
 
     //JSONfeed
-    if ($feed['type'] == 1) {
+    if ($feed['type'] == 1 && $convert_content) {
         loggit(3, "Converting JSONfeed to RSS for feed: [".$feed['url']."]");
         $feed['content'] = convert_jsonfeed_to_rss($feed['content']);
     }
@@ -1795,7 +1795,18 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     $fstart = time();
     $url = $feed['url'];
 
-    loggit(3, "FEEDSCAN: Scanning feed: [$url].");
+    loggit(1, "FEEDSCAN: Scanning feed: [$url].");
+
+    //Pull the latest content blob from the database
+    if( empty($feed['content']) && !empty($feed['lastcheck']) ) {
+        loggit(2, "  Feed: [$url] has no content: [".$feed['content']."]");
+        //Set the last check time in the stats
+        $stats['checktime'] += (time() - $fstart);
+        set_feed_stats($fid, $stats);
+        //Increment the error count
+        increment_feed_error_count($fid);
+        return (-1);
+    }
 
     //Fix up content issues before run
     loggit(1, "Fixing up common structural problems in feed: [$url]");
@@ -1840,7 +1851,6 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         loggit(3, "Fixed feed: [$url] in [".(time() - $tstart)."] seconds.");
     }
 
-
     //Debug
     //loggit(3, "DEBUG: [".$feed['content']."]");
 
@@ -1853,26 +1863,27 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     $stats['checktime'] += (time() - $fstart);
     set_feed_stats($fid, $stats);
 
-    //Pull the latest content blob from the database
-    if( empty($feed['content']) ) {
-        loggit(2, "  Feed: [$url] has no content: [".$feed['content']."]");
-        increment_feed_error_count($fid);
-        return (-1);
-    }
-
     //Is the feed any good?
     if (!feed_is_valid($feed['content']) && !is_feed($feed['content'])) {
-        if( stripos($feed['content'], 'encoding="utf-8"') && mb_detect_encoding($feed['content'], 'UTF-8', true) === FALSE ) {
-            $feed['content'] = utf8_encode($feed['content']);
+        //Fix stray ampersands in the xml
+        if( stripos($feed['content'], '& ') !== FALSE ) {
+            $feed['content'] = preg_replace('/\&\s/m', '&amp; ', $feed['content']);
+            loggit(3, "    Fixing poorly encoded entities (&,<,>) in XML feed: [$url]");
             if(!feed_is_valid($feed['content']) && !is_feed($feed['content'])) {
-                loggit(2, "  Feed: [" . $url . "] doesn't seem to be a known feed format. Skipping it.");
-                increment_feed_error_count($fid, 5);
-                return (-1);
+                //Try to correct the encoding
+                if( stripos($feed['content'], 'encoding="utf-8"') && mb_detect_encoding($feed['content'], 'UTF-8', true) === FALSE ) {
+                    $feed['content'] = utf8_encode($feed['content']);
+                    if(!feed_is_valid($feed['content']) && !is_feed($feed['content'])) {
+                        loggit(2, "  Feed: [" . $url . "] doesn't seem to be a known feed format. Skipping it. (1)");
+                        increment_feed_error_count($fid, 5);
+                        return (-1);
+                    }
+                } else {
+                    loggit(2, "  Feed: [" . $url . "] doesn't seem to be a known feed format. Skipping it. (2)");
+                    increment_feed_error_count($fid, 5);
+                    return (-1);
+                }
             }
-        } else {
-            loggit(2, "  Feed: [" . $url . "] doesn't seem to be a known feed format. Skipping it.");
-            increment_feed_error_count($fid, 5);
-            return (-1);
         }
     }
 
@@ -2073,16 +2084,16 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     $stats['lastnewtime'] = $fstart;
     set_feed_stats($fid, $stats);
 
+    //Evidently the scan was successful so reset the error counter
+    reset_feed_error_count($fid);
+    unmark_feed_as_dead($fid);
+
     //Is the feed empty?
     if ($count == 0) {
         loggit(3, "  DONE: There were no items in this feed: [$url].");
         //increment_feed_error_count($fid, 1);
         return (-2);
     }
-
-    //Evidently the scan was successful so reset the error counter
-    reset_feed_error_count($fid);
-    unmark_feed_as_dead($fid);
 
     //Log and leave
     loggit(3, "  DONE: [$newcount] out of: [$count] items from feed: [$url] were new.");
@@ -2929,6 +2940,10 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         $cleaned = clean_feed_item_content($description, 0, TRUE, TRUE);
         $description = $cleaned['text'];
 
+        //TODO: Experimental!!
+        //Do we want to cartulize new feed item links?
+        //$article = cartulize($url);
+
         //Attach extracted media tags as enclosures with correct type
         if (is_array($cleaned['media']) && count($cleaned['media']) > 0) {
             foreach ($cleaned['media'] as $mediatag) {
@@ -2937,10 +2952,11 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
                     $esize = check_head_size($mediatag['src']);
                 }
                 if ((empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) && !empty($mediatag['src'])) {
-                    $enclosures[] = array('url' => $mediatag['src'],
-                                          'length' => 0 + $esize,
-                                          'type' => make_mime_type($mediatag['src'], $mediatag['type']),
-                                          'extracted' => TRUE
+                    $enclosures[] = array(
+                        'url' => $mediatag['src'],
+                        'length' => 0 + $esize,
+                        'type' => make_mime_type($mediatag['src'], $mediatag['type']),
+                        'extracted' => TRUE
                     );
                     $media = 1;
                 }
@@ -3025,7 +3041,14 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         }
     }
 
-    loggit(3, "  TIMER: add_feed_item() took: [".(time() - $tstart)."] seconds.");
+    $ttime = time() - $tstart;
+    $identifier = $linkurl;
+    if( empty($identifier) ) {
+        $identifier = $uniq;
+    }
+    if( $ttime > 1 ) {
+        loggit(3, "   TIMER: add_feed_item() took: [$ttime] seconds for item: [$identifier]");
+    }
 
     //Log and return
     loggit(1, "New feed item for feed: [$fid].");
@@ -6718,13 +6741,13 @@ function convert_jsonfeed_to_rss($content = NULL, $max = NULL)
     $xmlFeed->addChild("channel");
 
     //Required
-    $xmlFeed->channel->addChild("title", $jf['title']);
+    $xmlFeed->channel->addChild("title", xmlentities($jf['title']));
     $xmlFeed->channel->addChild("pubDate", $lastBuildDate);
     $xmlFeed->channel->addChild("lastBuildDate", $lastBuildDate);
 
     //Optional
-    if(isset($jf['description'])) $xmlFeed->channel->description = $jf['description'];
-    if(isset($jf['home_page_url'])) $xmlFeed->channel->link = $jf['home_page_url'];
+    if(isset($jf['description'])) $xmlFeed->channel->description = xmlentities($jf['description']);
+    if(isset($jf['home_page_url'])) $xmlFeed->channel->link = xmlentities($jf['home_page_url']);
 
     //Items
     $count = 0;
@@ -6733,19 +6756,19 @@ function convert_jsonfeed_to_rss($content = NULL, $max = NULL)
 
         $newItem = $xmlFeed->channel->addChild('item');
 
-        if(isset($item['id'])) $newItem->addChild('guid', $item['id']);
-        if(isset($item['title'])) $newItem->addChild('title', $item['title']);
-        if(isset($item['content_text'])) $newItem->addChild('description', $item['content_text']);
-        if(isset($item['content_html'])) $newItem->addChild('description', $item['content_html']);
+        if(isset($item['id'])) $newItem->addChild('guid', xmlentities($item['id']));
+        if(isset($item['title'])) $newItem->addChild('title', xmlentities($item['title']));
+        if(isset($item['content_text'])) $newItem->addChild('description', xmlentities($item['content_text']));
+        if(isset($item['content_html'])) $newItem->addChild('description', xmlentities($item['content_html']));
         if(isset($item['date_published'])) $newItem->addChild('pubDate', $item['date_published']);
-        if(isset($item['url'])) $newItem->addChild('link', $item['url']);
+        if(isset($item['url'])) $newItem->addChild('link', xmlentities($item['url']));
 
         //Enclosures?
         if(isset($item['attachments'])) {
             foreach($item['attachments'] as $attachment) {
                 $enclosure = $newItem->addChild('enclosure');
-                $enclosure['url'] = $attachment['url'];
-                $enclosure['type'] = $attachment['mime_type'];
+                $enclosure['url'] = xmlentities($attachment['url']);
+                $enclosure['type'] = xmlentities($attachment['mime_type']);
                 $enclosure['length'] = $attachment['size_in_bytes'];
             }
         }
@@ -6756,4 +6779,51 @@ function convert_jsonfeed_to_rss($content = NULL, $max = NULL)
     //Log and leave
     loggit(1, "Converted: [$count] items from JSONfeed to RSS.");
     return($xmlFeed->asXML());
+}
+
+
+//Get poor quality feeds
+function get_poor_feeds()
+{
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    $thirtydaysago = time() - (86400 * 30);
+
+    //Build the query
+    $sqltxt = "SELECT id, url FROM $table_newsfeed WHERE (contenttype NOT LIKE '%xml%' OR content LIKE '<!DOCTYPE%') AND errors > 100 AND lastupdate < ? AND lastupdate > 0 AND dead = 0 ORDER BY lastupdate ASC ";
+
+    //Run the query
+    $sql = $dbh->prepare($sqltxt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("d", $thirtydaysago) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+
+    //See if there were any feed items returned
+    if ($sql->num_rows() < 1) {
+        $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "No poor feeds found.");
+        return (array());
+    }
+
+    $sql->bind_result($fid, $furl) or loggit(2, "MySql error: " . $dbh->error);
+
+    $feeds = array();
+    $count = 0;
+    while ($sql->fetch()) {
+        $feeds[$count] = array(
+            'id'  => $fid,
+            'url' => $furl
+        );
+        $count++;
+    }
+
+    $sql->close();
+
+    loggit(1, "Returning: [$count] poor feeds.");
+    return ($feeds);
 }

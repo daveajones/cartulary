@@ -218,12 +218,12 @@ function can_connect_to_database()
     //Connect to the database server
     $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
     if ($dbh->connect_error) {
-        loggit(2, 'Connect Error (' . $mysqli->connect_errno . ') '. $mysqli->connect_error);
-        return(FALSE);
+        loggit(2, 'Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
+        return (FALSE);
     }
 
     $dbh->close();
-    return(TRUE);
+    return (TRUE);
 }
 
 
@@ -315,15 +315,15 @@ function truncate_html($html, $max_words)
 }
 
 
-function extract_urls_from_text($text) {
+function extract_urls_from_text($text)
+{
 
-    if(empty($text)) {
+    if (empty($text)) {
         loggit(2, "The text to analyze for urls was blank or corrupt: [$text]");
     }
 
-    
 
-    return(array());
+    return (array());
 }
 
 
@@ -386,33 +386,33 @@ function extract_media($html)
                         'raw' => "<img src=\"$src\" />");
                     $idx++;
                 } else
-                if ($thistype == 'audio' || $tagname == 'audio') {
-                    $media_tags[$idx] = array('tag' => 'audio',
-                        'stag' => $tagname,
-                        'type' => 'audio',
-                        'src' => $src,
-                        'raw' => "<audio src=\"$src\"></audio>");
-                    loggit(3, "AUDIOSCRAPE: [$src]");
-                    $idx++;
-                } else
-                if ($thistype == 'video' || $tagname == 'video') {
-                    $media_tags[$idx] = array('tag' => 'video',
-                        'stag' => $tagname,
-                        'type' => 'video',
-                        'src' => $src,
-                        'raw' => "<video src=\"$src\"></video>");
-                    $idx++;
-                } else
-                if ($tagname == 'iframe') {
-                    $media_tags[$idx] = array('tag' => 'iframe',
-                        'stag' => $tagname,
-                        'type' => 'text/html',
-                        'src' => $src,
-                        'raw' => "<iframe src=\"$src\"></iframe>");
-                    $idx++;
-                } else {
-                    continue;
-                }
+                    if ($thistype == 'audio' || $tagname == 'audio') {
+                        $media_tags[$idx] = array('tag' => 'audio',
+                            'stag' => $tagname,
+                            'type' => 'audio',
+                            'src' => $src,
+                            'raw' => "<audio src=\"$src\"></audio>");
+                        loggit(3, "AUDIOSCRAPE: [$src]");
+                        $idx++;
+                    } else
+                        if ($thistype == 'video' || $tagname == 'video') {
+                            $media_tags[$idx] = array('tag' => 'video',
+                                'stag' => $tagname,
+                                'type' => 'video',
+                                'src' => $src,
+                                'raw' => "<video src=\"$src\"></video>");
+                            $idx++;
+                        } else
+                            if ($tagname == 'iframe') {
+                                $media_tags[$idx] = array('tag' => 'iframe',
+                                    'stag' => $tagname,
+                                    'type' => 'text/html',
+                                    'src' => $src,
+                                    'raw' => "<iframe src=\"$src\"></iframe>");
+                                $idx++;
+                            } else {
+                                continue;
+                            }
                 //loggit(3, "DEBUG: $src");
             }
         }
@@ -499,7 +499,7 @@ function clean_feed_item_content($content = "", $length = 0, $asarray = FALSE, $
         }
     }
 
-    loggit(3, "    TIMER: clean_feed_item_content() took: [".(time() - $tstart)."] seconds.");
+    loggit(3, "    TIMER: clean_feed_item_content() took: [" . (time() - $tstart) . "] seconds.");
 
     return ($content);
 }
@@ -545,7 +545,7 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
 
     //Treat some content inside a pre tag with special consideration
     if (preg_match_all('/\<pre[^>]*\>(.*?)\<\/pre\>/s', $content, $matches)) {
-        foreach($matches[1] as $a) {
+        foreach ($matches[1] as $a) {
             //loggit(3, "DEBUG: Found match for pre tag content: [$a]");
             $content = str_replace($a, str_replace("\t", '&nbsp;&nbsp;&nbsp;&nbsp;', $a), $content);
             $content = str_replace($a, str_replace(' ', '&nbsp;', $a), $content);
@@ -563,7 +563,7 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
     $content = preg_replace('/\<\/p\>\s*\<span[^>]*\>(.*)\<\/span\>/iU', "</p><p>$1</p>", $content);
 
     //Strip out all the html tags except for the ones that control textual layout
-    if($withmedia) {
+    if ($withmedia) {
         $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a><strong>');
     } else {
         $content = strip_tags($content, '<p><h1><h2><h3><h4><h5><ul><ol><li><table><thead><tbody><tr><td><th><blockquote><i><em><b><span><pre><br><hr><a><strong><img><audio><video>');
@@ -605,9 +605,9 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
     $content = preg_replace('/\<a\s+href=.*\#story-continues[^>]*\>.*\<\/a\>/iU', '', $content);
 
     //Attempt to de-duplicate the title from the body of the article
-    if(!empty($title)) {
+    if (!empty($title)) {
         loggit(3, "Deduplicating article title: [$title].");
-        $content = preg_replace("/\<h[1-9][^>]*\>\s*".preg_quote($title,"/")."\s*\<\/h[1-9]\>/iU", '', $content);
+        $content = preg_replace("/\<h[1-9][^>]*\>\s*" . preg_quote($title, "/") . "\s*\<\/h[1-9]\>/iU", '', $content);
     }
 
     //If a length was requested, chop it
@@ -617,34 +617,34 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
 
     //Now fix up relative urls to be absolute
     //Start with protocol relative since fixing that first will make path relative fixing easier
-    if(!empty($url)) {
+    if (!empty($url)) {
         $bail = FALSE;
         $newurlpreface = "";
-        if(stripos($url, "http") === 0) {
+        if (stripos($url, "http") === 0) {
             $urlparts = parse_url($url);
-            if(!empty($urlparts)) {
-                if(!empty($urlparts['scheme'])) {
-                    $newurlpreface .= $urlparts['scheme']."://";
+            if (!empty($urlparts)) {
+                if (!empty($urlparts['scheme'])) {
+                    $newurlpreface .= $urlparts['scheme'] . "://";
                 } else {
                     $bail = TRUE;
                     loggit(3, "The url: [$url] didn't have a scheme.");
                 }
-                if(!empty($urlparts['host'])) {
+                if (!empty($urlparts['host'])) {
                     $newurlpreface .= $urlparts['host'];
                 } else {
                     $bail = TRUE;
                     loggit(3, "The url: [$url] didn't have a host.");
                 }
-                if(!empty($urlparts['port'])) {
-                    $newurlpreface .= ":".$urlparts['port'];
+                if (!empty($urlparts['port'])) {
+                    $newurlpreface .= ":" . $urlparts['port'];
                 } else {
                     loggit(3, "The url: [$url] didn't have a port.");
                 }
                 $newurlpreface .= "/";
             }
-            if(!$bail) {
-                $content = preg_replace("/(src|href)(\=[\"'])\/\/([^\"'\ >]*)/i", "$1$2".$urlparts['scheme']."://$3", $content);
-                $content = preg_replace("/(src|href)(\=[\"'])\/([^\"'\ >]*)/i", "$1$2".$newurlpreface."$3", $content);
+            if (!$bail) {
+                $content = preg_replace("/(src|href)(\=[\"'])\/\/([^\"'\ >]*)/i", "$1$2" . $urlparts['scheme'] . "://$3", $content);
+                $content = preg_replace("/(src|href)(\=[\"'])\/([^\"'\ >]*)/i", "$1$2" . $newurlpreface . "$3", $content);
             } else {
                 loggit(3, "The url: [$url] wasn't well-formed. Can't fix article links.");
             }
@@ -653,7 +653,6 @@ function clean_article_content($content = "", $length = 0, $asarray = FALSE, $wi
             loggit(3, "The url: [$url] wasn't well-formed. Can't fix article links.");
         }
     }
-
 
 
     //Return the clean content and the media tags in an array
@@ -1194,9 +1193,9 @@ function get_final_url($url, $timeout = 5, $count = 0)
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
 
-    if($count > 5) {
+    if ($count > 5) {
         loggit(2, "Error: Too many redirects for url: [$url]. Abandoning...");
-        return($url);
+        return ($url);
     }
 
     $cookie = tempnam("/tmp", "CURLCOOKIE");
@@ -1399,7 +1398,7 @@ function getMastodonTimeline($hosturl, $token, $timeout = 30)
         return (FALSE);
     }
 
-    $url = trim($hosturl, "/ ")."/api/v1/timelines/home";
+    $url = trim($hosturl, "/ ") . "/api/v1/timelines/home";
     $url = clean_url($url);
 
     $curl = curl_init();
@@ -1416,7 +1415,7 @@ function getMastodonTimeline($hosturl, $token, $timeout = 30)
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, TRUE);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
     curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-        "Authorization: Bearer ".trim($token)
+        "Authorization: Bearer " . trim($token)
     ));
 
     $data = curl_exec($curl);
@@ -1481,11 +1480,11 @@ function toot($uid = NULL, $content = NULL, $link = "", $media_id = "")
         $twstatus['media_ids'] = array($media_id);
     }
 
-    loggit(3, "DEBUG: Toot upload: [".print_r($twstatus, TRUE)."]");
+    loggit(3, "DEBUG: Toot upload: [" . print_r($twstatus, TRUE) . "]");
 
     //Make an API call to post the tweet
-    $result = postUrlExtra(trim($prefs['mastodon_url'])."/api/v1/statuses", $twstatus, array(
-        "Authorization: Bearer ".$prefs['mastodon_access_token']
+    $result = postUrlExtra(trim($prefs['mastodon_url']) . "/api/v1/statuses", $twstatus, array(
+        "Authorization: Bearer " . $prefs['mastodon_access_token']
     ), TRUE);
 
     //Log and return
@@ -1520,26 +1519,26 @@ function toot_upload_picture($uid = NULL, $filepath = NULL)
     $prefs = get_user_prefs($uid);
 
     //Make an API call to post the tweet
-    $result = httpUploadFile(trim($prefs['mastodon_url'])."/api/v1/media", array(), array(
-        "Authorization: Bearer ".$prefs['mastodon_access_token']
+    $result = httpUploadFile(trim($prefs['mastodon_url']) . "/api/v1/media", array(), array(
+        "Authorization: Bearer " . $prefs['mastodon_access_token']
     ), $filepath);
 
-    if( $result['status_code'] != 200 ) {
-        loggit(2, "Uploading media file: [$filepath] to mastodon for user: [$uid] didn't work. Response code: [".$result['status_code']."]");
+    if ($result['status_code'] != 200) {
+        loggit(2, "Uploading media file: [$filepath] to mastodon for user: [$uid] didn't work. Response code: [" . $result['status_code'] . "]");
         return (FALSE);
     }
 
     $response = json_decode($result['body'], TRUE);
     $mediaid = $response['id'];
 
-    loggit(3, "DEBUG: toot_upload_picture: [".print_r($response, TRUE)."]");
+    loggit(3, "DEBUG: toot_upload_picture: [" . print_r($response, TRUE) . "]");
 
     //Log and return
     if ($result != FALSE) {
         loggit(3, "Uploaded a media file to mastodon for user: [$uid]. Got back media id: [$mediaid].");
         return ($mediaid);
     } else {
-        loggit(2, "Uploading media file: [$filepath] to mastodon for user: [$uid] didn't work. Response code: [".$result['status_code']."]");
+        loggit(2, "Uploading media file: [$filepath] to mastodon for user: [$uid] didn't work. Response code: [" . $result['status_code'] . "]");
         return (FALSE);
     }
 }
@@ -1590,11 +1589,11 @@ function micropub_post($uid = NULL, $content = NULL, $link = "", $media_id = "")
         $twstatus['media_ids'] = array($media_id);
     }
 
-    loggit(3, "DEBUG: Toot upload: [".print_r($twstatus, TRUE)."]");
+    loggit(3, "DEBUG: Toot upload: [" . print_r($twstatus, TRUE) . "]");
 
     //Make an API call to post the tweet
-    $result = postUrlExtra(trim($prefs['mastodon_url'])."/api/v1/statuses", $twstatus, array(
-        "Authorization: Bearer ".$prefs['mastodon_access_token']
+    $result = postUrlExtra(trim($prefs['mastodon_url']) . "/api/v1/statuses", $twstatus, array(
+        "Authorization: Bearer " . $prefs['mastodon_access_token']
     ), TRUE);
 
     //Log and return
@@ -1653,8 +1652,9 @@ function fetchFeedUrl($url, $subcount = 0, $sysver = '', $timeout = 30)
 
 
 //Handle headers from a curl request
-function curlHandleHeaderLine( $curl, $header_line ) {
-    echo "<br>YEAH: ".$header_line; // or do whatever
+function curlHandleHeaderLine($curl, $header_line)
+{
+    echo "<br>YEAH: " . $header_line; // or do whatever
     return strlen($header_line);
 }
 
@@ -1667,10 +1667,10 @@ function fetchUrlExtra($url, $timeout = 30, $referer = "", $useragent = "")
     $curl = curl_init();
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
     $ua = "$system_name/$cg_sys_version (+$cg_producthome)";
-    if(!empty($useragent)) {
+    if (!empty($useragent)) {
         $ua = $useragent;
     }
-    $headers=[];
+    $headers = [];
     curl_setopt($curl, CURLOPT_USERAGENT, $ua);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -1683,8 +1683,7 @@ function fetchUrlExtra($url, $timeout = 30, $referer = "", $useragent = "")
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
     curl_setopt($curl, CURLOPT_HEADERFUNCTION,
-        function($curl, $header) use (&$headers)
-        {
+        function ($curl, $header) use (&$headers) {
             $len = strlen($header);
             $header = explode(':', $header, 2);
             if (count($header) < 2) // ignore invalid headers
@@ -1700,7 +1699,7 @@ function fetchUrlExtra($url, $timeout = 30, $referer = "", $useragent = "")
         }
     );
 
-    if(!empty($referer)) {
+    if (!empty($referer)) {
         curl_setopt($curl, CURLOPT_REFERER, $referer);
     }
 
@@ -1743,7 +1742,7 @@ function postUrlExtra($url, $post_parameters = array(), $post_headers = array(),
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
     curl_setopt($curl, CURLOPT_POST, 1);
 
-    if($as_json) {
+    if ($as_json) {
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($post_parameters));
         $post_headers[] = "Content-Type: application/json";
     } else {
@@ -1751,7 +1750,7 @@ function postUrlExtra($url, $post_parameters = array(), $post_headers = array(),
     }
 
 
-    if(!empty($post_headers)) {
+    if (!empty($post_headers)) {
         curl_setopt($curl, CURLOPT_HTTPHEADER, $post_headers);
     }
 
@@ -1798,15 +1797,15 @@ function httpUploadFile($url, $post_parameters = array(), $post_headers = array(
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
     curl_setopt($curl, CURLOPT_POST, 1);
 
-    if(class_exists("CurlFile")) {
+    if (class_exists("CurlFile")) {
         curl_setopt($curl, CURLOPT_SAFE_UPLOAD, TRUE);
         $post_parameters['file'] = new CurlFile($filepath);
     } else {
-        $post_parameters['file'] = "@".$filepath;
+        $post_parameters['file'] = "@" . $filepath;
     }
     curl_setopt($curl, CURLOPT_POSTFIELDS, $post_parameters);
 
-    if(!empty($post_headers)) {
+    if (!empty($post_headers)) {
         curl_setopt($curl, CURLOPT_HTTPHEADER, $post_headers);
     }
 
@@ -1819,7 +1818,7 @@ function httpUploadFile($url, $post_parameters = array(), $post_headers = array(
 
     curl_close($curl);
 
-    loggit(3, "DEBUG: httpUploadFile: [".print_r($response, TRUE)."]");
+    loggit(3, "DEBUG: httpUploadFile: [" . print_r($response, TRUE) . "]");
 
     //return $response;
     return $response;
@@ -2071,7 +2070,7 @@ function create_s3_bucket($key, $secret, $bucket)
         ]);
     } catch (S3Exception $e) {
         //Log and leave on fail
-        loggit(2, "S3 Error: [".$e->getMessage()."].");
+        loggit(2, "S3 Error: [" . $e->getMessage() . "].");
         return (FALSE);
     }
 
@@ -2294,7 +2293,7 @@ function putInS3old($content, $filename, $bucket, $key, $secret, $headers = NULL
     }
 
     loggit(1, "putInS3(): Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
-    loggit(3, "S3: ".print_r($headers, TRUE));
+    loggit(3, "S3: " . print_r($headers, TRUE));
 
     if ($private) {
         $s3res = $s3->putObject($content, $bucket, $subpath . $filename, S3::ACL_PRIVATE, array(), $headers);
@@ -2360,21 +2359,21 @@ function deleteFromS3($filename, $bucket, $key, $secret)
         $bucket = str_replace('/', '', substr($s3bucket, 0, stripos($s3bucket, '/', 1)));
         $subpath = rtrim(substr($s3bucket, $spstart + 1), '/') . "/";
     }
-    $keyname = $subpath.$filename;
+    $keyname = $subpath . $filename;
 
     //Assemble object to delete
     $s3object = array(
         'Bucket' => $bucket,
-        'Key'    => $keyname
+        'Key' => $keyname
     );
 
     try {
         $s3res = $s3->deleteObject($s3object);
 
         // Log some stuff
-        loggit(3, "Deleted file from S3: [".print_r($s3res, TRUE)."].");
+        loggit(3, "Deleted file from S3: [" . print_r($s3res, TRUE) . "].");
     } catch (S3Exception $e) {
-        loggit(2, "S3 Error: [".$e->getMessage()."].");
+        loggit(2, "S3 Error: [" . $e->getMessage() . "].");
         loggit(2, "Could not delete S3 file: [$bucket/$keyname].");
         return (FALSE);
     }
@@ -2441,21 +2440,21 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
         $bucket = str_replace('/', '', substr($s3bucket, 0, stripos($s3bucket, '/', 1)));
         $subpath = rtrim(substr($s3bucket, $spstart + 1), '/') . "/";
     }
-    $keyname = $subpath.$filename;
+    $keyname = $subpath . $filename;
 
     //Assemble object to upload
     $s3object = array(
         'Bucket' => $bucket,
-        'Key'    => $keyname,
-        'Body'   => $content
+        'Key' => $keyname,
+        'Body' => $content
     );
 
-    loggit(3, "HEADERS: ".print_r($headers, TRUE));
+    loggit(3, "HEADERS: " . print_r($headers, TRUE));
 
     //Add headers if any
-    if(!empty($headers)) {
-        if(is_array($headers)) {
-            foreach($headers as $hkey => $hvalue) {
+    if (!empty($headers)) {
+        if (is_array($headers)) {
+            foreach ($headers as $hkey => $hvalue) {
                 loggit(3, "HEADER: [$hkey] => [$hvalue]");
                 $hkey = str_replace('-', '', $hkey);
                 $s3object[$hkey] = $hvalue;
@@ -2475,19 +2474,19 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
             $s3res = $s3->putObject($s3object);
 
             // Print the URL to the object.
-            loggit(3, "Wrote file to S3: [".$s3res['ObjectURL']."].");
+            loggit(3, "Wrote file to S3: [" . $s3res['ObjectURL'] . "].");
         } catch (S3Exception $e) {
-            loggit(2, "S3 Error: [".$e->getMessage()."].");
+            loggit(2, "S3 Error: [" . $e->getMessage() . "].");
             loggit(2, "Could not create S3 file: [$bucket/$keyname].");
             //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
             return (FALSE);
         } catch (Awsxception $e) {
-            loggit(2, "S3 Error: [".$e->getAwsErrorCode()."].");
+            loggit(2, "S3 Error: [" . $e->getAwsErrorCode() . "].");
             loggit(2, "Could not create S3 file: [$bucket/$keyname].");
             //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
             return (FALSE);
         } catch (Exception $e) {
-            loggit(2, "S3 Error: [".$e->getMessage()."].");
+            loggit(2, "S3 Error: [" . $e->getMessage() . "].");
             loggit(2, "Could not create S3 file: [$bucket/$keyname].");
             //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
             return (FALSE);
@@ -2500,19 +2499,19 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
             $s3res = $s3->putObject($s3object);
 
             // Print the URL to the object.
-            loggit(3, "Wrote file to S3: [".$s3res['ObjectURL']."].");
+            loggit(3, "Wrote file to S3: [" . $s3res['ObjectURL'] . "].");
         } catch (S3Exception $e) {
-            loggit(2, "S3 Error: [".$e->getMessage()."].");
+            loggit(2, "S3 Error: [" . $e->getMessage() . "].");
             loggit(2, "Could not create S3 file: [$bucket/$keyname].");
             //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
             return (FALSE);
         } catch (Awsxception $e) {
-            loggit(2, "S3 Error: [".$e->getAwsErrorCode()."].");
+            loggit(2, "S3 Error: [" . $e->getAwsErrorCode() . "].");
             loggit(2, "Could not create S3 file: [$bucket/$keyname].");
             //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
             return (FALSE);
         } catch (Exception $e) {
-            loggit(2, "S3 Error: [".$e->getMessage()."].");
+            loggit(2, "S3 Error: [" . $e->getMessage() . "].");
             loggit(2, "Could not create S3 file: [$bucket/$keyname].");
             //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
             return (FALSE);
@@ -2580,7 +2579,7 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
         $bucket = str_replace('/', '', substr($s3bucket, 0, stripos($s3bucket, '/', 1)));
         $subpath = rtrim(substr($s3bucket, $spstart + 1), '/') . "/";
     }
-    $keyname = $subpath.$filename;
+    $keyname = $subpath . $filename;
 
     loggit(1, "Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
 
@@ -2588,38 +2587,38 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
     if ($contenttype == NULL) {
         if ($private == FALSE) {
             $s3res = $s3->putObject(array(
-                'Bucket'       => $bucket,
-                'Key'          => $keyname,
-                'SourceFile'   => $filepath,
-                'ACL'          => 'public-read',
+                'Bucket' => $bucket,
+                'Key' => $keyname,
+                'SourceFile' => $filepath,
+                'ACL' => 'public-read',
                 'StorageClass' => 'REDUCED_REDUNDANCY'
             ));
         } else {
             $s3res = $s3->putObject(array(
-                'Bucket'       => $bucket,
-                'Key'          => $keyname,
-                'SourceFile'   => $filepath,
-                'ACL'          => 'private',
+                'Bucket' => $bucket,
+                'Key' => $keyname,
+                'SourceFile' => $filepath,
+                'ACL' => 'private',
                 'StorageClass' => 'REDUCED_REDUNDANCY'
             ));
         }
     } else {
         if ($private == FALSE) {
             $s3res = $s3->putObject(array(
-                'Bucket'       => $bucket,
-                'Key'          => $keyname,
-                'SourceFile'   => $filepath,
-                'ContentType'  => $contenttype,
-                'ACL'          => 'public-read',
+                'Bucket' => $bucket,
+                'Key' => $keyname,
+                'SourceFile' => $filepath,
+                'ContentType' => $contenttype,
+                'ACL' => 'public-read',
                 'StorageClass' => 'REDUCED_REDUNDANCY'
             ));
         } else {
             $s3res = $s3->putObject(array(
-                'Bucket'       => $bucket,
-                'Key'          => $keyname,
-                'SourceFile'   => $filepath,
-                'ContentType'  => $contenttype,
-                'ACL'          => 'private',
+                'Bucket' => $bucket,
+                'Key' => $keyname,
+                'SourceFile' => $filepath,
+                'ContentType' => $contenttype,
+                'ACL' => 'private',
                 'StorageClass' => 'REDUCED_REDUNDANCY'
             ));
         }
@@ -2632,7 +2631,7 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
         return (FALSE);
     } else {
         $s3url = "http://s3.amazonaws.com/$bucket/$subpath$filename";
-        loggit(1, "Wrote file to S3: [$s3url | ".$s3res['ObjectURL']."].");
+        loggit(1, "Wrote file to S3: [$s3url | " . $s3res['ObjectURL'] . "].");
     }
 
     return (TRUE);
@@ -2659,7 +2658,7 @@ function get_s3_authenticated_url($key, $secret, $bucket, $filekey, $minutes = 2
         loggit(2, "File missing from S3 call: [$filekey].");
         return (FALSE);
     }
-    if( empty($minutes) || !is_numeric($minutes) || $minutes > 10080 || $minutes < 1 ) {
+    if (empty($minutes) || !is_numeric($minutes) || $minutes > 10080 || $minutes < 1) {
         $minutes = 20;
     }
 
@@ -2682,7 +2681,7 @@ function get_s3_authenticated_url($key, $secret, $bucket, $filekey, $minutes = 2
         $request = $s3->createPresignedRequest($cmd, "+$minutes minutes");
 
         // Get the actual presigned-url
-        $s3authurl = (string) $request->getUri();
+        $s3authurl = (string)$request->getUri();
 
     } catch (S3Exception $e) {
         loggit(3, "Error getting authenticated url: " . $e->getMessage());
@@ -2691,7 +2690,7 @@ function get_s3_authenticated_url($key, $secret, $bucket, $filekey, $minutes = 2
 
     //Give back the result
     loggit(3, "S3 Got authenticated url: [$s3authurl]");
-    return($s3authurl);
+    return ($s3authurl);
 }
 
 
@@ -4670,11 +4669,12 @@ function remove_non_tag_space($string)
 
 
 //JSON encoding detection
-function is_json($strJson = NULL, $errorLog = FALSE) {
+function is_json($strJson = NULL, $errorLog = FALSE)
+{
     json_decode($strJson);
-    if( json_last_error() !== JSON_ERROR_NONE) {
-        if($errorLog) {
-            loggit(2, "Error parsing json string: [".substr($strJson, 0, 255)."]");
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        if ($errorLog) {
+            loggit(2, "Error parsing json string: [" . substr($strJson, 0, 255) . "]");
         }
         return false;
     }
@@ -4685,7 +4685,8 @@ function is_json($strJson = NULL, $errorLog = FALSE) {
 
 //Rotate image according to exif data
 //__via: https://stackoverflow.com/questions/7489742/php-read-exif-data-and-adjust-orientation
-function image_fix_orientation($filename) {
+function image_fix_orientation($filename)
+{
     loggit(3, "Fixing rotation of file: [$filename]");
     $exif = exif_read_data($filename);
     if (!empty($exif['Orientation'])) {
@@ -4718,7 +4719,14 @@ function convert_to_utf8($html, $header = null)
 
     $encoding = null;
     if ($html || $header) {
-        if (is_array($header)) $header = implode("\n", $header);
+        if (is_array($header)) {
+            $flat = "";
+            foreach($header as $k => $v) {
+                $flat .= $k.": ".implode("", $v)."\n";
+            }
+            $header = $flat;
+        }
+        loggit(3, "Header-post: ".print_r($header, TRUE));
         if (!$header || !preg_match_all('/^Content-Type:\s+([^;]+)(?:;\s*charset=["\']?([^;"\'\n]*))?/im', $header, $match, PREG_SET_ORDER)) {
             // error parsing the response
         } else {
@@ -4817,49 +4825,389 @@ function makeAbsoluteAttr($base, $e, $attr)
 
 
 //This function fixes common structural errors in xml feeds
-function fix_xml_feed_structure($content, $url) {
+function fix_xml_feed_structure($content, $url)
+{
     //Fix up content issues before run
     loggit(1, "Fixing up common structural problems in feed: [$url]");
     $content = trim($content);
     $invalid_characters = '/[^\x9\xa\x20-\xD7FF\xE000-\xFFFD]/';
-    $content = preg_replace($invalid_characters, '', $content );
+    $content = preg_replace($invalid_characters, '', $content);
 
     //Remove content before the <?xml declaration
     $elPos = stripos(substr($content, 0, 255), '<?xml');
-    if($elPos > 0) {
+    if ($elPos > 0) {
         loggit(3, "  Removing stuff before the <?xml header in: [$url]");
         $content = substr($content, $elPos);
     }
 
     //Remove stuff after the closing xml root tags
     $elPos = stripos($content, '</rss>');
-    if($elPos !== FALSE) {
+    if ($elPos !== FALSE) {
         $content = substr($content, 0, $elPos + 6);
     }
     $elPos = stripos($content, '</feed>');
-    if($elPos !== FALSE) {
+    if ($elPos !== FALSE) {
         $content = substr($content, 0, $elPos + 7);
     }
 
     //Fix feeds that don't have a correct <?xml prefix at the beginning
     $tstart = time();
-    if(stripos(substr($content, 0, 255), '<?xml') === FALSE) {
+    if (stripos(substr($content, 0, 255), '<?xml') === FALSE) {
         loggit(3, "  Missing <?xml> header in feed: [$url]. Let's dig deeper...");
 
         $elPos = stripos(substr($content, 0, 255), '<rss');
-        if($elPos !== FALSE) {
+        if ($elPos !== FALSE) {
             loggit(3, "    Fixing missing <?xml> header in RSS feed: [$url]");
-            $content = "<?xml version=\"1.0\"?>\n".substr($content, $elPos);
+            $content = "<?xml version=\"1.0\"?>\n" . substr($content, $elPos);
         }
         $elPos = stripos(substr($content, 0, 255), '<feed');
-        if($elPos !== FALSE) {
+        if ($elPos !== FALSE) {
             loggit(3, "    Fixing missing <?xml> header in RSS feed: [$url]");
-            $content = "<?xml version=\"1.0\"?>\n".substr($content, $elPos);
+            $content = "<?xml version=\"1.0\"?>\n" . substr($content, $elPos);
         }
     }
-    if((time() - $tstart) > 5) {
-        loggit(3, "Fixed feed: [$url] in [".(time() - $tstart)."] seconds.");
+    if ((time() - $tstart) > 5) {
+        loggit(3, "Fixed feed: [$url] in [" . (time() - $tstart) . "] seconds.");
     }
-    
+
     return $content;
+}
+
+
+//Article extraction as a function
+use andreskrey\Readability\Readability;
+use andreskrey\Readability\HTMLParser;
+use andreskrey\Readability\Configuration;
+function cartulize($url = NULL)
+{
+    //Environment
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    // Include path
+    set_include_path("$confroot/$libraries" . PATH_SEPARATOR . get_include_path());
+
+    include "/opt/cartulary/libraries/readability-php/src/Configuration.php";
+    include "/opt/cartulary/libraries/readability-php/src/ParseException.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/NodeTrait.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMAttr.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMCdataSection.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMCharacterData.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMComment.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMDocumentFragment.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMDocumentType.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMElement.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMEntity.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMEntityReference.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMNode.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMNotation.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMProcessingInstruction.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMText.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/NodeUtility.php";
+    include "/opt/cartulary/libraries/readability-php/src/Nodes/DOM/DOMDocument.php";
+    include "/opt/cartulary/libraries/readability-php/src/Readability.php";
+
+
+    //Punt if the query is blank
+    if (empty($url)) {
+        loggit(2, "The url was blank or corrupt: [$url].");
+        return (FALSE);
+    }
+
+
+    //Globals
+    $html_only = true;
+    $ispdf = FALSE;
+    $linkonly = FALSE;
+    $referer = "";
+    $reqtitle = NULL;
+
+    // Get a start time
+    $tstart = time();
+
+
+    // Sanitize and validate incoming URL string
+    if (!preg_match('!^https?://.+!i', $url)) {
+        $url = 'http://' . $url;
+    }
+    $url = filter_var($url, FILTER_SANITIZE_URL);
+    $test = filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED);
+    // deal with bug http://bugs.php.net/51192 (present in PHP 5.2.13 and PHP 5.3.2)
+    if ($test === false) {
+        $test = filter_var(strtr($url, '-', '_'), FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED);
+    }
+    if ($test !== false && $test !== null && preg_match('!^https?://!', $url)) {
+        // all okay
+        unset($test);
+    } else {
+        loggit(2, "Invalid url supplied: [$url]");
+        exit(NULL);
+    }
+
+
+    //Resolve re-directs
+    //$newurl = get_final_url($url);
+    $newurl = $url;
+
+    //Remove feedburner garbage
+    $url = trim(rtrim(preg_replace("/&?utm_(.*?)\=[^&]+/", "", $newurl), '?'));
+
+
+    //See if the response returned was actually a meta-refresh forwarding document
+    //##: -------  PRE-PROCESS the URL here to make sure we dodge any weirdness like proxies or non-HTML content-types
+    //Feed proxy?
+    if (preg_match('/feedproxy\.google\.com/i', $url)) {
+        $oldurl = $url;
+        $url = get_final_url($oldurl);
+        loggit(3, "Converting feedproxy url: [$oldurl] to [$url].");
+    }
+    if (preg_match('/wsj\.com\/articles/i', $url)) {
+        $oldurl = $url;
+        $url = str_replace("wsj.com/articles/", "wsj.com/amp/articles/", $url);
+        loggit(3, "Converting wsj url: [$oldurl] to [$url].");
+    }
+    if (preg_match('/ft\.com\//i', $url)) {
+        $referer = "https://www.google.com";
+        loggit(3, "Setting referer to: [$referer].");
+    }
+
+    //##: ------- END PRE-PROCESS of URL -----------------------------------------------------------------------------
+    $referer = "https://www.google.com";
+    $response = fetchUrlExtra($url, 30, $referer);
+    //loggit(3, "DEBUG: ".print_r($response, TRUE));
+    $mret = preg_match('|http-equiv.*refresh.*content="\s*\d+\s*;\s*url=\'?(.*?)\'?\s*"|i', $response['body'], $mrmatches);
+    if (($mret > 0) && !empty($mrmatches[1])) {
+        //loggit(3, "Found a meta refresh pointing to: [" . $mrmatches[1] . "].");
+        $url = get_final_url($mrmatches[1]);
+        $response = fetchUrlExtra($url);
+    }
+    $html = $response['body'];
+
+
+    //Reddit
+    if (preg_match('/^https?\:\/\/(www\.)?reddit\.com/i', $url)) {
+        loggit(3, "Getting a reddit link.");
+
+        $luie = libxml_use_internal_errors(true);
+        $doc = new DOMDocument();
+        $doc->loadHTML($html);
+        //Get the title
+        $nodes = $doc->getElementsByTagName("title");
+        $title = $nodes->item(0)->nodeValue;
+        loggit(3, "Reddit title: $title");
+        libxml_use_internal_errors($luie);
+
+        if (preg_match("/\<p.*class=\"title.*\<a.*class=\"title.*href=\"(.*)\"/iU", $html, $matches)) {
+            $url = get_final_url($matches[1]);
+            loggit(3, "Reddit link: [" . $url . "]");
+            $response = fetchUrlExtra($url);
+            $html = $response['body'];
+        } else {
+            loggit(2, "Couldn't extract Reddit link.");
+        }
+
+    //Memeorandum
+    } else if (preg_match('/memeorandum\.com/i', $url)) {
+        loggit(3, "Converting memeorandum.com link to span ref.");
+        //Get the code from the link
+        $posLastSlash = strripos($url, '/');
+        $posPoundA = stripos($url, '#a', $posLastSlash);
+        $code = substr($url, $posPoundA + 2);
+
+        if (preg_match("/\<span.*pml=\"$code\".*url=\"(.*)\".*head=\"(.*)\"/iU", $html, $matches)) {
+            $url = get_final_url($matches[1]);
+            $title = $matches[2];
+            loggit(3, "Memeorandum link-through url: [" . $url . "]");
+            $response = fetchUrlExtra($url);
+            $html = $response['body'];
+        } else {
+            loggit(2, "Couldn't extract Memeorandum link.");
+        }
+    }
+
+    //Is this a PDF?
+    if (substr($response['body'], 0, 4) == "%PDF") {
+        $ispdf = TRUE;
+        $pdfbody = $response['body'];
+        loggit(3, "The url: [$url] is a PDF document.");
+    }
+
+    // ---------- BEGIN ARTICLE PROCESSING ----------
+    //We skip all the extraction stuff if the article was already in the database
+    if ($linkonly == FALSE) {
+
+        //Get the page
+        if ($response) {
+            $effective_url = $response['effective_url'];
+            loggit(3, "Article effective url is: [$effective_url].");
+
+            $html = $response['body'];
+
+            //loggit(3, "ARTICLE: [$html]");
+            if (empty($html)) {
+                loggit(3, "DEBUG: Blank content returned for html.");
+                //loggit(3, "DEBUG: ".print_r($response, TRUE));
+            }
+            // remove strange things here
+            $html = str_replace('</[>', '', $html);
+
+            // Convert non-standard elements to divs
+
+            //FC Editor conversion
+            $html = preg_replace("/\<ul\ class=\"outline[^>]*\"\>\<li\ class=\"ou\ outline[^>]*\"\>(.*)\<\/li>\<\/ul\>/iU", "<p>$1</p>", $html);
+
+            // Convert encoding
+            $html = convert_to_utf8($html, $response['headers']);
+        }
+
+        //Was there an error?
+        if (!$response || $response['status_code'] >= 400) {
+            loggit(2, 'Got back: [' . $response['status_code'] . '] Error retrieving ' . $url . ' [' . $effective_url . ']');
+            exit(NULL);
+        }
+
+        //Is this a youtube link?
+        if (preg_match('/youtube\.com/i', $url)) {
+            loggit(3, "Cartulizing a Youtube video.");
+            preg_match("/v[\/\=]([A-Za-z0-9\_\-]*)/i", $url, $matches) || die("Couldn't extract YouTube ID string.");
+            $content = '<br/><iframe class="bodyvid" src="https://www.youtube.com/embed/' . $matches[1] . '" frameborder="0" allowfullscreen></iframe>';
+            preg_match("/\<meta.*property\=\"og\:title\".*content\=\"(.*)\".*\>/i", $html, $matches) || die("Couldn't extract the YouTube video title.");
+            $title = $matches[1];
+            loggit(3, "Youtube video title: [$title].");
+            $analysis = "";
+            $slimcontent = $content;
+
+        //Is this an image
+        } else if (url_is_a_picture($url)) {
+            loggit(3, "Getting an image.");
+            loggit(3, "Image source: [" . $url . "]");
+            $content = '<br/><img style="width:600px;" src="' . $url . '"></img>';
+            $analysis = "";
+            $slimcontent = $content;
+
+        //Is this audio
+        } else if (url_is_audio($url)) {
+            loggit(3, "Getting an audio url.");
+            loggit(3, "Audio source: [" . $url . "]");
+            $mt = make_mime_type($url);
+            $content = '<br/><audio style="width:400px" controls="true"><source src="' . $url . '" type="' . $mt . '"></audio>';
+            $analysis = "";
+            $slimcontent = $content;
+
+        //Is this video
+        } else if (url_is_video($url)) {
+            loggit(3, "Getting a video url.");
+            loggit(3, "Video source: [" . $url . "]");
+            $mt = make_mime_type($url);
+            $content = '<br/><video style="width:95%;margin:0 auto;display:block;" controls="true"><source src="' . $url . '" type="' . $mt . '"></video>';
+            $analysis = "";
+            $slimcontent = $content;
+
+        //Is this an imgur link?
+        } else if (preg_match('/imgur\.com/i', $url)) {
+            loggit(3, "Getting an image file as a full article.");
+            if (preg_match("/\<link.*rel=\"image_src.*href=\"(.*)\"/iU", $html, $matches)) {
+                $url = $matches[1];
+                loggit(3, "Imgur image source: [" . $url . "]");
+                $content = '<br/><img class="bodyvid" src="' . $matches[1] . '"></img>';
+            } else {
+                loggit(2, "Couldn't extract Imgur image: [" . $matches[1] . "]");
+            }
+            $analysis = "";
+            $slimcontent = $content;
+
+        //Askwoody?
+        } else if (preg_match('/^http.*askwoody\.com.*/i', $url)) {
+            loggit(2, "DEBUG: ----------------------> Askwoody.com post.");
+
+            $dom = new DomDocument();
+            $dom->loadHTML($html);
+            $classname = 'paddings';
+            $finder = new DomXPath($dom);
+            $nodes = $finder->query("(//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]//ul/li)[1]/*[self::p or self::blockquote or self::img or self::ul or self::ol or self::li or self::a]");
+            $tmp_dom = new DOMDocument();
+            foreach ($nodes as $node) {
+                $tmp_dom->appendChild($tmp_dom->importNode($node, true));
+            }
+            $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle, $effective_url);
+
+            $analysis = "";
+            $slimcontent = $content;
+
+        //Is this a blogger post?
+        } else if (preg_match('/^http.*blogspot\.com.*/i', $url)) {
+            loggit(3, "DEBUG: ----------------------> Getting a blogger.com post.");
+
+            $dom = new DomDocument();
+            $dom->loadHTML($html);
+            $classname = 'post-body';
+            $finder = new DomXPath($dom);
+            $nodes = $finder->query("//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+            $tmp_dom = new DOMDocument();
+            foreach ($nodes as $node) {
+                $tmp_dom->appendChild($tmp_dom->importNode($node, true));
+            }
+            $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle, $effective_url);
+
+            $analysis = "";
+            $slimcontent = $content;
+
+        //Is this a PDF?
+        } else if ($ispdf) {
+            loggit(3, "Cartulizing a PDF.");
+            $content = '';
+            include "$confroot/$libraries/PDFParser/vendor/autoload.php";
+            $parser = new \Smalot\PdfParser\Parser();
+            $pdf = $parser->parseContent($pdfbody);
+            $details = $pdf->getDetails();
+            loggit(3, print_r($details, TRUE));
+            if (empty($title) && isset($details['title']) && !empty($details['title'])) {
+                $title = $details['title'];
+            } else if (empty($title)) {
+                $title = "Untitled PDF";
+            }
+            foreach ($pdf->getPages() as $page) {
+                $content .= "<p>" . $page->getText() . "</p>";
+            }
+            //$content = $pdf->getText();
+            //Do textual analysis and save it in the database
+            $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
+            //Reduce all that whitespace
+            $slimcontent = clean_article_content($content, 0, FALSE, FALSE, $reqtitle);
+
+        //Normal web page
+        } else {
+            loggit(3, "Cartulizing article: [$url] with Readability.");
+
+            //Debugging loggit(3, print_r($html, TRUE));
+
+            //Set up an extraction
+            $readability = new Readability(new Configuration());
+
+            try {
+                $readability->parse($html);
+                $content = $readability->getContent();
+                $title = $readability->getTitle();
+                if (!empty($title)) {
+                    loggit(3, "Got article: [$title] with Readability.");
+                }
+            } catch (\andreskrey\Readability\ParseException $e) {
+                loggit(3, "DEBUG: New cart process failed with error: [" . $e->getMessage . "]");
+                return (NULL);
+            }
+
+            //Do textual analysis and save it in the database
+            $analysis = implode(",", array_unique(str_word_count(strip_tags($content), 1)));
+
+            //Reduce all that whitespace
+            $content = clean_article_content($content, 0, TRUE, TRUE, $reqtitle, $effective_url);
+            $slimcontent = $content;
+        }
+
+        //Calculate how long it took to cartulize this article
+        $took = time() - $tstart;
+        loggit(3, "Article: [$url] took: [$took] seconds to cartulize.");
+    }
+
+
+    return (Array('title' => $title, 'content' => $slimcontent, 'analysis' => $analysis));
 }

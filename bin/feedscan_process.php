@@ -22,6 +22,11 @@ if( empty($feedurl) ) {
     exit(1);
 }
 
+//Sleep for a random amount of time to back off on the database connections
+$sleeptime = mt_rand(1, 4);
+//loggit(3, "DEBUG: Sleeping for: [$sleeptime] seconds.");
+sleep( $sleeptime );
+
 //Get the feed list
 //Checking a single feed?
 if (!empty($feedurl)) {
@@ -66,8 +71,13 @@ if ($result == -1) {
 
 
 //Calculate time took to scan
-loggit(3, "It took " . (time() - $tstart) . " seconds to scan feed: [$feedurl]");
-loggit(3, "Updated: [$ncount]. New items: [$newitems].");
+$ttime = time() - $tstart;
+if($ttime > 1) {
+    loggit(3, "It took: [$ttime] seconds to scan feed: [$feedurl]");
+}
+if($newitems > 0) {
+    loggit(3, "Updated: [$ncount]. New items: [$newitems].");
+}
 echo "      It took " . (time() - $tstart) . " seconds to scan feed: [$feedurl].\n";
 echo "Updated: [$ncount]. New items: [$newitems].\n";
 

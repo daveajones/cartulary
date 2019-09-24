@@ -45,7 +45,8 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
         if ($pid == -1) {
             //TODO: this is a bad way to handle
-            die("could not fork");
+            loggit(2, "Feed scanner process could not fork!!");
+            die("Could not fork!!!");
         } elseif ($pid) {
             $execute++;
             echo "Current Process Count: $execute\n";
@@ -55,9 +56,9 @@ if (($pid = cronHelper::lock()) !== FALSE) {
             }
         } else {
             //echo "I am the child, $ccount pid = $pid \n";
-            exec('php /opt/cartulary/bin/feedscan_process.php '.$feed['url']);
-            echo "Child: [$ccount] finished.\n";
-            loggit(3, "  -- Child: [$ccount] finished.");
+            exec("php /opt/cartulary/bin/feedscan_process.php '".$feed['url']."'");
+            echo "  -- Child: [$ccount] finished.\n";
+            //loggit(3, "  -- Child: [$ccount] finished.");
             exit;
         }
 
@@ -66,7 +67,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
     //Calculate time took to scan
     loggit(3, "It took " . (time() - $tstart) . " seconds to scan [$ccount] of [$totalfeeds] feeds.");
-    loggit(3, "Total checked: [$ccount].");
+    loggit(3, "TAIL -- Total checked: [$ccount].");
     echo "      It took " . (time() - $tstart) . " seconds to scan [$ccount] of [$totalfeeds] feeds.\n";
     echo "Total checked: [$ccount].\n";
 
@@ -80,8 +81,8 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         calculate_map_word_today_counts();
     }
 
-    loggit(3, "It took " . (time() - $rstart) . " to rebuild search words.");
-    echo "      It took " . (time() - $rstart) . " to rebuild search words.\n";
+    loggit(3, "It took " . (time() - $rstart) . " seconds to rebuild search words.");
+    echo "      It took " . (time() - $rstart) . " seconds to rebuild search words.\n";
 
 
     // Log and leave

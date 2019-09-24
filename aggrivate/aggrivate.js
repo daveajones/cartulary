@@ -3,7 +3,8 @@ var mysql = require('mysql');
 var request = require('request');
 var fs = require('graceful-fs');
 var ini = require('ini');
-var Iconv = require('iconv').Iconv
+var Iconv = require('iconv').Iconv;
+var crypto = require('crypto');
 
 //Globals
 var netcalls = 0;
@@ -73,21 +74,21 @@ connection.connect(function (err) {
 var monthago = (Date.now() / 1000) - (28 * 86400);
 
 //Assemble query
-var query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' WHERE (errors < 100 OR lastupdate > ' + monthago + ' OR lastcheck = 0 OR lastmod = 0 OR content = "") AND dead=0 ORDER by lastcheck ASC';
+var query = 'SELECT id,title,url,lastmod,createdon,contenttype,contenthash FROM ' + config.tables.table_newsfeed + ' WHERE (errors < 100 OR lastupdate > ' + monthago + ' OR lastcheck = 0 OR lastmod = 0 OR content = "") AND dead=0 ORDER by lastcheck ASC';
 if (checkall && checkdead) {
-    query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' ORDER by lastcheck ASC';
+    query = 'SELECT id,title,url,lastmod,createdon,contenttype,contenthash FROM ' + config.tables.table_newsfeed + ' ORDER by lastcheck ASC';
 }
 if (checkall && !checkdead) {
-    query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' WHERE dead=0 ORDER by lastcheck ASC';
+    query = 'SELECT id,title,url,lastmod,createdon,contenttype,contenthash FROM ' + config.tables.table_newsfeed + ' WHERE dead=0 ORDER by lastcheck ASC';
 }
 if (!checkall && checkdead) {
-    query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' WHERE dead=1 ORDER by lastcheck ASC';
+    query = 'SELECT id,title,url,lastmod,createdon,contenttype,contenthash FROM ' + config.tables.table_newsfeed + ' WHERE dead=1 ORDER by lastcheck ASC';
 }
 if (checkerror) {
-    query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' WHERE dead=0 AND ( errors > 100 || content = "") ORDER by lastcheck ASC';
+    query = 'SELECT id,title,url,lastmod,createdon,contenttype,contenthash FROM ' + config.tables.table_newsfeed + ' WHERE dead=0 AND ( errors > 100 || content = "") ORDER by lastcheck ASC';
 }
 if (checkone) {
-    query = 'SELECT id,title,url,lastmod,createdon,contenttype FROM ' + config.tables.table_newsfeed + ' WHERE url="' + ckoneurl + '"';
+    query = 'SELECT id,title,url,lastmod,createdon,contenttype,contenthash FROM ' + config.tables.table_newsfeed + ' WHERE url="' + ckoneurl + '"';
 }
 
 //Pull the feed list
@@ -158,7 +159,7 @@ connection.query(query, function (err, rows, fields) {
             f.lastmodPretty = lastmod;
             opt.headers = {
                 'If-Modified-Since': lastmod,
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36',
+                'User-Agent': config.main.system_name + "/" + config.main.cg_sys_version + " (+" + config.main.cg_producthome + ")",
                 'Accept': 'application/xml,application/atom+xml,application/rss+xml,application/javascript,application/json,text/plain,text/xml;q=0.9, */*;q=0.8',
                 'Accept-Charset': 'utf-8;q=0.9, iso-8859-1;q=0.8',
                 'Accept-Language': 'en-US, en;q=0.9, fr-CH, fr;q=0.8, en;q=0.7, de;q=0.6, *;q=0.5'
@@ -169,12 +170,16 @@ connection.query(query, function (err, rows, fields) {
             request(opt, function (err, response, body) {
                 var requesterror = err;
                 var xml = '';
+                var xmlstring = '';
                 var newmod = 0;
                 var neterr = false;
                 var processbody = true;
+                var contentHash = "";
+                var alreadystored = false;
+                var contentChanged = false;
 
                 //Error handler
-                if (err ) {
+                if (err) {
                     neterr = true;
                     console.log("  " + f.title + " : (" + f.lastmodPretty + ") " + f.url + " : error on next line");
                     console.log(err);
@@ -279,6 +284,7 @@ connection.query(query, function (err, rows, fields) {
                     'content-type' in response.headers) {
 
                     xmlstring = body.toString();
+                    contentHash = crypto.createHash('md5').update(xmlstring).digest("hex");
 
                     //console.log(response.headers);
                     //console.log(response.headers['content-type']);
@@ -299,12 +305,31 @@ connection.query(query, function (err, rows, fields) {
                         //writeFile(f.url.toLowerCase().substr(f.url.toLowerCase().indexOf('://') + 3).replace(/[^0-9a-zA-Z.\-_]/gi, '_') + redirectCodes.join('-'), body);
 
                         dbcalls++;
-                        connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content=?,lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=?,contenttype=? WHERE id=?', [xml, response.statusCode, contype, f.id], function (err, result) {
+                        connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content=?,lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=?,contenttype=?,contenthash=? WHERE id=?', [xml, response.statusCode, contype, contentHash, f.id], function (err, result) {
                             if (err) throw err;
-                            if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
+                            if (result.affectedRows === 0) {
+                                console.log("Error updating database for feed: [" + f.url + "]");
+                            } else {
+                                alreadystored = true;
+                            }
                             dbcalls--;
                         });
                         processbody = false;
+                    }
+                }
+
+                //Get a hash of the feed raw content and determine if it changed or not
+                if (typeof body !== "undefined" && typeof body.toString === "function") {
+                    xmlstring = body.toString();
+                    contentHash = crypto.createHash('md5').update(xmlstring).digest("hex");
+
+                    //Did the content of the feed actually change?
+                    if(f.contenthash == contentHash) {
+                        //loggit(3, "Feed has not changed: [ "+f.contenthash+" | "+contentHash+" ]");
+                        //contentChanged = false;
+                    } else {
+                        loggit(3, "TAIL -- Feed: ["+f.url+"] content has changed: [ "+f.contenthash+" | "+contentHash+" ]");
+                        contentChanged = true;
                     }
                 }
 
@@ -327,12 +352,17 @@ connection.query(query, function (err, rows, fields) {
                         } else {
                             dbcalls++;
 
-                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content=?,lastcheck=UNIX_TIMESTAMP(now()),lastmod=?,updated=1,lasthttpstatus=?,lastgoodhttpstatus=UNIX_TIMESTAMP(now()),contenttype=? WHERE id=?', [xml, newmod, response.statusCode, contype, f.id], function (err, result) {
+                            var contentUpdated = 0;
+                            if(contentChanged) {
+                                contentUpdated = 1;
+                            }
+
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content=?,lastcheck=UNIX_TIMESTAMP(now()),lastmod=?,updated=?,lasthttpstatus=?,lastgoodhttpstatus=UNIX_TIMESTAMP(now()),contenttype=?,contenthash=? WHERE id=?', [xml, newmod, contentUpdated, response.statusCode, contype, contentHash, f.id], function (err, result) {
                                 if (err) throw err;
                                 if (result.affectedRows === 0) {
                                     console.log("  Error updating database for feed: [" + f.url + "]");
                                 } else {
-                                    //console.log("  Feed updated.");
+                                    //loggit(3, "Feed: ["+f.url+"] content has changed.");
                                 }
                                 dbcalls--;
                             });
@@ -376,7 +406,7 @@ connection.query(query, function (err, rows, fields) {
                     //4xx response
                     else if (response.statusCode / 100 === 4) {
                         dbcalls++;
-                        connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+4,lasthttpstatus=?,contenttype=? WHERE id=?', [response.statusCode, contype, f.id], function (err, result) {
+                        connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+4,lasthttpstatus=?,contenttype=?,contenthash="" WHERE id=?', [response.statusCode, contype, f.id], function (err, result) {
                             if (err) throw err;
                             if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
                             dbcalls--;
@@ -386,7 +416,7 @@ connection.query(query, function (err, rows, fields) {
                     //5xx response
                     else if (response.statusCode / 100 === 5) {
                         dbcalls++;
-                        connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+5,lasthttpstatus=?,contenttype=? WHERE id=?', [response.statusCode, contype, f.id], function (err, result) {
+                        connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+5,lasthttpstatus=?,contenttype=?,contenthash="" WHERE id=?', [response.statusCode, contype, f.id], function (err, result) {
                             if (err) throw err;
                             if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
                             dbcalls--;
@@ -396,7 +426,7 @@ connection.query(query, function (err, rows, fields) {
                     //Response we don't handle
                     else {
                         dbcalls++;
-                        connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),errors=errors+1,lasthttpstatus=?,contenttype=? WHERE id=?', [response.statusCode, contype, f.id], function (err, result) {
+                        connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),errors=errors+1,lasthttpstatus=?,contenttype=?,contenthash="" WHERE id=?', [response.statusCode, contype, f.id], function (err, result) {
                             if (err) throw err;
                             if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
                             dbcalls--;
@@ -457,12 +487,12 @@ connection.query(query, function (err, rows, fields) {
                     }
 
                     //There was a structural error in the feed content
-                    if(!requesterror) {
+                    if(!requesterror && !alreadystored) {
                         if (!processbody) {
                             console.log("There was a structural error in the feed content for: [" + f.url + "] " + statCode);
                             loggit(2, "There was a structural error in the feed content for: [" + f.url + "] " + statCode);
                             dbcalls++;
-                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content=?,lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=? WHERE id=?', [xml, statCode, f.id], function (err, result) {
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content=?,lastcheck=UNIX_TIMESTAMP(now()),updated=0,errors=errors+1,lasthttpstatus=?,contenttype=?,contenthash=? WHERE id=?', [xmlstring, statCode, contype, contentHash, f.id], function (err, result) {
                                 if (err) throw err;
                                 if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
                                 dbcalls--;
@@ -479,7 +509,7 @@ connection.query(query, function (err, rows, fields) {
                                 console.log(response);
                             }
                             dbcalls++;
-                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,lasthttpstatus=? WHERE id=?', [statCode, f.id], function (err, result) {
+                            connection.query('UPDATE ' + config.tables.table_newsfeed + ' SET content="",lastcheck=UNIX_TIMESTAMP(now()),updated=0,lasthttpstatus=?,contenttype="",contenthash="" WHERE id=?', [statCode, f.id], function (err, result) {
                                 if (err) throw err;
                                 if (result.affectedRows === 0) console.log("Error updating database for feed: [" + f.url + "]");
                                 dbcalls--;

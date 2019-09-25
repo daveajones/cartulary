@@ -1817,7 +1817,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Remove content before the <?xml declaration
     $elPos = stripos(substr($feed['content'], 0, 255), '<?xml');
     if($elPos > 0) {
-        loggit(3, "  Removing stuff before the <?xml header in: [$url]");
+        loggit(2, "  Removing stuff before the <?xml header in: [$url]");
         $feed['content'] = substr($feed['content'], $elPos);
     }
 
@@ -1834,21 +1834,21 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     //Fix feeds that don't have a correct <?xml prefix at the beginning
     $tstart = time();
     if(stripos(substr($feed['content'], 0, 255), '<?xml') === FALSE) {
-        loggit(3, "  Missing <?xml> header in feed: [$url]. Let's dig deeper...");
+        loggit(2, "  Missing <?xml> header in feed: [$url]. Let's dig deeper...");
 
         $elPos = stripos(substr($feed['content'], 0, 255), '<rss');
         if($elPos !== FALSE) {
-            loggit(3, "    Fixing missing <?xml> header in RSS feed: [$url]");
+            loggit(1, "    Fixing missing <?xml> header in RSS feed: [$url]");
             $feed['content'] = "<?xml version=\"1.0\"?>\n".substr($feed['content'], $elPos);
         }
         $elPos = stripos(substr($feed['content'], 0, 255), '<feed');
         if($elPos !== FALSE) {
-            loggit(3, "    Fixing missing <?xml> header in RSS feed: [$url]");
+            loggit(1, "    Fixing missing <?xml> header in RSS feed: [$url]");
             $feed['content'] = "<?xml version=\"1.0\"?>\n".substr($feed['content'], $elPos);
         }
     }
     if((time() - $tstart) > 5) {
-        loggit(3, "Fixed feed: [$url] in [".(time() - $tstart)."] seconds.");
+        loggit(1, "Fixed feed: [$url] in [".(time() - $tstart)."] seconds.");
     }
 
     //Debug
@@ -1868,7 +1868,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         //Fix stray ampersands in the xml
         if( stripos($feed['content'], '& ') !== FALSE ) {
             $feed['content'] = preg_replace('/\&\s/m', '&amp; ', $feed['content']);
-            loggit(3, "    Fixing poorly encoded entities (&,<,>) in XML feed: [$url]");
+            loggit(2, "    Fixing poorly encoded entities (&,<,>) in XML feed: [$url]");
             if(!feed_is_valid($feed['content']) && !is_feed($feed['content'])) {
                 //Try to correct the encoding
                 if( stripos($feed['content'], 'encoding="utf-8"') && mb_detect_encoding($feed['content'], 'UTF-8', true) === FALSE ) {
@@ -1895,7 +1895,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Was there a fatal error during parsing?
     if (!$x) {
-        loggit(3, "  Error parsing feed: [$url] Error: [".libxml_get_last_error()->message."]");
+        loggit(2, "  Error parsing feed: [$url] Error: [".libxml_get_last_error()->message."]");
         loggit(1, "  Failed to parse XML for feed: [$url].  Let's run it through Tidy() and try again.");
         libxml_clear_errors();
         $tidy = new tidy();
@@ -1969,7 +1969,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
         unmark_feed_as_dead($fid);
         return (-3);
     }
-    loggit(3, "  PUBDATE: [$pubdate | ".$feed['pubdate']."] Source: [$pubdatesource] changed.");
+    loggit(1, "  PUBDATE: [$pubdate | ".$feed['pubdate']."] Source: [$pubdatesource] changed.");
     update_feed_pubdate($fid, $pubdate);
 
     //Freshen feed title
@@ -2015,7 +2015,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     $newcount = 0;
     if (strtolower($x->getName()) == "rdf") {
         //Probably an RDF feed
-        loggit(3, "RDF Feed: ".$ftitle);
+        loggit(1, "RDF Feed: ".$ftitle);
         foreach ($x->item as $entry) {
             $items[$count] = $entry;
             $guid = get_unique_id_for_rdf_feed_item($entry, $namespaces);
@@ -2067,7 +2067,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
             $count++;
         }
     }
-    loggit(3, "  Feed item storage took [".(time() - $tstart)."] seconds.");
+    loggit(1, "  Feed item storage took [".(time() - $tstart)."] seconds.");
 
     //Flip the purge flags to old
     flip_purge_to_old($fid);
@@ -2090,7 +2090,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
 
     //Is the feed empty?
     if ($count == 0) {
-        loggit(3, "  DONE: There were no items in this feed: [$url].");
+        loggit(1, "  DONE: There were no items in this feed: [$url].");
         //increment_feed_error_count($fid, 1);
         return (-2);
     }

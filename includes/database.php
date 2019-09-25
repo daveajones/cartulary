@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 87;
+$cg_database_version = 88;
 $cg_database_updates = array();
 
 
@@ -1189,6 +1189,15 @@ CGDB0252;
 $cg_database_updates[86][] = <<<CGDB0253
  INSERT INTO `dbversion` ( `version` ) VALUES ( '87' )
 CGDB0253;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 87 to 88 -----------------------------------------------------------------------------------------------
+$cg_database_updates[87][] = <<<CGDB0254
+ UPDATE `newsfeeds` SET `url` = "http://localhost/adminlog-rss?t=$admin_feed_check_token" WHERE `url` = 'http://localhost/adminlog-rss'
+CGDB0254;
+$cg_database_updates[87][] = <<<CGDB0255
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '88' )
+CGDB0255;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

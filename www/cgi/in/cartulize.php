@@ -2,6 +2,14 @@
 <? include "$confroot/$templates/php_cgi_init_with_followup.php" ?>
 <?
 
+
+//TODO: strip out relative resource urls
+//TODO: fix wierd anchor linebreaks in carted content
+
+//TODO: !!!change article existence check to make sure it creates a duplicate with a new id instead of just linking to existing for new user
+//TODO: Also in carulize2 script!!!
+
+
 // Include path
 set_include_path("$confroot/$libraries" . PATH_SEPARATOR . get_include_path());
 
@@ -318,10 +326,14 @@ if ($linkonly == FALSE) {
 
     //Askwoody?
     } else if (preg_match('/^http.*askwoody\.com.*/i', $url)) {
-        loggit(2, "DEBUG: ----------------------> Askwoody.com post.");
+        loggit(2, "DEBUG: ----------------------> Askwoody post.");
 
         $dom = new DomDocument();
         $dom->loadHTML($html);
+        $eltitle = $dom->getElementsByTagName("title");
+        if ($eltitle->length > 0) {
+            $title = $eltitle->item(0)->textContent;
+        }
         $classname = 'paddings';
         $finder = new DomXPath($dom);
         $nodes = $finder->query("(//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]//ul/li)[1]/*[self::p or self::blockquote or self::img or self::ul or self::ol or self::li or self::a]");
@@ -354,34 +366,67 @@ if ($linkonly == FALSE) {
 //        $analysis = "";
 //        $slimcontent = $content;
 
-    //Is this a wordpress post?
-//    } else if (preg_match('/\<div.*class.*entry-content.*\>/i', $html)) {
-//        loggit(2, "DEBUG: ----------------------> Getting a wordpress post.");
-//
-//        $dom = new DomDocument();
-//        $dom->loadHTML($html);
-//        $classname = 'entry-content';
-//        $finder = new DomXPath($dom);
-//        $nodes = $finder->query("//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
-//        $tmp_dom = new DOMDocument();
-//        foreach ($nodes as $node) {
-//            $tmp_dom->appendChild($tmp_dom->importNode($node, true));
-//        }
-//
-//        //Get rid of all the wordpress sharing crap
-//        $content = preg_replace('/\<div.*class.*sharedaddy.*</div>/i', '', $content);
-//
-//        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE);
-//
-//        $analysis = "";
-//        $slimcontent = $content;
+        //Slate
+    } else if (preg_match('/^http.*slate\.com.*/i', $url) && preg_match('/.*slate\-paragraph.*/i', $html)) {
+        loggit(3, "DEBUG: ----------------------> Slate post.");
+
+        $html = str_replace('<aside', '<div', $html);
+        $html = str_replace('</aside>', '</div>', $html);
+
+        $luie = libxml_use_internal_errors(true);
+        $dom = new DomDocument();
+        $dom->loadHTML($html);
+        $eltitle = $dom->getElementsByTagName("title");
+        if ($eltitle->length > 0) {
+            $title = $eltitle->item(0)->textContent;
+        }
+        $classname = 'article__content';
+        $finder = new DomXPath($dom);
+        $nodes = $finder->query("(//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')])/*[self::p or self::blockquote or self::img or self::ul or self::ol or self::li or self::a]");
+        $tmp_dom = new DOMDocument();
+        foreach ($nodes as $node) {
+            $tmp_dom->appendChild($tmp_dom->importNode($node, true));
+        }
+        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle, $effective_url);
+        libxml_use_internal_errors($luie);
+
+        $analysis = "";
+        $slimcontent = $content;
+
+        //Mondaq
+    } else if (preg_match('/^http.*mondaq\.com.*/i', $url) && preg_match('/.*mondaq.*/i', $html)) {
+        loggit(3, "DEBUG: ----------------------> Mondaq post.");
+
+        $luie = libxml_use_internal_errors(true);
+        $dom = new DomDocument();
+        $dom->loadHTML($html);
+        $eltitle = $dom->getElementsByTagName("title");
+        if ($eltitle->length > 0) {
+            $title = $eltitle->item(0)->textContent;
+        }
+        $classname = 'articlebody';
+        $finder = new DomXPath($dom);
+        $nodes = $finder->query("(//div[contains(concat(' ', normalize-space(@id), ' '), ' $classname ')])/*[self::p or self::blockquote or self::img or self::ul or self::ol or self::li or self::a]");
+        $tmp_dom = new DOMDocument();
+        foreach ($nodes as $node) {
+            $tmp_dom->appendChild($tmp_dom->importNode($node, true));
+        }
+        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle, $effective_url);
+        libxml_use_internal_errors($luie);
+
+        $analysis = "";
+        $slimcontent = $content;
 
     //Is this a blogger post?
     } else if (preg_match('/^http.*blogspot\.com.*/i', $url)) {
-        loggit(3, "DEBUG: ----------------------> Getting a blogger.com post.");
+        loggit(3, "DEBUG: ----------------------> Blogger.com post.");
 
         $dom = new DomDocument();
         $dom->loadHTML($html);
+        $eltitle = $dom->getElementsByTagName("title");
+        if ($eltitle->length > 0) {
+            $title = $eltitle->item(0)->textContent;
+        }
         $classname = 'post-body';
         $finder = new DomXPath($dom);
         $nodes = $finder->query("//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");

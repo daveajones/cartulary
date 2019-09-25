@@ -1814,13 +1814,11 @@ function cartulize($url = NULL, $content = NULL, $reqtitle = NULL)
         $analysis = "";
         $slimcontent = $content;
 
-        //Slate
-    } else if (preg_match('/^http.*slate\.com.*/i', $url) && preg_match('/.*slate\-paragraph.*/i', $html)) {
-        loggit(3, "DEBUG: ----------------------> Slate.com post.");
-
+    } else if (preg_match('/slate.*div.*class.*slate-paragraph/sUi', $html)) {
         $html = str_replace('<aside', '<div', $html);
         $html = str_replace('</aside>', '</div>', $html);
 
+        $luie = libxml_use_internal_errors(true);
         $dom = new DomDocument();
         $dom->loadHTML($html);
         $eltitle = $dom->getElementsByTagName("title");
@@ -1835,14 +1833,12 @@ function cartulize($url = NULL, $content = NULL, $reqtitle = NULL)
             $tmp_dom->appendChild($tmp_dom->importNode($node, true));
         }
         $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $title, $effective_url);
+        libxml_use_internal_errors($luie);
 
         $analysis = "";
         $slimcontent = $content;
 
-        //Mondaq
-    } else if (preg_match('/^http.*mondaq\.com.*/i', $url) && preg_match('/.*mondaq.*/i', $html)) {
-        loggit(3, "DEBUG: ----------------------> Slate.com post.");
-
+    } else if (preg_match('/.*mondaq.*div.*articlebody/sUi', $html)) {
         $luie = libxml_use_internal_errors(true);
         $dom = new DomDocument();
         $dom->loadHTML($html);
@@ -1857,7 +1853,28 @@ function cartulize($url = NULL, $content = NULL, $reqtitle = NULL)
         foreach ($nodes as $node) {
             $tmp_dom->appendChild($tmp_dom->importNode($node, true));
         }
-        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $reqtitle, $effective_url);
+        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $title, $effective_url);
+        libxml_use_internal_errors($luie);
+
+        $analysis = "";
+        $slimcontent = $content;
+
+    } else if (preg_match('/jdsup.*div.*html-view-content.*jds-main-content/sUi', $html)) {
+        $luie = libxml_use_internal_errors(true);
+        $dom = new DomDocument();
+        $dom->loadHTML($html);
+        $eltitle = $dom->getElementsByTagName("title");
+        if ($eltitle->length > 0) {
+            $title = $eltitle->item(0)->textContent;
+        }
+        $classname = 'jds-main-content';
+        $finder = new DomXPath($dom);
+        $nodes = $finder->query("(//div[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')])/*[self::p or self::blockquote or self::img or self::ul or self::ol or self::li or self::a]");
+        $tmp_dom = new DOMDocument();
+        foreach ($nodes as $node) {
+            $tmp_dom->appendChild($tmp_dom->importNode($node, true));
+        }
+        $content = clean_article_content($tmp_dom->saveHTML(), 0, FALSE, FALSE, $title, $effective_url);
         libxml_use_internal_errors($luie);
 
         $analysis = "";

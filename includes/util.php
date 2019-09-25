@@ -4726,7 +4726,7 @@ function convert_to_utf8($html, $header = null)
             }
             $header = $flat;
         }
-        loggit(3, "Header-post: ".print_r($header, TRUE));
+        //loggit(3, "Header-post: ".print_r($header, TRUE));
         if (!$header || !preg_match_all('/^Content-Type:\s+([^;]+)(?:;\s*charset=["\']?([^;"\'\n]*))?/im', $header, $match, PREG_SET_ORDER)) {
             // error parsing the response
         } else {

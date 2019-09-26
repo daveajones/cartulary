@@ -40,10 +40,22 @@ if (isset($_REQUEST['json'])) {
     $json = FALSE;
 }
 
+// ---------- BEGIN SOURCE ATTRIBUTION HANDLING ----------
+//Check for a source url and title
+$sourceurl = "";
+$sourcetitle = "";
+if (isset($_REQUEST['surl']) && !empty($_REQUEST['surl'])) {
+    $sourceurl = $_REQUEST['surl'];
+}
+if (isset($_REQUEST['stitle']) && !empty($_REQUEST['stitle'])) {
+    $sourcetitle = $_REQUEST['stitle'];
+}
+// ---------- END SOURCE ATTRIBUTION HANDLING ----------
+
 //Was a title specified in the request?  If so, set that as the title instead of the extracted one
 $reqtitle = "";
 if (isset($_REQUEST['title'])) {
-    if (!empty($_REQUEST['title']) && stripos($_REQUEST['title'], "Subscribe to read") === FALSE ) {
+    if (!empty($_REQUEST['title']) && stripos($_REQUEST['title'], "Subscribe to read") === FALSE) {
         $title = $_REQUEST['title'];
         if (strpos($sourceurl, 'twitter.com') !== FALSE) {
             $title = '@' . $title;
@@ -123,7 +135,7 @@ if (($mret > 0) && !empty($mrmatches[1])) {
 $html = $response['body'];
 
 //If html body content was passed in just use it
-if( isset($_REQUEST['content']) && !empty($_REQUEST['content']) ) {
+if (isset($_REQUEST['content']) && !empty($_REQUEST['content'])) {
     $html = $_REQUEST['content'];
 }
 
@@ -277,7 +289,7 @@ if ($linkonly == FALSE) {
         $analysis = "";
         $slimcontent = $content;
 
-    //Is this an image
+        //Is this an image
     } else if (url_is_a_picture($url)) {
         loggit(3, "Getting an image.");
         loggit(3, "Image source: [" . $url . "]");
@@ -285,7 +297,7 @@ if ($linkonly == FALSE) {
         $analysis = "";
         $slimcontent = $content;
 
-    //Is this audio
+        //Is this audio
     } else if (url_is_audio($url)) {
         loggit(3, "Getting an audio url.");
         loggit(3, "Audio source: [" . $url . "]");
@@ -294,7 +306,7 @@ if ($linkonly == FALSE) {
         $analysis = "";
         $slimcontent = $content;
 
-    //Is this video
+        //Is this video
     } else if (url_is_video($url)) {
         loggit(3, "Getting a video url.");
         loggit(3, "Video source: [" . $url . "]");
@@ -303,7 +315,7 @@ if ($linkonly == FALSE) {
         $analysis = "";
         $slimcontent = $content;
 
-    //Is this an imgur link?
+        //Is this an imgur link?
     } else if (preg_match('/imgur\.com/i', $url)) {
         loggit(3, "Getting an image file as a full article.");
         if (preg_match("/\<link.*rel=\"image_src.*href=\"(.*)\"/iU", $html, $matches)) {
@@ -316,7 +328,7 @@ if ($linkonly == FALSE) {
         $analysis = "";
         $slimcontent = $content;
 
-    //Askwoody?
+        //Askwoody?
     } else if (preg_match('/^http.*askwoody\.com.*/i', $url)) {
         loggit(2, "DEBUG: ----------------------> Askwoody post.");
 
@@ -426,7 +438,7 @@ if ($linkonly == FALSE) {
         $slimcontent = $content;
 
 
-    //Is this a PDF?
+        //Is this a PDF?
     } else if ($ispdf) {
         loggit(3, "Cartulizing a PDF.");
         $content = '';
@@ -435,7 +447,7 @@ if ($linkonly == FALSE) {
         $pdf = $parser->parseContent($pdfbody);
         $details = $pdf->getDetails();
         loggit(3, print_r($details, TRUE));
-        if( empty($title) && isset($details['title']) && !empty($details['title']) ) {
+        if (empty($title) && isset($details['title']) && !empty($details['title'])) {
             $title = $details['title'];
         } else if (empty($title)) {
             $title = "Untitled PDF";
@@ -449,7 +461,7 @@ if ($linkonly == FALSE) {
         //Reduce all that whitespace
         $slimcontent = clean_article_content($content, 0, FALSE, FALSE, $reqtitle);
 
-    //Normal web page
+        //Normal web page
     } else {
         loggit(3, "Cartulizing article: [$url] with Readability.");
 
@@ -462,12 +474,12 @@ if ($linkonly == FALSE) {
             $readability->parse($html);
             $content = $readability->getContent();
             $title = $readability->getTitle();
-            if(!empty($title)) {
+            if (!empty($title)) {
                 loggit(3, "Got article: [$title] with Readability.");
             }
         } catch (\andreskrey\Readability\ParseException $e) {
             loggit(3, "DEBUG: New cart process failed.");
-            header("Location: /cgi/in/cartulize2?".$querystring);
+            header("Location: /cgi/in/cartulize2?" . $querystring);
             exit(0);
             //$content = sprintf('Error processing text: %s', $e->getMessage);
         }
@@ -501,21 +513,8 @@ loggit(3, "It took: [$took] seconds to shorten the url for article: [$aid].");
 // ---------- END URL SHORTENING ----------
 
 
-// ---------- BEGIN SOURCE ATTRIBUTION HANDLING ----------
-//Check for a source url and title
-$sourceurl = NULL;
-$sourcetitle = NULL;
-if (isset($_REQUEST['surl'])) {
-    $sourceurl = $_REQUEST['surl'];
-}
-if (isset($_REQUEST['stitle'])) {
-    $sourcetitle = $_REQUEST['stitle'];
-}
-// ---------- END SOURCE ATTRIBUTION HANDLING ----------
-
-
 // ---------- BEGIN TITLE HANDLING ----------
-if(!empty($reqtitle)) {
+if (!empty($reqtitle)) {
     $title = $reqtitle;
 }
 // ---------- END TITLE HANDLING ----------

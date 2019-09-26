@@ -2,14 +2,6 @@
 <? include "$confroot/$templates/php_cgi_init_with_followup.php" ?>
 <?
 
-
-//TODO: strip out relative resource urls
-//TODO: fix wierd anchor linebreaks in carted content
-
-//TODO: !!!change article existence check to make sure it creates a duplicate with a new id instead of just linking to existing for new user
-//TODO: Also in carulize2 script!!!
-
-
 // Include path
 set_include_path("$confroot/$libraries" . PATH_SEPARATOR . get_include_path());
 
@@ -412,9 +404,8 @@ if ($linkonly == FALSE) {
         $analysis = "";
         $slimcontent = $content;
 
-    //Is this a blogger post?
-    } else if (preg_match('/^http.*blogspot\.com.*/i', $url)) {
-        loggit(3, "DEBUG: ----------------------> Blogger.com post.");
+    } else if (preg_match('/meta.*blogger.*blogspot.*post-body/sUi', $html)) {
+        loggit(3, "DEBUG: ----------------------> Getting a blogger.com post.");
 
         $dom = new DomDocument();
         $dom->loadHTML($html);
@@ -433,6 +424,7 @@ if ($linkonly == FALSE) {
 
         $analysis = "";
         $slimcontent = $content;
+
 
     //Is this a PDF?
     } else if ($ispdf) {

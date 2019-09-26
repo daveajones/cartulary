@@ -47,3 +47,7 @@ cd $CARTROOT/aggrivate
 sudo node ./aggrivate.js checkerror force
 sudo node ./aggrivate.js checkdead force
 suod node ./aggrivate.js force
+
+##: Log the upgrade
+CARTVER=`sudo php /opt/cartulary/bin/getversion.php raw`
+sudo php /opt/cartulary/bin/admin_notify.php --content="System was upgraded to version: v$CARTVER" --title="System Upgrade"

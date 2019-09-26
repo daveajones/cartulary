@@ -366,11 +366,6 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         echo $output;
     }
 
-    //Log the upgrade
-    if ($action == "upgrade") {
-        add_admin_log_item("System was upgraded from version $version", "System Upgrade");
-    }
-
     echo "\n";
 
     //Remove the lock file

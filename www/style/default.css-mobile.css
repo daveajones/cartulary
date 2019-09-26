@@ -1002,6 +1002,7 @@ a.ipinfotracker {
     }
 
     .pageContentWrapper.Articles #divPageArticle #article .footer {
+        clear:both;
         border-top: solid #ddd 1px;
     }
 

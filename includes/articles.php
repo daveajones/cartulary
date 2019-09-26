@@ -1881,8 +1881,9 @@ function cartulize($url = NULL, $content = NULL, $reqtitle = NULL)
         $slimcontent = $content;
 
         //Is this a blogger post?
-    } else if (preg_match('/^http.*blogspot\.com.*/i', $url)) {
+    } else if (preg_match('/meta.*blogger.*blogspot.*post-body/sUi', $html)) {
         loggit(3, "DEBUG: ----------------------> Getting a blogger.com post.");
+        echo( "DEBUG: ----------------------> Getting a blogger.com post.");
 
         $dom = new DomDocument();
         $dom->loadHTML($html);

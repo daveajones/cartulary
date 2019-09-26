@@ -32,8 +32,9 @@ if (($pid = cronHelper::lock()) !== FALSE) {
             loggit(1, "Linking admin user: [" . $user['name'] . "] to admin log feed: [$alfurl]");
             if (!feed_is_linked_by_url($alfurl, $user['id'])) {
                 link_feed_to_user($fid, $user['id']);
-                mark_feed_as_sticky($fid, $user['id']);
             }
+            mark_feed_as_sticky($fid, $user['id']);
+            mark_feed_as_fulltext($fid, $user['id']);
         }
     }
 

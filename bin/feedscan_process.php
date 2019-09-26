@@ -27,8 +27,7 @@ $sleeptime = mt_rand(1, 4);
 //loggit(3, "DEBUG: Sleeping for: [$sleeptime] seconds.");
 sleep( $sleeptime );
 
-//Get the feed list
-//Checking a single feed?
+//Get the feed
 if (!empty($feedurl)) {
     $feed = get_feed_info(feed_exists($feedurl));
 } else {
@@ -37,13 +36,10 @@ if (!empty($feedurl)) {
     exit(1);
 }
 
-// Walk the feed list and get new items in each
-$ncount = 0;
+//Get new items in the feed
 $newitems = 0;
 
 echo "Checking feed: [" . $feed['title'] . " | " . $feed['url'] . "]...\n";
-
-//sleep(1);
 
 //Make a timestamp
 $fstart = time();
@@ -57,28 +53,21 @@ if ($result == -1) {
     echo "    Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]\n";
     $errorfeeds[] = $feed['url'];
 } else if ($result == -2) {
-    loggit(2, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] has no items.");
-    echo "    Feed is empty.\n";
+    loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] has no items.");
+    //echo "    Feed is empty.\n";
 } else if ($result == -3) {
     loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] is current.");
     //echo "    Feed is current.\n";
 } else {
     loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] updated.");
     echo "    Feed updated.\n";
-    $ncount++;
     $newitems += $result;
 }
 
-
 //Calculate time took to scan
 $ttime = time() - $tstart;
-if($ttime > 1) {
-    loggit(3, "It took: [$ttime] seconds to scan feed: [$feedurl]");
-}
-if($newitems > 0) {
-    loggit(3, "Updated: [$ncount]. New items: [$newitems].");
-}
-echo "      It took " . (time() - $tstart) . " seconds to scan feed: [$feedurl].\n";
-echo "Updated: [$ncount]. New items: [$newitems].\n";
+loggit(3, "  FEEDSCAN RESULTS: [$feedurl] - [$ttime] seconds - [$newitems] new items.");
+echo "  FEEDSCAN RESULTS: [$feedurl] - [$ttime] seconds - [$newitems] new items.\n";
+
 
 exit(0);

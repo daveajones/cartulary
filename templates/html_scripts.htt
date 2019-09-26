@@ -1,34 +1,35 @@
 <!-- Global scripts -->
 <!-- Core -->
-<script src="/script/pace.min.js?v=<?echo $cg_sys_version?>"></script>
-<script src="/script/jquery-1.11.2.min.js?v=<?echo $cg_sys_version?>"></script>
-<script src="/script/jquery.form.js?v=<?echo $cg_sys_version?>"></script>
-<script src="/script/bootstrap-2.3.1.min.js?v=<?echo $cg_sys_version?>"></script>
-<script src="/script/jquery.finger.min.js?v=<?echo $cg_sys_version?>"></script>
-<script src="/script/jquery.tmpl.min.js?v=<?echo $cg_sys_version?>"></script>
-<script src="/script/freedomcontroller.utils.js?v=<?echo $cg_sys_version?>"></script>
+<?$scriptver = $cg_sys_version."-0"?>
+<script src="/script/pace.min.js?v=<?echo $scriptver?>"></script>
+<script src="/script/jquery-1.11.2.min.js?v=<?echo $scriptver?>"></script>
+<script src="/script/jquery.form.js?v=<?echo $scriptver?>"></script>
+<script src="/script/bootstrap-2.3.1.min.js?v=<?echo $scriptver?>"></script>
+<script src="/script/jquery.finger.min.js?v=<?echo $scriptver?>"></script>
+<script src="/script/jquery.tmpl.min.js?v=<?echo $scriptver?>"></script>
+<script src="/script/freedomcontroller.utils.js?v=<?echo $scriptver?>"></script>
 <? if (isset($g_uid)) { ?>
-    <script src="/script/jquery.cookie.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/jquery.appear.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/jquery.uploadifive-v1.2.2.min.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/jquery-ui-1.10.2.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/jquery.masonry.min.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/jquery.debouncedresize.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/jquery.touchSwipe.min.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/hmac-sha1.js?v=<?echo $cg_sys_version?>"></script>
+    <script src="/script/jquery.cookie.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/jquery.appear.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/jquery.uploadifive-v1.2.2.min.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/jquery-ui-1.10.2.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/jquery.masonry.min.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/jquery.debouncedresize.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/jquery.touchSwipe.min.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/hmac-sha1.js?v=<?echo $scriptver?>"></script>
     <!-- Other -->
-    <script src="/script/keymaster.min.js?v=<?echo $cg_sys_version?>"></script>
+    <script src="/script/keymaster.min.js?v=<?echo $scriptver?>"></script>
     <!-- Global custom -->
-    <script src="/script/global-env.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/global-custom.js?v=<?echo $cg_sys_version?>"></script>
+    <script src="/script/global-env.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/global-custom.js?v=<?echo $scriptver?>"></script>
     <!-- Freedom Controller API -->
-    <script src="/script/freedomcontroller.v1.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/api-subscribe.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/api-river.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/api-search.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/api-people.js?v=<?echo $cg_sys_version?>"></script>
-    <script src="/script/upload.js?v=<?echo $cg_sys_version?>"></script>
+    <script src="/script/freedomcontroller.v1.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/api-subscribe.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/api-river.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/api-search.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/api-people.js?v=<?echo $scriptver?>"></script>
+    <script src="/script/upload.js?v=<?echo $scriptver?>"></script>
 <? } ?>
-<script src="/script/concord.js?v=<?echo $cg_sys_version?>"></script>
-<script src="/script/concordUtils.js?v=<?echo $cg_sys_version?>"></script>
-<script src="/script/bootbox.min.js?v=<?echo $cg_sys_version?>"></script>
+<script src="/script/concord.js?v=<?echo $scriptver?>"></script>
+<script src="/script/concordUtils.js?v=<?echo $scriptver?>"></script>
+<script src="/script/bootbox.min.js?v=<?echo $scriptver?>"></script>

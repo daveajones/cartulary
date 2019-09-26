@@ -74,4 +74,3 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     cronHelper::unlock();
 }
 exit(0);
-?>

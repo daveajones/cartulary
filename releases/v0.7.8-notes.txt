@@ -1,0 +1,24 @@
+#Release Notes - Freedom Controller v0.7.8
+
+
+The primary focus of this release is the aggregator and feed item scanner
+
+
+- Improvement: Feed item scanner is now asynchronous
+    - The feedscan.php script is now split into parent and child processes.
+    - The parent is "feedscan_manage.php"
+    - The child is "feedscan_process.php"
+    - Maximum children is set to 10 for now
+    - At the beginning of each spawned process, it sleeps for a random small amount of time to let the CPU breath
+
+- Improvement: Aggregator logic bugs stomped
+    - In the process of moving from PHP to node.js for the feed puller, some flow problems were made
+    - It's _much_ more stable now
+    - The PHP and Node.js sides of things agree with each other now on what they expect
+    - This will translate to fewer "over 50 errors" feeds in your subscription list page
+
+- Improvement: Article extraction tweaks
+    - For sites that were always problematic due to wierd structure
+    - Sometimes just relying on the containing element with the most downstream content doesn't work
+    - First steps to moving the cart'ing logic into the server api where it belongs
+    - Content detections improved to handle special cases

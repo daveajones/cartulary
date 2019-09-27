@@ -83,7 +83,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     $totalfeeds = $totalfeeds + count($poorfeeds);
     foreach( $poorfeeds as $feed) {
         $id = $feed['id'];
-        $url = $fi['url'];
+        $url = $feed['url'];
 
         if ($doit) {
             mark_feed_as_dead($id);

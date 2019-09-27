@@ -4,6 +4,8 @@
 //Let's not run twice
 if (($pid = cronHelper::lock()) !== FALSE) {
 
+    require_once "/opt/cartulary/libraries/markdown/Markdown.inc.php";
+
     $action = "";
     $rawver = FALSE;
     if (in_array("checknew", $argv)) {
@@ -50,10 +52,14 @@ if (($pid = cronHelper::lock()) !== FALSE) {
                 }
             }
             if(!$alreadynotified) {
-                $upgmessage = "A new version of cartulary is available: [$ghVersion].\n\nYou are currently on version: [$myVersion].\n\n";
+                $upgmessage = "<p>A new version of cartulary is available: [$ghVersion].</p>\n";
+                $upgmessage .= "<p>You are currently on version: [$myVersion].</p>\n";
+                $upgmessage .= "<hr>\n";
                 $releasenotes = fetchUrlSafe($cg_sys_master_release_url_prefix."v".$ghVersion."-notes.txt");
-                $upgmessage .= $releasenotes;
-                add_admin_log_item('<pre>'.$upgmessage.'</pre>', "Upgrade Available");
+                //$upgmessage .= $releasenotes;
+                $markdown = new \Michelf\Markdown();
+                $upgmessage .= $markdown->transform($releasenotes);
+                add_admin_log_item($upgmessage, "Upgrade Available");
             }
             loggit(3, "New version of cartulary available: [$ghVersion]");
             echo "A new version is available: $ghVersion\n";

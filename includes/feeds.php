@@ -603,10 +603,9 @@ function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL, $type = 0
     }
 
     //Does this feed exist already?
+    $existed = FALSE;
     $fid = feed_exists($url);
     if (!$fid) {
-        $existed = FALSE;
-        //Now that we have a good id, put the article into the database
         $stmt = "INSERT INTO $table_newsfeed (id,url,createdon, type) VALUES (?,?,?,?)";
         $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
         $sql->bind_param("ssdd", $id, $url, $createdon, $type) or loggit(2, "MySql error: " . $dbh->error);
@@ -626,6 +625,10 @@ function add_feed($url = NULL, $uid = NULL, $get = FALSE, $oid = NULL, $type = 0
     //Link this feed to an outline if that was requested
     if ($oid != NULL) {
         link_feed_to_outline($id, $oid, $uid);
+    }
+
+    if(!$existed) {
+        fetch_feed_content($id, TRUE);
     }
 
     //Was feed item retrieval requested?
@@ -2076,6 +2079,7 @@ function get_feed_items($fid = NULL, $max = NULL, $force = FALSE)
     delete_old_feed_items($fid);
 
     //Calculate new stats for this feed
+    //TODO: check for divide by zero in these calcs
     $stats['checktime'] += (time() - $fstart);
     $stats['avgchecktime'] = ($stats['checktime'] / $stats['checkcount']);
     $stats['newitems'] += $newcount;
@@ -2784,8 +2788,10 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         if (!empty($cleaned['media'])) {
             foreach ($cleaned['media'] as $mediatag) {
                 $esize = "";
-                if ($mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video') {
+                if ($mediatag['type'] == 'audio' || $mediatag['type'] == 'video') {
                     $esize = check_head_size($mediatag['src']);
+                } else {
+                    $esize = 0;
                 }
                 if ((empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) && !empty($mediatag['src'])) {
                     $enclosures[] = array('url' => $mediatag['src'],
@@ -2948,8 +2954,10 @@ function add_feed_item($fid = NULL, $item = NULL, $format = NULL, $namespaces = 
         if (is_array($cleaned['media']) && count($cleaned['media']) > 0) {
             foreach ($cleaned['media'] as $mediatag) {
                 $esize = "";
-                if ($mediatag['type'] == 'image' || $mediatag['type'] == 'audio' || $mediatag['type'] == 'video') {
+                if ($mediatag['type'] == 'audio' || $mediatag['type'] == 'video') {
                     $esize = check_head_size($mediatag['src']);
+                } else {
+                    $esize = 0;
                 }
                 if ((empty($esize) || $esize > 2500) && !in_array_r($mediatag['src'], $enclosures) && !empty($mediatag['src'])) {
                     $enclosures[] = array(
@@ -3678,6 +3686,8 @@ function get_unique_id_for_feed_item($item = NULL)
         return (FALSE);
     }
 
+    $tstart = time();
+
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
 
@@ -3691,7 +3701,7 @@ function get_unique_id_for_feed_item($item = NULL)
     $hashed = sha1($item->asXML());
 
     //Return
-    //loggit(3, "Returning hash: [$hashed] as unique id for feed item: [".print_r($item, TRUE)."]");
+    loggit(3, "Took: [".(time() - $tstart)."] seconds to generate hash: [$hashed] as unique id for feed item.");
     return ($hashed);
 }
 
@@ -3704,6 +3714,8 @@ function get_unique_id_for_rdf_feed_item($item = NULL, $namespaces = array())
         loggit(2, "The feed item is blank or corrupt: [" . print_r($item, TRUE) . "]");
         return (FALSE);
     }
+
+    $tstart = time();
 
     //Includes
     include get_cfg_var("cartulary_conf") . '/includes/env.php';
@@ -3726,7 +3738,7 @@ function get_unique_id_for_rdf_feed_item($item = NULL, $namespaces = array())
     $hashed = sha1($item->asXML());
 
     //Return
-    //loggit(3, "Returning hash: [$hashed] as unique id for feed item: [".print_r($item, TRUE)."]");
+    loggit(3, "Took: [".(time() - $tstart)."] seconds to generate hash: [$hashed] as unique id for RDF feed item.");
     return ($hashed);
 }
 
@@ -6826,4 +6838,29 @@ function get_poor_feeds()
 
     loggit(1, "Returning: [$count] poor feeds.");
     return ($feeds);
+}
+
+
+//Reset feed error count to zero
+function reset_feed_error_count_all($withdead=FALSE)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Run the query
+    if($withdead) {
+        $stmt = "UPDATE $table_newsfeed SET errors=0";
+    } else {
+        $stmt = "UPDATE $table_newsfeed SET errors=0 WHERE dead=0";
+    }
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close();
+
+    //Log and return
+    loggit(1, "Reset error count to zero for all feeds.");
+    return (TRUE);
 }

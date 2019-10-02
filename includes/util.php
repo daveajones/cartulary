@@ -1029,6 +1029,8 @@ function check_head_lastmod($url, $timeout = 5)
     // attempt to retrieve the modification date
     curl_setopt($curl, CURLOPT_FILETIME, true);
 
+    loggit(3, "CURL: Head lastmod check on: [$url]");
+
     $result = curl_exec($curl);
 
     $info = curl_getinfo($curl);
@@ -1110,7 +1112,7 @@ function check_head_size($url, $timeout = 5)
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 
-    loggit(1, "CURL: Head check on: [$url]");
+    loggit(3, "CURL: Head size check on: [$url]");
 
     $result = curl_exec($curl);
 
@@ -1155,7 +1157,7 @@ function check_head_content_type($url, $timeout = 5)
     curl_exec($curl);
 
     $ct = curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
-    //loggit(3, "DEBUG: CURL: Content-type check on: [$url] returned: [$ct]");
+    loggit(3, "DEBUG: CURL: Content-type check on: [$url].");
 
     return ($ct);
 }

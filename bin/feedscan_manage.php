@@ -56,10 +56,51 @@ if (($pid = cronHelper::lock()) !== FALSE) {
             }
         } else {
             //echo "I am the child, $ccount pid = $pid \n";
-            exec("php /opt/cartulary/bin/feedscan_process.php '".$feed['url']."'");
+
+            //Get the feed
+            $feedurl = $feed['url'];
+            if (empty($feedurl)) {
+                loggit(2, "Feed url was corrupt or blank: [$feedurl].");
+                echo "Feed url was corrupt or blank: [$feedurl].\n";
+                exit(1);
+            }
+
+            //Get new items in the feed
+            $newitems = 0;
+
+            echo "Checking feed: [" . $feed['title'] . " | " . $feed['url'] . "]...\n";
+
+            //Make a timestamp
+            $fstart = time();
+
+            //Parse the feed and add new items to the database
+            //loggit(3, "Checking feed: [ $feedcount | " . $feed['title'] . " | " . $feed['url'] . "].");
+            $result = get_feed_items($feed['id'], NULL, FALSE);
+
+            if ($result == -1) {
+                loggit(2, "Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]");
+                echo "    Error getting items for feed: [" . $feed['title'] . " | " . $feed['url'] . "]\n";
+                $errorfeeds[] = $feed['url'];
+            } else if ($result == -2) {
+                loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] has no items.");
+                //echo "    Feed is empty.\n";
+            } else if ($result == -3) {
+                loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] is current.");
+                //echo "    Feed is current.\n";
+            } else {
+                loggit(1, "Feed: [" . $feed['title'] . " | " . $feed['url'] . "] updated.");
+                echo "    Feed updated.\n";
+                $newitems += $result;
+            }
+
+            //Calculate time took to scan
+            $ftime = time() - $fstart;
+            loggit(3, "  FEEDSCAN RESULTS: [$feedurl] - [$ftime] seconds - [$newitems] new items.");
+            echo "  FEEDSCAN RESULTS: [$feedurl] - [$ftime] seconds - [$newitems] new items.\n";
+
             echo "  -- Child: [$ccount] finished.\n";
             //loggit(3, "  -- Child: [$ccount] finished.");
-            exit;
+            exit(0);
         }
 
         $ccount++;

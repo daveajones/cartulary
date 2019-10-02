@@ -179,7 +179,10 @@ if( !empty($templateid) ) {
 //Put the opml file in S3
 $s3info = get_s3_info($uid);
 if(!$private) {
-    $s3res = putInS3($opml, $filename, $s3info['bucket']."/opml", $s3info['key'], $s3info['secret'], "text/xml", $private);
+    $s3res = putInS3(gzencode($opml), $filename, $s3info['bucket']."/opml", $s3info['key'], $s3info['secret'], array(
+        'Content-Type'      => 'text/xml',
+        'Content-Encoding'  => 'gzip'
+    ), $private);
     if(!$s3res) {
         loggit(2, "Could not create S3 file: [$filename] for user: [$uid].");
         loggit(3, "Could not create S3 file: [$filename] for user: [$uid].");
@@ -212,7 +215,11 @@ $htmlfilename = str_replace('.opml', '.html', $filename);
 $s3htmlauthurl = "";
 $s3htmlurl = get_s3_url($uid, "/html/", $htmlfilename);
 $htmldata = process_opml_to_html($opml, $title, $uid, $disqus, $s3url, $rendertitle, $s3htmlurl);
-$s3res = putInS3($htmldata, $htmlfilename, $s3info['bucket']."/html", $s3info['key'], $s3info['secret'], "text/html", $private);
+$s3res = putInS3(gzencode($htmldata), $htmlfilename, $s3info['bucket']."/html", $s3info['key'], $s3info['secret'], array(
+    'Content-Type'      => 'text/html',
+    'Cache-Control'     => 'max-age=31556926',
+    'Content-Encoding'  => 'gzip'
+), $private);
 if(!$s3res) {
     loggit(2, "Could not create S3 file: [$htmlfilename] for user: [$uid].");
     loggit(3, "Could not create S3 file: [$htmlfilename] for user: [$uid].");
@@ -263,7 +270,10 @@ if( $type == 1 ) {
         echo json_encode($jsondata);
         exit(1);
     }
-    $s3res = putInS3($rssdata, $rssfilename, $s3info['bucket']."/rss", $s3info['key'], $s3info['secret'], "application/rss+xml", $private);
+    $s3res = putInS3(gzencode($rssdata), $rssfilename, $s3info['bucket']."/rss", $s3info['key'], $s3info['secret'], array(
+        'Content-Type'      => 'application/rss+xml',
+        'Content-Encoding'  => 'gzip'
+    ), $private);
     if(!$s3res) {
         loggit(2, "Could not create S3 file: [$rssfilename] for user: [$uid].");
         loggit(3, "Could not create S3 file: [$rssfilename] for user: [$uid].");
@@ -393,7 +403,10 @@ if( !empty($rhost) ) {
         loggit(3, "DEBUG: s3path is [$s3path].");
 
         //Now put the index stub into s3
-        $s3res = putInS3($rfile, $pend, $s3path, $s3info['key'], $s3info['secret'], "text/html");
+        $s3res = putInS3(gzencode($rfile), $pend, $s3path, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'text/html',
+            'Content-Encoding'  => 'gzip'
+        ));
         if(!$s3res) {
             loggit(2, "Could not create S3 file: [index.html] for user: [$uid].");
             loggit(3, "Could not create S3 file: [index.html] for user: [$uid].");

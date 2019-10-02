@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 89;
+$cg_database_version = 90;
 $cg_database_updates = array();
 
 
@@ -1207,6 +1207,16 @@ CGDB0256;
 $cg_database_updates[88][] = <<<CGDB0257
  INSERT INTO `dbversion` ( `version` ) VALUES ( '89' )
 CGDB0257;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 89 to 90 -----------------------------------------------------------------------------------------------
+$cg_database_updates[89][] = <<<CGDB0258
+ ALTER TABLE `sysprefs` ADD `system` TINYINT NOT NULL DEFAULT '1' FIRST, 
+ ADD UNIQUE (`system`)
+CGDB0258;
+$cg_database_updates[89][] = <<<CGDB0259
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '90' )
+CGDB0259;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 88;
+$cg_database_version = 89;
 $cg_database_updates = array();
 
 
@@ -1198,6 +1198,15 @@ CGDB0254;
 $cg_database_updates[87][] = <<<CGDB0255
  INSERT INTO `dbversion` ( `version` ) VALUES ( '88' )
 CGDB0255;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 88 to 89 -----------------------------------------------------------------------------------------------
+$cg_database_updates[88][] = <<<CGDB0256
+ ALTER TABLE `sysprefs` ADD `admin_feed_check_token` VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'Token value for checking admin-log feed'
+CGDB0256;
+$cg_database_updates[88][] = <<<CGDB0257
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '89' )
+CGDB0257;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

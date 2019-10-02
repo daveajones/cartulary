@@ -50,13 +50,13 @@ function create_user($email = NULL, $silent = NULL, $inside = NULL, $active = NU
     $username = $emparts[0] . random_gen(4);
     $tuid = get_user_id_from_username($username);
     $tc = 0;
-    while( $tuid != "none" && $tuid != FALSE ) {
+    while ($tuid != "none" && $tuid != FALSE) {
         $username = $emparts[0] . random_gen(4);
         $tuid = get_user_id_from_username($username);
         $tc++;
-        if($tc > 10) {
+        if ($tc > 10) {
             loggit(2, "Tried 10 times to create a user but couldn't: [$email | $username].");
-            return(FALSE);
+            return (FALSE);
         }
     }
 
@@ -181,7 +181,7 @@ function get_admin_log_items($max = NULL)
 
     $sqltxt .= " ORDER BY createdon DESC";
 
-    if ( !empty($max) && is_numeric($max) ) {
+    if (!empty($max) && is_numeric($max)) {
         $sqltxt .= " LIMIT $max";
     }
 
@@ -254,7 +254,7 @@ function build_admin_log_rss_feed($max = NULL)
     $rss = '<?xml version="1.0"?>' . "\n  <rss version=\"2.0\" xmlns:source=\"http://source.smallpict.com/2014/07/12/theSourceNamespace.html\" xmlns:sopml=\"$sopmlnamespaceurlv1\">\n    <channel>";
 
     $rss .= "\n
-      <title>" . htmlspecialchars($title." - ".$system_fqdn) . "</title>
+      <title>" . htmlspecialchars($title . " - " . $system_fqdn) . "</title>
       <link>" . htmlspecialchars($feedlink) . "</link>
       <description>$title</description>
       <language>en-us</language>
@@ -327,4 +327,171 @@ function build_admin_log_rss_feed($max = NULL)
 
     loggit(1, "Built admin log rss feed.");
     return ($rss);
+}
+
+
+//Initialize an empty set of system prefs
+function init_system_prefs()
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //New feed check token
+    $afctoken = random_gen(17);
+
+    //Build query
+    $stmt = "INSERT IGNORE INTO $table_sysprefs (system_name,system_url,admin_feed_check_token) VALUES (?,?,?)";
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sss", $cg_system_name, $cg_system_url, $afctoken) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Now get the prefs we just made
+    $sysprefs = get_system_prefs(TRUE);
+
+    //Log and return
+    loggit(1, "Initialized a default set of system prefs.");
+    return ($sysprefs);
+}
+
+
+//Return an array of all the prefs for this system
+function get_system_prefs($noinit = FALSE)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Connect to the database server
+    $dbh = new mysqli_Extended($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Build query
+    $sql = $dbh->prepare("SELECT * FROM $table_sysprefs") or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->store_result() or loggit(2, "MySql error: " . $dbh->error);
+    //See if the session is valid
+    $recount = $sql->num_rows();
+    if ($recount != 1) {
+        $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+        loggit(2, "No system prefs could be retrieved. Records: [$recount]");
+        if ($noinit == TRUE) {
+            return (FALSE);
+        } else {
+            return (init_system_prefs());
+        }
+    }
+    $sysprefs = $sql->fetch_assoc();
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(1, "Returning system prefs array.");
+    return ($sysprefs);
+}
+
+
+//Set prefs for this user
+function set_system_prefs($sysprefs = NULL)
+{
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    if ($sysprefs == NULL) {
+        loggit(2, "The prefs array is blank or corrupt: [$sysprefs]");
+        return (FALSE);
+    }
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the sid in the session table
+    $stmt = "UPDATE $table_sysprefs
+	         SET  system_name=?,
+                  system_url=?,
+                  default_style_sheet=?,
+                  s3key=?,
+                  s3secret=?,
+                  s3bucket=?,
+                  s3cname=?,
+                  twitterkey=?,
+                  twittersecret=?,
+                  twittertoken=?,
+                  twittertokensecret=?,
+                  urlshortener=?,
+                  default_avatar_url=?,
+                  s3shortbucket=?,
+                  lastshortcode=?,
+                  riverhours=?,
+                  microblogtitle=?,
+                  cartularytitle=?,
+                  mbfilename=?,
+                  cartfilename=?,
+                  admin_feed_check_token=?
+           WHERE system=1";
+
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("sssssssssssssssdsssss",
+        $sysprefs['system_name'],
+        $sysprefs['system_url'],
+        $sysprefs['default_style_sheet'],
+        $sysprefs['s3key'],
+        $sysprefs['s3secret'],
+        $sysprefs['s3bucket'],
+        $sysprefs['s3cname'],
+        $sysprefs['twitterkey'],
+        $sysprefs['twittersecret'],
+        $sysprefs['twittertoken'],
+        $sysprefs['twittertokensecret'],
+        $sysprefs['urlshortener'],
+        $sysprefs['default_avatar_url'],
+        $sysprefs['s3shortbucket'],
+        $sysprefs['lastshortcode'],
+        $sysprefs['riverhours'],
+        $sysprefs['microblogtitle'],
+        $sysprefs['cartularytitle'],
+        $sysprefs['mbfilename'],
+        $sysprefs['cartfilename'],
+        $sysprefs['admin_feed_check_token']
+    ) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    //Log and return
+    loggit(1, "Set system prefs.");
+    return (TRUE);
+}
+
+
+//Set the system admin feed check token
+function new_system_admin_feed_check_token() {
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Create a new token and set it
+    $afctoken = random_gen(17);
+    $sysprefs = get_system_prefs();
+    $sysprefs['admin_feed_check_token'] = $afctoken;
+    set_system_prefs($sysprefs);
+
+    //Now change the admin feed url in the newsfeeds table
+    $newurl = "http://localhost/adminlog-rss?t=$afctoken";
+    $oldurl = "http://localhost/adminlog-rss";
+
+    //Connect to the database server
+    $dbh = new mysqli($dbhost, $dbuser, $dbpass, $dbname) or loggit(2, "MySql error: " . $dbh->error);
+
+    //Look for the sid in the session table
+    $stmt = "UPDATE $table_newsfeed SET url=? WHERE url LIKE CONCAT('%', ?, '%')";
+
+    $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->bind_param("ss",
+        $newurl,
+        $oldurl
+    ) or loggit(2, "MySql error: " . $dbh->error);
+    $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
+    $sql->close() or loggit(2, "MySql error: " . $dbh->error);
+
+    loggit(3, "Set a new admin feed check token: [$afctoken]");
+    return($afctoken);
 }

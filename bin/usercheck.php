@@ -24,7 +24,9 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     }
 
     //Make sure that admin users are subscribed to the admin log feed
-    $alfurl = 'http://localhost' . $adminlogfeed . '?t=' . $admin_feed_check_token;
+    $sysprefs = get_system_prefs();
+    $afctoken = $sysprefs['admin_feed_check_token'];
+    $alfurl = 'http://localhost' . $adminlogfeed . '?t=' . $afctoken;
     $fid = add_feed($alfurl, NULL, TRUE, NULL);
     $users = get_admin_users();
     if($users) {

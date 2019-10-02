@@ -71,7 +71,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
     //Check for dead servers
     $servers = get_all_servers();
-    foreach( $servers as $server ) {
+    foreach ($servers as $server) {
         //Make sure the server is still alive
         $serverurl = get_final_url('http://' . $server['address']);
         if ($serverurl == FALSE) {
@@ -82,6 +82,9 @@ if (($pid = cronHelper::lock()) !== FALSE) {
             remove_server($server['guid']);
         }
     }
+
+    //Rotate the admin feed check token
+    new_system_admin_feed_check_token();
 
     //Calculate how long it took
     $took = time() - $tstart;
@@ -100,5 +103,3 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     cronHelper::unlock();
 }
 exit(0);
-?>
-

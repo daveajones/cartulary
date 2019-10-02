@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 90;
+$cg_database_version = 91;
 $cg_database_updates = array();
 
 
@@ -1217,6 +1217,15 @@ CGDB0258;
 $cg_database_updates[89][] = <<<CGDB0259
  INSERT INTO `dbversion` ( `version` ) VALUES ( '90' )
 CGDB0259;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 90 to 91 -----------------------------------------------------------------------------------------------
+$cg_database_updates[90][] = <<<CGDB0260
+ DELETE FROM `newsfeeds` WHERE url LIKE '%http://localhost/adminlog-rss%'
+CGDB0260;
+$cg_database_updates[90][] = <<<CGDB0261
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '91' )
+CGDB0261;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

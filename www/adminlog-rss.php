@@ -3,7 +3,17 @@
 <?
 
 //Check for an admin feed token
-if(!isset($_REQUEST['t']) || empty($_REQUEST['t']) || $_REQUEST['t'] != $admin_feed_check_token) {
+$sysprefs = get_system_prefs();
+if (empty($sysprefs['admin_feed_check_token'])) {
+    loggit(2, "No feed check token set in the system: [" . $sysprefs['admin_feed_check_token'] . "]");
+    exit(1);
+}
+$afctoken = "";
+if (isset($_REQUEST['t']) && !empty($_REQUEST['t'])) {
+    $afctoken = $_REQUEST['t'];
+}
+if ($afctoken != $sysprefs['admin_feed_check_token']) {
+    loggit(2, "Feed check token in REQUEST: [$afctoken] did not match system: [" . $sysprefs['admin_feed_check_token'] . "]");
     exit(1);
 }
 

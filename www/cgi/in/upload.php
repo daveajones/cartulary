@@ -11,21 +11,21 @@ $jsondata['fieldname'] = "";
 $uploadDir = "$confroot/$cg_folder_spool/";
 
 //Get the datestamp
-if( isset($_POST['datestamp']) && is_numeric($_POST['datestamp']) ) {
+if (isset($_POST['datestamp']) && is_numeric($_POST['datestamp'])) {
     $datestamp = $_POST['datestamp'];
 } else {
     $datestamp = (string)microtime(TRUE);
 }
 
 $sizes = NULL;
-if( isset($_POST['sizes']) && !empty($_POST['sizes']) ) {
+if (isset($_POST['sizes']) && !empty($_POST['sizes'])) {
     $sizes = json_decode($_POST['sizes'], TRUE);
     loggit(3, print_r($_POST, TRUE));
 }
 
 
 //Process the files coming in
-if ( !empty( $_FILES ) ) {
+if (!empty($_FILES)) {
     $tempFile = $_FILES['Filedata']['tmp_name'];
     $fileName = cleanFilename($_FILES['Filedata']['name']);
     $fileType = $_FILES['Filedata']['type'];
@@ -46,7 +46,7 @@ if ( !empty( $_FILES ) ) {
     }
 
     $s3info = get_s3_info($g_uid);
-    if ( $s3info != FALSE ) {
+    if ($s3info != FALSE) {
         loggit(3, "Uploading enclosure to S3: " . print_r($targetFile, TRUE));
 
         putFileInS3($targetFile, $targetS3File, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret']);
@@ -58,42 +58,43 @@ if ( !empty( $_FILES ) ) {
 
 
         //Make resized copies if any were requested
-        foreach ($sizes as $size) {
-            $width = $size['size'];
-            if( is_numeric($width) && $width < 4000 ) {
-                $newS3File = $targetS3File."_".$size['size'].".".$size['type'];
-                $newTargetFile = $targetFile."_".$width;
-                image_resize($targetFile, $newTargetFile, $size['type'], $width, NULL, NULL);
-                putFileInS3($newTargetFile, $newS3File , $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret']);
-                loggit(3, "Uploading: [$newTargetFile] to S3 as: [$newS3File].");
+        if (!empty($sizes) && is_array($sizes)) {
+            foreach ($sizes as $size) {
+                $width = $size['size'];
+                if (is_numeric($width) && $width < 4000) {
+                    $newS3File = $targetS3File . "_" . $size['size'] . "." . $size['type'];
+                    $newTargetFile = $targetFile . "_" . $width;
+                    image_resize($targetFile, $newTargetFile, $size['type'], $width, NULL, NULL);
+                    putFileInS3($newTargetFile, $newS3File, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret']);
+                    loggit(3, "Uploading: [$newTargetFile] to S3 as: [$newS3File].");
+                }
             }
         }
-
-
 
         loggit(3, "Unlinking file: $targetFile");
         unlink($targetFile);
 
         //Give back info if there was any
-        if(isset($_POST['element']) && is_numeric($_POST['element'])) {
+        if (isset($_POST['element']) && is_numeric($_POST['element'])) {
             $enclosure['element'] = $_POST['element'];
         }
         $enclosure['datestamp'] = $_POST['datestamp'];
 
         //Give feedback that all went well
         echo json_encode($enclosure);
-        return ( 0 );
+        return (0);
     }
 } else {
-    loggit(2, "Upload attempt was blank [" .print_r($_FILES, TRUE) . "].");
+    loggit(2, "Upload attempt was blank [" . print_r($_FILES, TRUE) . "].");
 }
 
 
-function image_resize($src, $dst, $newtype, $width, $height, $crop=0){
+function image_resize($src, $dst, $newtype, $width, $height, $crop = 0)
+{
 
-    if(!list($w, $h) = getimagesize($src)) return "Unsupported picture type!";
+    if (!list($w, $h) = getimagesize($src)) return "Unsupported picture type!";
 
-    if($w > $h) {
+    if ($w > $h) {
         $ar = $w / $h;
         $longside = 'w';
     } else {
@@ -108,27 +109,35 @@ function image_resize($src, $dst, $newtype, $width, $height, $crop=0){
 //    }
     $height = round($width / $ar);
 
-    $type = strtolower(substr(strrchr($src,"."),1));
-    if($type == 'jpeg') $type = 'jpg';
-    switch($type){
-        case 'bmp': $img = imagecreatefromwbmp($src); break;
-        case 'gif': $img = imagecreatefromgif($src); break;
-        case 'jpg': $img = imagecreatefromjpeg($src); break;
-        case 'png': $img = imagecreatefrompng($src); break;
-        default : return "Unsupported picture type!";
+    $type = strtolower(substr(strrchr($src, "."), 1));
+    if ($type == 'jpeg') $type = 'jpg';
+    switch ($type) {
+        case 'bmp':
+            $img = imagecreatefromwbmp($src);
+            break;
+        case 'gif':
+            $img = imagecreatefromgif($src);
+            break;
+        case 'jpg':
+            $img = imagecreatefromjpeg($src);
+            break;
+        case 'png':
+            $img = imagecreatefrompng($src);
+            break;
+        default :
+            return "Unsupported picture type!";
     }
 
     // resize
-    if($crop){
-        if($w < $width or $h < $height) return "Picture is too small!";
-        $ratio = max($width/$w, $height/$h);
+    if ($crop) {
+        if ($w < $width or $h < $height) return "Picture is too small!";
+        $ratio = max($width / $w, $height / $h);
         $h = $height / $ratio;
         $x = ($w - $width / $ratio) / 2;
         $w = $width / $ratio;
-    }
-    else{
-        if($w < $width and $h < $height) return "Picture is too small!";
-        $ratio = min($width/$w, $height/$h);
+    } else {
+        if ($w < $width and $h < $height) return "Picture is too small!";
+        $ratio = min($width / $w, $height / $h);
         $width = $w * $ratio;
         $height = $h * $ratio;
         $x = 0;
@@ -138,7 +147,7 @@ function image_resize($src, $dst, $newtype, $width, $height, $crop=0){
     $new = imagecreatetruecolor($width, $height);
 
     // preserve transparency
-    if($type == "gif" or $type == "png"){
+    if ($type == "gif" or $type == "png") {
         imagecolortransparent($new, imagecolorallocatealpha($new, 0, 0, 0, 127));
         imagealphablending($new, false);
         imagesavealpha($new, true);
@@ -146,11 +155,19 @@ function image_resize($src, $dst, $newtype, $width, $height, $crop=0){
 
     imagecopyresampled($new, $img, 0, 0, $x, 0, $width, $height, $w, $h);
 
-    switch($newtype){
-        case 'bmp': imagewbmp($new, $dst); break;
-        case 'gif': imagegif($new, $dst); break;
-        case 'jpg': imagejpeg($new, $dst); break;
-        case 'png': imagepng($new, $dst); break;
+    switch ($newtype) {
+        case 'bmp':
+            imagewbmp($new, $dst);
+            break;
+        case 'gif':
+            imagegif($new, $dst);
+            break;
+        case 'jpg':
+            imagejpeg($new, $dst);
+            break;
+        case 'png':
+            imagepng($new, $dst);
+            break;
     }
     return true;
 }

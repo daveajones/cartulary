@@ -1913,7 +1913,11 @@ function get_short_url($uid = NULL, $longurl = NULL)
     if (!empty($prefs['s3shortbucket'])) {
         $shortcode = get_next_short_url($prefs['lastshortcode']);
         $file = create_short_url_file($longurl, $uid);
-        $result = putInS3($file, $shortcode, $prefs['s3shortbucket'], $prefs['s3key'], $prefs['s3secret'], "text/html");
+        $result = putInS3(gzencode($file), $shortcode, $prefs['s3shortbucket'], $prefs['s3key'], $prefs['s3secret'], array(
+            'Content-Type'      => 'text/html',
+            'Cache-Control'     => 'max-age=31536000',
+            'Content-Encoding'  => 'gzip'
+        ));
         if ($result == FALSE) {
             return (FALSE);
         } else {
@@ -2521,7 +2525,6 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
     }
     if (!$s3res) {
         loggit(2, "Could not create S3 file: [$bucket/$subpath$filename].");
-        //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
         return (FALSE);
     } else {
         $s3url = "http://s3.amazonaws.com/$bucket/$subpath$filename";
@@ -2533,7 +2536,7 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
 
 
 //This puts a file into S3 from an actual file
-function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NULL, $private = FALSE)
+function putFileInS3($file, $filename, $bucket, $key, $secret, $headers = NULL, $private = FALSE)
 {
 
     //Check parameters
@@ -2583,57 +2586,89 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $contenttype = NU
     }
     $keyname = $subpath . $filename;
 
+    //Assemble object to upload
+    $filepath = $file;
+    $s3object = array(
+        'Bucket'     => $bucket,
+        'Key'        => $keyname,
+        'SourceFile' => $filepath
+    );
+
     loggit(1, "Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
 
-    $filepath = $file;
-    if ($contenttype == NULL) {
-        if ($private == FALSE) {
-            $s3res = $s3->putObject(array(
-                'Bucket' => $bucket,
-                'Key' => $keyname,
-                'SourceFile' => $filepath,
-                'ACL' => 'public-read',
-                'StorageClass' => 'REDUCED_REDUNDANCY'
-            ));
+    //Add headers if any
+    if (!empty($headers)) {
+        if (is_array($headers)) {
+            foreach ($headers as $hkey => $hvalue) {
+                loggit(3, "HEADER: [$hkey] => [$hvalue]");
+                $hkey = str_replace('-', '', $hkey);
+                $s3object[$hkey] = $hvalue;
+            }
         } else {
-            $s3res = $s3->putObject(array(
-                'Bucket' => $bucket,
-                'Key' => $keyname,
-                'SourceFile' => $filepath,
-                'ACL' => 'private',
-                'StorageClass' => 'REDUCED_REDUNDANCY'
-            ));
+            $s3object['ContentType'] = $headers;
+        }
+    }
+
+    //Make the call to S3
+    if ($private) {
+        try {
+            // Upload data.
+            $s3object['ACL'] = 'private';
+            //loggit(3, "S3: ".print_r($s3object, TRUE));
+            $s3res = $s3->putObject($s3object);
+
+            // Print the URL to the object.
+            loggit(3, "Wrote file to S3: [" . $s3res['ObjectURL'] . "].");
+        } catch (S3Exception $e) {
+            loggit(2, "S3 Error: [" . $e->getMessage() . "].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
+        } catch (Awsxception $e) {
+            loggit(2, "S3 Error: [" . $e->getAwsErrorCode() . "].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
+        } catch (Exception $e) {
+            loggit(2, "S3 Error: [" . $e->getMessage() . "].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
         }
     } else {
-        if ($private == FALSE) {
-            $s3res = $s3->putObject(array(
-                'Bucket' => $bucket,
-                'Key' => $keyname,
-                'SourceFile' => $filepath,
-                'ContentType' => $contenttype,
-                'ACL' => 'public-read',
-                'StorageClass' => 'REDUCED_REDUNDANCY'
-            ));
-        } else {
-            $s3res = $s3->putObject(array(
-                'Bucket' => $bucket,
-                'Key' => $keyname,
-                'SourceFile' => $filepath,
-                'ContentType' => $contenttype,
-                'ACL' => 'private',
-                'StorageClass' => 'REDUCED_REDUNDANCY'
-            ));
+        try {
+            // Upload data.
+            $s3object['ACL'] = 'public-read';
+            //loggit(3, "S3: ".print_r($s3object, TRUE));
+            $s3res = $s3->putObject($s3object);
+
+            // Print the URL to the object.
+            loggit(3, "Wrote file to S3: [" . $s3res['ObjectURL'] . "].");
+        } catch (S3Exception $e) {
+            loggit(2, "S3 Error: [" . $e->getMessage() . "].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
+        } catch (Awsxception $e) {
+            loggit(2, "S3 Error: [" . $e->getAwsErrorCode() . "].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
+        } catch (Exception $e) {
+            loggit(2, "S3 Error: [" . $e->getMessage() . "].");
+            loggit(2, "Could not create S3 file: [$bucket/$keyname].");
+            //loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
+            return (FALSE);
         }
     }
     //loggit(3, "S3DEBUG: ".print_r($s3res, TRUE));
 
     if (!$s3res) {
         loggit(2, "Could not create S3 file: [$bucket/$subpath$filename].");
-        loggit(3, "Could not create S3 file: [$bucket/$subpath$filename].");
         return (FALSE);
     } else {
         $s3url = "http://s3.amazonaws.com/$bucket/$subpath$filename";
-        loggit(1, "Wrote file to S3: [$s3url | " . $s3res['ObjectURL'] . "].");
+        loggit(1, "Wrote file to S3: [$s3url].");
     }
 
     return (TRUE);
@@ -4460,7 +4495,11 @@ function create_s3_qrcode_from_url($uid = NULL, $value = "", $qrfilename = "")
 
         //Put the desktop file
         $filename = $qrfilename;
-        $s3res = putInS3(gzencode($qrdata), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "image/png", "Content-Encoding" => "gzip"));
+        $s3res = putInS3(gzencode($qrdata), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'image/png',
+            'Cache-Control'     => 'max-age=31536000',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
         } else {

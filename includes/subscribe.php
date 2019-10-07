@@ -1296,7 +1296,10 @@ function build_opml_feeds_feed($uid = NULL, $max = NULL, $archive = FALSE, $feed
         }
 
         //Put the file
-        $s3res = putInS3($opml, $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], "text/xml");
+        $s3res = putInS3(gzencode($opml), $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'text/xml',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -1576,7 +1579,10 @@ function build_opml_reading_list($uid = NULL, $max = NULL)
         $subpath = "";
 
         //Put the file
-        $s3res = putInS3($opml, $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], "text/plain");
+        $s3res = putInS3(gzencode($opml), $filename, $s3info['bucket'] . $subpath, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'text/xml',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");

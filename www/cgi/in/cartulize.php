@@ -565,7 +565,10 @@ if ($prefs['staticarticles'] == 1) {
     $s3info = get_s3_info($g_uid);
     if ($s3info != FALSE) {
         $targetS3File = time() . "_" . random_gen(8) . ".html";
-        putInS3(make_article_printable($aid, $uid), $targetS3File, $s3info['bucket'] . "/art", $s3info['key'], $s3info['secret'], "text/html");
+        putInS3(gzencode(make_article_printable($aid, $uid)), $targetS3File, $s3info['bucket'] . "/art", $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'text/html',
+            'Content-Encoding'  => 'gzip'
+        ));
         $staticurl = get_s3_url($uid, '/art/', $targetS3File);
         loggit(3, "Stored article in S3 at location: [$staticurl].");
         update_article_static_url($aid, $uid, $staticurl);

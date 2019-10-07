@@ -8,11 +8,14 @@ $jsondata['fieldname'] = "";
 //Is S3 available?
 $s3info = get_s3_info($uid);
 
+loggit(3, print_r($_REQUEST, TRUE));
+
 //Get the content of the post
 loggit(1, "Blog post form: " . print_r($_REQUEST, TRUE));
 loggit(1, "Blog post files: " . print_r($_FILES, TRUE));
 $jsondata['fieldname'] = "content";
-if (isset($_REQUEST['content'])) {
+$content = "";
+if (isset($_REQUEST['content']) && !empty($_REQUEST['content'])) {
     $content = $_REQUEST['content'];
 } else {
     //Log it
@@ -151,7 +154,9 @@ if (isset($_FILES['file_mobile']) && $_FILES['file_mobile']['size'] > 0 && ($s3i
         image_fix_orientation($files['tmp_name']);
     }
     $encfile = date('YmdHis') . "_" . strtolower($files['name']);
-    putFileInS3($files['tmp_name'], $encfile, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret']);
+    putFileInS3($files['tmp_name'], $encfile, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret'], array(
+        'Cache-Control'     => 'max-age=31556926'
+    ));
     $enclosures[] = array(
         'url' => get_s3_url($uid, '/enc/', $encfile),
         'length' => $files['size'],

@@ -4085,7 +4085,10 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
 
         //Put the json river file
         $filename = $default_river_json_file_name;
-        $s3res = putInS3($djsonriver, $filename, $s3info['riverbucket'] . $subpath, $s3info['key'], $s3info['secret'], "application/javascript");
+        $s3res = putInS3(gzencode($djsonriver), $filename, $s3info['riverbucket'] . $subpath, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'application/javascript',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename].");
             //loggit(3, "Could not create S3 file: [$filename].");
@@ -4128,7 +4131,10 @@ function build_server_river_json($max = NULL, $force = FALSE, $mobile = FALSE)
 
             //Put the html template
             $filename = $s3info['riverfile'];
-            $s3res = putInS3($rftemplate, $filename, $s3info['riverbucket'] . $subpath, $s3info['key'], $s3info['secret'], "text/html");
+            $s3res = putInS3(gzencode($rftemplate), $filename, $s3info['riverbucket'] . $subpath, $s3info['key'], $s3info['secret'], array(
+                'Content-Type'      => 'text/html',
+                'Content-Encoding'  => 'gzip'
+            ));
             if (!$s3res) {
                 loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
                 //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -6708,7 +6714,10 @@ function build_opml_nfitem_feed($uid = NULL, $max = NULL, $archive = FALSE, $fee
         }
 
         //Put the file
-        $s3res = putInS3($opml, $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], "text/xml");
+        $s3res = putInS3(gzencode($opml), $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'text/xml',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");

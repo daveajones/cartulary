@@ -49,7 +49,9 @@ if (!empty($_FILES)) {
     if ($s3info != FALSE) {
         loggit(3, "Uploading enclosure to S3: " . print_r($targetFile, TRUE));
 
-        putFileInS3($targetFile, $targetS3File, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret']);
+        putFileInS3($targetFile, $targetS3File, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret'], array(
+            'Cache-Control'     => 'max-age=31556926'
+        ));
         $enclosure = array(
             'url' => get_s3_url($uid, '/enc/', $targetS3File),
             'length' => filesize($targetFile),
@@ -65,7 +67,9 @@ if (!empty($_FILES)) {
                     $newS3File = $targetS3File . "_" . $size['size'] . "." . $size['type'];
                     $newTargetFile = $targetFile . "_" . $width;
                     image_resize($targetFile, $newTargetFile, $size['type'], $width, NULL, NULL);
-                    putFileInS3($newTargetFile, $newS3File, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret']);
+                    putFileInS3($newTargetFile, $newS3File, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret'], array(
+                        'Cache-Control'     => 'max-age=31556926'
+                    ));
                     loggit(3, "Uploading: [$newTargetFile] to S3 as: [$newS3File].");
                 }
             }

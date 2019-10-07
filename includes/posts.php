@@ -796,7 +796,10 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
         }
 
         //Put the file
-        $s3res = putInS3(gzencode($rss), $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], array("Content-Type" => "application/rss+xml", "Content-Encoding" => "gzip"));
+        $s3res = putInS3(gzencode($rss), $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'application/rss+xml',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -1011,7 +1014,10 @@ function build_blog_opml_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts
         }
 
         //Put the file
-        $s3res = putInS3($opml, $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], "text/xml");
+        $s3res = putInS3(gzencode($opml), $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'text/xml',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -1428,7 +1434,10 @@ function build_blog_html_archive($uid = NULL, $max = NULL, $archive = FALSE, $po
         }
 
         //Put the file
-        $s3res = putInS3($html, $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], "text/html");
+        $s3res = putInS3(gzencode($html), $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'text/html',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
         } else {
@@ -1534,7 +1543,10 @@ function build_blog_script_widget($uid = NULL, $max = NULL, $archive = FALSE, $p
         }
 
         //Put the file
-        $s3res = putInS3($html, $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], "application/javascript");
+        $s3res = putInS3(gzencode($html), $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'application/javascript',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");

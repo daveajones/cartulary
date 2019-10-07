@@ -1825,7 +1825,10 @@ function build_social_outline($uid = NULL, $archive = FALSE, $nos3 = FALSE)
         }
 
         //Put the file
-        $s3res = putInS3($opml, $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], "text/xml");
+        $s3res = putInS3(gzencode($opml), $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'text/xml',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -1916,7 +1919,10 @@ function build_reading_list($title = NULL, $uid = NULL, $oid = NULL, $nos3 = FAL
         }
 
         //Put the file
-        $s3res = putInS3($opml, $filename, $s3info['bucket'] . $path, $s3info['key'], $s3info['secret'], "text/xml");
+        $s3res = putInS3(gzencode($opml), $filename, $s3info['bucket'] . $path, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'text/xml',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");
@@ -4135,7 +4141,10 @@ function build_opml_editor_feed($uid = NULL, $max = NULL, $archive = FALSE, $fil
         }
 
         //Put the file
-        $s3res = putInS3($opml, $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], "text/xml");
+        $s3res = putInS3(gzencode($opml), $filename, $s3info['bucket'] . $arcpath, $s3info['key'], $s3info['secret'], array(
+            'Content-Type'      => 'text/xml',
+            'Content-Encoding'  => 'gzip'
+        ));
         if (!$s3res) {
             loggit(2, "Could not create S3 file: [$filename] for user: [$username].");
             //loggit(3, "Could not create S3 file: [$filename] for user: [$username].");

@@ -12,7 +12,7 @@ $afctoken = "";
 if (isset($_REQUEST['t']) && !empty($_REQUEST['t'])) {
     $afctoken = $_REQUEST['t'];
 }
-if ($afctoken != $sysprefs['admin_feed_check_token']) {
+if (($afctoken != $sysprefs['admin_feed_check_token']) && ($afctoken != $cg_admin_feed_check_token)) {
     loggit(2, "Feed check token in REQUEST: [$afctoken] did not match system: [" . $sysprefs['admin_feed_check_token'] . "]");
     exit(1);
 }

@@ -14,6 +14,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         $silent = TRUE;
     }
 
+
     $cfname = "$confroot/conf/cartulary.conf";
     $cftemp = "$confroot/$templates/cartulary.conf";
 
@@ -49,6 +50,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     $l_cg_paypal_enabled = FALSE;
     $l_cg_paypal_button_id = "";
     $l_cg_search_v2_enable = FALSE;
+    $l_cg_admin_feed_check_token = random_gen(17);
 
 
     //If there is already a config file, let's hang on to it
@@ -114,6 +116,9 @@ if (($pid = cronHelper::lock()) !== FALSE) {
             }
             if (isset($cg_search_v2_enable)) {
                 $l_cg_search_v2_enable = $cg_search_v2_enable;
+            }
+            if (isset($l_cg_admin_feed_check_token)) {
+                $l_cg_admin_feed_check_token = $cg_admin_feed_check_token;
             }
         }
 
@@ -341,6 +346,17 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     if ($l_cg_search_v2_enable == TRUE) {
         $template = str_replace('cg_search_v2_enable=false', 'cg_search_v2_enable=true', $template);
     }
+
+    //Admin feed check token
+    $response = "";
+    if ($silent == FALSE) {
+        echo "Make a secure token for the admin log rss feed? [$l_cg_admin_feed_check_token]: ";
+        $response = get_user_response();
+    }
+    if (empty($response)) {
+        $response = $l_cg_admin_feed_check_token;
+    }
+    $template = str_replace('[ADMINFEEDCHECKTOKEN]', $response, $template);
 
     //Eliminate the newinstall flag if it's set
     if (!isset($cartularynewinstall)) {

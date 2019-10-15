@@ -5069,3 +5069,63 @@ function convert_opml_to_rss($content = NULL, $uid = NULL, $max = NULL)
     loggit(3, "DEBUG! RSS XML generated successfully.");
     return ($xxp);
 }
+
+
+//Convert opml to source namespace
+function convert_opml_to_source_namespace($content = NULL, $title = NULL, $pretty = TRUE, $prepend = '') {
+    
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Check params
+    if (empty($content)) {
+        loggit(2, "The feed content is blank or corrupt: [$content]");
+        return (FALSE);
+    }
+
+
+    $start = stripos($content, '<outline');
+    if($start !== FALSE) {
+        $content = substr($content, $start)."\n";
+    } else {
+        return(-1);
+    }
+
+    $end = stripos($content, '</body');
+    if($start !== FALSE && $end !== FALSE) {
+        $content = trim(substr($content, 0, $end))."\n";
+    } else {
+        return(-2);
+    }
+
+    $content = str_replace("<outline ", "<source:outline ", $content);
+    $content = str_replace("</outline>", "</source:outline>", $content);
+    $content = remove_non_tag_space($content);
+
+    //If pretty-print
+    $newcontent = "";
+    if($pretty) {
+        $content = str_replace("<source:outline", "\n<source:outline", $content);
+        $content = str_replace("</source:outline>", "\n</source:outline>", $content);
+
+        $space = "    ";
+        $indent = 0;
+        foreach( explode("\n", $content) as $line ) {
+
+            if($indent > 0 && stripos($line, "</source:outline") !== FALSE) {
+                $indent--;
+            }
+
+            $newcontent .= $prepend.str_repeat($space, $indent).$line."\n";
+
+            if(stripos($line, "<source:outline") !== FALSE && stripos($line, "/>") === FALSE) {
+                $indent++;
+            }
+        }
+    } else {
+        $newcontent = $prepend.$content;
+    }
+
+    loggit(1, "Converted opml content to source namespace.");
+    return($newcontent);
+}

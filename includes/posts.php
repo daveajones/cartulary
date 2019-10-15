@@ -765,8 +765,15 @@ function build_blog_rss_feed($uid = NULL, $max = NULL, $archive = FALSE, $posts 
             $rss .= '        <source url="' . clean_url_for_xml(trim($post['sourceurl'])) . '">' . htmlspecialchars(trim($post['sourcetitle'])) . '</source>' . "\n";
         }
         if (!empty($post['opml'])) {
+            //For sopml namespace
             $rss .= '        <sopml:opml><![CDATA[' . remove_non_tag_space($post['opml']) . ']]></sopml:opml>';
+            //For facebook IA
             $rss .= "\n".'        <content:encoded><![CDATA['."\n".convert_opml_to_ia($post['opml'], $rssurl).']]></content:encoded>'."\n";
+            //For source namespace
+            $snsopml = convert_opml_to_source_namespace($post['opml'], NULL, TRUE, '        ');
+            if($snsopml !== FALSE) {
+                $rss .= $snsopml."\n";
+            }
         }
         $rss .= $rss_enclosures;
         $rss .= "        <author>" . get_email_from_uid($uid) . " ($username)</author>\n";

@@ -2469,6 +2469,8 @@ function putInS3($content, $filename, $bucket, $key, $secret, $headers = NULL, $
             $s3object['ContentType'] = $headers;
         }
     }
+    $s3object['ETag'] = '"'.time()."-".random_gen(17).'"';
+
 
     loggit(1, "putInS3(): Putting file in S3: [$filename], going to attempt bucket: [$bucket] and subpath: [$subpath].");
 
@@ -2608,6 +2610,7 @@ function putFileInS3($file, $filename, $bucket, $key, $secret, $headers = NULL, 
             $s3object['ContentType'] = $headers;
         }
     }
+    $s3object['ETag'] = '"'.time()."-".random_gen(17).'"';
 
     //Make the call to S3
     if ($private) {

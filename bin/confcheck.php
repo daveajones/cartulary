@@ -51,6 +51,7 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     $l_cg_paypal_button_id = "";
     $l_cg_search_v2_enable = FALSE;
     $l_cg_admin_feed_check_token = random_gen(17);
+    $l_cg_backup_temp_folder = "";
 
 
     //If there is already a config file, let's hang on to it
@@ -117,8 +118,11 @@ if (($pid = cronHelper::lock()) !== FALSE) {
             if (isset($cg_search_v2_enable)) {
                 $l_cg_search_v2_enable = $cg_search_v2_enable;
             }
-            if (isset($l_cg_admin_feed_check_token)) {
+            if (isset($cg_admin_feed_check_token)) {
                 $l_cg_admin_feed_check_token = $cg_admin_feed_check_token;
+            }
+            if (isset($cg_backup_temp_folder)) {
+                $l_cg_backup_temp_folder = $cg_backup_temp_folder;
             }
         }
 
@@ -357,6 +361,9 @@ if (($pid = cronHelper::lock()) !== FALSE) {
         $response = $l_cg_admin_feed_check_token;
     }
     $template = str_replace('[ADMINFEEDCHECKTOKEN]', $response, $template);
+
+    //Preserve backup temp folder
+    $template = str_replace('[BACKUPTEMPFOLDER]', $l_cg_backup_temp_folder, $template);
 
     //Eliminate the newinstall flag if it's set
     if (!isset($cartularynewinstall)) {

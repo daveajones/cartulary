@@ -32,6 +32,11 @@ if (($pid = cronHelper::lock()) !== FALSE) {
     $filename = $dbname . "_backup." . date('Y-m-d.His') . ".sql.gz";
     $dumpfile = sys_get_temp_dir() . "/" . $filename;
 
+    //Was a backup folder specified in the conf file?
+    if(!empty($cg_backup_temp_folder)) {
+        $dumpfile = rtrim($cg_backup_temp_folder, '/ ') . "/" . $filename;
+    }
+
     //Run mysqldump command
     if ($cg_backup_encrypt == 1) {
         $cmdtorun = "mysqldump --single-transaction --quick -h$dbhost -u$dbuser -p$dbpass $dbname --ignore-table=$dbname.$table_nfitem --ignore-table=$dbname.$table_nfitem_map_catalog --ignore-table=$dbname.$table_nfenclosures --ignore-table=$dbname.$table_nfenclosures --ignore-table=$dbname.$table_nfitem_map --ignore-table=$dbname.$table_nfitemprop | cstream -t 1000000 | gzip -c | openssl enc -aes-256-cbc -salt -pass pass:$cg_backup_encrypt_password -out $dumpfile";

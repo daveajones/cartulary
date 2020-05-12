@@ -2211,11 +2211,18 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
                   mastodon_client_secret=?,
                   mastodon_access_token=?,
                   carttoken=?,
-	              ipinfotracker=?
+	              ipinfotracker=?,
+	              mastodon_filter_string=?,
+	              s3bucket_assets=?,
+                  s3key_assets=?,
+                  s3secret_assets=?,
+                  s3cname_assets=?,
+	              s3endpoint_assets=?,
+	              s3region_assets=?
            WHERE uid=?";
 
     $sql = $dbh->prepare($stmt) or loggit(2, "MySql error: " . $dbh->error);
-    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdsddssssssds",
+    $sql->bind_param("dddddssdssssssssssdsssdddssssdsdddddsdddddsddssdddsssdssssdsssdsddssssssdssssssss",
         $prefs['publicdefault'],
         $prefs['publicrss'],
         $prefs['publicopml'],
@@ -2289,6 +2296,13 @@ function set_user_prefs($uid = NULL, $prefs = NULL)
         $prefs['mastodon_access_token'],
         $prefs['carttoken'],
         $prefs['ipinfotracker'],
+        $prefs['mastodon_filter_string'],
+        $prefs['s3bucket_assets'],
+        $prefs['s3key_assets'],
+        $prefs['s3secret_assets'],
+        $prefs['s3cname_assets'],
+        $prefs['s3endpoint_assets'],
+        $prefs['s3region_assets'],
         $uid
     ) or loggit(2, "MySql error: " . $dbh->error);
     $sql->execute() or loggit(2, "MySql error: " . $dbh->error);
@@ -2446,6 +2460,31 @@ function s3_is_enabled($uid = NULL)
 
     //Check credentials
     if (!empty($prefs['s3bucket']) && !empty($prefs['s3key']) && !empty($prefs['s3secret'])) {
+        return (TRUE);
+    }
+
+    //At least one pref was bad
+    return (FALSE);
+}
+
+
+//Return true or false if the user has valid S3 credentials for assets upload
+function s3_assets_is_enabled($uid = NULL)
+{
+    //Check parameters
+    if (empty($uid)) {
+        loggit(2, "User id given is blank or corrupt: [$uid]");
+        return (FALSE);
+    }
+
+    //Includes
+    include get_cfg_var("cartulary_conf") . '/includes/env.php';
+
+    //Get user prefs
+    $prefs = get_user_prefs($uid);
+
+    //Check credentials
+    if (!empty($prefs['s3bucket_assets']) && !empty($prefs['s3key_assets']) && !empty($prefs['s3secret_assets'])) {
         return (TRUE);
     }
 
@@ -2702,6 +2741,12 @@ function get_s3_info($uid = NULL)
         $s3info['secret'] = $prefs['s3secret'];
         $s3info['bucket'] = $prefs['s3bucket'];
         $s3info['cname'] = $prefs['s3cname'];
+        $s3info['key_assets'] = $prefs['s3key_assets'];
+        $s3info['secret_assets'] = $prefs['s3secret_assets'];
+        $s3info['bucket_assets'] = $prefs['s3bucket_assets'];
+        $s3info['cname_assets'] = $prefs['s3cname_assets'];
+        $s3info['endpoint_assets'] = $prefs['s3endpoint_assets'];
+        $s3info['region_assets'] = $prefs['s3region_assets'];
         loggit(1, "User: [$uid] has s3 info.  Returning it.");
         return ($s3info);
     }

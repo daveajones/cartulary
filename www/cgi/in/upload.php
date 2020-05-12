@@ -49,11 +49,19 @@ if (!empty($_FILES)) {
     if ($s3info != FALSE) {
         loggit(3, "Uploading enclosure to S3: " . print_r($targetFile, TRUE));
 
-        putFileInS3($targetFile, $targetS3File, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret'], array(
-            'Cache-Control'     => 'max-age=31556926'
-        ));
+        if(s3_assets_is_enabled($g_uid) && (url_is_audio($targetFile) || url_is_video($targetFile))) {
+            putFileInS3($targetFile, $targetS3File, $s3info['bucket_assets'] . "/enc", $s3info['key_assets'], $s3info['secret_assets'], array(
+                'Cache-Control'     => 'max-age=31556926'
+            ), FALSE, $s3info['endpoint_assets'], $s3info['region_assets']);
+            $s3fileurl = get_s3_asset_url($uid, '/enc/', $targetS3File);
+        } else {
+            putFileInS3($targetFile, $targetS3File, $s3info['bucket'] . "/enc", $s3info['key'], $s3info['secret'], array(
+                'Cache-Control'     => 'max-age=31556926'
+            ));
+            $s3fileurl = get_s3_url($uid, '/enc/', $targetS3File);
+        }
         $enclosure = array(
-            'url' => get_s3_url($uid, '/enc/', $targetS3File),
+            'url' => $s3fileurl,
             'length' => filesize($targetFile),
             'type' => mime_content_type($targetFile)
         );

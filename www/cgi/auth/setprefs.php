@@ -81,6 +81,19 @@ if ( isset($_POST['smtp_port']) ) { $smtp_port = $_POST['smtp_port']; } else { $
 if ( isset($_POST['darkmode']) ) { $darkmode = 1; } else { $darkmode = 0; };
 if ( isset($_POST['mastodon_url']) ) { $mastodon_url = $_POST['mastodon_url']; } else { $mastodon_url = ""; };
 if ( isset($_POST['ipinfotracker']) ) { $ipinfotracker = 1; } else { $ipinfotracker = 0; };
+if ( isset($_POST['mastodon_filter_string']) ) { $mastodon_filter_string = $_POST['mastodon_filter_string']; } else { $mastodon_filter_string = ""; };
+if ( isset($_POST['s3bucket_assets']) ) { $s3bucket_assets = $_POST['s3bucket_assets']; } else { $s3bucket_assets = ""; };
+if ( isset($_POST['s3key_assets']) ) { $s3key_assets = $_POST['s3key_assets']; } else { $s3key_assets = ""; };
+if ( isset($_POST['s3secret_assets']) ) { $s3secret_assets = $_POST['s3secret_assets']; } else { $s3secret_assets = ""; };
+if ( isset($_POST['s3cname_assets']) ) { $s3cname_assets = $_POST['s3cname_assets']; } else { $s3cname_assets = ""; };
+if ( isset($_POST['s3endpoint_assets']) ) { $s3endpoint_assets = $_POST['s3endpoint_assets']; } else { $s3endpoint_assets = ""; };
+if ( isset($_POST['s3region_assets']) ) { $s3region_assets = $_POST['s3region_assets']; } else { $s3region_assets = ""; };
+
+
+//Debug
+//loggit(3, print_r($_REQUEST, TRUE));
+//loggit(3, print_r($s3region_assets, TRUE));
+
 $jsondata = array();
 $jsondata['goloc'] = "";
 $jsondata['prefname'] = "";
@@ -878,6 +891,83 @@ if( ($ipinfotracker < 0) || ($ipinfotracker > 1) ) {
     exit(1);
 }
 $prefs['ipinfotracker'] = $ipinfotracker;
+
+$jsondata['prefname'] = "mastodon_filter_string";
+if( strlen($mastodon_filter_string) > 700 ) {
+    //Log it
+    loggit(2,"The value for mastodon_filter_string was too long: [$mastodon_filter_string]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max mastodon_filter_string length is 700 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['mastodon_filter_string'] = $mastodon_filter_string;
+
+$jsondata['prefname'] = "s3bucket_assets";
+if( strlen($s3bucket_assets) > 254 ) {
+    //Log it
+    loggit(2,"The value for the s3bucket_assets pref was too long: [$s3bucket_assets]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max assets bucket name length is 254 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['s3bucket_assets'] = $s3bucket_assets;
+
+$jsondata['prefname'] = "s3key_assets";
+if( strlen($s3key_assets) > 254 ) {
+    //Log it
+    loggit(2,"The value for s3key_assets pref was too long: [$s3key_assets]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max s3 assets key length is 254 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['s3key_assets'] = $s3key_assets;
+
+$jsondata['prefname'] = "s3secret_assets";
+if( strlen($s3secret_assets) > 254 ) {
+    //Log it
+    loggit(2,"The value for s3secret_assets pref was too long: [$s3secret_assets]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max s3 assets secret length is 254 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['s3secret_assets'] = $s3secret_assets;
+
+$jsondata['prefname'] = "s3cname_assets";
+if( strlen($s3cname_assets) > 254 ) {
+    //Log it
+    loggit(2,"The value for s3cname_assets pref was too long: [$s3cname_assets]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max S3 assets bucket cname length is 254 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['s3cname_assets'] = $s3cname_assets;
+
+$jsondata['prefname'] = "s3endpoint_assets";
+if( strlen($s3endpoint_assets) > 254 ) {
+    //Log it
+    loggit(2,"The value for s3endpoint_assets pref was too long: [$s3endpoint_assets]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max S3 assets bucket endpoint length is 254 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['s3endpoint_assets'] = $s3endpoint_assets;
+
+$jsondata['prefname'] = "s3region_assets";
+if( strlen($s3region_assets) > 254 ) {
+    //Log it
+    loggit(2,"The value for s3region_assets pref was too long: [$s3region_assets]");
+    $jsondata['status'] = "false";
+    $jsondata['description'] = "Max S3 assets bucket region length is 254 characters.";
+    echo json_encode($jsondata);
+    exit(1);
+}
+$prefs['s3region_assets'] = $s3region_assets;
 //--------------------------------------------------------
 //--------------------------------------------------------
 

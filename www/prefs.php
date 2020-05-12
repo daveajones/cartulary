@@ -145,7 +145,7 @@ $tree_location = "Preferences";
                                 class="message"></span>
                         <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
                     </div>
-                    <h3>Amazon S3</h3>
+                    <h3>S3 Primary Storage <small>Holds HTML, OPML and other framework files.</small></h3>
                     <ul>
                         <div class="control-group">
                             <li>My Amazon S3 key is <input name="s3key" type="text" value="<? echo $prefs['s3key'] ?>"/>
@@ -171,6 +171,41 @@ $tree_location = "Preferences";
                                 <li>Microblog opml will be: <a id="aS3curlD" href="#"><span id="s3curlD"> </span></a>
                                 </li>
                             </ul>
+                        </div>
+                    </ul>
+                </div>
+
+                <div class="divPrefPane">
+                    <div class="divPrefSubmit pull-right divPrefAmazon"><img class="imgSpinner imgSpinnerSub"
+                                                                             src="/images/spinner.gif"/><span
+                                class="message"></span>
+                        <button id="btnPrefSubmit" class="btn btn-success" type="submit">Save</button>
+                    </div>
+                    <h3>S3 Asset Storage <small>Holds assets like images, audio, video, etc.</small></h3>
+                    <ul>
+                        <div class="control-group">
+                            <li>API Key: <input name="s3key_assets" type="text" value="<? echo $prefs['s3key_assets'] ?>"/>
+                            </li>
+                        </div>
+                        <div class="control-group">
+                            <li>API Secret: <input name="s3secret_assets" type="text"
+                                                              value="<? echo $prefs['s3secret_assets'] ?>"/></li>
+                        </div>
+                        <div class="control-group">
+                            <li>Bucket for storing assets: <input id="s3bucket_assets" name="s3bucket_assets"
+                                                                                              type="text"
+                                                                                              value="<? echo $prefs['s3bucket_assets'] ?>"/>
+                            </li>
+                            <li>Use a DNS cname of: <input id="s3cname_assets" name="s3cname_assets" type="text"
+                                                            value="<? echo $prefs['s3cname_assets'] ?>"/></li>
+                        </div>
+                        <div class="control-group">
+                            <li>API Endpoint: <input name="s3endpoint_assets" type="text" placeholder="http://s3.wasabisys.com or blank for Amazon" class="urlinput"
+                                                   value="<? echo $prefs['s3endpoint_assets'] ?>"/></li>
+                        </div>
+                        <div class="control-group">
+                            <li>API Region: <input name="s3region_assets" type="text" placeholder="us-east-1 or blank for Amazon"
+                                                     value="<? echo $prefs['s3region_assets'] ?>"/></li>
                         </div>
                     </ul>
                 </div>
@@ -512,6 +547,14 @@ $tree_location = "Preferences";
                                 </div>
                             </div>
                         <? } ?>
+                        <div class="control-group">
+                            <li>Filter String: <input name="mastodon_filter_string" type="text"
+                                                      placeholder="Only pull toots that have this string"
+                                                      value="<? echo $prefs['mastodon_filter_string'] ?>"/>
+                                <br>Timeline Feed: <a href="/cgi/out/mastodon.timeline.xml?u=<?echo $uid?>"><?echo $cg_system_url?>/cgi/out/mastodon.timeline.xml?u=<?echo $g_uid?></a>
+                            </li>
+
+                        </div>
                     </ul>
 
                     <h3 id="micropub">Micropub (alpha - not working yet)</h3>

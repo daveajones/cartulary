@@ -5,7 +5,7 @@
 
 
 //A list of database schema updates for each version
-$cg_database_version = 91;
+$cg_database_version = 94;
 $cg_database_updates = array();
 
 
@@ -1226,6 +1226,45 @@ CGDB0260;
 $cg_database_updates[90][] = <<<CGDB0261
  INSERT INTO `dbversion` ( `version` ) VALUES ( '91' )
 CGDB0261;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 91 to 92 -----------------------------------------------------------------------------------------------
+$cg_database_updates[91][] = <<<CGDB0262
+   ALTER TABLE `prefs` ADD `mastodon_filter_string` VARCHAR( 767 ) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT 'Only show toots that have this string.'
+CGDB0262;
+$cg_database_updates[91][] = <<<CGDB0263
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '92' )
+CGDB0263;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 92 to 93 -----------------------------------------------------------------------------------------------
+$cg_database_updates[92][] = <<<CGDB0264
+ ALTER TABLE `prefs` ADD `s3key_assets` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'api key for assets bucket'
+CGDB0264;
+$cg_database_updates[92][] = <<<CGDB0265
+ ALTER TABLE `prefs` ADD `s3secret_assets` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'api secret for assets bucket'
+CGDB0265;
+$cg_database_updates[92][] = <<<CGDB0266
+ ALTER TABLE `prefs` ADD `s3bucket_assets` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 's3 bucket for assets'
+CGDB0266;
+$cg_database_updates[92][] = <<<CGDB0267
+ ALTER TABLE `prefs` ADD `s3cname_assets` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 's3 cname for assets'
+CGDB0267;
+$cg_database_updates[92][] = <<<CGDB0268
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '93' )
+CGDB0268;
+//----------------------------------------------------------------------------------------------------------------
+
+//Version 93 to 94 -----------------------------------------------------------------------------------------------
+$cg_database_updates[93][] = <<<CGDB0269
+ ALTER TABLE `prefs` ADD `s3endpoint_assets` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'api endpoint url for assets bucket'
+CGDB0269;
+$cg_database_updates[93][] = <<<CGDB0270
+ ALTER TABLE `prefs` ADD `s3region_assets` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL COMMENT 'api region for assets bucket'
+CGDB0270;
+$cg_database_updates[93][] = <<<CGDB0271
+ INSERT INTO `dbversion` ( `version` ) VALUES ( '94' )
+CGDB0271;
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 

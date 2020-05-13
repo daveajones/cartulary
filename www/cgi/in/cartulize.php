@@ -70,6 +70,8 @@ $ispdf = FALSE;
 $linkonly = FALSE;
 $querystring = $_SERVER['QUERY_STRING'];
 $referer = "";
+$useragent = NULL;
+$response = NULL;
 
 // Get a start time
 $tstart = time();
@@ -115,6 +117,7 @@ if (preg_match('/feedproxy\.google\.com/i', $url)) {
 }
 if (preg_match('/wsj\.com\/articles/i', $url)) {
     $oldurl = $url;
+    $referer = "https://www.google.com";
     $url = str_replace("wsj.com/articles/", "wsj.com/amp/articles/", $url);
     loggit(3, "Converting wsj url: [$oldurl] to [$url].");
 }
@@ -122,20 +125,33 @@ if (preg_match('/ft\.com\//i', $url)) {
     $referer = "https://www.google.com";
     loggit(3, "Setting referer to: [$referer].");
 }
+if (preg_match('/bloomberg\.com\//i', $url)) {
+    $oldurl = $url;
+    $referer = "www.google.com";
+    $useragent = "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1";
+    $url = str_replace("bloomberg.com/", "bloomberg.com/amp/", $url);
+    $url = trim(rtrim(preg_replace("/\?(.*)/", "", $url), '?'));
+    loggit(3, "Converting bloomberg url: [$oldurl] to [$url].");
+    $response = fetchUrlExtra($url, 30, $referer, $useragent);
+}
+
 //##: ------- END PRE-PROCESS of URL -----------------------------------------------------------------------------
 $referer = "https://www.google.com";
-$response = fetchUrlExtra($url, 30, $referer);
+if(empty($response)) {
+    $response = fetchUrlExtra($url, 30, $referer, $useragent);
+}
 //loggit(3, "DEBUG: ".print_r($response, TRUE));
-$mret = preg_match('|http-equiv.*refresh.*content="\s*\d+\s*;\s*url=\'?(.*?)\'?\s*"|i', $response['body'], $mrmatches);
+$mret = preg_match('|http-equiv.*refresh.*content="\s*\d+\s*;\s*url=\'?(http.*?)\'?\s*"|i', $response['body'], $mrmatches);
 if (($mret > 0) && !empty($mrmatches[1])) {
     //loggit(3, "Found a meta refresh pointing to: [" . $mrmatches[1] . "].");
     $url = get_final_url($mrmatches[1]);
     $response = fetchUrlExtra($url);
 }
 $html = $response['body'];
+//loggit(3, print_r($response, TRUE));
 
 //If html body content was passed in just use it
-if (isset($_REQUEST['content']) && !empty($_REQUEST['content'])) {
+if (isset($_REQUEST['content']) && !empty($_REQUEST['content']) && stripos($url, "apple.news") === FALSE) {
     $html = $_REQUEST['content'];
 }
 
@@ -178,8 +194,36 @@ if (preg_match('/^https?\:\/\/(www\.)?reddit\.com/i', $url)) {
     } else {
         loggit(2, "Couldn't extract Memeorandum link.");
     }
+
+//Apple news
+} else if (preg_match('/apple\.news/i', $url)) {
+    loggit(3, "Extracting apple.news link");
+
+    if (preg_match('/redirectToUrlAfterTimeout\(\"(http.*)\"/', $html, $matches)) {
+        $url = get_final_url($matches[1]);
+        loggit(3, "Apple.news link-through url: [" . $url . "]");
+        $response = fetchUrlExtra($url);
+        $html = $response['body'];
+    } else {
+        loggit(2, "Couldn't extract Apple.news link.");
+    }
 }
 
+//Twitter thread
+if (preg_match('/twitter.com.*\/status\//i', $url)) {
+    loggit(3, "Converting twitter thread to html.");
+
+    $html = twitter_get_thread($url);
+
+    $response['body'] = $html;
+    $response['effective_url'] = $url;
+    $response['status_code'] = 200;
+
+    if (!$html) {
+        loggit(2, "Couldn't extract twitter thread.");
+        $response['status_code'] = 500;
+    }
+} else
 //Is this a PDF?
 if (substr($response['body'], 0, 4) == "%PDF") {
     $ispdf = TRUE;
@@ -436,7 +480,6 @@ if ($linkonly == FALSE) {
 
         $analysis = "";
         $slimcontent = $content;
-
 
         //Is this a PDF?
     } else if ($ispdf) {

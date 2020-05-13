@@ -53,7 +53,13 @@ $tree_location = "Show Article";
         <div id="content"><? echo $article['content']; ?></div>
         <div class="footer">
             <div class="divToolBox">
-                <a class="print" title="Printer Friendly" href="<? echo $showarticlepage . '-print?aid=' . $aid ?>"><img
+                <?
+                $pfarticle_url = $showarticlepage . '-print?aid=' . $aid;
+                if(!empty($article['staticurl'])) {
+                    $pfarticle_url = $article['staticurl'];
+                }
+                ?>
+                <a class="print" title="Printer Friendly" href="<?echo $pfarticle_url?>"><img
                             class="icon-print" src="/images/blank.gif" alt=""/> </a>
 
                 <? $rturl = $article['url']; ?>

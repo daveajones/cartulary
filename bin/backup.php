@@ -1,6 +1,9 @@
 <? include get_cfg_var("cartulary_conf") . '/includes/env.php'; ?>
 <? include "$confroot/$templates/php_bin_init.php" ?>
 <?
+
+//TODO: add cart directory to backup as well so we can quickly restore both db and app from backup
+
 //Let's not run twice
 if (($pid = cronHelper::lock()) !== FALSE) {
 
@@ -39,9 +42,24 @@ if (($pid = cronHelper::lock()) !== FALSE) {
 
     //Run mysqldump command
     if ($cg_backup_encrypt == 1) {
-        $cmdtorun = "mysqldump --single-transaction --quick -h$dbhost -u$dbuser -p$dbpass $dbname --ignore-table=$dbname.$table_nfitem --ignore-table=$dbname.$table_nfitem_map_catalog --ignore-table=$dbname.$table_nfenclosures --ignore-table=$dbname.$table_nfenclosures --ignore-table=$dbname.$table_nfitem_map --ignore-table=$dbname.$table_nfitemprop | cstream -t 1000000 | gzip -c | openssl enc -aes-256-cbc -salt -pass pass:$cg_backup_encrypt_password -out $dumpfile";
+        $cmdtorun = "mysqldump --single-transaction --quick -h$dbhost -u$dbuser -p$dbpass $dbname 
+        --ignore-table=$dbname.$table_nfitem 
+        --ignore-table=$dbname.$table_nfitem_map_catalog 
+        --ignore-table=$dbname.$table_nfenclosures 
+        --ignore-table=$dbname.$table_nfitem_map 
+        --ignore-table=$dbname.$table_nfitemprop 
+        | cstream -t 1000000 
+        | gzip -c 
+        | openssl enc -aes-256-cbc -salt -pass pass:$cg_backup_encrypt_password -out $dumpfile";
     } else {
-        $cmdtorun = "mysqldump --single-transaction --quick -h$dbhost -u$dbuser -p$dbpass $dbname --ignore-table=$dbname.$table_nfitem --ignore-table=$dbname.$table_nfitem_map_catalog --ignore-table=$dbname.$table_nfenclosures --ignore-table=$dbname.$table_nfenclosures --ignore-table=$dbname.$table_nfitem_map --ignore-table=$dbname.$table_nfitemprop | cstream -t 1000000 | gzip -c > $dumpfile";
+        $cmdtorun = "mysqldump --single-transaction --quick -h$dbhost -u$dbuser -p$dbpass $dbname 
+        --ignore-table=$dbname.$table_nfitem 
+        --ignore-table=$dbname.$table_nfitem_map_catalog 
+        --ignore-table=$dbname.$table_nfenclosures 
+        --ignore-table=$dbname.$table_nfitem_map 
+        --ignore-table=$dbname.$table_nfitemprop 
+        | cstream -t 1000000 
+        | gzip -c > $dumpfile";
     }
     loggit(3, "BACKUP: Running command: [$cmdtorun].");
     $output = `$cmdtorun`;

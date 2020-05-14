@@ -1,0 +1,25 @@
+#Release Notes - Freedom Controller v0.7.9
+
+
+The primary focus of this release is alternative s3 support for multimedia assets and mastodon timeline feed
+
+
+- New feature:  Support for Alternative S3 storage for multimedia files
+    - Think "Wasabi" with this.  You can specify a wasabi key/secret/bucket/endpoint/region in the preferences page
+    - If you have all of this filled in, audio and video files you upload will go to this bucket instead of Amazon
+    - Wasabi has free (as in $$) egress, so putting the big files there will reduce your AWS bill
+    - Remember to back it up though. :-)
+    - In the next release we'll also support alternative S3 providers for primary storage
+    - This is code that hasn't been touched in years, so we must tread carefully
+
+- New feature:  Mastodon timeline support with filtering
+    - Again, on the prefs page in the Mastodon section
+    - You can subscribe to your timeline as an RSS feed
+    - Apply a text filter to it, like "#coronavirus" and only items with that text string will show up in the feed
+    - You can use this for taming the firehose of your mastodon timeline into something that only applies to your FC interests
+
+- Improvements:  Cart'ing fixes
+    - Better cartulizing of twitter threads.  Still scraping since their API doesn't allow getting a whole thread.
+    - Better handling of B'Berg articles.
+    - Better handline of Apple News articles.
+    - Bugfixes and tweaks

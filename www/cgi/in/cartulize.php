@@ -213,6 +213,8 @@ if (preg_match('/^https?\:\/\/(www\.)?reddit\.com/i', $url)) {
 if (preg_match('/twitter.com.*\/status\//i', $url)) {
     loggit(3, "Converting twitter thread to html.");
 
+    $url = trim(rtrim(preg_replace("/\?(.*)/", "", $url), '?'));
+
     $html = twitter_get_thread($url);
 
     $response['body'] = $html;

@@ -1,5 +1,5 @@
 <!-- Global style sheets -->
-<?$stylever = $cg_sys_version."-0"?>
+<?$stylever = $cg_sys_version."-5"?>
 <link rel="stylesheet" href="/style/bootstrap-2.3.1-noicons.css?v=<?echo $stylever?>"/>
 <link rel="stylesheet" href="/style/jquery-ui.css?v=<?echo $stylever?>"/>
 <link rel="stylesheet" href="/style/style.css?v=<?echo $stylever?>"/>

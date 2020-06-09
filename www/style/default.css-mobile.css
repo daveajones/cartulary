@@ -1011,6 +1011,12 @@ a.ipinfotracker {
         margin: 10px auto 10px;
     }
 
+    .pageContentWrapper.Articles #divPageArticle #article .footer .divToolBox a {
+        display: inline-block;
+        margin-left:28px;
+
+    }
+
     .pageContentWrapper.Articles #divPageArticle #article .footer .divToolBox .opml {
         display: none;
     }

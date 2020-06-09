@@ -79,9 +79,29 @@ $tree_location = "Show Article";
                            echo '&shorturl=' . urlencode($article['shorturl']);
                        } ?>"><img class="icon-retweet-1" src="/images/blank.gif" alt=""/> </a>
                 <? } ?>
-                <a class="send" title="Email the article."
-                   href="mailto:?subject=Article:%20<? echo $article['title'] ?>&amp;body=<? echo $rturl ?>"><img
-                            class="icon-email-send" src="/images/blank.gif" alt=""/> </a>
+                <? if($g_platform == "mobile") {?>
+                    <a class="send" title="Email the article." href="#"><img class="icon-article-share" src="/images/blank.gif" alt=""/> </a>
+                    <script>
+                        $('a.send').on('click', function() {
+                            if (navigator.share) {
+                                navigator.share({
+                                    title: '<? echo $article['title'] ?>',
+                                    url: '<? echo $rturl ?>'
+                                }).then(() => {
+                                    console.log('Thanks for sharing!');
+                                })
+                                    .catch(console.error);
+                            } else {
+                                // fallback
+                            }
+                            return false;
+                        });
+                    </script>
+                <?} else {?>
+                    <a class="send" title="Email the article."
+                       href="mailto:?subject=Article:%20<? echo $article['title'] ?>&amp;body=<? echo $rturl ?>"><img
+                                class="icon-email-send" src="/images/blank.gif" alt=""/> </a>
+                <?}?>
                 <a class="link" title="Link to original source url." href="<? echo $article['url']; ?>"><img
                             class="icon-hyperlink" src="/images/blank.gif" alt=""/> </a>
                 <a class="edit" title="Open in the Editor" href="<? echo $editorpage . '?aid=' . $aid ?>"><img
